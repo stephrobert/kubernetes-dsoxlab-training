@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un Pod sans shell qu'il faut aller voir de l'intérieur.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup : l'apprenant
+# créait lui-même le Pod à déboguer. Ici le Pod est posé, comme à l'examen,
+# et seuls les gestes de débogage sont mesurés. Confronté à Kubernetes 1.37
+# le 2026-09-14 : conteneurs éphémères et `kubectl debug node/` inchangés.
+- name: Préparer le lab cka-kubectl-debug
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kubeadm à un nœud
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

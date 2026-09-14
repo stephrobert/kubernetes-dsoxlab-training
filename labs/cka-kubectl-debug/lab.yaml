@@ -1,0 +1,34 @@
+id: cka-kubectl-debug
+title: "Entrer dans un conteneur sans shell avec kubectl debug"
+level: troubleshooting
+description: |
+  Un Pod dont l'image ne contient aucun shell n'offre rien à kubectl exec.
+  Lui adjoindre un conteneur éphémère qui partage ses processus, atteindre le
+  système de fichiers du nœud par un Pod de débogage, et en laisser la preuve.
+skills:
+  - kubectl-debug
+  - ephemeral-container
+  - node-debug
+  - troubleshooting
+  - distroless
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# clusters and nodes » et « Manage and evaluate container output streams ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

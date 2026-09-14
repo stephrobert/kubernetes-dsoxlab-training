@@ -1,0 +1,32 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé, le namespace, les
+# Pods de débogage du nœud et le fichier témoin posé sur le nœud. Le cluster,
+# lui, reste en place.
+- name: Nettoyer le lab cka-kubectl-debug
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    # `kubectl debug node/` crée ses Pods dans le namespace courant de
+    # l'apprenant, qu'on ne connaît pas : on cherche dans tous.
+    - name: Supprimer les Pods de débogage du nœud, quel que soit leur namespace
+      ansible.builtin.shell: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get pods -A
+        -o jsonpath='{range .items[?(@.spec.hostPID==true)]}{.metadata.namespace} {.metadata.name}{"\n"}{end}'
+        | grep -v '^kube-system '
+        | while read -r ns nom; do
+            kubectl --kubeconfig /etc/kubernetes/admin.conf -n "$ns" delete pod "$nom" --ignore-not-found --wait=false;
+          done
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le fichier témoin du nœud
+      ansible.builtin.file:
+        path: /tmp/node-debug.txt
+        state: absent
