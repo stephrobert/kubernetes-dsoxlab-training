@@ -1,0 +1,10 @@
+# Progression et contexte : locaux à chaque machine, jamais versionnés.
+.dsoxlab.db
+.dsoxlab-context.json
+
+# Clé privée d'automatisation, posée par `dsoxlab instructor bootstrap`.
+ssh/id_ed25519
+
+# Répertoires de travail des labs `shell` : ce que l'apprenant y écrit lui
+# appartient, et le catalogue les recrée à chaque `run`.
+labs/**/challenge/work/

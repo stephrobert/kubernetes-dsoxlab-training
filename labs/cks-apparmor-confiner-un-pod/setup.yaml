@@ -1,0 +1,53 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit.
+- name: Préparer le lab cks-apparmor-confiner-un-pod
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kubeadm à un nœud
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Vérifier qu'AppArmor est bien actif sur le nœud
+      ansible.builtin.command: aa-status --enabled
+      register: aa
+      changed_when: false
+      failed_when: false
+
+    # C'est la raison d'être de ce lab : sur un nœud kind, cette vérification
+    # échoue et le kubelet refuse le Pod avec « Cannot enforce AppArmor:
+    # AppArmor is not enabled on the host ». Sur une VM, elle passe.
+    - name: Refuser de continuer si AppArmor est absent
+      ansible.builtin.fail:
+        msg: >-
+          AppArmor n'est pas actif sur ce nœud. Ce lab exige une vraie machine,
+          pas un nœud en conteneur.
+      when: aa.rc != 0
+
+    - name: Créer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf create namespace confinement
+      register: ns
+      changed_when: ns.rc == 0
+      failed_when: ns.rc != 0 and 'AlreadyExists' not in ns.stderr
+
+    - name: Déposer le profil AppArmor à charger par l'apprenant
+      ansible.builtin.copy:
+        dest: /etc/apparmor.d/k8s-refuser-ecriture
+        mode: "0644"
+        content: |
+          #include <tunables/global>
+
+          profile k8s-refuser-ecriture flags=(attach_disconnected) {
+            #include <abstractions/base>
+
+            file,
+            # Tout est permis, SAUF écrire sous /tmp : c'est ce refus qui
+            # rendra le confinement observable.
+            deny /tmp/** w,
+          }
+
+    - name: Retirer un profil déjà chargé, pour que le lab parte d'un état net
+      ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/k8s-refuser-ecriture
+      changed_when: false
+      failed_when: false

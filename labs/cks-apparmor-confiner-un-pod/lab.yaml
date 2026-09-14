@@ -1,0 +1,32 @@
+id: cks-apparmor-confiner-un-pod
+title: "Confiner un Pod avec un profil AppArmor"
+level: system-hardening
+description: |
+  Charger un profil AppArmor sur le nœud, l'appliquer à un conteneur par le
+  champ securityContext, et prouver que le confinement agit en constatant
+  l'échec d'une écriture que le profil interdit.
+skills:
+  - apparmor
+  - securitycontext
+  - node-hardening
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine System Hardening (10 %), citée mot pour
+# mot : « Appropriately use kernel hardening tools such as AppArmor, seccomp ».
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
