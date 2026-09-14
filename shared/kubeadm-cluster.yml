@@ -17,171 +17,180 @@
 # par mineure, il n'y a donc pas de dérive silencieuse d'une exécution à
 # l'autre.
 
-- name: Vérifier si le cluster répond déjà
-  ansible.builtin.command: kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
-  register: cluster_deja_la
-  changed_when: false
+# PIEGE CORRIGE LE 2026-09-14, ET IL MERITE D'ETRE RACONTE.
+# La premiere version gardait tout ce fichier derriere un unique
+# « le cluster repond-il deja ? ». Le premier passage a echoue APRES
+# `kubeadm init` mais AVANT le kubeconfig, le taint et le CNI. Au second
+# passage, la garde a vu un cluster qui repond et a tout saute : le noeud est
+# reste NotReady pour toujours, faute de CNI.
+#
+# Une garde grossiere transforme un echec partiel en echec permanent. Chaque
+# tache porte donc sa propre idempotence, et un cluster a moitie installe se
+# repare tout seul au passage suivant.
+- name: Désactiver le swap, refusé par le kubelet
+  ansible.builtin.command: swapoff -a
+  changed_when: true
+
+- name: Retirer le swap de fstab, pour qu'il ne revienne pas au redémarrage
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\sswap\s.*)$'
+    replace: '# \1'
+
+- name: Charger les modules noyau exigés par le réseau des conteneurs
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: Rendre le chargement persistant
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k8s.conf
+    content: "overlay\nbr_netfilter\n"
+    mode: "0644"
+
+- name: Laisser iptables voir le trafic ponté
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-kubernetes.conf
+    mode: "0644"
+    content: |
+      net.bridge.bridge-nf-call-iptables  = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward                 = 1
+
+- name: Appliquer les réglages noyau
+  ansible.builtin.command: sysctl --system
+  changed_when: true
+
+- name: Installer containerd et les dépendances du dépôt Kubernetes
+  ansible.builtin.apt:
+    name:
+      - containerd
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+    state: present
+    update_cache: true
+
+- name: Poser la configuration containerd par défaut
+  ansible.builtin.shell: |
+    set -o pipefail
+    mkdir -p /etc/containerd
+    containerd config default > /etc/containerd/config.toml
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+# Sans cela, le kubelet et containerd gèrent les cgroups différemment et
+# le nœud reste NotReady sans message explicite.
+# Pas de handler ici : ce fichier est INCLUS par les labs, et un handler
+# déclaré dans un fichier de tâches n'est pas résolu. Le redémarrage est
+# donc explicite, à la suite.
+- name: Aligner containerd sur le pilote de cgroups systemd
+  ansible.builtin.replace:
+    path: /etc/containerd/config.toml
+    regexp: 'SystemdCgroup = false'
+    replace: 'SystemdCgroup = true'
+
+- name: Redémarrer containerd pour prendre le pilote de cgroups
+  ansible.builtin.systemd_service:
+    name: containerd
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Récupérer la clé du dépôt Kubernetes
+  ansible.builtin.get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.37/deb/Release.key
+    dest: /tmp/k8s-release.key
+    mode: "0644"
+
+- name: Déchiffrer la clé vers le trousseau
+  ansible.builtin.shell: |
+    set -o pipefail
+    gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/k8s-release.key
+  args:
+    executable: /bin/bash
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Déclarer le dépôt Kubernetes 1.37
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+      https://pkgs.k8s.io/core:/stable:/v1.37/deb/ /
+    filename: kubernetes
+    state: present
+
+- name: Installer kubelet, kubeadm et kubectl
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    update_cache: true
+
+- name: Figer les trois paquets, pour qu'une mise à jour ne casse pas le lab
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Initialiser le plan de contrôle
+  ansible.builtin.command:
+    cmd: kubeadm init --pod-network-cidr=10.244.0.0/16
+    creates: /etc/kubernetes/admin.conf
+
+# `state: link` ne crée pas le répertoire parent : sans cette tâche, la
+# suivante échoue sur « No such file or directory ».
+- name: Créer le répertoire kube de root
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: "0700"
+
+- name: Poser le kubeconfig pour root
+  ansible.builtin.file:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    state: link
+    force: true
+
+- name: Créer le répertoire kube de l'utilisateur du lab
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user | default('ubuntu') }}/.kube"
+    state: directory
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0700"
+
+- name: Donner le kubeconfig à l'utilisateur du lab
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
+    remote_src: true
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0600"
+
+# Un cluster à un seul nœud n'ordonnance rien tant que le taint du plan de
+# contrôle est là. On le retire : ce catalogue apprend autre chose.
+- name: Retirer le taint du plan de contrôle
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes --all
+    node-role.kubernetes.io/control-plane- --overwrite
+  changed_when: true
   failed_when: false
 
-- name: Installer et initialiser le cluster
-  when: cluster_deja_la.rc != 0
-  block:
-    - name: Désactiver le swap, refusé par le kubelet
-      ansible.builtin.command: swapoff -a
-      changed_when: true
-
-    - name: Retirer le swap de fstab, pour qu'il ne revienne pas au redémarrage
-      ansible.builtin.replace:
-        path: /etc/fstab
-        regexp: '^([^#].*\sswap\s.*)$'
-        replace: '# \1'
-
-    - name: Charger les modules noyau exigés par le réseau des conteneurs
-      community.general.modprobe:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - overlay
-        - br_netfilter
-
-    - name: Rendre le chargement persistant
-      ansible.builtin.copy:
-        dest: /etc/modules-load.d/k8s.conf
-        content: "overlay\nbr_netfilter\n"
-        mode: "0644"
-
-    - name: Laisser iptables voir le trafic ponté
-      ansible.builtin.copy:
-        dest: /etc/sysctl.d/99-kubernetes.conf
-        mode: "0644"
-        content: |
-          net.bridge.bridge-nf-call-iptables  = 1
-          net.bridge.bridge-nf-call-ip6tables = 1
-          net.ipv4.ip_forward                 = 1
-
-    - name: Appliquer les réglages noyau
-      ansible.builtin.command: sysctl --system
-      changed_when: true
-
-    - name: Installer containerd et les dépendances du dépôt Kubernetes
-      ansible.builtin.apt:
-        name:
-          - containerd
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gpg
-        state: present
-        update_cache: true
-
-    - name: Poser la configuration containerd par défaut
-      ansible.builtin.shell: |
-        set -o pipefail
-        mkdir -p /etc/containerd
-        containerd config default > /etc/containerd/config.toml
-      args:
-        executable: /bin/bash
-      changed_when: true
-
-    # Sans cela, le kubelet et containerd gèrent les cgroups différemment et
-    # le nœud reste NotReady sans message explicite.
-    # Pas de handler ici : ce fichier est INCLUS par les labs, et un handler
-    # déclaré dans un fichier de tâches n'est pas résolu. Le redémarrage est
-    # donc explicite, à la suite.
-    - name: Aligner containerd sur le pilote de cgroups systemd
-      ansible.builtin.replace:
-        path: /etc/containerd/config.toml
-        regexp: 'SystemdCgroup = false'
-        replace: 'SystemdCgroup = true'
-
-    - name: Redémarrer containerd pour prendre le pilote de cgroups
-      ansible.builtin.systemd_service:
-        name: containerd
-        state: restarted
-        enabled: true
-        daemon_reload: true
-
-    - name: Récupérer la clé du dépôt Kubernetes
-      ansible.builtin.get_url:
-        url: https://pkgs.k8s.io/core:/stable:/v1.37/deb/Release.key
-        dest: /tmp/k8s-release.key
-        mode: "0644"
-
-    - name: Déchiffrer la clé vers le trousseau
-      ansible.builtin.shell: |
-        set -o pipefail
-        gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/k8s-release.key
-      args:
-        executable: /bin/bash
-        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-    - name: Déclarer le dépôt Kubernetes 1.37
-      ansible.builtin.apt_repository:
-        repo: >-
-          deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
-          https://pkgs.k8s.io/core:/stable:/v1.37/deb/ /
-        filename: kubernetes
-        state: present
-
-    - name: Installer kubelet, kubeadm et kubectl
-      ansible.builtin.apt:
-        name:
-          - kubelet
-          - kubeadm
-          - kubectl
-        state: present
-        update_cache: true
-
-    - name: Figer les trois paquets, pour qu'une mise à jour ne casse pas le lab
-      ansible.builtin.dpkg_selections:
-        name: "{{ item }}"
-        selection: hold
-      loop:
-        - kubelet
-        - kubeadm
-        - kubectl
-
-    - name: Initialiser le plan de contrôle
-      ansible.builtin.command:
-        cmd: kubeadm init --pod-network-cidr=10.244.0.0/16
-        creates: /etc/kubernetes/admin.conf
-
-    - name: Poser le kubeconfig pour root
-      ansible.builtin.file:
-        src: /etc/kubernetes/admin.conf
-        dest: /root/.kube/config
-        state: link
-        force: true
-
-    - name: Créer le répertoire kube de l'utilisateur du lab
-      ansible.builtin.file:
-        path: "/home/{{ ansible_user | default('ubuntu') }}/.kube"
-        state: directory
-        owner: "{{ ansible_user | default('ubuntu') }}"
-        mode: "0700"
-
-    - name: Donner le kubeconfig à l'utilisateur du lab
-      ansible.builtin.copy:
-        src: /etc/kubernetes/admin.conf
-        dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
-        remote_src: true
-        owner: "{{ ansible_user | default('ubuntu') }}"
-        mode: "0600"
-
-    # Un cluster à un seul nœud n'ordonnance rien tant que le taint du plan de
-    # contrôle est là. On le retire : ce catalogue apprend autre chose.
-    - name: Retirer le taint du plan de contrôle
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes --all
-        node-role.kubernetes.io/control-plane- --overwrite
-      changed_when: true
-      failed_when: false
-
-    - name: Installer le CNI
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
-        https://raw.githubusercontent.com/flannel-io/flannel/v0.27.4/Documentation/kube-flannel.yml
-      changed_when: true
+- name: Installer le CNI
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
+    https://raw.githubusercontent.com/flannel-io/flannel/v0.27.4/Documentation/kube-flannel.yml
+  changed_when: true
 
 - name: Attendre que le nœud soit Ready
   ansible.builtin.command: >-

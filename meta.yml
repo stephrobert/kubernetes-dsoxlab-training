@@ -46,7 +46,12 @@ infra:
   provider:
     - kvm
     - incus
-  network: lab-kubernetes
+  # « lab-kubernetes » est REFUSÉ : le pont dérivé, virbr-kubernetes, fait
+  # 16 caractères alors que le noyau en accepte 15. libvirt échoue alors en
+  # cours d'apply sur « Numerical result out of range », message qui ne nomme
+  # pas la cause. Le nom du pont vaut virbr- plus le nom du réseau privé de
+  # son préfixe lab- : il reste donc 9 caractères utiles.
+  network: lab-k8s
   cidr: 10.10.50.0/24
 
   # ATTENTION : l'IP et la MAC de chaque hôte dérivent de sa POSITION dans
