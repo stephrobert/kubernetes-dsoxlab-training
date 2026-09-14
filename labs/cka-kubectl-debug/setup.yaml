@@ -10,7 +10,7 @@
   hosts: lab_target
   become: true
   tasks:
-    - name: Installer le socle, un cluster kubeadm à un nœud
+    - name: Installer le socle, le cluster kubeadm du catalogue
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
 
     - name: Poser la situation du lab

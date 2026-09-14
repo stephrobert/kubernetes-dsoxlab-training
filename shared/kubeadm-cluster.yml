@@ -1,17 +1,20 @@
 ---
-# Socle commun à tous les labs de ce catalogue : un cluster kubeadm à un nœud,
-# prêt à recevoir des Pods.
+# Socle commun à tous les labs de ce catalogue : un cluster kubeadm, un control
+# plane et les workers que meta.yml déclare, prêt à recevoir des Pods.
 #
 # POURQUOI CE FICHIER EST INCLUS PAR CHAQUE LAB, ET NON JOUÉ UNE FOIS.
 # dsoxlab ne propose aucun point d'accroche à la fin du provisionnement : un
 # lab pose son état initial dans son propre `setup.yaml`, et rien d'autre ne
 # tourne entre le `terraform apply` et le lab. Le socle vit donc ici, et
-# chaque `setup.yaml` l'inclut.
+# chaque `setup.yaml` l'inclut, dans un play sur `lab_target`, le control
+# plane. Les workers sont préparés et joints depuis ce play, par délégation :
+# aucun lab n'a à connaître la topologie.
 #
 # Le coût est supportable parce que ces tâches sont IDEMPOTENTES : la première
 # exécution installe le cluster, les suivantes constatent qu'il est là et
-# rendent la main en quelques secondes. C'est aussi ce qui rend `dsoxlab reset`
-# utilisable, alors que le point de reprise est pris AVANT le setup.
+# rendent la main en quelques dizaines de secondes. C'est aussi ce qui rend
+# `dsoxlab reset` utilisable, alors que le point de reprise est pris AVANT le
+# setup.
 #
 # Version enseignée par la formation : 1.37. Le dépôt pkgs.k8s.io est versionné
 # par mineure, il n'y a donc pas de dérive silencieuse d'une exécution à
@@ -27,134 +30,12 @@
 # Une garde grossiere transforme un echec partiel en echec permanent. Chaque
 # tache porte donc sa propre idempotence, et un cluster a moitie installe se
 # repare tout seul au passage suivant.
-- name: Désactiver le swap, refusé par le kubelet
-  ansible.builtin.command: swapoff -a
-  changed_when: true
 
-- name: Retirer le swap de fstab, pour qu'il ne revienne pas au redémarrage
-  ansible.builtin.replace:
-    path: /etc/fstab
-    regexp: '^([^#].*\sswap\s.*)$'
-    replace: '# \1'
-
-- name: Charger les modules noyau exigés par le réseau des conteneurs
-  community.general.modprobe:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - overlay
-    - br_netfilter
-
-- name: Rendre le chargement persistant
-  ansible.builtin.copy:
-    dest: /etc/modules-load.d/k8s.conf
-    content: "overlay\nbr_netfilter\n"
-    mode: "0644"
-
-- name: Laisser iptables voir le trafic ponté
-  ansible.builtin.copy:
-    dest: /etc/sysctl.d/99-kubernetes.conf
-    mode: "0644"
-    content: |
-      net.bridge.bridge-nf-call-iptables  = 1
-      net.bridge.bridge-nf-call-ip6tables = 1
-      net.ipv4.ip_forward                 = 1
-
-- name: Appliquer les réglages noyau
-  ansible.builtin.command: sysctl --system
-  changed_when: true
-
-- name: Installer containerd et les dépendances du dépôt Kubernetes
-  ansible.builtin.apt:
-    name:
-      - containerd
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - gpg
-    state: present
-    update_cache: true
-
-- name: Poser la configuration containerd par défaut
-  ansible.builtin.shell: |
-    set -o pipefail
-    mkdir -p /etc/containerd
-    containerd config default > /etc/containerd/config.toml
-  args:
-    executable: /bin/bash
-  changed_when: true
-
-# Sans cela, le kubelet et containerd gèrent les cgroups différemment et
-# le nœud reste NotReady sans message explicite.
-# Pas de handler ici : ce fichier est INCLUS par les labs, et un handler
-# déclaré dans un fichier de tâches n'est pas résolu. Le redémarrage est
-# donc explicite, à la suite.
-- name: Aligner containerd sur le pilote de cgroups systemd
-  ansible.builtin.replace:
-    path: /etc/containerd/config.toml
-    regexp: 'SystemdCgroup = false'
-    replace: 'SystemdCgroup = true'
-
-- name: Redémarrer containerd pour prendre le pilote de cgroups
-  ansible.builtin.systemd_service:
-    name: containerd
-    state: restarted
-    enabled: true
-    daemon_reload: true
-
-- name: Récupérer la clé du dépôt Kubernetes
-  ansible.builtin.get_url:
-    url: https://pkgs.k8s.io/core:/stable:/v1.37/deb/Release.key
-    dest: /tmp/k8s-release.key
-    mode: "0644"
-
-- name: Déchiffrer la clé vers le trousseau
-  ansible.builtin.shell: |
-    set -o pipefail
-    gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/k8s-release.key
-  args:
-    executable: /bin/bash
-    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-- name: Déclarer le dépôt Kubernetes 1.37
-  ansible.builtin.apt_repository:
-    repo: >-
-      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
-      https://pkgs.k8s.io/core:/stable:/v1.37/deb/ /
-    filename: kubernetes
-    state: present
-
-# cri-tools apporte crictl, l'outil de l'examen pour voir les conteneurs quand
-# kubectl est aveugle. kubeadm ne le tire plus : mesuré le 2026-09-14, aucun
-# /usr/bin/crictl sur un nœud fraîchement installé par ce socle.
-- name: Installer kubelet, kubeadm, kubectl et crictl
-  ansible.builtin.apt:
-    name:
-      - kubelet
-      - kubeadm
-      - kubectl
-      - cri-tools
-    state: present
-    update_cache: true
-
-# Sans ce fichier, crictl avertit à chaque appel avant de tomber sur containerd
-# par défaut : un apprenant qui lit l'avertissement croit à une erreur.
-- name: Dire à crictl où est containerd
-  ansible.builtin.copy:
-    dest: /etc/crictl.yaml
-    mode: "0644"
-    content: |
-      runtime-endpoint: unix:///run/containerd/containerd.sock
-      image-endpoint: unix:///run/containerd/containerd.sock
-
-- name: Figer les trois paquets, pour qu'une mise à jour ne casse pas le lab
-  ansible.builtin.dpkg_selections:
-    name: "{{ item }}"
-    selection: hold
-  loop:
-    - kubelet
-    - kubeadm
-    - kubectl
+# ---------------------------------------------------------------------------
+# Le control plane
+# ---------------------------------------------------------------------------
+- name: Préparer le control plane comme un nœud Kubernetes
+  ansible.builtin.include_tasks: noeud-kubernetes.yml
 
 - name: Initialiser le plan de contrôle
   ansible.builtin.command:
@@ -191,8 +72,9 @@
     owner: "{{ ansible_user | default('ubuntu') }}"
     mode: "0600"
 
-# Un cluster à un seul nœud n'ordonnance rien tant que le taint du plan de
-# contrôle est là. On le retire : ce catalogue apprend autre chose.
+# Le taint du plan de contrôle est retiré, même avec un worker : un lab qui
+# n'a besoin que d'un nœud doit continuer à tourner si le worker manque, et
+# les labs qui enseignent les taints posent les leurs. Décision de l'issue #2.
 - name: Retirer le taint du plan de contrôle
   ansible.builtin.command: >-
     kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes --all
@@ -206,8 +88,105 @@
     https://raw.githubusercontent.com/flannel-io/flannel/v0.27.4/Documentation/kube-flannel.yml
   changed_when: true
 
-- name: Attendre que le nœud soit Ready
+- name: Attendre que le control plane soit Ready
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+    node/{{ inventory_hostname }} --timeout=300s
+  changed_when: false
+
+# ---------------------------------------------------------------------------
+# Les workers : ceux que meta.yml déclare avec `role: worker`. dsoxlab les met
+# dans le groupe `labenv` avec leur rôle en host_var ; on les prépare et on
+# les joint depuis ici, par délégation, sans que les labs aient à le savoir.
+# ---------------------------------------------------------------------------
+- name: Recenser les workers déclarés par meta.yml
+  ansible.builtin.set_fact:
+    workers: >-
+      {{ groups['labenv'] | default([])
+         | reject('equalto', inventory_hostname)
+         | select('in', hostvars | dict2items | selectattr('value.role', 'defined')
+                                  | selectattr('value.role', 'equalto', 'worker')
+                                  | map(attribute='key') | list)
+         | list }}
+
+- name: Préparer chaque worker comme un nœud Kubernetes
+  ansible.builtin.include_tasks:
+    file: noeud-kubernetes.yml
+    apply:
+      delegate_to: "{{ noeud }}"
+  loop: "{{ workers }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Lister les nœuds déjà joints
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+    -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+  register: noeuds_joints
+  changed_when: false
+
+- name: Retenir les workers qui manquent encore au cluster
+  ansible.builtin.set_fact:
+    workers_manquants: "{{ workers | reject('in', noeuds_joints.stdout_lines) | list }}"
+
+# Un token de jointure n'est fabriqué que s'il sert : il expire de lui-même.
+- name: Fabriquer une commande de jointure
+  ansible.builtin.command: kubeadm token create --print-join-command --ttl 30m
+  register: jointure
+  changed_when: true
+  when: workers_manquants | length > 0
+
+- name: Joindre chaque worker manquant au cluster
+  ansible.builtin.command:
+    cmd: "{{ jointure.stdout }}"
+    creates: /etc/kubernetes/kubelet.conf
+  delegate_to: "{{ noeud }}"
+  loop: "{{ workers_manquants }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Attendre que tous les nœuds soient Ready
   ansible.builtin.command: >-
     kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
     nodes --all --timeout=300s
   changed_when: false
+
+# ---------------------------------------------------------------------------
+# Comme à l'examen : depuis le control plane, `ssh <nœud>` ouvre une session
+# sur chaque worker, sans mot de passe. Les labs de diagnostic de nœud en
+# dépendent, et l'apprenant n'a pas à connaître la clé de dsoxlab. Mesuré le
+# 2026-09-14 : le nom k8s-w1.lab se résout depuis le control plane, mais
+# l'utilisateur du lab n'y avait aucune clé.
+# ---------------------------------------------------------------------------
+- name: Donner une clé SSH à l'utilisateur du lab sur le control plane
+  ansible.builtin.command:
+    cmd: ssh-keygen -q -t ed25519 -N "" -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519
+    creates: /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519
+  become: true
+  become_user: "{{ ansible_user | default('ubuntu') }}"
+
+- name: Lire cette clé publique
+  ansible.builtin.slurp:
+    src: /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519.pub
+  register: cle_lab
+
+- name: Autoriser cette clé sur chaque worker
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user | default('ubuntu') }}/.ssh/authorized_keys
+    line: "{{ cle_lab.content | b64decode | trim }}"
+    create: true
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0600"
+  delegate_to: "{{ noeud }}"
+  loop: "{{ workers }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Accepter la clé d'hôte des nœuds du lab au premier ssh
+  ansible.builtin.copy:
+    dest: /home/{{ ansible_user | default('ubuntu') }}/.ssh/config
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0600"
+    content: |
+      Host k8s-*
+        StrictHostKeyChecking accept-new

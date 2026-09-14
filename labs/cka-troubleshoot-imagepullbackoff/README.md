@@ -10,7 +10,7 @@ dans les events, pas dans le statut.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm vanilla à un nœud |
+| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
 | Leçon jumelée | [Diagnostiquer un ImagePullBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/) |
 

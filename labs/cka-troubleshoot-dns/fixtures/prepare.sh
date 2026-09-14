@@ -6,6 +6,11 @@
 # existe peut-être déjà, et où CoreDNS est peut-être encore éteint par un
 # passage précédent. Chaque étape doit donc partir de l'état qu'elle trouve.
 set -euo pipefail
+# La trace complète va dans un journal sur le nœud : dsoxlab ne montre que
+# « non-zero return code » quand ce script échoue, et le validateur relit
+# ce fichier pour dire pourquoi.
+exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
+set -x
 
 # `dsoxlab clean` supprime le namespace sans attendre : un `reset` enchaîne
 # donc sur un namespace encore en Terminating, dans lequel l'API server refuse

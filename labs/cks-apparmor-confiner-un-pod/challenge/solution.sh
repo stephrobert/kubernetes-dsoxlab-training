@@ -19,6 +19,9 @@ kind: Pod
 metadata:
   name: confine
 spec:
+  # Le profil n'est chargé que sur le control plane : le Pod doit y tourner,
+  # sinon le kubelet du worker le refuse, faute de profil sur CE nœud.
+  nodeName: k8s-cp.lab
   containers:
     - name: app
       image: busybox:1.37.0@sha256:f85340bf132ae937d2c2a763b8335c9bab35d6e8293f70f606b9c6178d84f42b

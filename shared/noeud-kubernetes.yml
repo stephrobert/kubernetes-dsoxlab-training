@@ -1,0 +1,137 @@
+---
+# Ce qu'un nœud Kubernetes doit avoir avant d'entrer dans le cluster, control
+# plane ou worker : pas de swap, les modules et réglages noyau du réseau des
+# conteneurs, containerd sur le pilote de cgroups systemd, et les paquets
+# kubelet, kubeadm, kubectl et crictl figés sur la mineure enseignée.
+#
+# Inclus par shared/kubeadm-cluster.yml : une fois pour le control plane, puis
+# une fois par worker, délégué. Chaque tâche porte sa propre idempotence, pour
+# la même raison que le socle : une garde grossière transforme un échec partiel
+# en échec permanent.
+- name: Désactiver le swap, refusé par le kubelet
+  ansible.builtin.command: swapoff -a
+  changed_when: true
+
+- name: Retirer le swap de fstab, pour qu'il ne revienne pas au redémarrage
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\sswap\s.*)$'
+    replace: '# \1'
+
+- name: Charger les modules noyau exigés par le réseau des conteneurs
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: Rendre le chargement persistant
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k8s.conf
+    content: "overlay\nbr_netfilter\n"
+    mode: "0644"
+
+- name: Laisser iptables voir le trafic ponté
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-kubernetes.conf
+    mode: "0644"
+    content: |
+      net.bridge.bridge-nf-call-iptables  = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward                 = 1
+
+- name: Appliquer les réglages noyau
+  ansible.builtin.command: sysctl --system
+  changed_when: true
+
+- name: Installer containerd et les dépendances du dépôt Kubernetes
+  ansible.builtin.apt:
+    name:
+      - containerd
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+    state: present
+    update_cache: true
+
+- name: Poser la configuration containerd par défaut
+  ansible.builtin.shell: |
+    set -o pipefail
+    mkdir -p /etc/containerd
+    containerd config default > /etc/containerd/config.toml
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+# Sans cela, le kubelet et containerd gèrent les cgroups différemment et
+# le nœud reste NotReady sans message explicite.
+# Pas de handler ici : ce fichier est INCLUS, et un handler déclaré dans un
+# fichier de tâches n'est pas résolu. Le redémarrage est donc explicite.
+- name: Aligner containerd sur le pilote de cgroups systemd
+  ansible.builtin.replace:
+    path: /etc/containerd/config.toml
+    regexp: 'SystemdCgroup = false'
+    replace: 'SystemdCgroup = true'
+
+- name: Redémarrer containerd pour prendre le pilote de cgroups
+  ansible.builtin.systemd_service:
+    name: containerd
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Récupérer la clé du dépôt Kubernetes
+  ansible.builtin.get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.37/deb/Release.key
+    dest: /tmp/k8s-release.key
+    mode: "0644"
+
+- name: Déchiffrer la clé vers le trousseau
+  ansible.builtin.shell: |
+    set -o pipefail
+    gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/k8s-release.key
+  args:
+    executable: /bin/bash
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Déclarer le dépôt Kubernetes 1.37
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+      https://pkgs.k8s.io/core:/stable:/v1.37/deb/ /
+    filename: kubernetes
+    state: present
+
+# cri-tools apporte crictl, l'outil de l'examen pour voir les conteneurs quand
+# kubectl est aveugle. kubeadm ne le tire plus : mesuré le 2026-09-14, aucun
+# /usr/bin/crictl sur un nœud fraîchement installé par ce socle.
+- name: Installer kubelet, kubeadm, kubectl et crictl
+  ansible.builtin.apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - cri-tools
+    state: present
+    update_cache: true
+
+- name: Figer les paquets, pour qu'une mise à jour ne casse pas le lab
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+# Sans ce fichier, crictl avertit à chaque appel avant de tomber sur containerd
+# par défaut : un apprenant qui lit l'avertissement croit à une erreur.
+- name: Dire à crictl où est containerd
+  ansible.builtin.copy:
+    dest: /etc/crictl.yaml
+    mode: "0644"
+    content: |
+      runtime-endpoint: unix:///run/containerd/containerd.sock
+      image-endpoint: unix:///run/containerd/containerd.sock

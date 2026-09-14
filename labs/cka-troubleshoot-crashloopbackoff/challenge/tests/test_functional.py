@@ -36,9 +36,15 @@ def _kubectl(host, args: str):
 
 
 def _pods(host) -> list[dict]:
+    """Les Pods du Deployment, hors ceux en cours de suppression.
+
+    Pendant un rollout, un ancien Pod dont le conteneur sortait en erreur
+    reste listé en phase Failed le temps de sa période de grâce : il ne dit
+    rien de l'état réparé, et le compter recalerait un travail juste.
+    """
     res = _kubectl(host, f"-n {NAMESPACE} get pods -l {SELECTEUR} -o json")
     assert res.rc == 0, f"Lecture des Pods impossible : {res.stderr.strip()}"
-    return json.loads(res.stdout)["items"]
+    return [p for p in json.loads(res.stdout)["items"] if not p["metadata"].get("deletionTimestamp")]
 
 
 def _un_pod_pret(host) -> str:

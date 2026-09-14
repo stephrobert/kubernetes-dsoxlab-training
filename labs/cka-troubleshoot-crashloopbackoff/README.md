@@ -10,7 +10,7 @@ events.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm vanilla à un nœud |
+| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
 | Leçon jumelée | [Diagnostiquer un CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 

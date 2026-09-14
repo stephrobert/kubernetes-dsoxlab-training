@@ -23,8 +23,21 @@ $K -n production patch deployment api-server --type=json -p '[
 ]'
 $K -n production rollout status deployment/api-server --timeout=180s
 
-# 3. La preuve : la configuration est lue, et l'application la sert.
-POD=$($K -n production get pods -l app=api-server -o jsonpath='{.items[0].metadata.name}')
+# 3. La preuve : la configuration est lue, et l'application la sert. On vise
+#    un Pod prêt et non en cours de suppression : pendant le rollout, un
+#    ancien Pod dont le conteneur sortait en erreur reste listé en phase
+#    Failed le temps de sa période de grâce. Mesuré à deux nœuds le
+#    2026-09-14 : « cannot exec into a container in a completed pod ».
+POD=$($K -n production get pods -l app=api-server -o json | python3 -c '
+import json, sys
+pods = json.load(sys.stdin)["items"]
+prets = [p["metadata"]["name"] for p in pods
+         if p["status"].get("phase") == "Running"
+         and not p["metadata"].get("deletionTimestamp")
+         and all(c.get("ready") for c in p["status"].get("containerStatuses", []))]
+print(prets[0] if prets else "")
+')
+[[ -n "$POD" ]] || { echo "Aucun Pod prêt après le rollout." >&2; exit 1; }
 $K -n production exec "$POD" -- cat /etc/config/app.conf
 $K -n production exec "$POD" -- wget -qO- http://127.0.0.1:8080/app.conf
 echo "api-server tourne en 2/2 et sert sa configuration."

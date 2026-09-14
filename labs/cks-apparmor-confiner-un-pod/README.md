@@ -10,7 +10,7 @@ que ce catalogue fournit.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm vanilla à un nœud |
+| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
 | Leçon jumelée | [AppArmor et seccomp](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 

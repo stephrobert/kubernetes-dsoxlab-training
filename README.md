@@ -32,9 +32,10 @@ dsoxlab check cks-apparmor-confiner-un-pod
 
 ## L'infrastructure : un cluster kubeadm vanilla
 
-Deux VM Ubuntu 24.04, la distribution que recommande le guide kubeadm publié.
-Le socle installe un cluster **Kubernetes 1.37**, la version qu'enseigne la
-formation.
+Deux VM Ubuntu 24.04, la distribution que recommande le guide kubeadm publié :
+un control plane, `k8s-cp.lab`, et un worker, `k8s-w1.lab`, joignable par
+`ssh` depuis le control plane comme à l'examen. Le socle installe un cluster
+**Kubernetes 1.37**, la version qu'enseigne la formation.
 
 **Pourquoi pas kind ?** Parce que certains faits ne se prouvent pas dans un
 conteneur. Sur un nœud kind, le kubelet refuse un Pod AppArmor avec

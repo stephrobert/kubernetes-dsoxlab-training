@@ -9,7 +9,7 @@ c'est un composant du cluster qu'il faut retrouver et remettre en service.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm vanilla à un nœud |
+| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
 | Leçon jumelée | [CoreDNS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 

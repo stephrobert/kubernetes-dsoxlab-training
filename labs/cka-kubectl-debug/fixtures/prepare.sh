@@ -2,6 +2,11 @@
 # Pose la situation : un Pod dont l'image n'a aucun shell, dans un namespace
 # propre, sans trace d'un passage précédent. Rejouable par `dsoxlab reset`.
 set -euo pipefail
+# La trace complète va dans un journal sur le nœud : dsoxlab ne montre que
+# « non-zero return code » quand ce script échoue, et le validateur relit
+# ce fichier pour dire pourquoi.
+exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
+set -x
 
 # `dsoxlab clean` supprime le namespace sans attendre : on attend qu'il ait
 # vraiment disparu avant de le recréer.

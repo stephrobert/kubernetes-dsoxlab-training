@@ -6,6 +6,11 @@
 # Rejouable : le Deployment est supprimé puis recréé, pour défaire la
 # correction d'un passage précédent.
 set -euo pipefail
+# La trace complète va dans un journal sur le nœud : dsoxlab ne montre que
+# « non-zero return code » quand ce script échoue, et le validateur relit
+# ce fichier pour dire pourquoi.
+exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
+set -x
 
 if [[ "$(kubectl get namespace production -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
   kubectl wait --for=delete namespace/production --timeout=180s

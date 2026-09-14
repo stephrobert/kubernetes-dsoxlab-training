@@ -12,17 +12,20 @@ seule, mais il ne sait pas dire « ce processus n'écrira jamais dans ce
 répertoire précis ». C'est le travail d'**AppArmor**, un module de sécurité du
 noyau Linux.
 
-Le profil est déjà déposé sur le nœud, dans
-`/etc/apparmor.d/k8s-refuser-ecriture`. Il n'est **pas chargé** : un fichier de
-profil posé sur le disque ne confine rien tant que le noyau ne l'a pas lu.
+Le profil est déjà déposé sur le control plane **`k8s-cp.lab`**, dans
+`/etc/apparmor.d/k8s-refuser-ecriture`, et nulle part ailleurs. Il n'est
+**pas chargé** : un fichier de profil posé sur le disque ne confine rien tant
+que le noyau ne l'a pas lu. Et un profil chargé sur un nœud ne vaut que sur
+ce nœud : le Pod devra tourner là où le profil est.
 
 ## Ce que vous devez obtenir
 
 1. Le profil **`k8s-refuser-ecriture` est chargé** dans le noyau du nœud, en
    mode **enforce** et non en mode `complain`.
 
-2. Un Pod nommé **`confine`** tourne dans le namespace **`confinement`**, et
-   son conteneur est **confiné par ce profil**.
+2. Un Pod nommé **`confine`** tourne dans le namespace **`confinement`**, sur
+   le nœud où le profil est chargé, et son conteneur est **confiné par ce
+   profil**.
 
 3. Le confinement est **effectif** : une écriture dans `/tmp` depuis ce
    conteneur est refusée, alors que la lecture du système de fichiers

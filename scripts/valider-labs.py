@@ -83,6 +83,10 @@ for d in get("get", "deployments", "-n", "kube-system")["items"]:
     ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
 for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
     ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+# Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
+# redémarrage, on ne retient que le compte de son DaemonSet.
+for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
+    ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
 for p in get("get", "pods", "-n", "kube-system")["items"]:
     if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
         ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
@@ -95,7 +99,7 @@ for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemon
              "ingresses", "resourcequotas", "limitranges"):
     for x in get("get", kind, "-A")["items"]:
         nsn = x["metadata"]["namespace"]
-        if nsn == "kube-system" or nsn in photo["terminating"]:
+        if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
             continue
         objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
 photo["objets"] = sorted(objets)
@@ -153,6 +157,19 @@ def cible(lab: Path) -> str:
 def ssh(hote: str, script: str, journal, timeout: int, root: bool = False) -> subprocess.CompletedProcess:
     interpreteur = "sudo python3 -" if root else "bash -s"
     return commande(["ssh", "-F", str(SSH_CONFIG), hote, interpreteur], journal, timeout, entree=script)
+
+
+def trace_prepare(hote: str, journal) -> str:
+    """La fin du journal que fixtures/prepare.sh écrit sur le nœud.
+
+    dsoxlab ne rend que « non-zero return code » quand un script de mise en
+    situation échoue. Chaque prepare.sh trace donc dans
+    /var/log/dsoxlab-prepare.log, et c'est là qu'on lit la cause.
+    """
+    res = ssh(hote, "sudo tail -n 25 /var/log/dsoxlab-prepare.log 2>/dev/null || true", journal, 60)
+    trace = res.stdout.strip()
+    return f"Fin de /var/log/dsoxlab-prepare.log sur {hote} :\n{trace[-1200:]}" if trace else \
+        f"Aucune trace de prepare.sh sur {hote}, voir le journal."
 
 
 def photographier(hote: str, journal) -> dict:
@@ -239,7 +256,7 @@ def valider(lab: Path, rejeu: bool) -> dict:
 
             res = dsoxlab(["run", ident], journal, 900)
             if res.returncode != 0:
-                raise Echec(f"dsoxlab run a échoué (rc={res.returncode}), voir {journal_path}")
+                raise Echec(f"dsoxlab run a échoué (rc={res.returncode}). {trace_prepare(hote, journal)}")
             resultat["avant"] = check(ident, journal)
             dire(f"avant le travail : {resultat['avant']['passed']}/{resultat['avant']['total']}")
 
@@ -255,7 +272,8 @@ def valider(lab: Path, rejeu: bool) -> dict:
                 dsoxlab(["clean", ident, "--yes"], journal, 600)
                 res = dsoxlab(["run", ident], journal, 900)
                 if res.returncode != 0:
-                    raise Echec(f"le second dsoxlab run a échoué (rc={res.returncode}) : le setup ne se rejoue pas")
+                    raise Echec(f"le second dsoxlab run a échoué (rc={res.returncode}) : le setup ne se "
+                                f"rejoue pas. {trace_prepare(hote, journal)}")
                 resultat["rejeu"] = check(ident, journal)
                 dire(f"après clean et run : {resultat['rejeu']['passed']}/{resultat['rejeu']['total']}")
 

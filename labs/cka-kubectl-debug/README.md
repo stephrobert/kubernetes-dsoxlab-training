@@ -10,7 +10,7 @@ nœud sans session SSH.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm vanilla à un nœud |
+| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
 | Leçon jumelée | [Débugger une application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
