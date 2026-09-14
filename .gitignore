@@ -8,3 +8,9 @@ ssh/id_ed25519
 # Répertoires de travail des labs `shell` : ce que l'apprenant y écrit lui
 # appartient, et le catalogue les recrée à chaque `run`.
 labs/**/challenge/work/
+
+# Caches Python : pytest les recrée, et un .pyc versionné se périme en silence
+# d'une version d'interpréteur à l'autre.
+__pycache__/
+*.pyc
+.pytest_cache/

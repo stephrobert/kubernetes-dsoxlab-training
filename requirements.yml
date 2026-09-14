@@ -1,0 +1,17 @@
+---
+# Collections Ansible que ce dépôt emploie réellement, hors `ansible.builtin`.
+#
+# Elles se déclarent ici parce que l'inverse a déjà coûté cher au catalogue
+# Linux : deux collections s'y trouvaient installées par hasard sur la machine
+# de développement, la troisième non, et un capstone échouait sur un « rc=4 »
+# qui ressemblait à un problème de réseau.
+#
+# Le même piège guettait ici : `shared/kubeadm-cluster.yml` appelle
+# `community.general.modprobe`, et le premier lab est passé sans que rien ne
+# dise que cette collection était requise.
+#
+# Installation :
+#     ansible-galaxy collection install -r requirements.yml
+
+collections:
+  - name: community.general

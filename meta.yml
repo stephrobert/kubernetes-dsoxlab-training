@@ -10,7 +10,7 @@ schema_version: 1
 repo:
   id: kubernetes-dsoxlab-training
   category: kubernetes
-  title: "Kubernetes DevSecOps Training — CKA, CKAD et CKS"
+  title: "Kubernetes DevSecOps Training : CKA, CKAD et CKS"
   blog_url: "https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/"
   description: |
     Labs vérifiables pour la formation Kubernetes du blog Stéphane Robert.
@@ -84,7 +84,7 @@ infra:
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
 sections:
   - id: cka
-    title: "CKA — Certified Kubernetes Administrator"
+    title: "CKA, Certified Kubernetes Administrator"
     description: |
       Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et
       c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui
@@ -92,14 +92,14 @@ sections:
     labs: []
 
   - id: ckad
-    title: "CKAD — Certified Kubernetes Application Developer"
+    title: "CKAD, Certified Kubernetes Application Developer"
     description: |
       Cinq domaines orientés application. « Application Environment,
       Configuration and Security » pèse 25 %, le plus lourd des cinq.
     labs: []
 
   - id: cks
-    title: "CKS — Certified Kubernetes Security Specialist"
+    title: "CKS, Certified Kubernetes Security Specialist"
     description: |
       Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux
       seuls. Plusieurs compétences y sont invérifiables sur un cluster en
