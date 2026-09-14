@@ -122,10 +122,21 @@ def main() -> int:
         d = defauts(lab)
         (incomplets if d else prets).append((lab.name, d))
 
+    # Ce que scripts/valider-labs.py a mesuré : la seule preuve qu'un lab
+    # livrable est aussi un lab juste.
+    validations = RACINE / "validation-labs.json"
+    mesures = yaml.safe_load(validations.read_text(encoding="utf-8")) if validations.is_file() else {}
+
     print(f"{len(dossiers)} lab(s) : {len(prets)} livrable(s), {len(incomplets)} incomplet(s)\n")
 
     for nom, _ in prets:
-        print(f"  ✔ {nom}")
+        m = mesures.get(nom)
+        if m and m.get("verdict") == "VALIDE":
+            print(f"  ✔ {nom}    validé le {m['date']} sur {m.get('kubernetes', '?')}")
+        elif m:
+            print(f"  ✔ {nom}    ROUGE le {m['date']} : {'; '.join(m.get('raisons') or [m.get('erreur', '?')])}")
+        else:
+            print(f"  ✔ {nom}    jamais validé")
     for nom, d in incomplets:
         print(f"\n  ✘ {nom}")
         for x in d:

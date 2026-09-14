@@ -24,12 +24,34 @@
           pas un nœud en conteneur.
       when: aa.rc != 0
 
+    # `dsoxlab clean` supprime le namespace sans attendre : un `reset` enchaîne
+    # sur un namespace en Terminating, où rien ne se crée et où le Pod d'un
+    # passage précédent survit. Mesuré par scripts/valider-labs.py le
+    # 2026-09-14 : sans cette attente, deux tests passaient avant le travail.
+    - name: Attendre la disparition d'un namespace en cours de suppression
+      ansible.builtin.shell: |
+        set -o pipefail
+        phase=$(kubectl --kubeconfig /etc/kubernetes/admin.conf get namespace confinement \
+          -o jsonpath='{.status.phase}' 2>/dev/null || true)
+        if [ "$phase" = "Terminating" ]; then
+          kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=delete namespace/confinement --timeout=180s
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: false
+
     - name: Créer le namespace de travail
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kubernetes/admin.conf create namespace confinement
       register: ns
       changed_when: ns.rc == 0
       failed_when: ns.rc != 0 and 'AlreadyExists' not in ns.stderr
+
+    - name: Retirer le Pod d'un passage précédent, pour que le lab parte d'un état net
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n confinement delete pod confine
+        --ignore-not-found --wait=true
+      changed_when: true
 
     - name: Déposer le profil AppArmor à charger par l'apprenant
       ansible.builtin.copy:

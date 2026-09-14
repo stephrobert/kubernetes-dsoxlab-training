@@ -124,14 +124,28 @@
     filename: kubernetes
     state: present
 
-- name: Installer kubelet, kubeadm et kubectl
+# cri-tools apporte crictl, l'outil de l'examen pour voir les conteneurs quand
+# kubectl est aveugle. kubeadm ne le tire plus : mesuré le 2026-09-14, aucun
+# /usr/bin/crictl sur un nœud fraîchement installé par ce socle.
+- name: Installer kubelet, kubeadm, kubectl et crictl
   ansible.builtin.apt:
     name:
       - kubelet
       - kubeadm
       - kubectl
+      - cri-tools
     state: present
     update_cache: true
+
+# Sans ce fichier, crictl avertit à chaque appel avant de tomber sur containerd
+# par défaut : un apprenant qui lit l'avertissement croit à une erreur.
+- name: Dire à crictl où est containerd
+  ansible.builtin.copy:
+    dest: /etc/crictl.yaml
+    mode: "0644"
+    content: |
+      runtime-endpoint: unix:///run/containerd/containerd.sock
+      image-endpoint: unix:///run/containerd/containerd.sock
 
 - name: Figer les trois paquets, pour qu'une mise à jour ne casse pas le lab
   ansible.builtin.dpkg_selections:

@@ -1,0 +1,194 @@
+{
+ "cka-kubectl-debug": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 90,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 21 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-kubectl-debug.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-troubleshoot-apiserver": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 139,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 18 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-apiserver.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-troubleshoot-crashloopbackoff": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 121,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 21 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-crashloopbackoff.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-troubleshoot-dns": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 161,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 21 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-dns.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-troubleshoot-imagepullbackoff": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 96,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 18 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-imagepullbackoff.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-apparmor-confiner-un-pod": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-14",
+  "duree_s": 110,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 18 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-apparmor-confiner-un-pod.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ }
+}

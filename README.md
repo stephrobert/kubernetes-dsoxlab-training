@@ -47,6 +47,18 @@ Les règles d'écriture d'un lab, les pièges de topologie et la doctrine de tes
 vivent dans [`CLAUDE.md`](CLAUDE.md). Le backlog est dans
 [`todo/ROADMAP-LABS.md`](todo/ROADMAP-LABS.md).
 
+Un lab n'est validé que joué dans les deux sens, et sans trace :
+
+```bash
+python3 scripts/valider-labs.py --lab <id>
+```
+
+Le validateur photographie le cluster, joue le lab, vérifie que les tests
+rendent 0 avant le travail et 100 après la solution du formateur, nettoie,
+rejoue, puis compare le cluster à sa photographie. Le résultat de chaque lab,
+date et version de Kubernetes comprises, est dans
+[`validation-labs.json`](validation-labs.json).
+
 ## Transposer les labs hérités
 
 61 labs CKA/CKAD/CKS existent dans `~/Projets/K8sExamLab`, l'ancêtre archivé de
