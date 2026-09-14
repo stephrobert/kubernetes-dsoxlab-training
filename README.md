@@ -15,7 +15,8 @@ Chaque lab pose un état initial, énonce un objectif, et valide en lisant
 ## Démarrer
 
 ```bash
-git clone <ce dépôt> && cd kubernetes-dsoxlab-training
+git clone https://github.com/stephrobert/kubernetes-dsoxlab-training.git
+cd kubernetes-dsoxlab-training
 ansible-galaxy collection install -r requirements.yml
 
 export LAB_HOME=$PWD
