@@ -1,10 +1,21 @@
 ---
-# A_COMPLETER : l'ancien format n'avait PAS de nettoyage. Lister ici ce
-# que le lab crée, namespaces compris. Le cluster, lui, reste en place.
-- name: Nettoyer le lab troubleshoot-dns
+# Joué par `dsoxlab clean` : défait ce que le lab a créé et remet le DNS du
+# cluster en service, que l'apprenant l'ait réparé ou non. Le cluster, lui,
+# reste en place, il est le socle commun de tous les labs du catalogue.
+- name: Nettoyer le lab cka-troubleshoot-dns
   hosts: lab_target
   become: true
   tasks:
-    - name: A_COMPLETER supprimer les objets créés par ce lab
-      ansible.builtin.debug:
-        msg: "Nettoyage à écrire pour troubleshoot-dns"
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace app
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Remettre CoreDNS à ses deux replicas, l'état que kubeadm pose
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        scale deployment coredns --replicas=2
+      changed_when: true
+      failed_when: false

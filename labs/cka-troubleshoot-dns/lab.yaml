@@ -1,26 +1,34 @@
 id: cka-troubleshoot-dns
-title: Troubleshoot DNS Resolution
+title: "Rétablir la résolution DNS du cluster"
 level: troubleshooting
-description: Pods in the cluster can no longer resolve service names. Diagnose and
+description: |
+  Plus aucun Pod ne résout de nom de service. Trouver pourquoi le DNS du
+  cluster ne répond plus, le remettre en service, et prouver qu'un Pod client
+  résout et joint à nouveau un Service par son nom.
 skills:
-- troubleshooting
-- dns
-- coredns
-- networking
-- cka-essential
+  - troubleshooting
+  - dns
+  - coredns
+  - networking
 distros:
-- ubuntu24
-doc_url: https://example.invalid/A_COMPLETER
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
 lab_type: lab
-estimated_time: 8m
+estimated_time: 10m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %), le plus lourd
+# des trois examens : « Troubleshoot cluster components » et « Troubleshoot
+# services and networking ».
 certification_tags:
-- cka
+  - cka
+
 runtime:
   type: vm
   targets:
-  - name: cp
-    host: k8s-cp.lab
+    - name: cp
+      host: k8s-cp.lab
   default: cp
+
 validation:
   functional: true
   persistence_after_reboot: false

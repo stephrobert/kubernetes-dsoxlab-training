@@ -1,35 +1,43 @@
-# Troubleshoot DNS Resolution
-
-<!-- A_COMPLETER : ce scénario vient de K8sExamLab et il est EN ANGLAIS.
-     À réécrire en français, et à confronter à Kubernetes 1.37 : ce lab visait
-     la 1.34. -->
+# Rétablir la résolution DNS du cluster
 
 ## La situation
 
-Pods in the cluster can no longer resolve service names. Diagnose and
-fix the CoreDNS issue so that DNS resolution works again.
+Une équipe vous appelle : son application ne répond plus. Elle tourne dans le
+namespace **`app`** et n'a rien de compliqué : un Pod **`web`** qui sert une
+page, un Service **`web-svc`** qui l'expose, et un Pod **`client`** qui
+l'interroge par son nom, `web-svc.app.svc.cluster.local`.
+
+Personne n'a touché à l'application. Le Pod `web` tourne, le Service existe,
+et pourtant le client ne joint plus rien : le nom ne se résout plus. Ce n'est
+pas l'application qui est cassée, c'est **quelque chose dans le cluster**.
 
 ## Ce que vous devez obtenir
 
-A namespace 'app' contains a web server pod 'web' and a Service
-'web-svc'. A client pod 'client' should be able to reach the web
-server via DNS (web-svc.app.svc.cluster.local), but DNS is broken.
+1. Depuis le Pod `client`, le nom `web-svc.app.svc.cluster.local` se résout
+   à nouveau.
 
-1. Confirm that DNS resolution fails from the 'client' pod by
-   attempting to resolve the service hostname.
+2. Le Pod `client` joint `web-svc` en HTTP par ce nom.
 
-2. Investigate the CoreDNS component in the kube-system namespace
-   to identify why DNS resolution is not functioning.
+3. Le composant qui résout les noms dans le cluster est **de nouveau en
+   service**, dans l'état où un cluster kubeadm le pose. Une rustine dans
+   le Pod `client` ne compte pas : c'est le cluster qu'on vous demande de
+   réparer.
 
-3. Restore CoreDNS to a healthy state so that DNS queries are
-   answered again.
+## Les repères utiles
 
-4. Verify that the 'client' pod can successfully resolve the service
-   hostname and reach 'web-svc' via HTTP.
+La résolution de noms dans Kubernetes n'est pas assurée par les Pods
+eux-mêmes : chaque Pod interroge un Service du namespace **`kube-system`**,
+dont l'adresse est écrite dans son `/etc/resolv.conf`. Ce Service, comme
+tous les autres, ne répond que si des Pods se tiennent derrière lui.
+
+Commencez par constater la panne depuis le Pod `client`, puis remontez : le
+Service, ses endpoints, et ce qui devrait les fournir.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent l'état du cluster, pas les commandes tapées.
+Les tests lisent l'état du **cluster**, pas les commandes que vous avez
+tapées : ils regardent le composant DNS, puis ils tentent réellement une
+résolution et une requête HTTP depuis le Pod `client`.
 
 ```bash
 dsoxlab check cka-troubleshoot-dns

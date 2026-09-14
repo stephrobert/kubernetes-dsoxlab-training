@@ -14,3 +14,6 @@ labs/**/challenge/work/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Réglages Claude Code propres à ce poste : autorisations de commandes.
+.claude/settings.local.json

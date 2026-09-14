@@ -62,7 +62,11 @@ def defauts(lab: Path) -> list[str]:
         texte = scen.read_text(encoding="utf-8")
         if MARQUEUR in texte:
             out.append("scenario.md : marqueur à lever")
-        elif ANGLAIS.search(texte):
+        # L'identifiant du lab apparaît dans le scénario (la commande `dsoxlab
+        # check <id>`), et huit labs CKA portent « troubleshoot » dans le leur :
+        # on le retire avant de chercher de l'anglais, sinon un scénario
+        # entièrement français est déclaré anglais.
+        elif ANGLAIS.search(texte.replace(lab.name, "")):
             out.append("scenario.md : encore en anglais")
 
     clean = lab / "cleanup.yaml"

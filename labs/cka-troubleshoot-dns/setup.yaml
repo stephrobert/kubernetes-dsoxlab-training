@@ -1,7 +1,12 @@
 ---
-# Transposé de K8sExamLab. A_COMPLETER : relire le script de mise en
-# situation, il vise Kubernetes 1.34 et non 1.37.
-- name: Préparer le lab troubleshoot-dns
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, une application qui marchait et un DNS de cluster qu'on
+# a éteint.
+#
+# Transposé de K8sExamLab. Confronté à Kubernetes 1.37 le 2026-09-14 : le
+# Deployment s'appelle toujours `coredns`, ses Pods portent toujours le label
+# `k8s-app=kube-dns`, et kubeadm en pose toujours deux replicas.
+- name: Préparer le lab cka-troubleshoot-dns
   hosts: lab_target
   become: true
   tasks:
