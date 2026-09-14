@@ -61,6 +61,7 @@ def scenario(vieux: dict) -> str:
     On ne traduit pas automatiquement : une consigne d'examen mal traduite est
     pire qu'une consigne en anglais, parce qu'elle se lit sans méfiance.
     """
+    ident = f"{SECTIONS.get(vieux.get('category', ''), 'cka')}-{vieux['id']}"
     return f"""# {vieux['title']}
 
 <!-- {MARQUEUR} : ce scénario vient de K8sExamLab et il est EN ANGLAIS.
@@ -80,7 +81,7 @@ def scenario(vieux: dict) -> str:
 Les tests lisent l'état du cluster, pas les commandes tapées.
 
 ```bash
-dsoxlab check {vieux['id']}
+dsoxlab check {ident}
 ```
 """
 
@@ -88,7 +89,10 @@ dsoxlab check {vieux['id']}
 def lab_yaml(vieux: dict, section: str) -> dict:
     minutes = vieux.get("duration_minutes", 30)
     return {
-        "id": vieux["id"],
+        # L'identifiant porte l'examen, comme le repertoire : deux labs peuvent
+        # traiter le meme sujet pour deux certifications differentes, et un id
+        # qui diverge du repertoire rend « dsoxlab run » deroutant.
+        "id": f"{section}-{vieux['id']}",
         "title": vieux["title"],
         "level": vieux.get("domain", section),
         "description": (vieux.get("description", "").strip().splitlines() or [""])[0],

@@ -1,4 +1,4 @@
-id: troubleshoot-dns
+id: cka-troubleshoot-dns
 title: Troubleshoot DNS Resolution
 level: troubleshooting
 description: Pods in the cluster can no longer resolve service names. Diagnose and

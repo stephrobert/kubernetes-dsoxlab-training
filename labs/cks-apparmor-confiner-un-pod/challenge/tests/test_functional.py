@@ -1,4 +1,4 @@
-"""test_functional.py — cks-apparmor-confiner-un-pod
+"""test_functional.py : cks-apparmor-confiner-un-pod
 
 Ces tests lisent l'état du NŒUD et du CLUSTER, jamais les commandes tapées.
 C'est la seule façon de valider une compétence d'examen pratique : le candidat

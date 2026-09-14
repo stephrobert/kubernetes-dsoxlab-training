@@ -32,5 +32,5 @@ server via DNS (web-svc.app.svc.cluster.local), but DNS is broken.
 Les tests lisent l'état du cluster, pas les commandes tapées.
 
 ```bash
-dsoxlab check troubleshoot-dns
+dsoxlab check cka-troubleshoot-dns
 ```

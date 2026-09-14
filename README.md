@@ -45,3 +45,18 @@ enseigne sur kind, ce catalogue éprouve sur des machines.
 Les règles d'écriture d'un lab, les pièges de topologie et la doctrine de test
 vivent dans [`CLAUDE.md`](CLAUDE.md). Le backlog est dans
 [`todo/ROADMAP-LABS.md`](todo/ROADMAP-LABS.md).
+
+## Transposer les labs hérités
+
+61 labs CKA/CKAD/CKS existent dans `~/Projets/K8sExamLab`, l'ancêtre archivé de
+dsoxlab. Leur substance est récupérable et l'outillage est là :
+
+```bash
+python3 scripts/convertir-k8sexamlab.py --lab <chemin>   # transpose
+python3 scripts/proposer-doc-url.py                      # jumelle la leçon
+python3 scripts/check-labs-completude.py --check         # ce qui reste
+```
+
+La transposition est mécanique ; la **validation ne l'est pas**. Un lab
+transposé qui passe la structure ne prouve rien : le premier essai a révélé une
+solution héritée qui contredisait son propre setup.
