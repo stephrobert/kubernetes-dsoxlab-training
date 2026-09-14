@@ -61,3 +61,16 @@ python3 scripts/check-labs-completude.py --check         # ce qui reste
 La transposition est mécanique ; la **validation ne l'est pas**. Un lab
 transposé qui passe la structure ne prouve rien : le premier essai a révélé une
 solution héritée qui contredisait son propre setup.
+
+## Licence
+
+Copyright (c) 2026 Stéphane Robert, https://blog.stephane-robert.info
+
+Ce catalogue est publié sous licence
+[Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE). Vous
+pouvez le partager et l'adapter, y compris commercialement, à une condition :
+créditer Stéphane Robert, lier le blog, et indiquer si vous avez modifié le
+contenu, sans laisser entendre que l'auteur approuve votre usage.
+
+Le fichier `LICENSE` ne contient que le texte officiel de la licence, sans
+en-tête ajouté : c'est ce qui permet à GitHub de la reconnaître.
