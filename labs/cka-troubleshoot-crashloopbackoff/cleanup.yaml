@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé. Tout vit dans le
+# namespace production, le supprimer suffit. Le cluster, lui, reste en place.
+- name: Nettoyer le lab cka-troubleshoot-crashloopbackoff
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace production
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

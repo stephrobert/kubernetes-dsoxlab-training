@@ -1,0 +1,34 @@
+id: cka-troubleshoot-crashloopbackoff
+title: "Sortir un Deployment du CrashLoopBackOff"
+level: troubleshooting
+description: |
+  Les Pods d'un Deployment redémarrent en boucle depuis la dernière livraison.
+  Lire ce que le processus a dit avant de mourir, comprendre ce qui lui
+  manque, corriger le Deployment, et prouver que l'application sert à nouveau.
+skills:
+  - troubleshooting
+  - crashloopbackoff
+  - logs
+  - configmap
+  - deployment
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Manage and
+# evaluate container output streams » et « Troubleshoot clusters and nodes ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

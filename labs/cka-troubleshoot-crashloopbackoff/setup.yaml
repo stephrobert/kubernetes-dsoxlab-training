@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un Deployment dont les Pods redémarrent en boucle.
+#
+# Transposé de K8sExamLab. Le lab hérité cassait la commande elle-même et
+# demandait de « corriger la commande » sans dire vers quoi ; ici la commande
+# est saine, c'est la configuration qui manque, et la panne a une cause
+# qu'on peut lire dans les logs. Confronté à Kubernetes 1.37 le 2026-09-14.
+- name: Préparer le lab cka-troubleshoot-crashloopbackoff
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kubeadm à un nœud
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
