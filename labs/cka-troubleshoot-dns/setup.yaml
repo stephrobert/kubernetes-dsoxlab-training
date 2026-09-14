@@ -1,0 +1,22 @@
+---
+# Transposé de K8sExamLab. A_COMPLETER : relire le script de mise en
+# situation, il vise Kubernetes 1.34 et non 1.37.
+- name: Préparer le lab troubleshoot-dns
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kubeadm à un nœud
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Déposer la bibliothèque de checks héritée sur le nœud
+      ansible.builtin.copy:
+        src: ../../shared/checks/
+        dest: /opt/checks/
+        mode: "0755"
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

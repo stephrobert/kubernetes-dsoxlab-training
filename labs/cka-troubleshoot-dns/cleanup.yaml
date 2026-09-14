@@ -1,0 +1,10 @@
+---
+# A_COMPLETER : l'ancien format n'avait PAS de nettoyage. Lister ici ce
+# que le lab crée, namespaces compris. Le cluster, lui, reste en place.
+- name: Nettoyer le lab troubleshoot-dns
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: A_COMPLETER supprimer les objets créés par ce lab
+      ansible.builtin.debug:
+        msg: "Nettoyage à écrire pour troubleshoot-dns"

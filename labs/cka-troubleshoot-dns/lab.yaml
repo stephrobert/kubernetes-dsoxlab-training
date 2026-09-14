@@ -1,0 +1,26 @@
+id: troubleshoot-dns
+title: Troubleshoot DNS Resolution
+level: troubleshooting
+description: Pods in the cluster can no longer resolve service names. Diagnose and
+skills:
+- troubleshooting
+- dns
+- coredns
+- networking
+- cka-essential
+distros:
+- ubuntu24
+doc_url: https://example.invalid/A_COMPLETER
+lab_type: lab
+estimated_time: 8m
+certification_tags:
+- cka
+runtime:
+  type: vm
+  targets:
+  - name: cp
+    host: k8s-cp.lab
+  default: cp
+validation:
+  functional: true
+  persistence_after_reboot: false
