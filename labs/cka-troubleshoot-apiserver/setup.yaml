@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un API server qui sort en erreur au démarrage.
+#
+# Transposé de K8sExamLab, qui injectait un flag nommé
+# « --invalid-flag-that-breaks » : personne ne tape ça par erreur. Ici c'est
+# une lettre de trop sur un vrai flag, ce qu'un collègue peut faire un
+# vendredi soir. Confronté à Kubernetes 1.37 le 2026-09-14 : le manifeste
+# kubeadm porte toujours `--authorization-mode=Node,RBAC`.
+- name: Préparer le lab cka-troubleshoot-apiserver
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kubeadm à un nœud
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

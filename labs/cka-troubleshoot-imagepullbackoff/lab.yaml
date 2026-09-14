@@ -1,0 +1,33 @@
+id: cka-troubleshoot-imagepullbackoff
+title: "Sortir un Pod de l'ImagePullBackOff"
+level: troubleshooting
+description: |
+  Un Pod ne démarre pas parce que son image ne se télécharge pas. Lire le
+  message exact du runtime dans les events, corriger la référence d'image, et
+  prouver que le serveur répond.
+skills:
+  - troubleshooting
+  - imagepullbackoff
+  - images
+  - events
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# clusters and nodes » et « Manage and evaluate container output streams ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

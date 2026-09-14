@@ -1,0 +1,36 @@
+id: cka-troubleshoot-apiserver
+title: "Remettre l'API server en service"
+level: troubleshooting
+description: |
+  kubectl ne répond plus : l'API server du control plane sort en erreur au
+  démarrage. Sans API, diagnostiquer sur le nœud, dans les conteneurs et les
+  journaux du kubelet, corriger le manifeste statique, et prouver que l'API
+  répond sans avoir affaibli son autorisation.
+skills:
+  - troubleshooting
+  - kube-apiserver
+  - static-pod
+  - crictl
+  - control-plane
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# cluster components ». C'est un des sujets que kind ne peut pas prouver : le
+# manifeste statique et le kubelet sont ceux d'une vraie machine.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

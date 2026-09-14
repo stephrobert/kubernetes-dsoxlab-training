@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab clean` : rend l'API server, que l'apprenant l'ait réparé
+# ou non. Ce lab ne crée aucun objet dans le cluster ; il ne touche qu'un
+# fichier du nœud, et il faut attendre que l'API réponde à nouveau, sinon le
+# lab suivant partirait d'un cluster sans API.
+- name: Nettoyer le lab cka-troubleshoot-apiserver
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Rendre au manifeste son flag d'autorisation
+      ansible.builtin.replace:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        regexp: '--authorization-modes='
+        replace: '--authorization-mode='
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
