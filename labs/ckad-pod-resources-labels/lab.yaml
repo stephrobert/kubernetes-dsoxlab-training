@@ -1,0 +1,35 @@
+id: ckad-pod-resources-labels
+title: "Un Pod à deux conteneurs, avec budgets, labels et annotation"
+level: application-design
+description: |
+  Écrire à la main un Pod à deux conteneurs, chacun avec ses requests et ses
+  limits, avec des labels et une annotation, et prouver depuis l'intérieur de
+  chaque conteneur que la limite de mémoire est celle que le noyau applique.
+skills:
+  - pods
+  - resources
+  - labels
+  - annotations
+  - multi-container
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# « Understand multi-container Pod design patterns », et Application
+# Environment : « Understand requests, limits, quotas ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,36 @@
+id: ckad-security-context-hardened
+title: "Durcir un Pod avec un securityContext"
+level: application-environment
+description: |
+  Faire tourner un serveur web sans privilège : utilisateur non root,
+  aucune escalade, racine en lecture seule, toutes les capabilities retirées.
+  Et lui donner quand même de quoi écrire là où il en a besoin, sinon il ne
+  démarre pas. Prouver, de l'intérieur, que le confinement agit et que
+  l'application sert.
+skills:
+  - security-context
+  - hardening
+  - non-root
+  - readonly-filesystem
+  - capabilities
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Environment, Configuration
+# and Security (25 %) : « Understand SecurityContexts ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

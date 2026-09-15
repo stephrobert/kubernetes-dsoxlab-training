@@ -1,0 +1,35 @@
+id: ckad-rolling-update-strategy
+title: "Régler une mise à jour progressive : maxSurge et maxUnavailable"
+level: application-deployment
+description: |
+  Contraindre la façon dont un Deployment remplace ses Pods, jamais plus de
+  deux en trop ni plus d'un indisponible, puis déclencher une mise à jour
+  d'image et prouver qu'elle est allée au bout : ancienne révision à zéro,
+  nouvelle au complet.
+skills:
+  - rolling-update
+  - deployment
+  - strategy
+  - maxsurge
+  - maxunavailable
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Deployment (20 %) :
+# « Understand Deployments and how to perform rolling updates ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

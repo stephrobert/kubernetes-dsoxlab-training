@@ -1,0 +1,35 @@
+id: ckad-probes-all-types
+title: "Trois sondes sur un Pod : startup, liveness, readiness"
+level: application-observability
+description: |
+  Équiper une application des trois sondes, avec des réglages qui ont un
+  sens : un démarrage lent toléré, une vivacité surveillée, un trafic
+  qui n'arrive qu'une fois prête. Prouver que les sondes agissent : le Pod
+  n'est Ready que parce qu'elles répondent.
+skills:
+  - probes
+  - liveness
+  - readiness
+  - startup
+  - health-check
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Observability and
+# Maintenance (15 %) : « Implement probes and health checks ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -543,6 +543,102 @@
   },
   "verdict": "VALIDE"
  },
+ "ckad-rbac-role-rolebinding": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 171,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-rbac-role-rolebinding.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-rolling-update-strategy": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 112,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-rolling-update-strategy.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-security-context-hardened": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 93,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-security-context-hardened.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "cks-apparmor-confiner-un-pod": {
   "apres": {
    "passed": 4,

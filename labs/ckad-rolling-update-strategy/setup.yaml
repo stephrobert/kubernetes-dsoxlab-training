@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le Deployment
+# en 1.26 avec la stratégie par défaut. Régler la stratégie puis mettre à
+# jour, c'est le travail.
+#
+# Transposé de K8sExamLab, dont le YAML hérité avait deux tags mal indentés
+# dans sa liste d'indices, et qui demandait un ConfigMap « evidence » qui ne
+# prouvait rien : supprimé, les ReplicaSets le prouvent. Confronté à
+# Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-rolling-update-strategy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

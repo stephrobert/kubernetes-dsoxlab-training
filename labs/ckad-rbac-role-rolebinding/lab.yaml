@@ -1,0 +1,35 @@
+id: ckad-rbac-role-rolebinding
+title: "Donner un accès en lecture seule aux Pods avec RBAC"
+level: application-environment
+description: |
+  Permettre à une utilisatrice de lire les Pods d'un namespace et leurs logs,
+  et rien de plus : ni créer, ni supprimer, ni voir les autres namespaces.
+  Prouver les deux côtés avec kubectl auth can-i, ce qui est permis et ce qui
+  reste refusé.
+skills:
+  - rbac
+  - role
+  - rolebinding
+  - auth-can-i
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Environment, Configuration
+# and Security (25 %) : « Understand authentication, authorization and
+# admission control ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

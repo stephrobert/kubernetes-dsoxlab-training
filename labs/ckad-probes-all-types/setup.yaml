@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
+# retire le Pod qu'un passage précédent aurait laissé. Le reste est le travail.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup et ne vérifiait
+# que la présence des sondes : ici on exige qu'elles trouvent ce qu'elles
+# cherchent, Pod Ready et sans redémarrage. Confronté à Kubernetes 1.37 le
+# 2026-09-15.
+- name: Préparer le lab ckad-probes-all-types
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
