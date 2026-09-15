@@ -1,0 +1,38 @@
+id: cka-rbac-serviceaccount
+title: "Donner une identité à une application : ServiceAccount, Role, RoleBinding"
+level: cluster-architecture-installation-configuration
+description: |
+  Une application refuse de démarrer parce que son ServiceAccount n'existe
+  pas. Le créer, lui accorder le droit de lire les Pods de son namespace et
+  rien d'autre, puis prouver depuis l'intérieur du Pod, avec son propre
+  jeton, que lister passe et que supprimer, lire les Secrets ou regarder
+  ailleurs sont refusés.
+skills:
+  - serviceaccount
+  - role
+  - rolebinding
+  - rbac
+  - least-privilege
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
+# Configuration (25 %) : « Manage role based access control (RBAC) ». Le lab
+# CKAD voisin donne des droits à une utilisatrice ; celui-ci en donne à une
+# application, et la preuve se fait depuis son Pod, avec le jeton projeté.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

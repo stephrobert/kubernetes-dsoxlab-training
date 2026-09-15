@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, et avec lui le
+# ServiceAccount, le Role, le RoleBinding et l'application. Le cluster reste.
+- name: Nettoyer le lab cka-rbac-serviceaccount
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace app-team
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

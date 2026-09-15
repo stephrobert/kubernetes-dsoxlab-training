@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, puis le taint que ce lab a
+# posé sur le control plane, pour rendre au socle le cluster qu'il attend.
+- name: Nettoyer le lab cka-daemonset-all-nodes
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de supervision
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace monitoring
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le taint posé sur le control plane
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes k8s-cp.lab
+        node-role.kubernetes.io/control-plane:NoSchedule-
+      changed_when: true
+      failed_when: false

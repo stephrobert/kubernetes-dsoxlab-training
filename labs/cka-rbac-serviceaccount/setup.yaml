@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le namespace existe,
+# le Deployment inventaire est posé avec un ServiceAccount qui n'existe pas,
+# et le ReplicaSet échoue à créer son Pod. Tout ce que le candidat doit
+# faire reste à faire.
+#
+# Transposé de K8sExamLab, qui faisait tout créer par le candidat, namespace
+# compris, et vérifiait les droits avec `kubectl auth can-i`. Ici la preuve
+# vient du Pod lui-même. Confronté à Kubernetes 1.37 le 2026-09-15 : un
+# ReplicaSet dont le ServiceAccount manque émet FailedCreate et réessaie
+# dès que le ServiceAccount apparaît.
+- name: Préparer le lab cka-rbac-serviceaccount
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application sans son identité
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

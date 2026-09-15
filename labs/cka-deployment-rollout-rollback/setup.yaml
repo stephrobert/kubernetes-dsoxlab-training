@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : webapp tourne en
+# nginx:1.26-alpine, puis une mise à jour vers une image qui n'existe pas
+# est lancée et reste bloquée, un Pod en ImagePullBackOff, trois anciens qui
+# servent. C'est la situation de l'examen.
+#
+# Transposé de K8sExamLab, qui faisait faire au candidat une mise à jour qui
+# marche puis un retour arrière sans raison. Confronté à Kubernetes 1.37 le
+# 2026-09-15 : avec trois replicas et la stratégie par défaut, le
+# déploiement bloqué garde ses trois anciens Pods et n'en ajoute qu'un.
+- name: Préparer le lab cka-deployment-rollout-rollback
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application, puis la mise à jour fautive
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

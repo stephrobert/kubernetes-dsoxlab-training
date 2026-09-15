@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le control plane
+# reçoit son taint de production, le namespace existe, aucun DaemonSet n'y
+# est. Tout ce que le candidat doit faire reste à faire.
+#
+# Transposé de K8sExamLab, qui tournait sur kind avec le taint d'origine.
+# Le socle du catalogue retire ce taint pour que les labs à un nœud aient
+# de la place ; ce lab le remet, le temps de la session, et le nettoyage le
+# retire. Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab cka-daemonset-all-nodes
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le taint du control plane et le namespace
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

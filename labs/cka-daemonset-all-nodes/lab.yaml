@@ -1,0 +1,37 @@
+id: cka-daemonset-all-nodes
+title: "Un agent sur chaque nœud, control plane compris"
+level: workloads-scheduling
+description: |
+  Déployer un DaemonSet qui pose un agent sur tous les nœuds du cluster, y
+  compris le control plane, protégé par son taint. Les tests comptent un Pod
+  par nœud, vérifient que le taint est toujours là et que l'agent y tourne
+  quand même, et lisent ses logs pour prouver qu'il fait son travail.
+skills:
+  - daemonset
+  - tolerations
+  - taints
+  - node-scheduling
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) :
+# « Understand the primitives used to create robust, self-healing,
+# application deployments » et les tolerations. Le socle retire le taint du
+# control plane pour les autres labs ; celui-ci le remet, comme dans tout
+# cluster de production, et le retire au nettoyage.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

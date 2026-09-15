@@ -1,0 +1,38 @@
+id: cka-deployment-rollout-rollback
+title: "Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version"
+level: workloads-scheduling
+description: |
+  Une mise à jour est partie avec un nom d'image faux et le déploiement est
+  bloqué. Revenir à la révision qui marchait par l'historique du Deployment,
+  puis livrer l'image correcte avec une cause de changement. Les tests
+  lisent les ReplicaSets et leurs numéros de révision : ils racontent ce qui
+  s'est passé, et un Deployment recréé de zéro ne raconte rien.
+skills:
+  - deployment
+  - rollout
+  - rollback
+  - replicaset
+  - revision-history
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) :
+# « Understand application deployments and how to perform rolling update and
+# rollbacks ». Le lab CKAD voisin règle maxSurge et maxUnavailable ; celui-ci
+# part d'un déploiement bloqué, la situation de l'examen.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace et tout ce qu'il contient.
+# Le cluster reste en place.
+- name: Nettoyer le lab cka-deployment-rollout-rollback
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
