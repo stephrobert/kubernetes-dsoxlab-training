@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Transpose un lab de K8sExamLab vers le contrat dsoxlab courant.
 
 K8sExamLab est l'ancêtre archivé de dsoxlab : moteur et labs y vivaient

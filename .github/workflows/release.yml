@@ -1,0 +1,114 @@
+# Publie une release GitHub avec un bundle tar.gz du catalogue de labs.
+# Pas de PyPI, pas de wheel : ce dépôt est du CONTENU. L'artefact publié est une
+# archive tar.gz du catalogue (labs, socle, contrat), plus son empreinte
+# SHA-256. Déclenché par un tag `vX.Y.Z`.
+#
+# Chaîne de provenance attachée à chaque release :
+#   - provenance SLSA native  → `gh attestation verify <tar.gz> --repo <repo>`
+#   - provenance.intoto.jsonl → asset attendu par Scorecard Signed-Releases
+#   - signature Cosign keyless → `cosign verify-blob` (voir RELEASING.md)
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+# Refus par défaut : le job déclare les portées dont il a besoin.
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Bundle tar.gz et release GitHub
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # créer la release et y attacher les assets
+      id-token: write # OIDC keyless (provenance SLSA + cosign)
+      attestations: write # enregistrer l'attestation de build SLSA du tar.gz
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Construire le bundle tar.gz
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          PKG="kubernetes-dsoxlab-training-${VERSION}"
+          # Contenu publié : le catalogue, le socle, le contrat, la
+          # gouvernance, et les mesures de validation, qui sont la preuve que
+          # chaque lab a été joué dans les deux sens.
+          #
+          # Exclus : le pilotage local, le généré, le VCS. `.claude/`, `todo/`
+          # et `CLAUDE.md` ne sont de toute façon pas versionnés (voir
+          # .git/info/exclude) : les lister ici est une ceinture de sécurité,
+          # pas une nécessité, et une exclusion qui ne correspond à rien ne fait
+          # pas échouer tar, contrairement à un chemin listé mais absent.
+          tar --exclude-vcs \
+              --exclude=".claude" \
+              --exclude="todo" \
+              --exclude="CLAUDE.md" \
+              --exclude=".venv" \
+              --exclude="__pycache__" \
+              --exclude="*.pyc" \
+              --exclude=".pytest_cache" \
+              --exclude=".ruff_cache" \
+              --exclude=".dsoxlab-context.json" \
+              --exclude=".dsoxlab.db" \
+              -czf "${PKG}.tar.gz" \
+              labs shared meta.yml conftest.py pyproject.toml requirements.yml \
+              scripts tests validation-labs.json ssh \
+              README.md LICENSE CONTRIBUTING.md CODE_OF_CONDUCT.md \
+              SECURITY.md CHANGELOG.md
+          sha256sum "${PKG}.tar.gz" > "${PKG}.tar.gz.sha256"
+          echo "PKG=${PKG}" >> "$GITHUB_ENV"
+
+      # Attestation native : SLSA niveau 2 (build hébergé, provenance signée).
+      # Vérifiable avec :
+      #   gh attestation verify <tar.gz> --repo stephrobert/kubernetes-dsoxlab-training
+      - name: Attester la provenance du build
+        id: attest
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: "${{ env.PKG }}.tar.gz"
+
+      - name: Installer Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      # Signature keyless (OIDC et journal Rekor public) : aucune clé privée
+      # stockée. PKG vient de GITHUB_ENV : c'est une variable shell, pas une
+      # interpolation ${{ }} dans un run (règle template-injection).
+      - name: Signer le bundle (keyless Sigstore)
+        run: |
+          set -euo pipefail
+          cosign sign-blob --yes \
+            --bundle "${PKG}.tar.gz.cosign.bundle" \
+            "${PKG}.tar.gz"
+
+      # Scorecard Signed-Releases cherche un asset `*.intoto.jsonl` attaché à la
+      # release, et non l'attestation seule : ce sont deux artefacts distincts.
+      - name: Créer la release GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          set -euo pipefail
+          cp "${BUNDLE}" provenance.intoto.jsonl
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            "${PKG}.tar.gz" \
+            "${PKG}.tar.gz.sha256" \
+            "${PKG}.tar.gz.cosign.bundle" \
+            provenance.intoto.jsonl

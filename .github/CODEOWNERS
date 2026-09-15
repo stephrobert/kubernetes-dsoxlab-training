@@ -1,0 +1,23 @@
+# Propriétaire par défaut de tout le dépôt. Une pull request demande la revue
+# d'un propriétaire (imposé par la règle de protection sur `main`).
+* @stephrobert
+
+# La chaîne CI/CD est la surface la plus sensible du dépôt : un changement ici
+# peut exfiltrer des secrets ou affaiblir tous les autres contrôles. Déclarée
+# explicitement pour qu'une revue reste exigée, même si le propriétaire par
+# défaut ci-dessus venait à être élargi.
+/.github/workflows/ @stephrobert
+/.github/dependabot.yml @stephrobert
+/.plumber.yaml @stephrobert
+/.poutine.yml @stephrobert
+/.pre-commit-config.yaml @stephrobert
+
+# Le socle partagé. Il n'appartient à aucun lab et ils l'incluent tous : une
+# faute ici les casse tous à la fois, et le message d'erreur parlera du lab,
+# jamais du socle.
+/shared/ @stephrobert
+
+# Le juge du catalogue. `valider-labs.py` décide qu'un lab est VALIDE, et rien
+# ne relit son verdict : un assouplissement passé inaperçu rendrait vert un
+# catalogue qui ne prouve plus rien.
+/scripts/valider-labs.py @stephrobert

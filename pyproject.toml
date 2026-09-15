@@ -1,0 +1,107 @@
+[project]
+name = "kubernetes-dsoxlab-training"
+version = "0.1.0"
+description = "Catalogue de micro-labs vérifiables CKA, CKAD et CKS — fournisseur de contenu pour la CLI dsoxlab"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pytest.ini_options]
+# Le contrat dsoxlab impose que chaque lab nomme son test
+# challenge/tests/test_functional.py. Les fichiers partagent donc tous le même
+# basename, dans des répertoires sans __init__.py : le mode d'import
+# « prepend » historique les prend alors pour un seul et même module et échoue
+# en « import file mismatch ». importlib les isole par leur chemin.
+addopts = "--import-mode=importlib"
+
+# `ansible-runner` appelle encore `codecs.open()`, que Python 3.14 déprécie :
+# chaque playbook joué émet une poignée de DeprecationWarning. Ce n'est ni
+# notre code ni notre décision, et ce bruit a un coût réel : il noie les
+# warnings qui parlent, eux, de nos labs. On fait donc taire ce message précis,
+# de cette bibliothèque précise ; tout AUTRE warning reste visible.
+#
+# Le message est traité comme une EXPRESSION RÉGULIÈRE : les parenthèses de
+# `codecs.open()` doivent être échappées, sinon elles forment un groupe vide et
+# le motif ne correspond plus à rien. Guillemets SIMPLES : en TOML, une chaîne
+# littérale n'interprète pas les échappements, ce qu'il faut pour une regex.
+filterwarnings = [
+    "default",
+    'ignore:codecs\.open\(\) is deprecated:DeprecationWarning',
+]
+
+# Ne collecter QUE les tests des challenges. Le contrat dsoxlab impose leur
+# emplacement (challenge/tests/test_functional.py) : tout ce qui porte
+# `test_*.py` ailleurs est autre chose.
+#
+# Conséquence voulue : `tests/` (les vérificateurs de CATALOGUE : collections
+# déclarées, syntaxe des playbooks, indices, style, pièges du dépôt) reste hors
+# de la suite normale. Ils ne valident pas un lab, ils valident le dépôt, et
+# ils sont câblés en pre-commit. On les lance explicitement :
+#     pytest tests/ -v
+# Un chemin passé en argument prime sur testpaths : cette commande fonctionne
+# malgré l'exclusion.
+testpaths = ["labs"]
+norecursedirs = ["deps", "*.egg", ".git", ".venv", "__pycache__"]
+
+[tool.ruff]
+# Les règles sont fixées ICI, et c'est le point important. Les hooks et la CI
+# appellent `uvx ruff`, qui prend la DERNIÈRE version publiée : sans jeu de
+# règles écrit dans le dépôt, ce que ruff juge change le jour où ruff change
+# d'avis, et le job « parité pre-commit » de la CI cesse de prouver ce qu'il
+# annonce. Le cas n'est pas théorique : ruff 0.16 a élargi son jeu par défaut
+# par rapport aux E4/E7/E9/F historiques. Vérifié le 2026-09-15 que cette
+# section est bien celle qui s'applique, en forçant une règle qu'elle ignore.
+target-version = "py311"
+
+[tool.ruff.lint]
+# Jeu calibré sur ce dépôt : tout ce qui attrape un vrai défaut, rien qui
+# oblige à réécrire 37 labs pour une question de goût.
+select = [
+    "E4", "E7", "E9", "F",  # les défauts de ruff : erreurs réelles
+    "I",    # imports triés
+    "UP",   # tournures dépassées pour la version cible
+    "B",    # bugbear : les pièges qui se paient à l'exécution
+    "BLE",  # except nu : une exception avalée se paie plus tard
+    "SIM",  # simplifications lisibles
+    "RUF",  # règles propres à ruff
+    "EXE",  # shebang et bit d'exécution cohérents
+    "DTZ",  # dates sans fuseau : elles changent de valeur selon la machine
+    "PLE", "PLW",  # erreurs et avertissements pylint
+    "S",    # bandit, la lecture sécurité
+]
+ignore = [
+    # E501 (ligne trop longue) n'est pas retenue : les messages d'assertion de
+    # ce dépôt enseignent, et les couper à 88 colonnes les rendrait moins
+    # lisibles, pas plus. 442 constats, aucun défaut derrière.
+    "E501",
+    # S101 : `assert` est le verbe de pytest. L'interdire dans un dépôt dont le
+    # contenu est fait de tests n'aurait aucun sens.
+    "S101",
+    # S603 et S607 : appeler un sous-processus, et le nommer sans chemin
+    # absolu, est le métier de ce dépôt. `kubectl`, `ssh` et `ansible-playbook`
+    # viennent du PATH, délibérément : c'est ainsi que l'apprenant les appelle.
+    "S603", "S607",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Les tests de labs lisent des sorties de commandes et comparent des valeurs
+# nommées par le sujet (codes HTTP, tailles de cgroup, nombres de replicas) :
+# les extraire en constantes éloignerait le chiffre de ce qu'il mesure.
+"labs/**/test_functional.py" = ["PLR2004"]
+
+[tool.uv]
+# Ce dépôt n'est pas un package Python, juste un fournisseur de labs.
+package = false
+
+[dependency-groups]
+# dsoxlab n'est PAS déclaré ici, contrairement au catalogue Linux jumeau, et
+# c'est délibéré. Il l'y est en source chemin local éditable (`../dsoxlab`),
+# ce qui oblige chaque hook et chaque job de CI à passer par
+# `uv run --no-project` pour éviter qu'uv ne tente de rebuilder un dépôt absent
+# du checkout. Ici la CLI est un OUTIL, installé à part :
+#     uv tool install dsoxlab      # ou : uvx dsoxlab <commande>
+# Le dépôt ne garde en dev-dep que ce dont ses vérificateurs de catalogue ont
+# besoin pour lire des YAML.
+dev = [
+    "pyyaml>=6",
+    "pytest>=8",
+]

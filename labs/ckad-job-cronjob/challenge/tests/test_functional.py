@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -41,7 +41,7 @@ def _json(host, args: str, absent: str) -> dict:
 
 
 def _instant(texte: str) -> datetime:
-    return datetime.strptime(texte, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return datetime.strptime(texte, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
 
 
 # ----------------------------------------------------------------------

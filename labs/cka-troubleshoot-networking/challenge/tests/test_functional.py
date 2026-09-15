@@ -120,7 +120,7 @@ def test_le_client_joint_le_service(host):
             f"http://{SERVICE}/ ne répond pas, et le Service n'a aucun endpoint : "
             "commencez par le selector, les tests précédents disent quoi regarder."
         )
-        assert False, (
+        pytest.fail(
             f"Le Service a des endpoints, mais http://{SERVICE}/ ne répond pas "
             "depuis le client. Reste le port, ou une politique réseau qui bloque "
             f"encore le trafic entrant vers les Pods web. Sortie : {res.stderr.strip()[:200]}"

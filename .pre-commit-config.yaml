@@ -1,0 +1,151 @@
+# Hooks pre-commit d'un dépôt de CONTENU (catalogue de labs). Arrêt net contre
+# la fuite de secrets et de clés privées, et contre le commit de fichiers
+# générés. Pas de mypy : il n'y a pas de source de paquet ; le contrat
+# déclaratif est vérifié par `dsoxlab validate-structure`.
+#
+# Installer une fois :   pre-commit install --install-hooks
+# Tout passer :          pre-commit run --all-files
+#
+# Ce que ce fichier NE refait pas, et c'est délibéré : les liens relatifs
+# cassés, les fixtures déclarées mais absentes, la cohérence des cibles d'un lab
+# avec meta.yml. Le moteur les rend déjà (`validate-structure`, hook pre-push),
+# et un second contrôle qui diverge du premier est pire qu'aucun.
+
+minimum_pre_commit_version: "3.5.0"
+default_install_hook_types: [pre-commit, pre-push]
+
+repos:
+  # Hygiène générale, et arrêt net sur les secrets et les clés privées.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '(^LICENSE$|\.md$)'
+      - id: end-of-file-fixer
+        exclude: '^LICENSE$'
+      - id: check-yaml # valide chaque lab.yaml, setup.yaml, meta.yml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=2048']
+      - id: detect-private-key # refuse une clé SSH privée commitée
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Outillage du catalogue : lint du Python des labs, chasse aux secrets,
+  # vérificateurs de catalogue, contrat déclaratif.
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (lint du python des labs)
+        entry: uvx ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      # Une dependabot.yml invalide est refusée en bloc par GitHub, qui cesse
+      # alors d'ouvrir des PR : cela ressemble exactement à « aucune mise à
+      # jour disponible ». Le catalogue Linux jumeau en a fait les frais avec
+      # des paliers semver-*-days que l'écosystème github-actions ne supporte
+      # pas. Le hook réduit l'écart, il ne le ferme pas : il rejette une clé mal
+      # orthographiée ou un écosystème inexistant, pas une restriction propre à
+      # un écosystème.
+      - id: dependabot-schema
+        name: dependabot.yml est conforme au schéma officiel
+        entry: uvx check-jsonschema --builtin-schema vendor.dependabot
+        language: system
+        files: '^\.github/dependabot\.yml$'
+
+      - id: trufflehog
+        name: trufflehog (chasse aux secrets)
+        # --no-update : ne jamais aller chercher un binaire neuf au moment du
+        # hook, c'est la chaîne d'approvisionnement du poste qui s'élargirait.
+        entry: trufflehog git file://. --since-commit HEAD --results=verified --fail --no-update
+        language: system
+        pass_filenames: false
+
+      # Une collection Ansible employée mais non déclarée ne se voit pas : elle
+      # est installée par hasard sur la machine de qui a écrit le lab, absente
+      # sur celle du suivant, et l'échec se présente alors comme un « rc=4 »
+      # d'Ansible, qui ressemble à un problème de réseau.
+      - id: collections-declarees
+        name: toute collection Ansible employée est déclarée
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_collections_declarees.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Les indices sont encodés pour qu'un apprenant n'y accède pas en ouvrant
+      # le fichier, et bilingues pour de vrai : `text_fr` reste une copie de
+      # l'anglais tant que personne n'est passé, et le fichier a l'air complet.
+      - id: indices
+        name: les indices sont encodés, bilingues et à coût croissant
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_indices.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Le style du blog interdit emoji et tiret cadratin dans ce que
+      # l'apprenant lit. Une règle de rédaction sans contrôle dérive au premier
+      # lab écrit vite, et le tiret cadratin arrive tout seul.
+      - id: style-apprenant
+        name: ce que l'apprenant lit n'a ni emoji ni tiret cadratin
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_style_apprenant.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Les quatre pièges que ce dépôt a payés au moins une fois : un ssh sans
+      # -n dans une solution lue par `bash -s`, un prepare.sh qui ne trace pas,
+      # un setup qui n'installe pas le socle, un namespace jamais supprimé.
+      - id: pieges-du-depot
+        name: les pièges documentés ne sont pas retombés
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_pieges_du_depot.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Garde-fou d'outillage : un test présent mais débranché ne protège plus
+      # rien, et personne ne s'en aperçoit.
+      - id: outillage-coherent
+        name: les vérificateurs de catalogue sont présents et câblés
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_outillage_coherent.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # Un YAML valide ne prouve pas qu'Ansible charge les tâches : une
+      # apostrophe dans un bloc `shell` casse le découpage des arguments, et le
+      # playbook ne se voit refusé qu'à l'exécution, en rc=4 sans une seule
+      # tâche jouée. On ne le lance que si un playbook change : `--syntax-check`
+      # sort un processus par fichier.
+      - id: playbooks-syntaxe
+        name: les setup/cleanup et le socle se chargent (ansible-playbook --syntax-check)
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_playbooks_syntaxe.py -q
+        language: system
+        pass_filenames: false
+        files: '^(labs/.*/(setup|cleanup)\.yaml|shared/.*\.yml)$'
+
+      # Le contrat déclaratif est vérifié au push, hors du chemin de chaque
+      # commit pour la vitesse. Un provider doit être choisi même si rien n'est
+      # provisionné ici.
+      - id: validate-structure
+        name: dsoxlab validate-structure
+        entry: env DSOXLAB_PROVIDER=kvm uvx dsoxlab validate-structure
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Le README doit lister tous les labs avec leur leçon jumelée. Il est
+      # régénéré depuis les lab.yaml réels ; un catalogue périmé bloque le push.
+      #
+      # --no-project : environnement éphémère avec juste pyyaml, pour qu'uv ne
+      # résolve pas le pyproject de ce dépôt.
+      - id: catalog-fresh
+        name: le catalogue du README est à jour (labs + leçons)
+        entry: uv run --no-project --with pyyaml python scripts/gen_catalog.py --check
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

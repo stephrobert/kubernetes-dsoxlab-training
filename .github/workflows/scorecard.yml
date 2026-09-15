@@ -1,0 +1,55 @@
+# OpenSSF Scorecard : mesure la posture de sécurité de la chaîne
+# d'approvisionnement du dépôt (protection de branche, dépendances épinglées,
+# permissions des jetons, revue de code…) et publie le résultat sur le
+# visualiseur public Scorecard, qui alimente le badge du README.
+name: OpenSSF Scorecard
+
+on:
+  push:
+    branches: [main]
+  branch_protection_rule:
+  schedule:
+    - cron: '30 1 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    name: Analyse Scorecard
+    # Scorecard a besoin d'un dépôt public (API du graphe de commits et
+    # publication du résultat). Se saute tant que le dépôt est privé, s'active
+    # tout seul une fois public.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write   # dépôt du SARIF dans Code Scanning
+      id-token: write          # publication du résultat à l'API OpenSSF Scorecard
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Lancer Scorecard
+        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true # publie au visualiseur OpenSSF, qui alimente le badge
+
+      - name: Déposer le SARIF dans Code Scanning
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        with:
+          sarif_file: results.sarif

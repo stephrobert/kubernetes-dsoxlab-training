@@ -1,0 +1,247 @@
+# Porte d'entrée d'un dépôt de CONTENU (catalogue de labs), pas d'un paquet
+# Python. zizmor analyse d'abord les workflows eux-mêmes (barrière rapide) ; les
+# jobs plus lourds n'attendent que lui. Aucun build, aucune publication, aucun
+# artefact.
+#
+# Base de durcissement : chaque action est épinglée par SHA de commit complet,
+# le jeton par défaut n'a aucune permission, chaque job demande uniquement ce
+# dont il a besoin, le checkout ne conserve jamais d'identifiants, et chaque job
+# porte une limite de temps.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Refus par défaut : un job déclare les portées dont il a besoin, rien n'est
+# hérité.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Barrière de sécurité rapide : les autres jobs en dépendent.
+  zizmor:
+    name: Zizmor (analyse statique des workflows)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Zizmor
+        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+        with:
+          version: "1.26.1"
+          advanced-security: false
+
+  # Syntaxe des workflows. actionlint est le seul analyseur qui refuse une
+  # portée de permission inexistante (par exemple le tentant mais imaginaire
+  # `administration: read`) et qui passe chaque bloc `run:` au shellcheck.
+  # Installé depuis l'archive de release épinglée, empreinte SHA-256 vérifiée,
+  # comme trufflehog plus bas : aucune action tierce supplémentaire n'entre dans
+  # la frontière de confiance juste pour faire du lint.
+  actionlint:
+    name: Actionlint (syntaxe des workflows)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Installer actionlint (binaire de release vérifié)
+        env:
+          ACTIONLINT_VERSION: "1.7.12"
+        run: |
+          set -euo pipefail
+          workdir="$(mktemp -d)"
+          base="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          asset="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -fsSL -o "${workdir}/${asset}" "${base}/${asset}"
+          curl -fsSL -o "${workdir}/checksums.txt" "${base}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          (cd "${workdir}" && grep " ${asset}$" checksums.txt | sha256sum -c -)
+          tar -xzf "${workdir}/${asset}" -C "${workdir}" actionlint
+          sudo install -m 0755 "${workdir}/actionlint" /usr/local/bin/actionlint
+          actionlint --version
+
+      - name: Lancer actionlint
+        run: actionlint -color
+
+  # Analyse des chaînes d'exploitation CI/CD : modélise les déclencheurs, les
+  # permissions et les flux de données pour faire apparaître des scénarios
+  # d'attaque complets (checkout de code non fiable puis exécution, injection,
+  # permissions par défaut trop larges). Complète zizmor plutôt que de le
+  # répéter.
+  poutine:
+    name: Poutine (chaînes d'exploitation CI/CD)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Poutine
+        uses: boostsecurityio/poutine-action@e240ebd3eff8b2db5a8e5f6b28f58739d7db2247 # v1.1.4
+
+  # Parité : jouer TOUS les hooks pre-commit (étapes commit ET push), exactement
+  # comme le ferait le pre-commit local d'un contributeur. Rien de ce qui est
+  # imposé localement (hygiène, ruff, trufflehog, vérificateurs de catalogue,
+  # contrat déclaratif, fraîcheur du README) ne peut alors passer avec un
+  # `git commit --no-verify` : un hook en échec refuse la PR. C'est la source de
+  # vérité unique, la CI joue le .pre-commit-config.yaml et non une copie de ses
+  # étapes entretenue à la main.
+  pre-commit:
+    name: Parité pre-commit (tous les hooks)
+    needs: zizmor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      # Ce dépôt déclare deux providers ; le hook pre-push validate-structure
+      # en veut un actif, même si la CI ne provisionne rien.
+      DSOXLAB_PROVIDER: kvm
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # trufflehog parcourt l'historique git
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+
+      # Sans ansible-playbook sur le PATH, le contrôle de syntaxe des playbooks
+      # se met en `skip` : le job resterait vert en n'ayant rien vérifié, ce qui
+      # est exactement la panne de harnais déguisée en succès que ce dépôt
+      # cherche à éviter. Le test exige d'ailleurs que le socle se charge.
+      - name: Installer ansible-core (le contrôle de syntaxe en dépend)
+        run: |
+          set -euo pipefail
+          uv tool install ansible-core
+          ansible-playbook --version | head -1
+
+      - name: Installer trufflehog (binaire de release vérifié ; le hook tourne avec --no-update)
+        # Archive de release épinglée, empreinte SHA-256 vérifiée contre les
+        # sommes publiées avant usage : pas de script distant passé au shell
+        # (Plumber ISSUE-411).
+        env:
+          TRUFFLEHOG_VERSION: "3.95.2"
+        run: |
+          set -euo pipefail
+          workdir="$(mktemp -d)"
+          base="https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}"
+          asset="trufflehog_${TRUFFLEHOG_VERSION}_linux_amd64.tar.gz"
+          curl -fsSL -o "${workdir}/${asset}" "${base}/${asset}"
+          curl -fsSL -o "${workdir}/checksums.txt" "${base}/trufflehog_${TRUFFLEHOG_VERSION}_checksums.txt"
+          (cd "${workdir}" && grep " ${asset}$" checksums.txt | sha256sum -c -)
+          tar -xzf "${workdir}/${asset}" -C "${workdir}" trufflehog
+          sudo install -m 0755 "${workdir}/trufflehog" /usr/local/bin/trufflehog
+          trufflehog --version
+
+      - name: Jouer chaque hook (étape commit)
+        run: uvx pre-commit@4.6.0 run --all-files --show-diff-on-failure --color always
+
+      - name: Jouer chaque hook (étape push)
+        run: uvx pre-commit@4.6.0 run --all-files --hook-stage pre-push --show-diff-on-failure --color always
+
+  # Le contrat déclaratif, cette fois avec le réseau. `--check-urls` demande à
+  # chaque `doc_url` de répondre : une leçon renommée côté blog laisse sinon un
+  # lien mort que rien ne signale, et l'apprenant tombe dessus au moment précis
+  # où il cherche le cours.
+  #
+  # Ce contrôle est délibérément absent des hooks pre-commit : un commit hors
+  # ligne ne doit pas échouer, et une indisponibilité du site n'a rien à voir
+  # avec la justesse d'un lab. Il a donc sa place ici, et seulement ici.
+  contrat:
+    name: Contrat du catalogue (leçons jumelées comprises)
+    needs: zizmor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      DSOXLAB_PROVIDER: kvm
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+
+      - name: Vérifier la structure et les leçons jumelées
+        run: uvx dsoxlab validate-structure --check-urls
+
+  # Analyse statique du Python du dépôt (tests de labs, conftest, vérificateurs
+  # de catalogue). Les constats vont dans l'onglet Sécurité, aucun artefact
+  # n'est publié.
+  codeql:
+    name: CodeQL (python)
+    needs: zizmor
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialiser CodeQL
+        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+        with:
+          languages: python
+          build-mode: none # Python est interprété, aucun build à observer
+
+      - name: Analyser
+        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6

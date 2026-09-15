@@ -21,7 +21,7 @@ from conftest import lab_host, lab_target_host
 NAMESPACE = "lab"
 POD = "app"
 CONFIGMAP = "app-settings"
-SECRET = "db-credentials"
+SECRET = "db-credentials"  # noqa: S105 - nom d'un Secret, pas un mot de passe
 MONTAGE = "/etc/app-config"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
@@ -93,7 +93,7 @@ def test_le_pod_recoit_les_variables_par_reference(host):
     )
     conteneur = pod["spec"]["containers"][0]
     sources = {
-        (list(ref.keys())[0], list(ref.values())[0].get("name"))
+        (next(iter(ref.keys())), next(iter(ref.values())).get("name"))
         for ref in conteneur.get("envFrom") or []
     }
     en_clair = [

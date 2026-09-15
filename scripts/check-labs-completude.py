@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Dit ce qui reste à faire sur chaque lab, et refuse de laisser passer un
 lab transposé qu'on aurait cru fini.
 
@@ -14,7 +13,7 @@ que le contrat ne regarde pas.
 
 CE QU'IL NE PEUT PAS VÉRIFIER, et qui reste à la charge de l'auteur : qu'un
 lab **joué** rende 0 avant le travail et 100 après. Aucun script ne le dira à
-votre place, c'est la règle non négociable du `CLAUDE.md`.
+votre place, c'est la règle non négociable de `CONTRIBUTING.md`.
 """
 
 from __future__ import annotations

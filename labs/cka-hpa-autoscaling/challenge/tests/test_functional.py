@@ -118,7 +118,7 @@ def test_la_charge_est_coupee(host):
         p["metadata"]["name"] for p in json.loads(res.stdout)["items"]
         if not p["metadata"].get("deletionTimestamp")
         and p["status"].get("phase") == "Running"
-        and not (p["metadata"].get("labels") or {}).get("app") == DEPLOYMENT
+        and (p["metadata"].get("labels") or {}).get("app") != DEPLOYMENT
     ]
     assert not generateurs, (
         f"Ces Pods tournent encore dans {NAMESPACE} : {generateurs}. La charge de test se coupe "

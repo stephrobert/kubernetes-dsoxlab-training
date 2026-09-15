@@ -1,0 +1,31 @@
+# Poutine, analyse des chaînes d'exploitation CI/CD.
+#
+# Acquittements CIBLÉS uniquement. La règle reste globalement active pour que
+# toute AUTRE action tierce continue d'être signalée : chaque exception ci-
+# dessous nomme un purl exact.
+#
+# `github_action_from_unverified_creator_used` se déclenche sur toute action
+# dont le propriétaire n'est pas « verified creator » sur la Marketplace. Ce
+# statut est une formalité de publication, pas un verdict de sécurité :
+# plusieurs outils de sécurité de premier plan ne le portent pas. Chaque action
+# ci-dessous est épinglée par SHA de commit, listée dans
+# `.plumber.yaml: trustedGithubActions`, et relue à la main.
+skip:
+  - rule: github_action_from_unverified_creator_used
+    purl:
+      # Action officielle du scanner plumber lui-même (getplumber.io), qui juge
+      # la conformité de ce dépôt.
+      - pkg:githubactions/getplumber/plumber
+      # Action officielle du scanner zizmor (zizmorcore), la barrière d'analyse
+      # statique des workflows dans ci.yml.
+      - pkg:githubactions/zizmorcore/zizmor-action
+      # Action officielle de poutine lui-même (BoostSecurity), le scanner qui
+      # lit cette configuration.
+      - pkg:githubactions/boostsecurityio/poutine-action
+      # Astral, mainteneur de uv et ruff, l'outillage sur lequel repose ce dépôt.
+      - pkg:githubactions/astral-sh/setup-uv
+      # StepSecurity, harden-runner, la surveillance de sortie réseau posée en
+      # première étape de chaque job.
+      - pkg:githubactions/step-security/harden-runner
+      # Sigstore, le projet amont derrière la signature keyless cosign.
+      - pkg:githubactions/sigstore/cosign-installer

@@ -101,7 +101,7 @@ def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
         if "pods" in ressources or "*" in ressources:
             verbes_pods |= verbes
         autres += sorted(r for r in ressources if r not in ("pods",))
-    assert VERBES_LECTURE <= verbes_pods, (
+    assert verbes_pods >= VERBES_LECTURE, (
         f"Le Role donne {sorted(verbes_pods)} sur les Pods, il manque {sorted(VERBES_LECTURE - verbes_pods)}."
     )
     en_trop = verbes_pods - VERBES_LECTURE

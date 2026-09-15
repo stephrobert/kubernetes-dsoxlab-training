@@ -176,7 +176,7 @@ def test_ce_qui_a_ete_ecrit_apres_la_sauvegarde_a_disparu(host):
         "soir : si le cluster tournait sur les données restaurées, il n'existerait plus. Soit la "
         "restauration n'a pas eu lieu, soit l'API server sert encore son cache d'avant."
     )
-    res = _kubectl(host, f"-n default get configmaps -o json")
+    res = _kubectl(host, "-n default get configmaps -o json")
     assert res.rc == 0, f"La liste des ConfigMaps de default échoue : {res.stderr.strip()[:200]}"
     noms = [c["metadata"]["name"] for c in json.loads(res.stdout)["items"]]
     assert BRUIT not in noms, (

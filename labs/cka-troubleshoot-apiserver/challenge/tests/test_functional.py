@@ -73,7 +73,7 @@ def test_le_pod_statique_tourne(host):
             return
         time.sleep(5)
     raison = ((statut.get("state") or {}).get("waiting") or {}).get("reason")
-    assert False, (
+    pytest.fail(
         f"Après 90 s, le Pod {POD} est en phase {pod['status'].get('phase')!r}, "
         f"prêt : {statut.get('ready')}, raison d'attente : {raison}, "
         f"redémarrages : {statut.get('restartCount')}. Le conteneur sort encore "

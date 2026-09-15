@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Propose, pour chaque lab de K8sExamLab, la leçon du blog qui lui correspond.
 
 `doc_url` est le champ que le convertisseur ne peut pas deviner, et c'est le
@@ -54,9 +53,9 @@ def mots(texte: str) -> set[str]:
 def lecons() -> list[tuple[str, str, str]]:
     d = yaml.safe_load(PARCOURS.read_text(encoding="utf-8"))
     return [
-        (l["title"], l["href"], m["id"])
+        (lecon["title"], lecon["href"], m["id"])
         for m in d["modules"]
-        for l in m.get("lessons", [])
+        for lecon in m.get("lessons", [])
     ]
 
 
@@ -78,7 +77,7 @@ def apparier(lab: dict, cibles: list[tuple[str, str, str]]):
     cles = mots(" ".join(lab.get("tags") or [])) | mots(lab.get("title", ""))
     cles |= mots(lab.get("domain", "").replace("-", " "))
     meilleur = None
-    for titre, href, module in cibles:
+    for titre, href, _module in cibles:
         candidat = mots(titre) | mots(href.replace("/", " ").replace("-", " "))
         score = len(cles & candidat)
         if meilleur is None or score > meilleur[0]:

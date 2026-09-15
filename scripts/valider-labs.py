@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Joue chaque lab dans les deux sens et vérifie qu'il ne laisse aucune trace.
 
-C'est la règle non négociable du CLAUDE.md, automatisée : un test qui passe
+C'est la règle non négociable de CONTRIBUTING.md, automatisée : un test qui passe
 ne prouve rien tant qu'on n'a pas vu échouer ce qui doit échouer. Pour chaque
 lab, dans l'ordre :
 
@@ -35,12 +34,13 @@ d'automatisation en place (dsoxlab instructor bootstrap).
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import subprocess
 import sys
 import time
-from datetime import date
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -117,8 +117,11 @@ def commande(args: list[str], journal, timeout: int, entree: str | None = None) 
     journal.flush()
     env = dict(os.environ, LAB_HOME=str(RACINE))
     try:
+        # check=False : c'est l'appelant qui juge le code de retour, et
+        # une exception ici perdrait la sortie déjà journalisée.
         res = subprocess.run(args, capture_output=True, text=True, timeout=timeout, env=env,
-                             stdin=subprocess.DEVNULL if entree is None else None, input=entree, cwd=RACINE)
+                             stdin=subprocess.DEVNULL if entree is None else None, input=entree,
+                             cwd=RACINE, check=False)
     except subprocess.TimeoutExpired as e:
         journal.write(f"DÉLAI DÉPASSÉ après {timeout}s\n")
         raise Echec(f"délai de {timeout}s dépassé : {' '.join(args[:3])}") from e
@@ -174,7 +177,7 @@ def trace_prepare(hote: str, journal) -> str:
 
 def photographier(hote: str, journal) -> dict:
     res = ssh(hote, PHOTOGRAPHIE, journal, 180, root=True)
-    lignes = [l for l in res.stdout.splitlines() if l.startswith("{")]
+    lignes = [ligne for ligne in res.stdout.splitlines() if ligne.startswith("{")]
     if res.returncode != 0 or not lignes:
         raise Echec(f"photographie du cluster impossible : {res.stderr.strip()[-300:]}")
     return json.loads(lignes[-1])
@@ -241,7 +244,7 @@ def valider(lab: Path, rejeu: bool) -> dict:
     CACHE.mkdir(parents=True, exist_ok=True)
     journal_path = CACHE / f"validation-{ident}.log"
     debut = time.time()
-    resultat: dict = {"date": date.today().isoformat(), "cible": hote, "journal": str(journal_path)}
+    resultat: dict = {"date": datetime.now(tz=UTC).date().isoformat(), "cible": hote, "journal": str(journal_path)}
     etapes: list[str] = []
 
     def dire(msg: str) -> None:
@@ -287,10 +290,8 @@ def valider(lab: Path, rejeu: bool) -> dict:
             resultat["erreur"] = str(e)
             dire(f"ÉCHEC : {e}")
             # On tente quand même de rendre le cluster.
-            try:
+            with contextlib.suppress(Echec):
                 dsoxlab(["clean", ident, "--yes"], journal, 600)
-            except Echec:
-                pass
 
     resultat["duree_s"] = round(time.time() - debut)
     resultat["verdict"] = verdict(resultat, rejeu)

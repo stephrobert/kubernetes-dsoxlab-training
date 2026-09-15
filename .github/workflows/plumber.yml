@@ -1,0 +1,81 @@
+# Valide la chaîne CI/CD de ce dépôt avec Plumber (getplumber.io) : il analyse
+# les workflows GitHub Actions et les réglages du dépôt au regard de
+# `.plumber.yaml`, dépose ses constats dans Code Scanning, publie le score de
+# conformité qui alimente le badge du README, et échoue sous le seuil. L'action
+# vérifie l'attestation de provenance SLSA du binaire téléchargé avant de le
+# lancer.
+#
+# Ce workflow ne tourne QUE dans des contextes de confiance (push sur main,
+# planification, déclenchement manuel) : il a besoin d'un jeton privilégié
+# (Administration: read) pour vérifier la protection de branche, et ce secret ne
+# doit jamais être exposé à une exécution `pull_request`, en particulier depuis
+# un fork. Les pull requests sont couvertes côté sécurité des workflows par
+# zizmor dans ci.yml, qui n'utilise aucun secret.
+#
+# PRÉREQUIS DE CONFIGURATION, à faire une fois dans les réglages GitHub : créer
+# l'environnement `security`, restreint à la branche `main`, et y déposer le
+# secret `PLUMBER_ADMIN_TOKEN` (PAT à portée fine, Administration + Contents +
+# Metadata en lecture). Sans lui, le contrôle `branchMustBeProtected`
+# s'abstient : il ne rend pas le job rouge, il cesse simplement de vérifier.
+name: Conformité Plumber
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 2 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plumber:
+    name: Analyse Plumber
+    # Se saute tant que le dépôt est privé (le dépôt de SARIF demande Advanced
+    # Security, gratuit sur les dépôts publics) ; s'active tout seul une fois
+    # public.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # Le jeton privilégié vit dans cet environnement protégé, restreint à la
+    # branche main : il est hors d'atteinte d'une exécution pull_request.
+    environment: security
+    permissions:
+      contents: read
+      security-events: write   # dépôt du SARIF dans Code Scanning
+      actions: read            # lecture de l'exécution pour le statut Plumber
+      id-token: write          # OIDC pour publier le score à score.getplumber.io
+    steps:
+      - name: Durcir le runner
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Analyse de conformité Plumber
+        uses: getplumber/plumber@e81ed4965fd92e0d2b63e95d399ed0419f5de2fa # v0.4.36
+        with:
+          version: "v0.4.3"
+          verify-attestation: "true"   # provenance SLSA du binaire, avant de le lancer
+          # La barrière est le score Plumber lui-même. `threshold` est OBSOLÈTE
+          # et sa valeur 100 est explicitement « traitée comme non définie » par
+          # l'action : elle ne gardait rien. min-points avec soft-fail à false
+          # est la vraie barrière : le job ne passe qu'à 100/100, et le moindre
+          # constat le fait échouer.
+          min-points: "100"
+          soft-fail: "false"
+          upload-sarif: "true"          # constats dans l'onglet Sécurité
+          upload-artifacts: "false"     # aucun artefact téléchargeable publié
+          score-push: "true"            # publie le score, qui alimente le badge
+          # PAT à portée fine (Administration + Contents + Metadata en lecture),
+          # stocké comme secret de l'environnement protégé `security`, pour que
+          # branchMustBeProtected soit vérifié pour de vrai.
+          github-token: ${{ secrets.PLUMBER_ADMIN_TOKEN }}
