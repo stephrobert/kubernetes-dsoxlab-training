@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le worker n'a ni le
+# taint ni le label, le namespace existe et il est vide. Tout ce que le
+# candidat doit faire reste à faire.
+#
+# Transposé de K8sExamLab, qui tournait sur kind. Confronté à Kubernetes
+# 1.37 le 2026-09-15.
+- name: Préparer le lab cka-taints-tolerations-placement
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le namespace, retirer ce qu'un passage précédent a laissé
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

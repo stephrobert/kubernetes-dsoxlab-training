@@ -1,0 +1,39 @@
+id: cka-node-affinity
+title: "Placer avec nodeAffinity : contrainte obligatoire et préférence"
+level: workloads-scheduling
+description: |
+  Placer un Deployment par une affinité de nœud obligatoire sur un label à
+  plusieurs valeurs, y ajouter une préférence pondérée, puis débloquer un
+  Pod qui attend un nœud qui n'existe pas encore en posant le label qu'il
+  exige. Les tests lisent les labels des nœuds, les affinités déclarées et
+  le nœud réel de chaque Pod.
+skills:
+  - nodeAffinity
+  - requiredDuringScheduling
+  - preferredDuringScheduling
+  - node-labels
+  - scheduling
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) : les
+# mécanismes de placement, nodeAffinity en particulier. Le lab hérité
+# exigeait kubernetes.io/os=linux, contrainte que tout nœud satisfait ;
+# ici la contrainte obligatoire porte sur un label que seul le worker a,
+# ce qui rend son effet mesurable.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

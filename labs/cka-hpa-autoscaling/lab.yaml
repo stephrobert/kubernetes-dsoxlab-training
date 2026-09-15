@@ -1,0 +1,38 @@
+id: cka-hpa-autoscaling
+title: "Faire monter en charge automatiquement avec un HorizontalPodAutoscaler"
+level: workloads-scheduling
+description: |
+  Poser un HPA sur un Deployment, générer de la charge, voir la montée en
+  replicas, puis couper la charge. Les tests lisent le HPA, ses métriques
+  courantes, et l'event de redimensionnement que le contrôleur a émis : un
+  HPA qui n'a jamais redimensionné n'est pas un HPA validé.
+skills:
+  - hpa
+  - autoscaling
+  - metrics-server
+  - resource-requests
+  - load-testing
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) :
+# « Configure workload autoscaling ». Le lab hérité lisait le spec du HPA et
+# un ConfigMap recopiant ses valeurs ; ici la charge doit être générée, et
+# la montée observée. metrics-server 0.9.0, la version courante, est
+# installé par le setup et retiré par le nettoyage.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

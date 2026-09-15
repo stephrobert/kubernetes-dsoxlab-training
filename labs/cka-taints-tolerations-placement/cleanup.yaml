@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, puis le taint et le label
+# posés sur le worker, pour rendre au socle le nœud qu'il attend.
+- name: Nettoyer le lab cka-taints-tolerations-placement
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le taint env du worker
+      ansible.builtin.command: kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes k8s-w1.lab env-
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le label disktype du worker
+      ansible.builtin.command: kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes k8s-w1.lab disktype-
+      changed_when: true
+      failed_when: false

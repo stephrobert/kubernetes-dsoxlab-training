@@ -1,0 +1,32 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : installe metrics-server
+# dans sa version courante, avec l'option que kubeadm impose parce que les
+# certificats de service des kubelets sont auto-signés, attend que
+# kubectl top réponde, puis pose l'application et son Service. Le HPA, la
+# charge et son arrêt restent au candidat.
+#
+# Transposé de K8sExamLab, qui ne générait aucune charge. metrics-server
+# 0.9.0 mesuré disponible sur GitHub le 2026-09-15. Confronté à Kubernetes
+# 1.37 le même jour.
+- name: Préparer le lab cka-hpa-autoscaling
+  hosts: lab_target
+  become: true
+  vars:
+    metrics_server_version: "0.9.0"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Récupérer le manifeste de metrics-server {{ metrics_server_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/kubernetes-sigs/metrics-server/releases/download/v{{ metrics_server_version }}/components.yaml"
+        dest: "/root/metrics-server-v{{ metrics_server_version }}.yaml"
+        mode: "0644"
+
+    - name: Installer metrics-server et poser l'application
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        MANIFESTE: "/root/metrics-server-v{{ metrics_server_version }}.yaml"

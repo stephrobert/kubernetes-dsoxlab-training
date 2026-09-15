@@ -1,0 +1,38 @@
+id: cka-taints-tolerations-placement
+title: "Réserver un nœud : taint, tolérance et nodeSelector"
+level: workloads-scheduling
+description: |
+  Réserver le worker à la production par un taint et un label, puis placer
+  un Pod qui doit y aller, tolérance et nodeSelector, et un Pod qui ne doit
+  pas y aller. Les tests lisent le nœud, le placement réel de chaque Pod et
+  les mécanismes déclarés : un Pod épinglé par nodeName contourne le taint
+  et ne passe pas.
+skills:
+  - taints
+  - tolerations
+  - nodeSelector
+  - node-labels
+  - scheduling
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) :
+# « Understand how resource limits can affect Pod scheduling » et les
+# mécanismes de placement. Le lab hérité tournait sur kind avec un nœud
+# nommé kind-worker ; ici c'est k8s-w1.lab, un vrai worker.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

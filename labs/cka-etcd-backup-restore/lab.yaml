@@ -1,0 +1,41 @@
+id: cka-etcd-backup-restore
+title: "Sauvegarder etcd, puis restaurer le cluster depuis un instantané"
+level: cluster-architecture-installation-configuration
+description: |
+  Un namespace a disparu. Prendre d'abord une sauvegarde fraîche de l'état
+  courant, puis restaurer le cluster depuis l'instantané de la veille, sans
+  arrêter le mauvais composant et sans laisser l'API server sur un cache
+  périmé. Les tests prouvent qu'etcd tourne sur un répertoire produit
+  pendant le lab, que les objets reviennent avec leur UID d'origine, et que
+  ce qui a été écrit après la sauvegarde a disparu.
+skills:
+  - etcd
+  - etcdctl
+  - etcdutl
+  - snapshot
+  - static-pod
+  - disaster-recovery
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
+# Configuration (25 %) : « Implement and configure a highly-available control
+# plane » et « Perform etcd backup and restore », le sujet que l'attestation
+# etcd du blog n'a pas pu éprouver sur kind : la restauration y coûte le
+# cluster. La vague 1 du backlog le réclamait sous le nom cka-restaurer-etcd.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

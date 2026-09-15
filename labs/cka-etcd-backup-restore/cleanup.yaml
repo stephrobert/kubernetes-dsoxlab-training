@@ -1,0 +1,38 @@
+---
+# Joué par `dsoxlab clean` : ramène etcd sur /var/lib/etcd avec le manifeste
+# d'origine, en gardant les données courantes, ou repart de l'instantané de
+# secours si le cluster ne revient pas. Puis retire ce que le lab a écrit.
+# etcdctl et etcdutl restent : ce sont des outils du nœud, comme crictl.
+- name: Nettoyer le lab cka-etcd-backup-restore
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Ramener etcd sur /var/lib/etcd, cluster en marche
+      ansible.builtin.script: fixtures/remettre-etcd.sh
+      args:
+        executable: /bin/bash
+
+    - name: Supprimer le namespace restauré
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace important-data
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le bruit écrit après la sauvegarde, s'il est encore là
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n default delete configmap
+        bruit-apres-sauvegarde --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les instantanés, l'état noté et le répertoire restauré
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /opt/backup
+        - /var/lib/etcd-restored
+        - /var/lib/dsoxlab/cka-etcd-backup-restore.json
+        - /var/lib/dsoxlab/etcd-secours.db
+        - /root/dsoxlab-manifestes-hors-service

@@ -1,0 +1,51 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : installe etcdctl et
+# etcdutl dans la version de l'etcd embarqué par kubeadm 1.37, ramène le
+# cluster sur son répertoire de données d'origine si un passage précédent
+# l'en a sorti, puis pose la situation : un namespace créé, sauvegardé,
+# supprimé, et du bruit écrit après la sauvegarde.
+#
+# Transposé de K8sExamLab, dont le lab faisait supprimer le namespace par le
+# candidat et vérifiait l'instantané avec `etcdctl snapshot status`, commande
+# qui n'existe plus en 3.7 et rend pourtant 0. Confronté à Kubernetes 1.37 et
+# etcd 3.7.0 le 2026-09-15 : la leçon jumelée arrêtait le kubelet pour
+# restaurer, ce qui ne stoppe pas etcd ; mesuré, remonté au blog, corrigé.
+- name: Préparer le lab cka-etcd-backup-restore
+  hosts: lab_target
+  become: true
+  vars:
+    etcd_version: "3.7.0"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    # La version est celle de l'image registry.k8s.io/etcd:3.7.0-0 que
+    # kubeadm 1.37 déploie : le client parle la même API que le serveur.
+    - name: Récupérer l'archive etcd {{ etcd_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        dest: "/root/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        mode: "0644"
+
+    - name: Installer etcdctl et etcdutl dans /usr/local/bin
+      ansible.builtin.unarchive:
+        src: "/root/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+          - "etcd-v{{ etcd_version }}-linux-amd64/etcdctl"
+          - "etcd-v{{ etcd_version }}-linux-amd64/etcdutl"
+        creates: /usr/local/bin/etcdutl
+
+    - name: Ramener etcd sur /var/lib/etcd si un passage précédent l'en a sorti
+      ansible.builtin.script: fixtures/remettre-etcd.sh
+      args:
+        executable: /bin/bash
+
+    - name: Poser la situation, sauvegarde d'hier soir comprise
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

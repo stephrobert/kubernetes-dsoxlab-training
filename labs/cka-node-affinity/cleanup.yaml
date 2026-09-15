@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, puis les labels posés sur
+# les nœuds, pour rendre au socle les nœuds qu'il attend.
+- name: Nettoyer le lab cka-node-affinity
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les labels du lab de tous les nœuds
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf label nodes --all
+        disktype- storage-tier- accelerator-
+      changed_when: true
+      failed_when: false

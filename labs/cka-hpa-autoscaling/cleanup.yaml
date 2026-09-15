@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, puis metrics-server, que
+# le socle n'installe pas. Le cluster reste en place.
+- name: Nettoyer le lab cka-hpa-autoscaling
+  hosts: lab_target
+  become: true
+  vars:
+    metrics_server_version: "0.9.0"
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer metrics-server
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete
+        -f /root/metrics-server-v{{ metrics_server_version }}.yaml --ignore-not-found
+      changed_when: true
+      failed_when: false
