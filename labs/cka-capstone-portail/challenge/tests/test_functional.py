@@ -98,12 +98,12 @@ def _curl(host, url: str, patience_s: int = 12) -> tuple[bool, str]:
     Le budget reste borné : un accès qui ne s'ouvre pas en une douzaine de
     secondes ne s'ouvrira pas, et le test doit alors échouer pour de bon.
     """
-    res = host.run(
-        "for _ in $(seq 1 %d); do "
-        "code=$(curl -sS -o /dev/null -w '%%{http_code}' -m 3 %s 2>/dev/null); "
+    boucle = (
+        f"for _ in $(seq 1 {patience_s}); do "
+        f"code=$(curl -sS -o /dev/null -w '%{{http_code}}' -m 3 {url} 2>/dev/null); "
         '[ "$code" = "200" ] && break; sleep 1; done; echo -n "$code"'
-        % (patience_s, url)
     )
+    res = host.run(boucle)
     return res.stdout.strip() == "200", res.stdout.strip() or res.stderr.strip()
 
 
