@@ -1,0 +1,5 @@
+title: "Sortir un Pod de l'ImagePullBackOff"
+description: |
+  Un Pod ne démarre pas parce que son image ne se télécharge pas. Lire le
+  message exact du runtime dans les events, corriger la référence d'image, et
+  prouver que le serveur répond.

@@ -1,52 +1,52 @@
-# Placer avec nodeAffinity : contrainte obligatoire et préférence
+# Placing with nodeAffinity: required constraint and preference
 
-## La situation
+## The situation
 
-L'application **`storage-app`** écrit beaucoup et ne doit tourner que sur
-des nœuds à disques rapides, `ssd` ou `nvme`. Parmi eux, l'équipe préfère
-ceux qui portent le label `storage-tier=fast`, sans en faire une
-obligation. Un seul nœud du cluster a des disques rapides :
-**`k8s-w1.lab`**, qu'il faut étiqueter.
+The **`storage-app`** application writes a lot and must only run on nodes
+with fast disks, `ssd` or `nvme`. Among those, the team prefers the ones
+carrying the label `storage-tier=fast`, without making it a requirement.
+Only one node in the cluster has fast disks: **`k8s-w1.lab`**, which you
+have to label.
 
-Une seconde application, **`gpu-app`**, exige un accélérateur que le
-cluster n'a pas encore : elle doit être déclarée dès maintenant, attendre,
-puis démarrer d'elle-même le jour où un nœud sera étiqueté.
+A second application, **`gpu-app`**, demands an accelerator the cluster does
+not have yet: it must be declared right now, wait, then start on its own the
+day a node gets labelled.
 
-Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
-**`lab`** existe.
+You are on the control plane, with `kubectl` configured. The **`lab`**
+namespace exists.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le nœud `k8s-w1.lab` porte le label **`disktype=ssd`**.
+1. The node `k8s-w1.lab` carries the label **`disktype=ssd`**.
 
-2. Un Deployment **`storage-app`** dans `lab`, trois replicas, image
-   `nginx:1.27-alpine`, avec une affinité de nœud **obligatoire** sur
-   `disktype` valant `ssd` **ou** `nvme`, et une affinité **préférée** de
-   poids **80** sur `storage-tier=fast`. Ses trois Pods tournent.
+2. A **`storage-app`** Deployment in `lab`, three replicas, image
+   `nginx:1.27-alpine`, with a **required** node affinity on `disktype`
+   being `ssd` **or** `nvme`, and a **preferred** affinity of weight **80**
+   on `storage-tier=fast`. Its three Pods are running.
 
-3. Un Pod **`gpu-app`** dans `lab`, image `nginx:1.27-alpine`, avec une
-   affinité de nœud obligatoire sur **`accelerator=gpu`**. Déclaré avant
-   que le label existe, il reste `Pending`.
+3. A **`gpu-app`** Pod in `lab`, image `nginx:1.27-alpine`, with a required
+   node affinity on **`accelerator=gpu`**. Declared before the label exists,
+   it stays `Pending`.
 
-4. Le label **`accelerator=gpu`** posé sur `k8s-w1.lab` : `gpu-app` passe
-   `Running` sans avoir été recréé.
+4. The label **`accelerator=gpu`** set on `k8s-w1.lab`: `gpu-app` becomes
+   `Running` without having been recreated.
 
-## Les repères utiles
+## Useful bearings
 
-`nodeAffinity` distingue ce qui est **obligatoire** au placement de ce qui
-est **préféré** ; les deux ont un nom long qui finit par
-`IgnoredDuringExecution`, et c'est ce suffixe qui dit qu'un Pod déjà placé
-ne bouge pas si le label change ensuite. Les opérateurs `In`, `NotIn`,
-`Exists` permettent plus qu'une égalité.
+`nodeAffinity` separates what is **required** for placement from what is
+**preferred**; both have a long name ending in `IgnoredDuringExecution`, and
+that suffix is what says an already placed Pod does not move if the label
+changes afterwards. The `In`, `NotIn` and `Exists` operators allow more than
+an equality.
 
-Un Pod `Pending` pour affinité le dit dans `kubectl describe pod`, avec le
-nombre de nœuds qui ne correspondent pas. Le scheduler réessaie de lui-même
-dès qu'un nœud change.
+A Pod left `Pending` because of an affinity says so in `kubectl describe
+pod`, with the number of nodes that do not match. The scheduler retries on
+its own as soon as a node changes.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les labels des nœuds, les affinités déclarées par
-`storage-app` et `gpu-app`, et le nœud réel de chacun de leurs Pods.
+The tests read the node labels, the affinities declared by `storage-app` and
+`gpu-app`, and the actual node of each of their Pods.
 
 ```bash
 dsoxlab check cka-node-affinity

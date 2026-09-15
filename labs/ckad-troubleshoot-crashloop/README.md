@@ -1,25 +1,25 @@
-# Trois Pods en CrashLoopBackOff, trois causes
+# Three Pods in CrashLoopBackOff, three causes
 
-Lab **CKAD**, domaine *Application Observability and Maintenance* (15 % de
-l'épreuve), compétences « Utilize container logs » et « Debugging in
-Kubernetes ».
+**CKAD** lab, *Application Observability and Maintenance* domain (15 % of
+the exam), competencies "Utilize container logs" and "Debugging in
+Kubernetes".
 
-Trois lectures différentes pour trois pannes : le message de sortie du
-conteneur, ses logs précédents, et la raison `OOMKilled` que seul le kubelet
-raconte. Chaque test observe le Pod pendant quinze secondes : un Pod
-`Running` entre deux morts ne passe pas.
+Three different readings for three failures: the container's exit message,
+its previous logs, and the `OOMKilled` reason that only the kubelet tells.
+Each test watches the Pod for fifteen seconds: a Pod that is `Running`
+between two deaths does not pass.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer un CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Diagnosing a CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-crashloop
 dsoxlab check ckad-troubleshoot-crashloop
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

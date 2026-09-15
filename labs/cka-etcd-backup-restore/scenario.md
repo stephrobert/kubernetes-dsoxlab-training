@@ -1,52 +1,53 @@
-# Sauvegarder etcd, puis restaurer le cluster depuis un instantané
+# Back up etcd, then restore the cluster from a snapshot
 
-## La situation
+## The situation
 
-Ce matin, le namespace **`important-data`** n'existe plus. Il portait un
-ConfigMap **`mission-critical`** dont l'équipe a besoin aujourd'hui, et
-personne ne sait ce qui s'est passé.
+This morning, the namespace **`important-data`** is gone. It held a ConfigMap
+**`mission-critical`** that the team needs today, and nobody knows what
+happened.
 
-Une sauvegarde d'etcd a été prise hier soir, avant l'incident :
-**`/opt/backup/etcd-snapshot-previous.db`**. Le cluster est un kubeadm à un
-control plane, **`k8s-cp.lab`**, sur lequel vous êtes connecté avec les
-droits `sudo`. Les outils `etcdctl` et `etcdutl` sont installés, dans la
-version de l'etcd qui tourne.
+An etcd backup was taken yesterday evening, before the incident:
+**`/opt/backup/etcd-snapshot-previous.db`**. The cluster is a kubeadm cluster
+with a single control plane, **`k8s-cp.lab`**, where you are connected with
+`sudo` rights. The tools `etcdctl` and `etcdutl` are installed, in the version
+of the etcd that is running.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. **Avant toute chose**, une sauvegarde fraîche de l'état courant dans
-   **`/opt/backup/etcd-snapshot.db`**, vérifiée. On ne restaure jamais sans
-   avoir sauvegardé ce qu'on s'apprête à écraser.
+1. **Before anything else**, a fresh backup of the current state in
+   **`/opt/backup/etcd-snapshot.db`**, verified. You never restore without
+   having backed up what you are about to overwrite.
 
-2. Le cluster **restauré depuis la sauvegarde d'hier soir**, dans un
-   répertoire de données neuf, et etcd qui tourne dessus. Le namespace
-   `important-data` et son ConfigMap sont de retour, tels qu'ils étaient.
+2. The cluster **restored from yesterday evening's backup**, into a fresh data
+   directory, with etcd running on it. The namespace `important-data` and its
+   ConfigMap are back, just as they were.
 
-3. Un cluster **sain** après l'opération : l'API répond, les deux nœuds sont
-   `Ready`, et ce que l'API server avait en cache avant la restauration ne
-   traîne plus.
+3. A **healthy** cluster after the operation: the API answers, both nodes are
+   `Ready`, and whatever the API server held in cache before the restore is no
+   longer hanging around.
 
-## Les repères utiles
+## Useful bearings
 
-Sur ce cluster, etcd est un Pod statique : son manifeste dans
-`/etc/kubernetes/manifests` dit où sont ses certificats, son répertoire de
-données, et sous quel nom il se connaît. Le kubelet relance ce Pod dès que
-le manifeste change, et l'arrête dès que le manifeste disparaît du
-répertoire. Arrêter le kubelet, lui, n'arrête aucun conteneur.
+On this cluster, etcd is a static Pod: its manifest in
+`/etc/kubernetes/manifests` says where its certificates are, where its data
+directory is, and under what name it knows itself. The kubelet restarts that
+Pod as soon as the manifest changes, and stops it as soon as the manifest
+leaves the directory. Stopping the kubelet, on the other hand, stops no
+container.
 
-Depuis etcd 3.6, `etcdctl` ne sait plus que prendre un instantané ; le
-vérifier et le restaurer sont le travail de `etcdutl`, hors ligne, dans un
-répertoire qui n'existe pas encore. Le nom du membre, le cluster initial et
-l'URL de pair qu'on lui donne doivent être ceux du manifeste.
+Since etcd 3.6, `etcdctl` only knows how to take a snapshot; verifying it and
+restoring it are the work of `etcdutl`, offline, into a directory that does not
+exist yet. The member name, the initial cluster and the peer URL you give it
+must be those of the manifest.
 
-L'API server garde en mémoire ce qu'il a lu dans etcd. Restaurer sous ses
-pieds sans le relancer laisse ce cache en désaccord avec la base.
+The API server keeps in memory what it read from etcd. Restoring under its feet
+without restarting it leaves that cache out of step with the database.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'instantané frais, la date du répertoire de données que
-l'etcd en marche utilise, les UID des objets revenus, et cherchent un objet
-créé après la sauvegarde d'hier soir, qui ne doit plus exister.
+The tests read the fresh snapshot, the date of the data directory that the
+running etcd uses, the UIDs of the objects that came back, and look for an
+object created after yesterday evening's backup, which must no longer exist.
 
 ```bash
 dsoxlab check cka-etcd-backup-restore

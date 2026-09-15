@@ -1,48 +1,47 @@
-# Faire monter en charge automatiquement avec un HorizontalPodAutoscaler
+# Scale out automatically with a HorizontalPodAutoscaler
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, l'application **`php-apache`** tourne en un
-seul replica derrière le Service du même nom. Chaque requête lui coûte du
-CPU, et l'équipe veut qu'elle grossisse d'elle-même sous la charge, jusqu'à
-dix replicas, puis redescende. Le cluster a un metrics-server en état de
-marche : `kubectl top pods` répond.
+In the namespace **`lab`**, the application **`php-apache`** runs with a single
+replica behind the Service of the same name. Every request costs it CPU, and
+the team wants it to grow on its own under load, up to ten replicas, then come
+back down. The cluster has a working metrics-server: `kubectl top pods`
+answers.
 
-Vous êtes sur le control plane, avec `kubectl` configuré.
+You are on the control plane, with `kubectl` configured.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un HorizontalPodAutoscaler **`php-apache-hpa`** dans `lab`, en
-   `autoscaling/v2`, qui vise le Deployment `php-apache`, entre **1** et
-   **10** replicas, sur une utilisation CPU moyenne cible de **50 %** des
+1. A HorizontalPodAutoscaler **`php-apache-hpa`** in `lab`, in
+   `autoscaling/v2`, targeting the Deployment `php-apache`, between **1** and
+   **10** replicas, on a target average CPU utilization of **50 %** of the
    requests.
 
-2. Le HPA **lit des métriques** : sa cible affiche un pourcentage, pas
-   `<unknown>`.
+2. The HPA **reads metrics**: its target shows a percentage, not `<unknown>`.
 
-3. Une **montée en charge observée** : sous une charge que vous générez
-   depuis un Pod du cluster, le HPA a fait passer le Deployment à au moins
-   **deux** replicas. Le contrôleur en laisse la trace.
+3. An **observed scale-up**: under a load that you generate from a Pod in the
+   cluster, the HPA took the Deployment to at least **two** replicas. The
+   controller leaves a trace of it.
 
-4. La charge est **coupée** à la fin : aucun Pod générateur ne tourne plus
-   dans `lab`.
+4. The load is **cut** at the end: no load generator Pod is still running in
+   `lab`.
 
-## Les repères utiles
+## Useful bearings
 
-Le HPA compare l'utilisation CPU des Pods à leurs `requests` : sans
-requests, la cible reste `<unknown>` et rien ne bouge. Il relit les
-métriques toutes les quinze secondes et décide toutes les trente ; comptez
-une à deux minutes entre le début de la charge et le premier Pod
-supplémentaire. `kubectl get hpa -w` montre les transitions en direct, et
-`kubectl describe hpa` les décisions prises.
+The HPA compares the CPU utilization of the Pods to their `requests`: with no
+requests, the target stays `<unknown>` and nothing moves. It rereads the
+metrics every fifteen seconds and decides every thirty; count one to two
+minutes between the start of the load and the first extra Pod.
+`kubectl get hpa -w` shows the transitions live, and `kubectl describe hpa` the
+decisions taken.
 
-Une boucle de `wget` depuis un Pod `busybox` vers le Service suffit à
-saturer un replica. Un Pod lancé pour ça se supprime quand on a fini.
+A `wget` loop from a `busybox` Pod against the Service is enough to saturate
+one replica. A Pod started for that is deleted once you are done.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le HPA, ses métriques courantes, les events du contrôleur
-d'autoscaling, et cherchent un générateur de charge encore en marche.
+The tests read the HPA, its current metrics, the events of the autoscaling
+controller, and look for a load generator still running.
 
 ```bash
 dsoxlab check cka-hpa-autoscaling

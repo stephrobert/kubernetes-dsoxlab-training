@@ -1,23 +1,23 @@
-# Trois sondes sur un Pod : startup, liveness, readiness
+# Three probes on one Pod: startup, liveness, readiness
 
-Lab **CKAD**, domaine *Application Observability and Maintenance* (15 % de
-l'épreuve), compétence « Implement probes and health checks ».
+**CKAD** lab, *Application Observability and Maintenance* domain (15 % of the
+exam), competency "Implement probes and health checks".
 
-Le lab hérité ne vérifiait que la présence des sondes. Ici le Pod doit être
-`Ready` sans redémarrage : c'est la preuve que les sondes trouvent ce
-qu'elles cherchent, et une sonde vers un mauvais chemin ne passerait pas.
+The inherited lab only checked that the probes were present. Here the Pod
+must be `Ready` with no restart: that is the proof that the probes find what
+they are looking for, and a probe aimed at a wrong path would not pass.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Définir les Probes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Defining Probes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
 
 ```bash
 dsoxlab run   ckad-probes-all-types
 dsoxlab check ckad-probes-all-types
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

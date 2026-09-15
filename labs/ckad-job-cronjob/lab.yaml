@@ -1,11 +1,10 @@
 id: ckad-job-cronjob
-title: "Un Job à complétions parallèles et un CronJob"
+title: "A Job with parallel completions, and a CronJob"
 level: application-design
 description: |
-  Exécuter un traitement quatre fois, deux à la fois, avec un Job, et
-  prouver que les exécutions se sont bien chevauchées. Puis planifier un
-  nettoyage toutes les cinq minutes avec un CronJob qui garde un historique
-  borné.
+  Run a workload four times, two at a time, with a Job, and prove that the
+  runs really did overlap. Then schedule a cleanup every five minutes with
+  a CronJob that keeps a bounded history.
 skills:
   - job
   - cronjob

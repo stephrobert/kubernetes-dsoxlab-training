@@ -1,26 +1,26 @@
-# Isoler la base de données : seul le backend y accède
+# Isolate the database: only the backend gets in
 
-Lab **CKA**, domaine *Services and Networking* (20 % de l'épreuve),
-compétence « Define and enforce Network Policies ».
+**CKA** lab, *Services and Networking* domain (20 % of the exam),
+competency "Define and enforce Network Policies".
 
-Le lab hérité lisait le spec de la politique et tentait une connexion dans
-chaque sens. Ici un Pod `intrus`, au bon label mais dans un autre namespace,
-doit rester dehors : un `namespaceSelector` vide, l'erreur classique, le
-laisserait entrer. Et la base doit pouvoir encore sortir, ce qu'une
-politique trop large casserait. Calico applique les politiques ; sans lui,
-rien de cela ne se mesurerait.
+The inherited lab read the spec of the policy and attempted one connection in
+each direction. Here a Pod `intrus`, with the right label but in another
+namespace, must stay out: an empty `namespaceSelector`, the classic mistake,
+would let it in. And the database must still be able to reach out, which a
+policy that is too broad would break. Calico enforces the policies; without it,
+none of this would be measurable.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Les NetworkPolicies Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Kubernetes NetworkPolicies](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 
 ```bash
 dsoxlab run   cka-networkpolicy-isolate-db
 dsoxlab check cka-networkpolicy-isolate-db
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

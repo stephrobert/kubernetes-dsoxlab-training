@@ -56,8 +56,12 @@ def _textes_lus_par_l_apprenant() -> list[tuple[str, str]]:
     """Rend [(origine lisible, texte)] pour tout ce que l'apprenant lit."""
     textes: list[tuple[str, str]] = []
 
-    for fichier in sorted(LABS.glob("*/scenario.md")) + sorted(LABS.glob("*/README.md")):
-        textes.append((str(fichier.relative_to(RACINE)), fichier.read_text(encoding="utf-8")))
+    # Les deux langues : le catalogue est bilingue, anglais prioritaire, et une
+    # règle de style qui ne vaudrait que d'un côté ne vaudrait rien. Le tiret
+    # cadratin, en particulier, arrive surtout par la traduction.
+    for motif in ("*/scenario.md", "*/scenario.fr.md", "*/README.md", "*/README.fr.md"):
+        for fichier in sorted(LABS.glob(motif)):
+            textes.append((str(fichier.relative_to(RACINE)), fichier.read_text(encoding="utf-8")))
 
     # Les indices sont encodés : sans les décoder, le contrôle passerait au vert
     # sur du base64, qui ne contient évidemment ni emoji ni cadratin.
@@ -93,9 +97,10 @@ TEXTES = _textes_lus_par_l_apprenant()
 def test_il_y_a_des_textes_a_lire() -> None:
     """Garde-fou : sans lui, un parcours cassé rendrait la suite verte à vide."""
     labs = list(LABS.glob("*/lab.yaml"))
-    assert len(TEXTES) >= 3 * len(labs), (
+    assert len(TEXTES) >= 5 * len(labs), (
         f"{len(TEXTES)} texte(s) pour {len(labs)} lab(s) : chaque lab a au moins "
-        "un scenario.md, un README.md et des indices. Le parcours est cassé."
+        "un scenario et un README dans CHAQUE langue, plus ses indices. Le "
+        "parcours est cassé, ou une traduction manque."
     )
 
 

@@ -1,45 +1,45 @@
-# Sortir un Deployment du CrashLoopBackOff
+# Get a Deployment out of CrashLoopBackOff
 
-## La situation
+## The situation
 
-Dans le namespace **`production`**, le Deployment **`api-server`** doit
-tourner en deux replicas. Depuis la dernière livraison, ses Pods
-**redémarrent en boucle** : `kubectl get pods` les montre en
-`CrashLoopBackOff`, avec un compteur de redémarrages qui grimpe.
+In the **`production`** namespace, the **`api-server`** Deployment is supposed
+to run two replicas. Since the last release, its Pods **restart in a loop**:
+`kubectl get pods` shows them in `CrashLoopBackOff`, with a restart counter
+climbing.
 
-L'équipe jure que l'image n'a pas changé. Elle a déposé la configuration de
-l'application dans le namespace, et dit que « tout est là ». La charte de
-l'équipe est simple : une application lit sa configuration à l'endroit que
-lui indique la variable d'environnement **`APP_CONFIG_PATH`**, et cet endroit
-est **`/etc/config`**.
+The team swears the image has not changed. They dropped the application's
+configuration into the namespace, and say that "everything is there". The
+team's rule is simple: an application reads its configuration at the location
+given by the **`APP_CONFIG_PATH`** environment variable, and that location is
+**`/etc/config`**.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le Deployment `api-server` a **deux replicas disponibles**.
+1. The `api-server` Deployment has **two available replicas**.
 
-2. Plus aucun Pod de `api-server` ne redémarre en boucle.
+2. No `api-server` Pod restarts in a loop any more.
 
-3. Dans les Pods, `APP_CONFIG_PATH` vaut `/etc/config`, et l'application y
-   trouve réellement son fichier `app.conf`.
+3. Inside the Pods, `APP_CONFIG_PATH` is `/etc/config`, and the application
+   really finds its `app.conf` file there.
 
-4. L'application **répond** : elle sert son `app.conf` sur son port.
+4. The application **answers**: it serves its `app.conf` on its port.
 
-La correction se fait **sur le Deployment**, pas sur les Pods : un Pod
-corrigé à la main serait remplacé à la prochaine occasion.
+The fix is made **on the Deployment**, not on the Pods: a Pod patched by hand
+would be replaced at the next opportunity.
 
-## Les repères utiles
+## Useful bearings
 
-`CrashLoopBackOff` n'est pas une cause, c'est une conséquence : le conteneur
-démarre, s'arrête aussitôt, et le kubelet espace ses redémarrages. Le pourquoi
-est dans ce que le processus a écrit avant de mourir, et dans ce que le
-Deployment lui donne, ou ne lui donne pas.
+`CrashLoopBackOff` is not a cause, it is a consequence: the container starts,
+stops right away, and the kubelet spaces out its restarts. The why is in what
+the process wrote before it died, and in what the Deployment gives it, or does
+not give it.
 
-Regardez ce que le namespace contient d'autre que le Deployment.
+Look at what the namespace holds besides the Deployment.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'état du Deployment et de ses Pods, puis ils entrent dans un
-Pod pour lire le fichier de configuration et interroger l'application.
+The tests read the state of the Deployment and of its Pods, then they enter a
+Pod to read the configuration file and query the application.
 
 ```bash
 dsoxlab check cka-troubleshoot-crashloopbackoff

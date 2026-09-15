@@ -1,47 +1,48 @@
-# Isoler la base de données : seul le backend y accède
+# Isolate the database: only the backend gets in
 
-## La situation
+## The situation
 
-Dans le namespace **`database`**, la base **`db`** écoute sur le port 5432,
-derrière le Service du même nom. Deux applications tournent à côté :
-**`backend`**, qui a besoin de la base, et **`frontend`**, qui n'a rien à y
-faire. Aujourd'hui, tout le monde peut s'y connecter, y compris depuis les
-autres namespaces : un Pod nommé **`intrus`**, dans le namespace `autre`,
-porte le label `app=backend` et atteint la base sans difficulté.
+In the namespace **`database`**, the database **`db`** listens on port 5432,
+behind the Service of the same name. Two applications run alongside it:
+**`backend`**, which needs the database, and **`frontend`**, which has no
+business there. Today, everyone can connect to it, including from other
+namespaces: a Pod named **`intrus`**, in the namespace `autre`, carries the
+label `app=backend` and reaches the database without any trouble.
 
-Vous êtes sur le control plane, avec `kubectl` configuré.
+You are on the control plane, with `kubectl` configured.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Une NetworkPolicy **`db-allow-backend`** dans `database`, qui s'applique
-   à la base et ne laisse entrer que les Pods **`app=backend` du même
-   namespace**, sur le port **5432** en TCP.
+1. A NetworkPolicy **`db-allow-backend`** in `database`, which applies to the
+   database and lets in only the **`app=backend` Pods of the same
+   namespace**, on port **5432** in TCP.
 
-2. `backend` atteint toujours `db` sur 5432.
+2. `backend` still reaches `db` on 5432.
 
-3. `frontend` n'y arrive plus, et `intrus` non plus, malgré son label.
+3. `frontend` no longer manages to, and neither does `intrus`, despite its
+   label.
 
-4. La base peut toujours **sortir** : elle résout des noms. La politique ne
-   restreint que ce qui entre.
+4. The database can still **reach out**: it resolves names. The policy
+   restricts only what comes in.
 
-## Les repères utiles
+## Useful bearings
 
-Une NetworkPolicy sélectionne des Pods par `podSelector`, et dit dans
-`policyTypes` ce qu'elle contrôle, l'entrée, la sortie, ou les deux. Dès
-qu'un Pod est sélectionné pour l'entrée, tout ce que la politique ne cite
-pas est refusé : c'est ce qui isole.
+A NetworkPolicy selects Pods through `podSelector`, and says in `policyTypes`
+what it controls, ingress, egress, or both. As soon as a Pod is selected for
+ingress, everything the policy does not name is refused: that is what isolates.
 
-Une règle `from` avec un `podSelector` seul ne vise que le namespace de la
-politique. Y ajouter un `namespaceSelector` vide ouvre à tous les
-namespaces : c'est l'erreur qui laisserait entrer `intrus`.
+A `from` rule with a `podSelector` alone only covers the namespace of the
+policy. Adding an empty `namespaceSelector` to it opens up to every namespace:
+that is the mistake that would let `intrus` in.
 
-`kubectl exec backend -n database -- nc -z -w 3 db 5432` répond 0 si la
-connexion s'établit, et rend la main au bout de trois secondes sinon.
+`kubectl exec backend -n database -- nc -z -w 3 db 5432` returns 0 if the
+connection is established, and gives back the prompt after three seconds
+otherwise.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent la politique, puis tentent les connexions depuis
-`backend`, `frontend` et `intrus`, et une résolution de nom depuis `db`.
+The tests read the policy, then attempt the connections from `backend`,
+`frontend` and `intrus`, and a name resolution from `db`.
 
 ```bash
 dsoxlab check cka-networkpolicy-isolate-db

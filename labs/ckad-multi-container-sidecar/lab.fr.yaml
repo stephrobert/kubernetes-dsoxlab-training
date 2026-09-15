@@ -1,0 +1,6 @@
+title: "Un sidecar natif qui suit les logs de l'application"
+description: |
+  Faire lire par un second conteneur les logs qu'une application écrit dans
+  un fichier, avec un sidecar natif, déclaré comme init container à
+  restartPolicy Always, et un volume partagé. Prouver que le sidecar
+  transmet réellement les lignes.

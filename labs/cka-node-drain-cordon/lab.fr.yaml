@@ -1,0 +1,7 @@
+title: "Vider un worker pour une maintenance, sans couper le service"
+description: |
+  Protéger une application par un PodDisruptionBudget, retirer le worker du
+  scheduling, l'évacuer en respectant ce budget et les DaemonSets, puis le
+  remettre en service et tracer l'opération. Les tests prouvent que les
+  Pods ont réellement été recréés ailleurs, que le nœud est revenu, et que
+  le DaemonSet du CNI n'a pas bougé.

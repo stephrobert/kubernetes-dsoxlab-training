@@ -1,0 +1,6 @@
+title: "Faire monter en charge automatiquement avec un HorizontalPodAutoscaler"
+description: |
+  Poser un HPA sur un Deployment, générer de la charge, voir la montée en
+  replicas, puis couper la charge. Les tests lisent le HPA, ses métriques
+  courantes, et l'event de redimensionnement que le contrôleur a émis : un
+  HPA qui n'a jamais redimensionné n'est pas un HPA validé.

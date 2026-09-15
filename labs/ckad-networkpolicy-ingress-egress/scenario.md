@@ -1,48 +1,47 @@
-# Cloisonner trois tiers avec des NetworkPolicy ingress et egress
+# Partition three tiers with ingress and egress NetworkPolicy
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, une application classique en trois tiers :
-**`frontend`**, **`backend`** et **`database`**, trois Pods labellisés
-`tier=frontend`, `tier=backend` et `tier=database`. Les deux derniers
-servent en HTTP sur le port **80**. Aujourd'hui, tout parle à tout, et un
-quatrième Pod, **`intrus`**, sans aucun label, atteint la base de données
-sans difficulté.
+In the **`lab`** namespace, a classic three-tier application:
+**`frontend`**, **`backend`** and **`database`**, three Pods labelled
+`tier=frontend`, `tier=backend` and `tier=database`. The last two serve HTTP
+on port **80**. Today everything talks to everything, and a fourth Pod,
+**`intrus`**, with no label at all, reaches the database without any
+trouble.
 
-L'équipe sécurité veut que seuls les flux prévus existent : le frontend
-parle au backend, le backend parle à la base et résout des noms, et la
-base ne parle à personne.
+The security team wants only the intended flows to exist: the frontend talks
+to the backend, the backend talks to the database and resolves names, and the
+database talks to nobody.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Une NetworkPolicy **`backend-policy`** sur les Pods `tier=backend` qui
-   n'autorise en entrée que les Pods `tier=frontend` sur le port 80, et en
-   sortie que les Pods `tier=database` sur le port 80, plus le **DNS** du
-   cluster, port 53 en UDP et TCP.
+1. A NetworkPolicy **`backend-policy`** on the `tier=backend` Pods that
+   allows inbound traffic only from `tier=frontend` Pods on port 80, and
+   outbound traffic only to `tier=database` Pods on port 80, plus the cluster
+   **DNS**, port 53 over UDP and TCP.
 
-2. Une NetworkPolicy **`database-policy`** sur les Pods `tier=database` qui
-   n'autorise en entrée que les Pods `tier=backend` sur le port 80, et
-   **aucune sortie**.
+2. A NetworkPolicy **`database-policy`** on the `tier=database` Pods that
+   allows inbound traffic only from `tier=backend` Pods on port 80, and
+   **no outbound traffic at all**.
 
-3. En vrai : `frontend` joint `backend`, `backend` joint `database` et
-   résout des noms, `intrus` ne joint ni `backend` ni `database`, et
-   `database` ne joint rien, pas même le DNS.
+3. For real: `frontend` reaches `backend`, `backend` reaches `database` and
+   resolves names, `intrus` reaches neither `backend` nor `database`, and
+   `database` reaches nothing, not even DNS.
 
-## Les repères utiles
+## Useful bearings
 
-Une NetworkPolicy ne dit que ce qu'elle autorise, dans les directions
-qu'elle déclare sous `policyTypes`. Déclarer `Egress` sans aucune règle
-`egress`, c'est interdire toute sortie ; ne pas déclarer `Egress`, c'est ne
-rien dire sur la sortie.
+A NetworkPolicy only states what it allows, in the directions it declares
+under `policyTypes`. Declaring `Egress` with no `egress` rule forbids all
+outbound traffic; not declaring `Egress` says nothing about outbound traffic.
 
-Un Pod dont la sortie est restreinte perd le DNS si on ne l'autorise pas
-explicitement : le résolveur du cluster est dans `kube-system`, et il écoute
-sur le port 53 en UDP et en TCP.
+A Pod whose egress is restricted loses DNS unless you allow it explicitly:
+the cluster resolver lives in `kube-system`, and it listens on port 53 over
+UDP and over TCP.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les deux politiques, puis font de vraies connexions entre
-les Pods, celles qui doivent passer et celles qui doivent échouer.
+The tests read the two policies, then make real connections between the Pods,
+the ones that must go through and the ones that must fail.
 
 ```bash
 dsoxlab check ckad-networkpolicy-ingress-egress

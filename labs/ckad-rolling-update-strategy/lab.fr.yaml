@@ -1,0 +1,6 @@
+title: "Régler une mise à jour progressive : maxSurge et maxUnavailable"
+description: |
+  Contraindre la façon dont un Deployment remplace ses Pods, jamais plus de
+  deux en trop ni plus d'un indisponible, puis déclencher une mise à jour
+  d'image et prouver qu'elle est allée au bout : ancienne révision à zéro,
+  nouvelle au complet.

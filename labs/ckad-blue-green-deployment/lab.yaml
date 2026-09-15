@@ -1,11 +1,10 @@
 id: ckad-blue-green-deployment
-title: "Basculer le trafic d'une version à l'autre : blue-green"
+title: "Switch traffic from one version to the other: blue-green"
 level: application-deployment
 description: |
-  Faire tourner deux versions d'une application côte à côte, et basculer tout
-  le trafic de l'une à l'autre en changeant le selector d'un Service. Prouver
-  la bascule depuis un client : toutes les requêtes atteignent la nouvelle
-  version, aucune l'ancienne.
+  Run two versions of an application side by side, then switch all the traffic
+  from one to the other by changing a Service selector. Prove the switch from
+  a client: every request reaches the new version, none the old one.
 skills:
   - blue-green
   - deployment-strategy

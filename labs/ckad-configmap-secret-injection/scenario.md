@@ -1,48 +1,46 @@
-# Injecter configuration et secrets dans un Pod
+# Inject configuration and secrets into a Pod
 
-## La situation
+## The situation
 
-L'équipe livre l'application **`app`** dans le namespace **`lab`**. Elle lit
-sa configuration de deux façons : des **variables d'environnement** pour ses
-réglages simples, et un fichier **`config.yaml`** qu'elle attend sous
-`/etc/app-config`. Elle a aussi besoin des identifiants de sa base de
-données, et la règle de la maison est stricte : **aucun mot de passe dans un
-manifeste de Pod**.
+The team ships the application **`app`** in the **`lab`** namespace. It reads
+its configuration in two ways: **environment variables** for its simple
+settings, and a **`config.yaml`** file it expects under `/etc/app-config`. It
+also needs the credentials of its database, and the house rule is strict: **no
+password in a Pod manifest**.
 
-Le namespace existe. Tout le reste est à faire.
+The namespace exists. Everything else is up to you.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un ConfigMap **`app-settings`** dans `lab`, avec `APP_MODE` valant
-   `production`, `LOG_LEVEL` valant `info`, et une clé **`config.yaml`** dont
-   le contenu comporte la ligne `port: 8080`.
+1. A ConfigMap **`app-settings`** in `lab`, with `APP_MODE` set to
+   `production`, `LOG_LEVEL` set to `info`, and a **`config.yaml`** key whose
+   content includes the line `port: 8080`.
 
-2. Un Secret **`db-credentials`** dans `lab`, avec les clés **`DB_HOST`**,
-   valant `db.internal.svc`, et **`DB_PASSWORD`**, dont vous choisissez la
-   valeur.
+2. A Secret **`db-credentials`** in `lab`, with the keys **`DB_HOST`**, set to
+   `db.internal.svc`, and **`DB_PASSWORD`**, whose value you choose.
 
-3. Un Pod **`app`** dans `lab`, image `nginx:1.27-alpine`, qui reçoit
-   **toutes** les clés de `app-settings` en variables d'environnement, qui
-   reçoit `DB_HOST` et `DB_PASSWORD` depuis le Secret, et qui monte
-   `app-settings` sous **`/etc/app-config`**.
+3. A Pod **`app`** in `lab`, image `nginx:1.27-alpine`, which receives **all**
+   the keys of `app-settings` as environment variables, which receives
+   `DB_HOST` and `DB_PASSWORD` from the Secret, and which mounts
+   `app-settings` under **`/etc/app-config`**.
 
-4. De l'intérieur du conteneur : `APP_MODE` vaut `production`, `DB_PASSWORD`
-   est défini, et `/etc/app-config/config.yaml` contient `port: 8080`.
+4. From inside the container: `APP_MODE` is `production`, `DB_PASSWORD` is
+   set, and `/etc/app-config/config.yaml` contains `port: 8080`.
 
-## Les repères utiles
+## Useful bearings
 
-Il y a deux façons d'injecter un ConfigMap en variables : clé par clé, ou
-d'un bloc. Même chose pour un Secret. Le Pod ne porte alors qu'une
-**référence**, jamais la valeur.
+There are two ways to inject a ConfigMap as variables: key by key, or as a
+whole block. Same thing for a Secret. The Pod then carries only a
+**reference**, never the value.
 
-Monté comme un volume, un ConfigMap devient un répertoire : chaque clé y est
-un fichier. Et contrairement aux variables d'environnement, un fichier monté
-suit les modifications du ConfigMap, avec un délai.
+Mounted as a volume, a ConfigMap becomes a directory: each key is a file in
+it. And unlike environment variables, a mounted file follows changes made to
+the ConfigMap, with a delay.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le ConfigMap, le Secret et la définition du Pod, puis ils
-entrent dans le conteneur pour lire les variables et le fichier.
+The tests read the ConfigMap, the Secret and the Pod definition, then they
+step into the container to read the variables and the file.
 
 ```bash
 dsoxlab check ckad-configmap-secret-injection

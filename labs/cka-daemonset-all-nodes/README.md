@@ -1,25 +1,25 @@
-# Un agent sur chaque nœud, control plane compris
+# An agent on every node, including the control plane
 
-Lab **CKA**, domaine *Workloads and Scheduling* (15 % de l'épreuve),
-compétence « Understand the primitives used to create robust, self-healing,
-application deployments », ici le DaemonSet et les tolérances.
+**CKA** lab, *Workloads and Scheduling* domain (15 % of the exam),
+competency "Understand the primitives used to create robust, self-healing,
+application deployments", here the DaemonSet and tolerations.
 
-Le socle du catalogue retire le taint du control plane pour laisser de la
-place aux labs à un nœud. Ce lab le remet, le temps de la session, et les
-tests exigent qu'il y reste : l'agent doit y tourner par une tolérance, pas
-parce que le control plane a été ouvert à tous.
+The catalogue's shared base removes the control plane taint to leave room for
+single-node labs. This lab puts it back for the length of the session, and the
+tests require that it stays: the agent must run there through a toleration, not
+because the control plane was opened to everyone.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [DaemonSets Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [Kubernetes DaemonSets](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/) |
 
 ```bash
 dsoxlab run   cka-daemonset-all-nodes
 dsoxlab check cka-daemonset-all-nodes
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

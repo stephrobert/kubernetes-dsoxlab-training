@@ -1,11 +1,11 @@
 id: cka-troubleshoot-kubelet
-title: "Réparer un kubelet qui refuse de démarrer"
+title: "Repair a kubelet that refuses to start"
 level: troubleshooting
 description: |
-  Le kubelet d'un worker s'arrête aussitôt lancé, et le nœud est NotReady.
-  Lire dans le journal ce qu'il reproche à sa configuration, corriger le
-  fichier sans rien casser d'autre, et prouver que le nœud et son application
-  sont revenus.
+  A worker's kubelet stops as soon as it is launched, and the node is NotReady.
+  Read in the journal what it holds against its configuration, fix the file
+  without breaking anything else, and prove that the node and its application
+  are back.
 skills:
   - troubleshooting
   - kubelet

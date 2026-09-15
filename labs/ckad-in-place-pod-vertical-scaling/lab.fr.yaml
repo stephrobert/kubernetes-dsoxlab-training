@@ -1,0 +1,5 @@
+title: "Redimensionner un Pod en place, sans le redémarrer"
+description: |
+  Augmenter le CPU et la mémoire d'un Pod qui tourne, sans le recréer ni
+  redémarrer son conteneur, par la sous-ressource resize. Prouver que le
+  noyau applique la nouvelle limite et que le conteneur est resté le même.

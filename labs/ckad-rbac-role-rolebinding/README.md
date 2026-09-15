@@ -1,24 +1,24 @@
-# Donner un accès en lecture seule aux Pods avec RBAC
+# Grant read-only access to Pods with RBAC
 
-Lab **CKAD**, domaine *Application Environment, Configuration and Security*
-(25 % de l'épreuve), compétence « Understand authentication, authorization
-and admission control ».
+**CKAD** lab, *Application Environment, Configuration and Security* domain
+(25 % of the exam), competency "Understand authentication, authorization
+and admission control".
 
-Le RBAC se mesure avec `kubectl auth can-i --as`, et un lab qui ne vérifie
-que les droits accordés laisserait passer un `cluster-admin`. Celui-ci
-vérifie les deux côtés.
+RBAC is measured with `kubectl auth can-i --as`, and a lab that only checks
+the rights granted would let a `cluster-admin` through. This one checks both
+sides.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [RBAC Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Kubernetes RBAC](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 
 ```bash
 dsoxlab run   ckad-rbac-role-rolebinding
 dsoxlab check ckad-rbac-role-rolebinding
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

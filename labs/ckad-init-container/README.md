@@ -1,24 +1,24 @@
-# Attendre une dépendance avec un init container
+# Wait for a dependency with an init container
 
-Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
-compétence « Understand multi-container Pod design patterns ».
+**CKAD** lab, *Application Design and Build* domain (20 % of the exam),
+competency "Understand multi-container Pod design patterns".
 
-Le lab hérité faisait attendre « que le Service soit résolvable par DNS » :
-un Service se résout dès qu'il existe, même sans endpoint, et ce gardien
-n'aurait rien attendu. Ici il attend une réponse HTTP, et le Pod reste
-vraiment en `Init` tant que rien ne répond.
+The inherited lab waited "for the Service to be resolvable through DNS": a
+Service resolves as soon as it exists, even with no endpoint, so that guard
+would have waited for nothing. Here it waits for an HTTP answer, and the Pod
+really stays in `Init` as long as nothing answers.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Init Containers et Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Init Containers and Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
 
 ```bash
 dsoxlab run   ckad-init-container
 dsoxlab check ckad-init-container
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

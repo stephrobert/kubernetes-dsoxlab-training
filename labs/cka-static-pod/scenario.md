@@ -1,45 +1,45 @@
-# Poser un Pod statique sur un worker, sans passer par l'API
+# Place a static Pod on a worker, without going through the API
 
-## La situation
+## The situation
 
-L'équipe réseau veut une page de statut servie depuis le worker
-**`k8s-w1.lab`** lui-même, qui reste en ligne même quand l'API server est
-injoignable. Un Deployment ne convient pas : sans API, rien ne le
-replanifie. Ce qu'il faut, c'est un Pod que le **kubelet du worker gère
-seul**, à partir d'un fichier posé sur le nœud.
+The network team wants a status page served from the worker
+**`k8s-w1.lab`** itself, one that stays up even when the API server is
+unreachable. A Deployment will not do: with no API, nothing reschedules it.
+What is needed is a Pod that the **worker's kubelet manages on its own**,
+from a file placed on the node.
 
-Vous êtes sur le control plane. Comme à l'examen, `ssh k8s-w1.lab` vous
-ouvre une session sur le worker.
+You are on the control plane. As in the exam, `ssh k8s-w1.lab` opens a
+session on the worker.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Sur `k8s-w1.lab`, un manifeste de Pod déposé dans le **répertoire que le
-   kubelet surveille**. Ce répertoire n'est pas à deviner : la configuration
-   du kubelet le désigne.
+1. On `k8s-w1.lab`, a Pod manifest dropped in the **directory the kubelet
+   watches**. That directory is not to be guessed: the kubelet's own
+   configuration names it.
 
-2. Le Pod s'appelle **`static-web`**, tourne dans le namespace `default`,
-   porte le label `role: static`, et son conteneur, nommé `web`, utilise
-   l'image **`nginx:1.27-alpine`** et expose le **port 80**.
+2. The Pod is called **`static-web`**, runs in the `default` namespace,
+   carries the label `role: static`, and its container, named `web`, uses
+   the image **`nginx:1.27-alpine`** and exposes **port 80**.
 
-3. Le Pod apparaît dans l'API, en **`Running`**, sous le nom que le kubelet
-   donne aux Pods miroirs : le nom du Pod suffixé du nom du nœud.
+3. The Pod shows up in the API, **`Running`**, under the name the kubelet
+   gives to mirror Pods: the Pod name suffixed with the node name.
 
-## Les repères utiles
+## Useful bearings
 
-Le kubelet ne crée pas ce Pod parce qu'on le lui a demandé par l'API : il
-le crée parce qu'il a lu un fichier, et il publie ensuite dans l'API un
-**Pod miroir** pour qu'on le voie, en lecture seule. Supprimer ce miroir ne
-supprime rien : le kubelet le recrée. Seul le fichier compte.
+The kubelet does not create this Pod because someone asked through the API:
+it creates it because it read a file, and it then publishes a **mirror Pod**
+in the API so that you can see it, read-only. Deleting that mirror deletes
+nothing: the kubelet recreates it. Only the file counts.
 
-Le chemin surveillé est un champ de `/var/lib/kubelet/config.yaml`, le
-fichier que `kubeadm` a écrit en joignant le nœud. Un manifeste mal formé
-n'apparaît nulle part dans l'API : c'est le journal du kubelet, sur le
-worker, qui dit ce qu'il lui reproche.
+The watched path is a field of `/var/lib/kubelet/config.yaml`, the file
+`kubeadm` wrote when the node joined. A malformed manifest shows up nowhere
+in the API: it is the kubelet's journal, on the worker, that says what it
+holds against it.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le fichier sur le worker, le Pod miroir dans l'API, et
-demandent au runtime du worker s'il exécute vraiment le conteneur.
+The tests read the file on the worker, the mirror Pod in the API, and ask
+the worker's runtime whether it is really running the container.
 
 ```bash
 dsoxlab check cka-static-pod

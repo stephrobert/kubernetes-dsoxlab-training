@@ -1,12 +1,12 @@
 id: cka-node-drain-cordon
-title: "Vider un worker pour une maintenance, sans couper le service"
+title: "Drain a worker for maintenance, without cutting the service"
 level: cluster-architecture-installation-configuration
 description: |
-  Protéger une application par un PodDisruptionBudget, retirer le worker du
-  scheduling, l'évacuer en respectant ce budget et les DaemonSets, puis le
-  remettre en service et tracer l'opération. Les tests prouvent que les
-  Pods ont réellement été recréés ailleurs, que le nœud est revenu, et que
-  le DaemonSet du CNI n'a pas bougé.
+  Protect an application with a PodDisruptionBudget, take the worker out of
+  scheduling, evict it while respecting that budget and the DaemonSets, then
+  put it back in service and record the operation. The tests prove that the
+  Pods really were recreated elsewhere, that the node came back, and that
+  the CNI DaemonSet did not move.
 skills:
   - cordon
   - drain

@@ -1,26 +1,26 @@
-# Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit
+# A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes
 
-Lab **CKA**, domaine *Storage* (10 % de l'épreuve), compétences
-« Understand persistent volumes and know how to create them », « Understand
-volume modes, access modes and reclaim policies », « Understand persistent
-volume claims ».
+**CKA** lab, *Storage* domain (10 % of the exam), competencies
+"Understand persistent volumes and know how to create them", "Understand
+volume modes, access modes and reclaim policies", "Understand persistent
+volume claims".
 
-Le lab hérité lisait le fichier dans le Pod, ce qu'un `emptyDir` monté sur
-`/data` aurait aussi donné. Ici le dernier test lit le même fichier sur le
-disque du nœud où le Pod tourne, par ssh : c'est là que la persistance se
-prouve.
+The lab inherited from K8sExamLab read the file inside the Pod, which an
+`emptyDir` mounted on `/data` would also have given. Here the last test
+reads the same file on the disk of the node where the Pod runs, over ssh:
+that is where persistence is proven.
 
 | | |
 |---|---|
-| Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Stockage Kubernetes : PV, PVC, StorageClass et CSI](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
+| Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
+| Duration | about 15 minutes |
+| Companion lesson | [Kubernetes storage: PV, PVC, StorageClass and CSI](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
 
 ```bash
 dsoxlab run   cka-pv-pvc-storageclass
 dsoxlab check cka-pv-pvc-storageclass
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

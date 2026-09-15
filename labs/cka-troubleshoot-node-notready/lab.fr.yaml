@@ -1,0 +1,6 @@
+title: "Ramener un nœud NotReady dans le cluster"
+description: |
+  Un worker est passé NotReady, et l'application qui lui est réservée est
+  dégradée. Trouver sur le nœud pourquoi il ne parle plus au control plane,
+  remettre son agent en service de façon durable, et prouver que
+  l'application est revenue.

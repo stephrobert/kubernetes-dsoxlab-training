@@ -1,43 +1,42 @@
-# Trois Pods en CrashLoopBackOff, trois causes
+# Three Pods in CrashLoopBackOff, three causes
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, trois Pods redémarrent en boucle depuis ce
-matin : **`bad-command`**, **`missing-env`** et **`oom-killed`**. Leurs noms
-ne sont pas un indice, c'est l'équipe précédente qui les a nommés ainsi
-après coup, en découvrant les pannes, et personne ne les a corrigés.
+In the **`lab`** namespace, three Pods have been restarting in a loop since
+this morning: **`bad-command`**, **`missing-env`** and **`oom-killed`**.
+Their names are not a hint, the previous team named them that way after the
+fact, as it discovered the failures, and nobody fixed them.
 
-Chacun meurt pour une raison différente, et chaque raison se lit à un
-endroit différent : le message de sortie du conteneur, ses logs, ou ce que
-le kubelet raconte de sa dernière mort.
+Each one dies for a different reason, and each reason is read in a different
+place: the container's exit message, its logs, or what the kubelet tells
+about its last death.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. `bad-command` tourne : sa commande de démarrage existe et reste en vie.
+1. `bad-command` runs: its start command exists and stays alive.
 
-2. `missing-env` tourne : il reçoit la variable d'environnement qu'il exige.
-   Ses logs disent laquelle.
+2. `missing-env` runs: it gets the environment variable it demands. Its logs
+   say which one.
 
-3. `oom-killed` tourne : sa limite de mémoire suffit à nginx, au moins
-   **64Mi**, et il n'est plus tué par le noyau.
+3. `oom-killed` runs: its memory limit is enough for nginx, at least
+   **64Mi**, and it is no longer killed by the kernel.
 
-4. Les trois Pods sont en **`Running`**, stables, et le compteur de
-   redémarrages ne monte plus.
+4. The three Pods are **`Running`**, stable, and the restart counter no
+   longer goes up.
 
-## Les repères utiles
+## Useful bearings
 
-`kubectl describe pod` montre pour chaque conteneur son dernier état
-terminé, avec une raison, `Error` ou `OOMKilled`, et un code de sortie.
-`kubectl logs --previous` montre ce que le conteneur a écrit avant de
-mourir.
+`kubectl describe pod` shows, for each container, its last terminated state,
+with a reason, `Error` or `OOMKilled`, and an exit code.
+`kubectl logs --previous` shows what the container wrote before dying.
 
-Un Pod nu ne se modifie pas sur ces champs : la commande, les variables et
-les limites sont figées. Il faut le recréer, avec le même nom.
+A bare Pod cannot be modified on those fields: the command, the variables
+and the limits are frozen. It has to be recreated, with the same name.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'état de chaque Pod, sa limite de mémoire, et s'assurent
-que le compteur de redémarrages n'augmente plus.
+The tests read the state of each Pod, its memory limit, and make sure the
+restart counter no longer increases.
 
 ```bash
 dsoxlab check ckad-troubleshoot-crashloop

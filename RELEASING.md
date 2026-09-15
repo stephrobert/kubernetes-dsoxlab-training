@@ -1,72 +1,78 @@
-# Publier une version de kubernetes-dsoxlab-training
+# Releasing kubernetes-dsoxlab-training
 
-Ce dépôt livre du **contenu de labs**, pas un paquet Python. Une version publie
-un **bundle `tar.gz`** du catalogue comme asset d'une Release GitHub : pas de
-PyPI, pas de wheel, aucun registre d'artefacts externe.
+**Language:** [English](./RELEASING.md) · [Français](./RELEASING.fr.md)
 
-## Ce que contient une version
+This repository ships **lab content**, not a Python package. A release
+publishes a **`tar.gz` bundle** of the catalogue as an asset of a GitHub
+Release: no PyPI, no wheel, no external artifact registry.
 
-Le workflow `release.yml` construit
-`kubernetes-dsoxlab-training-<version>.tar.gz` avec :
+## What a release contains
+
+The `release.yml` workflow builds
+`kubernetes-dsoxlab-training-<version>.tar.gz` with:
 
 - `labs/`, `shared/`, `meta.yml`, `conftest.py`, `requirements.yml`,
-  `pyproject.toml`, `ssh/` (la clé publique du lab),
-- `scripts/` et `tests/`, parce qu'un catalogue qui prétend se valider doit
-  livrer de quoi le faire,
-- `validation-labs.json`, la preuve que chaque lab a été joué dans les deux
-  sens, avec sa date et la version de Kubernetes,
-- les documents de gouvernance (`README`, `LICENSE`, `CONTRIBUTING`,
+  `pyproject.toml`, `ssh/` (the lab's public key),
+- `scripts/` and `tests/`, because a catalogue that claims to validate itself
+  must ship the means to do so,
+- `validation-labs.json`, the proof that every lab was played in both
+  directions, with its date and its Kubernetes version,
+- the governance documents (`README`, `LICENSE`, `CONTRIBUTING`,
   `CODE_OF_CONDUCT`, `SECURITY`, `CHANGELOG`).
 
-Il **exclut** le pilotage local (`.claude/`, `todo/`, `CLAUDE.md`) et les
-fichiers générés (caches, état runtime de dsoxlab). Ces trois premiers ne sont
-de toute façon pas versionnés : les exclure est une ceinture de sécurité, pas
-une nécessité. Une exclusion qui ne correspond à rien ne fait pas échouer `tar`,
-contrairement à un chemin listé mais absent, ce qui a déjà cassé une release
-dans le dépôt Linux jumeau.
+It **excludes** local steering (`.claude/`, `todo/`, `CLAUDE.md`) and generated
+files (caches, dsoxlab runtime state). The first three are not versioned
+anyway: excluding them is a safety belt, not a necessity. An exclusion that
+matches nothing does not fail `tar`, unlike a path that is listed but absent,
+which has already broken a release in the sibling Linux catalogue.
 
-Quatre artefacts accompagnent l'archive :
+Four artifacts accompany the archive:
 
-| Artefact | Rôle |
+| Artifact | Purpose |
 | --- | --- |
-| `<pkg>.tar.gz.sha256` | empreinte d'intégrité |
-| `provenance.intoto.jsonl` | provenance SLSA, ce que lit Scorecard Signed-Releases |
-| `<pkg>.tar.gz.cosign.bundle` | bundle de signature Cosign keyless |
-| (côté registre) | attestation de build native GitHub |
+| `<pkg>.tar.gz.sha256` | integrity digest |
+| `provenance.intoto.jsonl` | SLSA provenance, what Scorecard Signed-Releases reads |
+| `<pkg>.tar.gz.cosign.bundle` | keyless Cosign signature bundle |
+| (registry side) | GitHub's native build attestation |
 
-## Pourquoi trois jobs, et pas un seul
+## Why three jobs, and not one
 
-Le workflow est découpé en **construire**, **attester**, **publier**, et ce
-découpage est la seule chose qui sépare SLSA Build Level 2 de Level 3.
+The workflow is split into **build**, **attest**, **publish**, and that split is
+the only thing separating SLSA Build Level 2 from Level 3.
 
-La documentation GitHub le dit en deux phrases : « Artifact attestations by
-itself provides SLSA v1.0 Build Level 2 », et « Reusable workflows can provide
-isolation between the build process and the calling workflow, to meet SLSA
-v1.0 Build Level 3 ». Tant que le job qui construit l'archive est aussi celui
-qui signe sa provenance, rien n'empêche techniquement le processus de build de
-produire une provenance qui ment. Le niveau 3 exige que la signature se fasse
-hors de sa portée.
+GitHub's documentation puts it in two sentences: "Artifact attestations by
+itself provides SLSA v1.0 Build Level 2", and "Reusable workflows can provide
+isolation between the build process and the calling workflow, to meet SLSA v1.0
+Build Level 3". As long as the job that builds the archive is also the one that
+signs its provenance, nothing technically stops the build process from
+producing provenance that lies. Level 3 requires the signing to happen out of
+its reach.
 
-D'où `.github/workflows/attester.yml`, appelé comme workflow réutilisable :
+Hence `.github/workflows/attester.yml`, called as a reusable workflow:
 
-- il est le **seul du dépôt** à recevoir la permission `attestations: write` ;
-- il ne reçoit qu'un **nom et une empreinte**, jamais l'archive ni le dépôt : il
-  ne fait aucun `checkout` ;
-- le job de publication, lui, peut écrire la release mais **ne peut pas
-  attester**, faute de cette permission ;
-- l'archive est recomparée à son empreinte **avant** publication, pour qu'un
-  artefact altéré entre deux jobs ne soit pas publié avec une provenance qui ne
-  le décrit pas.
+- it is the **only workflow in the repository** granted `attestations: write`;
+- it receives **a name and a digest**, never the archive nor the repository: it
+  performs no `checkout`;
+- the publish job can write the release but **cannot attest**, lacking that
+  permission;
+- the archive is re-checked against its digest **before** publication, so that
+  an artifact altered between two jobs is not published with provenance that
+  does not describe it.
 
-L'appel s'écrit `uses: $/.github/workflows/attester.yml`, la forme
-« self-repository » que GitHub a rendue disponible en juillet 2026 : elle
-résout le workflow au commit qui tourne, sans dépendre de l'état du système de
-fichiers, donc sans pouvoir charger un fichier qu'une étape précédente aurait
-déposé.
+The call reads `uses: ./.github/workflows/attester.yml`, and not the newer
+`$/` "self-repository" form, even though zizmor recommends the latter. The
+reason is worth recording: security tooling cannot read `$/` yet, and an
+analyser that does not understand a construct cannot judge it safe. Measured on
+2026-09-15, on that exact line: actionlint rejects it as an invalid format,
+zizmor 1.26.1 refuses to load the file and audits nothing at all, and Plumber
+takes it for an unpinned third-party action from an unauthorised source, two
+HIGH findings and a score of 70/100 instead of 100/100. The called workflow is
+the one that *signs*: it is the last line in the repository on which to give up
+the analysers' scrutiny.
 
-## Produire une version
+## Cutting a release
 
-1. Vérifier que le catalogue est vert, et pas seulement livrable :
+1. Check that the catalogue is green, not merely shippable:
 
    ```bash
    dsoxlab validate-structure --check-urls
@@ -74,38 +80,38 @@ déposé.
    python3 scripts/check-labs-completude.py --check
    ```
 
-2. Basculer les entrées de `CHANGELOG.md` sous une nouvelle version.
-3. Taguer et pousser le tag, ce qui déclenche `release.yml` :
+2. Move the `CHANGELOG.md` and `CHANGELOG.fr.md` entries under a new version.
+3. Tag and push the tag, which triggers `release.yml`:
 
    ```bash
    git tag vX.Y.Z
    git push origin vX.Y.Z
    ```
 
-4. Le workflow construit le `tar.gz`, atteste sa provenance, le signe en
-   keyless et crée la Release GitHub avec des notes générées automatiquement.
+4. The workflow builds the `tar.gz`, attests its provenance, signs it keyless
+   and creates the GitHub Release with auto-generated notes.
 
-## Vérifier une version
+## Verifying a release
 
-Intégrité et contenu :
+Integrity and contents:
 
 ```bash
 sha256sum -c kubernetes-dsoxlab-training-<version>.tar.gz.sha256
 tar tzf kubernetes-dsoxlab-training-<version>.tar.gz | head
 ```
 
-Provenance du build. Prouve que l'archive a bien été produite par le workflow de
-ce dépôt, et non reconstruite par quelqu'un d'autre :
+Build provenance. Proves the archive really was produced by this repository's
+workflow, and not rebuilt by someone else:
 
 ```bash
 gh attestation verify kubernetes-dsoxlab-training-<version>.tar.gz \
   --repo stephrobert/kubernetes-dsoxlab-training
 ```
 
-**La vérification qui atteste le niveau 3** nomme le workflow signataire. Elle
-échoue si la provenance a été produite ailleurs que par le workflow
-d'attestation isolé, et c'est elle qu'il faut lancer à la première release pour
-confirmer que la chaîne tient :
+**The check that establishes Build Level 3** names the signing workflow. It
+fails if the provenance was produced anywhere other than the isolated attester
+workflow, and it is the one to run on the first release to confirm the chain
+holds:
 
 ```bash
 gh attestation verify kubernetes-dsoxlab-training-<version>.tar.gz \
@@ -113,9 +119,9 @@ gh attestation verify kubernetes-dsoxlab-training-<version>.tar.gz \
   --signer-workflow stephrobert/kubernetes-dsoxlab-training/.github/workflows/attester.yml
 ```
 
-Signature Cosign keyless. Les **deux** options de certificat sont obligatoires :
-sans elles, `cosign verify-blob` accepte n'importe quelle identité, ce qui vide
-la vérification de son sens.
+Keyless Cosign signature. **Both** certificate flags are mandatory: without
+them, `cosign verify-blob` accepts any identity, which empties the verification
+of its meaning.
 
 ```bash
 cosign verify-blob \
@@ -125,24 +131,24 @@ cosign verify-blob \
   kubernetes-dsoxlab-training-<version>.tar.gz
 ```
 
-> **Piège de version Cosign.** La CI installe **Cosign 3.x**, qui écrit un
-> nouveau format de bundle. Un **Cosign 2.x** local répond `no signatures found`
-> sur une archive pourtant parfaitement signée : la release n'est pas cassée,
-> c'est l'outil local qui ne sait pas lire le format. Vérifiez `cosign version`
-> et alignez-le avant de conclure quoi que ce soit.
+> **Cosign version trap.** The CI installs **Cosign 3.x**, which writes a new
+> bundle format. A local **Cosign 2.x** answers `no signatures found` on a
+> perfectly signed archive: the release is not broken, the local tool cannot
+> read the format. Check `cosign version` and align it before concluding
+> anything.
 
-## Réglages GitHub à faire une fois
+## GitHub settings to do once
 
-Deux workflows ont besoin d'une configuration qui ne vit pas dans le dépôt :
+Two workflows need configuration that does not live in the repository:
 
-- **`plumber.yml`** attend un environnement `security`, restreint à la branche
-  `main`, portant le secret `PLUMBER_ADMIN_TOKEN` : un PAT à portée fine avec
-  Administration, Contents et Metadata en lecture. Sans lui, le workflow tourne
-  quand même, sur le jeton du job, mais le contrôle `branchMustBeProtected`
-  s'abstient et le score reste incomplet.
-- **La protection de la branche `main`**, par le ruleset « Protection de main » :
-  c'est elle que Scorecard et Plumber mesurent. Historique linéaire, suppression
-  et poussée en force interdites, passage par pull request avec résolution des
-  fils de discussion, et les six jobs de la CI en contrôles obligatoires.
+- **`plumber.yml`** expects a `security` environment, restricted to the `main`
+  branch, holding the `PLUMBER_ADMIN_TOKEN` secret: a fine-grained PAT with
+  Administration, Contents and Metadata read access. Without it the workflow
+  still runs, on the job token, but the `branchMustBeProtected` control abstains
+  and the score stays incomplete.
+- **Protection of the `main` branch**, through the "Protection de main" ruleset:
+  that is what Scorecard and Plumber measure. Linear history, deletion and force
+  pushes forbidden, pull request required with review thread resolution, and the
+  six CI jobs as required status checks.
 
-> Les commits et les tags sont créés par un humain, jamais par un assistant.
+> Commits and tags are created by a human, never by an assistant.

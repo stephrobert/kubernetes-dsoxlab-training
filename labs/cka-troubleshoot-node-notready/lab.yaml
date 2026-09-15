@@ -1,11 +1,10 @@
 id: cka-troubleshoot-node-notready
-title: "Ramener un nœud NotReady dans le cluster"
+title: "Bring a NotReady node back into the cluster"
 level: troubleshooting
 description: |
-  Un worker est passé NotReady, et l'application qui lui est réservée est
-  dégradée. Trouver sur le nœud pourquoi il ne parle plus au control plane,
-  remettre son agent en service de façon durable, et prouver que
-  l'application est revenue.
+  A worker has gone NotReady, and the application reserved for it is degraded.
+  Find out on the node why it no longer talks to the control plane, put its
+  agent back in service for good, and prove that the application is back.
 skills:
   - troubleshooting
   - node-notready

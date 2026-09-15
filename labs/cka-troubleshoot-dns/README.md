@@ -1,22 +1,23 @@
-# Rétablir la résolution DNS du cluster
+# Restore the cluster's DNS resolution
 
-Lab **CKA**, domaine *Troubleshooting* (30 % de l'épreuve, le plus lourd des
-trois examens), compétences « Troubleshoot cluster components » et
-« Troubleshoot services and networking ».
+**CKA** lab, *Troubleshooting* domain (30 % of the exam, the heaviest of the
+three exams), competencies "Troubleshoot cluster components" and
+"Troubleshoot services and networking".
 
-Le DNS en panne est le classique de l'examen : l'application n'a rien, et
-c'est un composant du cluster qu'il faut retrouver et remettre en service.
+Broken DNS is the classic exam question: there is nothing wrong with the
+application, and it is a cluster component that has to be found and put back
+in service.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [CoreDNS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [CoreDNS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-dns
 dsoxlab check cka-troubleshoot-dns
 ```
 
-Transposé de K8sExamLab le 2026-09-14, puis joué : 0 avant le travail,
-100 après la solution du formateur.
+Ported from K8sExamLab on 2026-09-14, then played: 0 before the work,
+100 after the trainer's solution.

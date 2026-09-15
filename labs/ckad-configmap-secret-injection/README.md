@@ -1,23 +1,24 @@
-# Injecter configuration et secrets dans un Pod
+# Inject configuration and secrets into a Pod
 
-Lab **CKAD**, domaine *Application Environment, Configuration and Security*
-(25 % de l'épreuve, le plus lourd des cinq), compétences « Understand
-ConfigMaps » et « Understand Secrets ».
+**CKAD** lab, *Application Environment, Configuration and Security* domain
+(25 % of the exam, the heaviest of the five), competencies "Understand
+ConfigMaps" and "Understand Secrets".
 
-Le geste le plus fréquent du CKAD : donner à une application sa configuration
-sans la coller dans son manifeste, et ses secrets sans les écrire nulle part.
+The most frequent move of the CKAD: giving an application its configuration
+without pasting it into its manifest, and its secrets without writing them
+anywhere.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Les ConfigMaps](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [ConfigMaps](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
 
 ```bash
 dsoxlab run   ckad-configmap-secret-injection
 dsoxlab check ckad-configmap-secret-injection
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

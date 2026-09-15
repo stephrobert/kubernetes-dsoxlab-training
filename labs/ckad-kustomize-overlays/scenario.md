@@ -1,45 +1,43 @@
-# Une base Kustomize et deux overlays, dev et prod
+# One Kustomize base and two overlays, dev and prod
 
-## La situation
+## The situation
 
-L'équipe déploie la même application dans deux namespaces, **`dev`** et
-**`prod`**, et en a assez de maintenir deux jeux de manifestes qui
-divergent. Elle veut une **base** unique, et deux **overlays** qui ne
-portent que les différences. Les deux namespaces existent.
+The team deploys the same application into two namespaces, **`dev`** and
+**`prod`**, and is tired of maintaining two sets of manifests that drift
+apart. It wants a single **base**, and two **overlays** carrying only the
+differences. Both namespaces already exist.
 
-L'application, c'est un Deployment **`app`**, image `nginx:1.27-alpine`, et
-un Service **`app-svc`** sur le port 80 qui le dessert.
+The application is a Deployment **`app`**, image `nginx:1.27-alpine`, and a
+Service **`app-svc`** on port 80 that serves it.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Dans `dev` : un Deployment **`dev-app`** à **1** replica, dont les Pods
-   portent le label `env=dev`, et un Service **`dev-app-svc`** qui a des
+1. In `dev`: a Deployment **`dev-app`** with **1** replica, whose Pods carry
+   the label `env=dev`, and a Service **`dev-app-svc`** that has endpoints.
+
+2. In `prod`: a Deployment **`prod-app`** with **3** replicas, whose Pods
+   carry the label `env=prod`, and a Service **`prod-app-svc`** that has
    endpoints.
 
-2. Dans `prod` : un Deployment **`prod-app`** à **3** replicas, dont les Pods
-   portent le label `env=prod`, et un Service **`prod-app-svc`** qui a des
-   endpoints.
+3. Both environments come from the **same base**: same image, same port, same
+   structure, only the namespace, the replica count, the name prefix and the
+   environment label differ.
 
-3. Les deux environnements viennent de la **même base** : même image, même
-   port, même structure, seuls le namespace, le nombre de replicas, le
-   préfixe des noms et le label d'environnement diffèrent.
+## Useful bearings
 
-## Les repères utiles
+`kubectl apply -k <directory>` applies a `kustomization.yaml`. An overlay
+references the base in `resources`, and Kustomize knows how to prefix names,
+set a namespace, add labels right down into the selectors, and change a
+replica count, without touching the base.
 
-`kubectl apply -k <répertoire>` applique un `kustomization.yaml`. Un overlay
-référence la base dans `resources`, et Kustomize sait préfixer les noms,
-fixer un namespace, ajouter des labels jusque dans les selectors, et changer
-un nombre de replicas, sans toucher à la base.
+The added label must also make it into the Service selector, otherwise the
+Service no longer finds its Pods: Kustomize does that for you, if you ask it
+to.
 
-Le label ajouté doit aussi entrer dans le selector du Service, sinon le
-Service ne trouve plus ses Pods : Kustomize le fait pour vous, si on le lui
-demande.
+## How you will know it works
 
-## Comment vous saurez que c'est bon
-
-Les tests lisent les Deployments, leurs Pods, les Services et leurs
-endpoints dans les deux namespaces, et comparent la structure des deux
-environnements.
+The tests read the Deployments, their Pods, the Services and their endpoints
+in both namespaces, and compare the structure of the two environments.
 
 ```bash
 dsoxlab check ckad-kustomize-overlays

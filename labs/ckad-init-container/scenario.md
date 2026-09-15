@@ -1,47 +1,44 @@
-# Attendre une dépendance avec un init container
+# Wait for a dependency with an init container
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, l'application **`app`** lit sa configuration au
-démarrage sur un serveur interne, exposé par le Service **`config-svc`** sur
-le port 80. Quand ce serveur n'est pas là, l'application démarre quand même,
-sans configuration, et se comporte n'importe comment pendant des heures avant
-que quelqu'un s'en aperçoive.
+In the **`lab`** namespace, the application **`app`** reads its configuration
+at startup from an internal server, exposed by the Service **`config-svc`** on
+port 80. When that server is not there, the application starts anyway, with no
+configuration, and behaves erratically for hours before anyone notices.
 
-L'équipe veut que l'application **n'aille pas plus loin tant que
-`config-svc` ne répond pas**. Le Service existe déjà, mais rien ne se tient
-derrière lui pour l'instant : c'est la situation de départ, et c'est celle
-qu'il faut savoir gérer.
+The team wants the application to **go no further as long as `config-svc` does
+not answer**. The Service already exists, but nothing stands behind it for now:
+that is the starting situation, and it is the one you must know how to handle.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Pod **`app`** dans `lab`, avec un init container nommé
-   **`wait-for-config`** qui attend que `http://config-svc/` réponde, puis
-   un conteneur principal nommé **`main`**, image `nginx:1.27-alpine`.
+1. A Pod **`app`** in `lab`, with an init container named
+   **`wait-for-config`** that waits until `http://config-svc/` answers, then a
+   main container named **`main`**, image `nginx:1.27-alpine`.
 
-2. Tant que rien ne répond derrière `config-svc`, le Pod `app` reste en
-   **`Init`** : constatez-le.
+2. As long as nothing answers behind `config-svc`, the Pod `app` stays in
+   **`Init`**: see it for yourself.
 
-3. Un Pod **`config-server`** dans `lab`, image `nginx:1.27-alpine`, portant
-   le label **`app=config`**, que le Service `config-svc` sélectionne.
+3. A Pod **`config-server`** in `lab`, image `nginx:1.27-alpine`, carrying the
+   label **`app=config`**, which the Service `config-svc` selects.
 
-4. Une fois `config-server` prêt, l'init container se termine et `app`
-   passe en `Running` sans que vous ayez rien fait d'autre.
+4. Once `config-server` is ready, the init container finishes and `app` moves
+   to `Running` without you doing anything else.
 
-## Les repères utiles
+## Useful bearings
 
-Un init container s'exécute avant les conteneurs principaux, jusqu'au bout,
-et le Pod attend qu'il réussisse. Une boucle `until` avec `wget` fait un
-excellent gardien.
+An init container runs before the main containers, all the way through, and the
+Pod waits for it to succeed. An `until` loop with `wget` makes an excellent
+guard.
 
-Un Service se résout dans le DNS dès qu'il existe, même sans endpoint :
-attendre que le nom se résolve n'attend rien. Attendre une réponse HTTP,
-oui.
+A Service resolves in DNS as soon as it exists, even with no endpoint: waiting
+for the name to resolve waits for nothing. Waiting for an HTTP answer does.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent la définition du Pod `app`, les endpoints du Service, et
-l'état de l'init container, terminé avec succès.
+The tests read the definition of the Pod `app`, the endpoints of the Service,
+and the state of the init container, terminated successfully.
 
 ```bash
 dsoxlab check ckad-init-container

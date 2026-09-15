@@ -1,39 +1,39 @@
-# Exposer un Deployment par un Service ClusterIP
+# Expose a Deployment through a ClusterIP Service
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, l'équipe veut un serveur web en **trois
-replicas**, joignable par les autres applications du cluster sous un nom
-stable, **`web-svc`**, quel que soit le Pod qui répond. Pour vérifier la
-répartition, chaque Pod doit répondre avec **son propre nom**.
+In the **`lab`** namespace, the team wants a web server in **three replicas**,
+reachable by the other applications of the cluster under a stable name,
+**`web-svc`**, whichever Pod answers. To check the spread, each Pod must answer
+with **its own name**.
 
-Un Pod **`client`** est là pour interroger le Service.
+A Pod named **`client`** is there to query the Service.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Deployment **`web`** dans `lab`, trois replicas, image `busybox:1.36`,
-   dont chaque Pod sert son nom d'hôte en HTTP sur le port **8080**. Ses
-   Pods portent le label `app=web`.
+1. A Deployment **`web`** in `lab`, three replicas, image `busybox:1.36`,
+   where each Pod serves its hostname over HTTP on port **8080**. Its Pods
+   carry the label `app=web`.
 
-2. Un Service **`web-svc`** de type ClusterIP, port **80**, qui vise le port
-   8080 des Pods `app=web`.
+2. A Service **`web-svc`** of type ClusterIP, port **80**, pointing at port
+   8080 of the `app=web` Pods.
 
-3. Depuis `client`, `http://web-svc/` répond, et sur une dizaine de
-   requêtes, **au moins deux Pods différents** répondent.
+3. From `client`, `http://web-svc/` answers, and over about ten requests, **at
+   least two different Pods** answer.
 
-## Les repères utiles
+## Useful bearings
 
-Un serveur qui répond son nom d'hôte tient en une commande busybox :
-`hostname` dans un fichier, puis `httpd -f` sur ce répertoire. Dans un Pod,
-le nom d'hôte est le nom du Pod.
+A server that answers with its hostname fits in one busybox command:
+`hostname` into a file, then `httpd -f` on that directory. Inside a Pod, the
+hostname is the Pod name.
 
-`kubectl expose deployment` crée le Service en une commande, si on lui dit
-le port et le port cible.
+`kubectl expose deployment` creates the Service in a single command, if you
+tell it the port and the target port.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le Deployment et le Service, puis font dix requêtes depuis
-`client` et comptent les Pods qui ont répondu.
+The tests read the Deployment and the Service, then make ten requests from
+`client` and count the Pods that answered.
 
 ```bash
 dsoxlab check ckad-expose-service

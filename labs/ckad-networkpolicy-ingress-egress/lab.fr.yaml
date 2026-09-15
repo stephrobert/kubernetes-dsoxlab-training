@@ -1,0 +1,6 @@
+title: "Cloisonner trois tiers avec des NetworkPolicy ingress et egress"
+description: |
+  Frontend, backend, base de données : n'autoriser que les flux prévus,
+  dans les deux sens, DNS compris, et interdire tout le reste. Prouver
+  chaque règle par une vraie connexion, celle qui passe et celle qui est
+  bloquée.

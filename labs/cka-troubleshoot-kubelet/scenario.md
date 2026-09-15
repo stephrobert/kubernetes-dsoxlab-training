@@ -1,45 +1,44 @@
-# Réparer un kubelet qui refuse de démarrer
+# Repair a kubelet that refuses to start
 
-## La situation
+## The situation
 
-Hier soir, un collègue a « juste ajusté le DNS » sur le worker
-**`k8s-w1.lab`**. Ce matin, le nœud est **`NotReady`**, et `systemctl start
-kubelet` ne change rien : le service repart, puis s'arrête aussitôt, encore
-et encore.
+Last night, a colleague "just adjusted the DNS" on the worker
+**`k8s-w1.lab`**. This morning, the node is **`NotReady`**, and `systemctl start
+kubelet` changes nothing: the service comes back, then stops right away, again
+and again.
 
-L'application **`web-app`**, dans le namespace **`production`**, est réservée
-à ce worker par un `nodeSelector` et doit tourner en trois replicas. Elle est
-dégradée depuis la nuit.
+The **`web-app`** application, in the **`production`** namespace, is reserved
+for this worker by a `nodeSelector` and must run three replicas. It has been
+degraded since the night.
 
-Vous êtes sur le control plane. Comme à l'examen, `ssh k8s-w1.lab` vous ouvre
-une session sur le worker.
+You are on the control plane. As in the exam, `ssh k8s-w1.lab` opens a session
+on the worker.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le nœud `k8s-w1.lab` est **`Ready`**.
+1. The `k8s-w1.lab` node is **`Ready`**.
 
-2. Le kubelet **tourne**, avec une configuration **valide** : l'adresse
-   légitime du DNS du cluster, celle du Service `kube-dns`, doit y rester.
-   Réparer en supprimant toute la configuration n'est pas réparer.
+2. The kubelet is **running**, with a **valid** configuration: the legitimate
+   address of the cluster DNS, that of the `kube-dns` Service, must remain in
+   it. Repairing by deleting the whole configuration is not repairing.
 
-3. Le Deployment `web-app` a ses **trois replicas disponibles**, sur
+3. The `web-app` Deployment has its **three replicas available**, on
    `k8s-w1.lab`.
 
-## Les repères utiles
+## Useful bearings
 
-Un service qui s'arrête aussitôt lancé dit pourquoi dans le journal, et le
-kubelet est précis sur ce point : il nomme le fichier qu'il ne parvient pas à
-lire, et la ligne. Sur un cluster kubeadm, il lit sa configuration dans un
-fichier YAML sous `/var/lib/kubelet`, écrit par `kubeadm` au moment de la
-jointure du nœud.
+A service that stops as soon as it is launched says why in the journal, and the
+kubelet is precise on that point: it names the file it cannot read, and the
+line. On a kubeadm cluster, it reads its configuration from a YAML file under
+`/var/lib/kubelet`, written by `kubeadm` when the node joined.
 
-Ce que `kubeadm` a écrit est correct ; ce qui a été ajouté après ne l'est pas,
-ni dans sa forme, ni dans son contenu.
+What `kubeadm` wrote is correct; what was added afterwards is not, neither in
+its form nor in its content.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'état du nœud depuis l'API, l'état du service et le fichier
-de configuration sur le worker lui-même, et l'état du Deployment.
+The tests read the node's state from the API, the state of the service and the
+configuration file on the worker itself, and the state of the Deployment.
 
 ```bash
 dsoxlab check cka-troubleshoot-kubelet

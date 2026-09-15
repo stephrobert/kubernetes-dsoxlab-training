@@ -1,12 +1,12 @@
 id: cka-node-affinity
-title: "Placer avec nodeAffinity : contrainte obligatoire et préférence"
+title: "Placing with nodeAffinity: required constraint and preference"
 level: workloads-scheduling
 description: |
-  Placer un Deployment par une affinité de nœud obligatoire sur un label à
-  plusieurs valeurs, y ajouter une préférence pondérée, puis débloquer un
-  Pod qui attend un nœud qui n'existe pas encore en posant le label qu'il
-  exige. Les tests lisent les labels des nœuds, les affinités déclarées et
-  le nœud réel de chaque Pod.
+  Place a Deployment with a required node affinity on a label that accepts
+  several values, add a weighted preference to it, then unblock a Pod that
+  is waiting for a node which does not exist yet, by setting the label it
+  demands. The tests read the node labels, the declared affinities and the
+  actual node of every Pod.
 skills:
   - nodeAffinity
   - requiredDuringScheduling

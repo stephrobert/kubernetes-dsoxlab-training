@@ -1,25 +1,25 @@
-# Vider un worker pour une maintenance, sans couper le service
+# Drain a worker for maintenance, without cutting the service
 
-Lab **CKA**, domaine *Cluster Architecture, Installation and Configuration*
-(25 % de l'épreuve), compétences « Prepare underlying infrastructure » et
-« Manage the lifecycle of Kubernetes clusters ».
+**CKA** lab, *Cluster Architecture, Installation and Configuration* domain
+(25 % of the exam), competencies "Prepare underlying infrastructure" and
+"Manage the lifecycle of Kubernetes clusters".
 
-Le lab hérité tournait sur kind et lisait des specs : un PDB existait, des
-nœuds étaient schedulables. Ici le worker est une vraie machine, le CNI y
-tourne en DaemonSet, un Pod orphelin y traîne, et les tests prouvent que
-chaque Pod de l'application a été recréé ailleurs après le début du lab.
+The lab inherited from K8sExamLab ran on kind and read specs: a PDB existed,
+nodes were schedulable. Here the worker is a real machine, the CNI runs on
+it as a DaemonSet, an orphan Pod is lying around, and the tests prove that
+every Pod of the application was recreated elsewhere after the lab started.
 
 | | |
 |---|---|
-| Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Préparer une maintenance de cluster Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
+| Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
+| Duration | about 15 minutes |
+| Companion lesson | [Preparing a Kubernetes cluster maintenance](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-node-drain-cordon
 dsoxlab check cka-node-drain-cordon
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

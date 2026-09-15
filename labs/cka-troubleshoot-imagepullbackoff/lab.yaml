@@ -1,10 +1,10 @@
 id: cka-troubleshoot-imagepullbackoff
-title: "Sortir un Pod de l'ImagePullBackOff"
+title: "Get a Pod out of ImagePullBackOff"
 level: troubleshooting
 description: |
-  Un Pod ne démarre pas parce que son image ne se télécharge pas. Lire le
-  message exact du runtime dans les events, corriger la référence d'image, et
-  prouver que le serveur répond.
+  A Pod does not start because its image will not download. Read the runtime's
+  exact message in the events, fix the image reference, and prove that the
+  server answers.
 skills:
   - troubleshooting
   - imagepullbackoff

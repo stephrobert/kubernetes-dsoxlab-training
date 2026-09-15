@@ -1,42 +1,42 @@
-# Ramener un nœud NotReady dans le cluster
+# Bring a NotReady node back into the cluster
 
-## La situation
+## The situation
 
-Le worker **`k8s-w1.lab`** est passé **`NotReady`** ce matin, et personne ne
-sait pourquoi. Le control plane, lui, va bien.
+The worker **`k8s-w1.lab`** went **`NotReady`** this morning, and nobody knows
+why. The control plane, for its part, is fine.
 
-L'application **`web-app`**, dans le namespace **`production`**, doit tourner
-en trois replicas. Elle est **réservée à ce worker** par un `nodeSelector`,
-pour des raisons de licence : elle n'a nulle part ailleurs où aller. Depuis
-ce matin, elle est dégradée.
+The **`web-app`** application, in the **`production`** namespace, must run
+three replicas. It is **reserved for this worker** by a `nodeSelector`, for
+licensing reasons: it has nowhere else to go. Since this morning, it has been
+degraded.
 
-Vous êtes sur le control plane. Comme à l'examen, `ssh k8s-w1.lab` vous ouvre
-une session sur le worker.
+You are on the control plane. As in the exam, `ssh k8s-w1.lab` opens a session
+on the worker.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le nœud `k8s-w1.lab` est **`Ready`**.
+1. The `k8s-w1.lab` node is **`Ready`**.
 
-2. L'agent du nœud **tourne**, et il **survivra à un redémarrage** de la
-   machine : réparer pour une heure ne compte pas.
+2. The node's agent is **running**, and it **will survive a reboot** of the
+   machine: repairing for an hour does not count.
 
-3. Le Deployment `web-app` a ses **trois replicas disponibles**, sur
+3. The `web-app` Deployment has its **three replicas available**, on
    `k8s-w1.lab`.
 
-## Les repères utiles
+## Useful bearings
 
-Un nœud `NotReady` est un nœud dont l'agent ne donne plus de nouvelles au
-control plane. `kubectl describe node` le dit dans ses conditions, avec
-l'heure du dernier signe de vie. Le reste ne se lit pas depuis le control
-plane : il faut aller sur le nœud, et y interroger systemd.
+A `NotReady` node is a node whose agent no longer reports to the control plane.
+`kubectl describe node` says so in its conditions, with the time of the last
+sign of life. The rest cannot be read from the control plane: you have to go to
+the node, and question systemd there.
 
-Un service peut être arrêté de deux façons, et l'une des deux ne se voit pas
-dans `systemctl status`.
+A service can be stopped in two ways, and one of the two does not show up in
+`systemctl status`.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'état du nœud depuis l'API, l'état du service sur le worker
-lui-même, et l'état du Deployment.
+The tests read the node's state from the API, the state of the service on the
+worker itself, and the state of the Deployment.
 
 ```bash
 dsoxlab check cka-troubleshoot-node-notready

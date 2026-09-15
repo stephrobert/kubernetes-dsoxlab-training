@@ -1,0 +1,6 @@
+title: "Un agent sur chaque nœud, control plane compris"
+description: |
+  Déployer un DaemonSet qui pose un agent sur tous les nœuds du cluster, y
+  compris le control plane, protégé par son taint. Les tests comptent un Pod
+  par nœud, vérifient que le taint est toujours là et que l'agent y tourne
+  quand même, et lisent ses logs pour prouver qu'il fait son travail.

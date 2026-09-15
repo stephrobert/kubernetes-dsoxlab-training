@@ -1,12 +1,12 @@
 id: cka-deployment-rollout-rollback
-title: "Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version"
+title: "Roll back a stuck rollout, then ship the right version"
 level: workloads-scheduling
 description: |
-  Une mise à jour est partie avec un nom d'image faux et le déploiement est
-  bloqué. Revenir à la révision qui marchait par l'historique du Deployment,
-  puis livrer l'image correcte avec une cause de changement. Les tests
-  lisent les ReplicaSets et leurs numéros de révision : ils racontent ce qui
-  s'est passé, et un Deployment recréé de zéro ne raconte rien.
+  An update went out with a wrong image name and the rollout is stuck. Go
+  back to the revision that worked through the Deployment history, then ship
+  the correct image with a change cause. The tests read the ReplicaSets and
+  their revision numbers: they tell the story of what happened, and a
+  Deployment recreated from scratch tells no story at all.
 skills:
   - deployment
   - rollout

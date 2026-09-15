@@ -1,0 +1,8 @@
+title: "Sauvegarder etcd, puis restaurer le cluster depuis un instantané"
+description: |
+  Un namespace a disparu. Prendre d'abord une sauvegarde fraîche de l'état
+  courant, puis restaurer le cluster depuis l'instantané de la veille, sans
+  arrêter le mauvais composant et sans laisser l'API server sur un cache
+  périmé. Les tests prouvent qu'etcd tourne sur un répertoire produit
+  pendant le lab, que les objets reviennent avec leur UID d'origine, et que
+  ce qui a été écrit après la sauvegarde a disparu.

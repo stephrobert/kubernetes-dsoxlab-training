@@ -1,0 +1,6 @@
+title: "Une base Kustomize et deux overlays, dev et prod"
+description: |
+  Décrire une application une seule fois, dans une base Kustomize, et la
+  déployer dans deux namespaces avec des overlays qui changent le nombre de
+  replicas, préfixent les noms et ajoutent un label d'environnement. Prouver
+  que les deux environnements tournent et se ressemblent.

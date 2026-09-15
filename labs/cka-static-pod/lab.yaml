@@ -1,12 +1,11 @@
 id: cka-static-pod
-title: "Poser un Pod statique sur un worker, sans passer par l'API"
+title: "Place a static Pod on a worker, without going through the API"
 level: cluster-architecture-installation-configuration
 description: |
-  Faire tourner un Pod que le kubelet du worker gère seul, à partir d'un
-  manifeste déposé sur le nœud, et le voir apparaître dans l'API sous son
-  nom de miroir. Le fichier doit être au bon endroit, celui que la
-  configuration du kubelet désigne, et le runtime du worker doit
-  réellement exécuter le conteneur.
+  Run a Pod that the worker's kubelet manages on its own, from a manifest
+  dropped on the node, and see it appear in the API under its mirror name.
+  The file must sit where the kubelet's own configuration says, and the
+  worker's runtime must really be running the container.
 skills:
   - static-pod
   - kubelet

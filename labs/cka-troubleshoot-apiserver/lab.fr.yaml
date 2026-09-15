@@ -1,0 +1,6 @@
+title: "Remettre l'API server en service"
+description: |
+  kubectl ne répond plus : l'API server du control plane sort en erreur au
+  démarrage. Sans API, diagnostiquer sur le nœud, dans les conteneurs et les
+  journaux du kubelet, corriger le manifeste statique, et prouver que l'API
+  répond sans avoir affaibli son autorisation.

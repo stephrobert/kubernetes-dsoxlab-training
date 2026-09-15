@@ -1,46 +1,46 @@
-# Un sidecar natif qui suit les logs de l'application
+# A native sidecar that tails the application logs
 
-## La situation
+## The situation
 
-Une application ancienne, dans le namespace **`lab`**, n'écrit pas ses logs
-sur la sortie standard : elle les écrit dans un fichier,
-**`/var/log/app/output.log`**, une ligne par seconde. `kubectl logs` ne
-montre donc rien, et l'équipe d'exploitation veut ces lignes là où tout le
-monde les lit.
+An old application, in the **`lab`** namespace, does not write its logs to
+standard output: it writes them to a file,
+**`/var/log/app/output.log`**, one line per second. `kubectl logs` therefore
+shows nothing, and the operations team wants those lines where everyone
+reads them.
 
-Plutôt que de modifier l'application, on lui adjoint un **sidecar** qui suit
-le fichier et le recopie sur sa propre sortie standard. Depuis Kubernetes
-1.33, un sidecar se déclare d'une façon précise, qui garantit qu'il démarre
-avant l'application et s'arrête après elle.
+Rather than modify the application, you attach a **sidecar** to it that
+tails the file and copies it to its own standard output. Since Kubernetes
+1.33, a sidecar is declared in a specific way, which guarantees that it
+starts before the application and stops after it.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Pod **`app-with-sidecar`** dans `lab`, avec un volume **`logs`** de
-   type `emptyDir`.
+1. A Pod **`app-with-sidecar`** in `lab`, with a volume **`logs`** of type
+   `emptyDir`.
 
-2. Un conteneur principal **`app`**, image `busybox:1.36`, qui écrit une
-   ligne par seconde dans `/var/log/app/output.log`, sur ce volume.
+2. A main container **`app`**, image `busybox:1.36`, that writes one line per
+   second into `/var/log/app/output.log`, on that volume.
 
-3. Un **sidecar natif** nommé **`log-shipper`**, même image, déclaré comme
-   il se doit depuis la 1.33, qui suit ce fichier en continu et le recopie
-   sur sa sortie standard.
+3. A **native sidecar** named **`log-shipper`**, same image, declared the way
+   it should be since 1.33, that tails that file continuously and copies it
+   to its standard output.
 
-4. Le Pod tourne, le fichier se remplit, et `kubectl logs` du sidecar montre
-   les lignes de l'application.
+4. The Pod is running, the file fills up, and `kubectl logs` on the sidecar
+   shows the application lines.
 
-## Les repères utiles
+## Useful bearings
 
-Un sidecar natif n'est pas un second conteneur sous `containers` : c'est un
-init container auquel on donne une `restartPolicy`. C'est ce détail qui
-change tout, et c'est lui que l'examen attend.
+A native sidecar is not a second container under `containers`: it is an init
+container given a `restartPolicy`. That detail is what changes everything,
+and it is what the exam expects.
 
-Les deux conteneurs ne partagent rien par défaut, même pas un répertoire :
-le volume doit être monté dans les deux.
+The two containers share nothing by default, not even a directory: the
+volume must be mounted in both.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent la définition du Pod, entrent dans le conteneur pour lire
-le fichier, et lisent les logs du sidecar.
+The tests read the Pod definition, enter the container to read the file, and
+read the sidecar logs.
 
 ```bash
 dsoxlab check ckad-multi-container-sidecar

@@ -1,0 +1,5 @@
+title: "Entrer dans un conteneur sans shell avec kubectl debug"
+description: |
+  Un Pod dont l'image ne contient aucun shell n'offre rien à kubectl exec.
+  Lui adjoindre un conteneur éphémère qui partage ses processus, atteindre le
+  système de fichiers du nœud par un Pod de débogage, et en laisser la preuve.

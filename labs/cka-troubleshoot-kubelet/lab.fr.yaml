@@ -1,0 +1,6 @@
+title: "Réparer un kubelet qui refuse de démarrer"
+description: |
+  Le kubelet d'un worker s'arrête aussitôt lancé, et le nœud est NotReady.
+  Lire dans le journal ce qu'il reproche à sa configuration, corriger le
+  fichier sans rien casser d'autre, et prouver que le nœud et son application
+  sont revenus.

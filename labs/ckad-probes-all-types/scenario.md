@@ -1,46 +1,44 @@
-# Trois sondes sur un Pod : startup, liveness, readiness
+# Three probes on one Pod: startup, liveness, readiness
 
-## La situation
+## The situation
 
-L'application **`probed-app`** du namespace **`lab`** est un serveur web,
-image `nginx:1.27-alpine`, qui répond sur le port 80. Elle a deux défauts
-connus : elle met parfois **longtemps à démarrer**, jusqu'à une minute, et
-il lui arrive de **se figer** sans mourir. Sans sondes, Kubernetes la croit
-en bonne santé dans les deux cas, et lui envoie du trafic.
+The **`probed-app`** application in the **`lab`** namespace is a web server,
+image `nginx:1.27-alpine`, answering on port 80. It has two known defects: it
+sometimes **takes a long time to start**, up to a minute, and it sometimes
+**freezes** without dying. With no probes, Kubernetes believes it healthy in
+both cases, and sends traffic to it.
 
-L'équipe veut les trois sondes, chacune pour ce qu'elle sait faire.
+The team wants all three probes, each for what it is good at.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Pod **`probed-app`** dans `lab`, avec cette image, qui déclare son
-   port 80.
+1. A Pod **`probed-app`** in `lab`, with that image, declaring its port 80.
 
-2. Une sonde de **démarrage** en HTTP sur ce port, qui tolère un démarrage
-   lent : au moins **une minute** d'échecs consécutifs avant d'abandonner.
+2. A **startup** probe over HTTP on that port, tolerating a slow start: at
+   least **one minute** of consecutive failures before it gives up.
 
-3. Une sonde de **vivacité** en HTTP sur ce port, qui relance le conteneur
-   s'il ne répond plus.
+3. A **liveness** probe over HTTP on that port, restarting the container when
+   it stops answering.
 
-4. Une sonde de **disponibilité** en HTTP sur ce port, qui retire le Pod du
-   trafic tant qu'il ne répond pas.
+4. A **readiness** probe over HTTP on that port, pulling the Pod out of
+   traffic for as long as it does not answer.
 
-5. Le Pod est **`Running`** et **`Ready`**, sans redémarrage : c'est la
-   preuve que les trois sondes trouvent ce qu'elles cherchent.
+5. The Pod is **`Running`** and **`Ready`**, with no restart: that is the
+   proof that all three probes find what they are looking for.
 
-## Les repères utiles
+## Useful bearings
 
-Une sonde HTTP qui vise un mauvais chemin ou un mauvais port échoue en
-silence : le Pod reste `Running`, mais jamais `Ready`, ou redémarre en
-boucle. `kubectl describe pod` raconte chaque échec de sonde dans ses
-events.
+An HTTP probe aimed at a wrong path or a wrong port fails silently: the Pod
+stays `Running`, but never becomes `Ready`, or restarts in a loop.
+`kubectl describe pod` reports every probe failure in its events.
 
-La tolérance d'une sonde est un produit : le nombre d'échecs admis
-multiplié par l'intervalle entre deux essais.
+The tolerance of a probe is a product: the number of failures allowed
+multiplied by the interval between two attempts.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les trois sondes dans la définition du Pod, puis son état :
-`Ready`, sans redémarrage.
+The tests read the three probes in the Pod definition, then its state:
+`Ready`, with no restart.
 
 ```bash
 dsoxlab check ckad-probes-all-types

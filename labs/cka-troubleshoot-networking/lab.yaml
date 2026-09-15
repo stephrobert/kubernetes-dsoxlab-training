@@ -1,11 +1,11 @@
 id: cka-troubleshoot-networking
-title: "Rétablir le trafic vers un Service"
+title: "Restore traffic to a Service"
 level: troubleshooting
 description: |
-  Un Service ne dessert plus ses Pods : selector faux, port faux, et une
-  politique réseau qui ferme tout. Remettre le Service d'aplomb, rouvrir
-  exactement ce qu'il faut sans retirer la politique de sécurité, et prouver
-  qu'un client joint le Service par son nom.
+  A Service no longer serves its Pods: wrong selector, wrong port, and a
+  network policy that closes everything. Set the Service straight, reopen
+  exactly what is needed without removing the security policy, and prove that
+  a client reaches the Service by its name.
 skills:
   - troubleshooting
   - services

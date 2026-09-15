@@ -1,0 +1,7 @@
+title: "Donner une identité à une application : ServiceAccount, Role, RoleBinding"
+description: |
+  Une application refuse de démarrer parce que son ServiceAccount n'existe
+  pas. Le créer, lui accorder le droit de lire les Pods de son namespace et
+  rien d'autre, puis prouver depuis l'intérieur du Pod, avec son propre
+  jeton, que lister passe et que supprimer, lire les Secrets ou regarder
+  ailleurs sont refusés.

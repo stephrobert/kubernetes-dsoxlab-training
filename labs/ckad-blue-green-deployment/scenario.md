@@ -1,45 +1,43 @@
-# Basculer le trafic d'une version à l'autre : blue-green
+# Switch traffic from one version to the other: blue-green
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, l'équipe veut livrer une nouvelle version de
-son application sans la moindre coupure et avec un retour arrière
-instantané. La méthode retenue : deux versions qui tournent **en même
-temps**, `blue` en production et `green` prête à prendre le relais, et un
-seul Service, **`app-prod`**, qui décide laquelle reçoit le trafic.
+In the **`lab`** namespace, the team wants to ship a new version of its
+application with no downtime at all and with an instant rollback. The method
+they picked: two versions running **at the same time**, `blue` in production
+and `green` ready to take over, and a single Service, **`app-prod`**, that
+decides which one receives the traffic.
 
-Pour que la bascule se voie, chaque version répond avec son nom. Un Pod
-**`client`** est là pour l'interroger.
+So that the switch can be seen, each version answers with its own name. A Pod
+named **`client`** is there to query it.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Deployment **`app-blue`** à 2 replicas, dont les Pods portent les
-   labels `app=myapp` et `version=blue`, et répondent `blue` en HTTP sur le
-   port 8080.
+1. A Deployment **`app-blue`** with 2 replicas, whose Pods carry the labels
+   `app=myapp` and `version=blue`, and answer `blue` over HTTP on port 8080.
 
-2. Un Deployment **`app-green`** à 2 replicas, labels `app=myapp` et
-   `version=green`, qui répond `green` sur le même port.
+2. A Deployment **`app-green`** with 2 replicas, labels `app=myapp` and
+   `version=green`, answering `green` on the same port.
 
-3. Un Service **`app-prod`**, port 8080, qui vise d'abord la version blue.
+3. A Service **`app-prod`**, port 8080, pointing at the blue version first.
 
-4. La bascule : `app-prod` vise la version green. Ses endpoints sont
-   exactement les Pods green, et depuis `client`, **toutes** les requêtes
-   vers `http://app-prod:8080/` répondent `green`.
+4. The switch: `app-prod` points at the green version. Its endpoints are
+   exactly the green Pods, and from `client`, **every** request to
+   `http://app-prod:8080/` answers `green`.
 
-## Les repères utiles
+## Useful bearings
 
-Un serveur qui répond son nom tient en une ligne de busybox : `httpd -f`
-sert un répertoire, et un `echo` dans `index.html` avant de le lancer
-suffit.
+A server that answers with its own name fits in one line of busybox: `httpd -f`
+serves a directory, and an `echo` into `index.html` before starting it is
+enough.
 
-Le selector d'un Service se change en place, et les endpoints suivent en
-quelques secondes : c'est toute la bascule, et c'est aussi le retour
-arrière.
+A Service selector can be changed in place, and the endpoints follow within a
+few seconds: that is the whole switch, and it is also the rollback.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les deux Deployments, le selector et les endpoints du
-Service, et font plusieurs requêtes depuis `client`.
+The tests read both Deployments, the Service selector and its endpoints, and
+make several requests from `client`.
 
 ```bash
 dsoxlab check ckad-blue-green-deployment

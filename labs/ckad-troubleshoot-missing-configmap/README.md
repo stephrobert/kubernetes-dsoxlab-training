@@ -1,23 +1,23 @@
-# Un Pod bloqué par un ConfigMap qui n'existe pas
+# A Pod blocked by a ConfigMap that does not exist
 
-Lab **CKAD**, domaine *Application Observability and Maintenance* (15 % de
-l'épreuve), compétence « Debugging in Kubernetes ».
+**CKAD** lab, *Application Observability and Maintenance* domain (15 % of
+the exam), competency "Debugging in Kubernetes".
 
-La panne sans logs : le conteneur n'existe pas encore, et seuls les events
-parlent. Le lab hérité vérifiait que le ConfigMap existe ; ici l'application
-doit servir ce qu'il contient.
+The failure with no logs: the container does not exist yet, and only the
+events talk. The inherited lab checked that the ConfigMap exists; here the
+application must serve what it contains.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Débugger une application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [Debugging an application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-missing-configmap
 dsoxlab check ckad-troubleshoot-missing-configmap
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

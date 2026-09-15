@@ -1,11 +1,11 @@
 id: ckad-troubleshoot-missing-configmap
-title: "Un Pod bloqué par un ConfigMap qui n'existe pas"
+title: "A Pod blocked by a ConfigMap that does not exist"
 level: application-observability
 description: |
-  Un Pod ne démarre pas et ne dit rien dans ses logs, parce qu'il n'a pas
-  encore de conteneur : ce sont ses events qui parlent. Lire la cause,
-  créer la ressource manquante avec le contenu attendu, et prouver que
-  l'application sert.
+  A Pod does not start and says nothing in its logs, because it has no
+  container yet: its events are the ones that talk. Read the cause, create
+  the missing resource with the expected content, and prove that the
+  application serves.
 skills:
   - troubleshooting
   - configmap

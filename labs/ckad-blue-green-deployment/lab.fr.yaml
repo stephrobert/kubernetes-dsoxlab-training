@@ -1,0 +1,6 @@
+title: "Basculer le trafic d'une version à l'autre : blue-green"
+description: |
+  Faire tourner deux versions d'une application côte à côte, et basculer tout
+  le trafic de l'une à l'autre en changeant le selector d'un Service. Prouver
+  la bascule depuis un client : toutes les requêtes atteignent la nouvelle
+  version, aucune l'ancienne.

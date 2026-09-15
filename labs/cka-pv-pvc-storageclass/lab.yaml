@@ -1,12 +1,12 @@
 id: cka-pv-pvc-storageclass
-title: "Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit"
+title: "A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes"
 level: storage
 description: |
-  Sur un cluster sans provisionnement dynamique, créer un PersistentVolume
-  sur le disque d'un nœud, le réclamer par un PersistentVolumeClaim, le
-  monter dans un Pod qui y écrit. Les tests lisent le volume, la liaison,
-  le montage, le fichier dans le Pod, puis le même fichier sur le disque du
-  nœud : c'est là que se prouve la persistance.
+  On a cluster with no dynamic provisioning, create a PersistentVolume on a
+  node's disk, claim it with a PersistentVolumeClaim, mount it in a Pod that
+  writes to it. The tests read the volume, the binding, the mount, the file
+  inside the Pod, then the same file on the node's disk: that is where
+  persistence is proven.
 skills:
   - persistentvolume
   - persistentvolumeclaim

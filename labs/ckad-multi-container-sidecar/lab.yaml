@@ -1,11 +1,11 @@
 id: ckad-multi-container-sidecar
-title: "Un sidecar natif qui suit les logs de l'application"
+title: "A native sidecar that tails the application logs"
 level: application-design
 description: |
-  Faire lire par un second conteneur les logs qu'une application écrit dans
-  un fichier, avec un sidecar natif, déclaré comme init container à
-  restartPolicy Always, et un volume partagé. Prouver que le sidecar
-  transmet réellement les lignes.
+  Have a second container read the logs an application writes to a file,
+  with a native sidecar, declared as an init container with restartPolicy
+  Always, and a shared volume. Prove that the sidecar really does pass the
+  lines on.
 skills:
   - sidecar
   - multi-container

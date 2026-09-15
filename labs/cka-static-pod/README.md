@@ -1,24 +1,24 @@
-# Poser un Pod statique sur un worker, sans passer par l'API
+# Place a static Pod on a worker, without going through the API
 
-Lab **CKA**, domaine *Cluster Architecture, Installation and Configuration*
-(25 % de l'épreuve), compétence « Understand the role of the kubelet ».
+**CKA** lab, *Cluster Architecture, Installation and Configuration* domain
+(25 % of the exam), competency "Understand the role of the kubelet".
 
-Le lab hérité de K8sExamLab n'avait pas de solution jouable, son fichier
-était tronqué. Ici le candidat cherche le répertoire surveillé dans la
-configuration du kubelet du worker, et le dernier test demande au runtime du
-nœud s'il exécute vraiment le conteneur.
+The lab inherited from K8sExamLab had no runnable solution: its file was
+truncated. Here the candidate looks for the watched directory in the worker
+kubelet's own configuration, and the last test asks the node's runtime whether
+it is really running the container.
 
 | | |
 |---|---|
-| Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Fonctionnement des Worker Nodes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
+| Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
+| Duration | about 10 minutes |
+| Companion lesson | [How worker nodes work](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   cka-static-pod
 dsoxlab check cka-static-pod
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.
