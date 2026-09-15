@@ -384,23 +384,36 @@
   "verdict": "VALIDE"
  },
  "ckad-in-place-pod-vertical-scaling": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
   "avant": {
-   "passed": 1,
-   "score": 33,
+   "passed": 0,
+   "score": 0,
    "total": 3
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-15",
-  "duree_s": 97,
-  "erreur": "la solution du formateur a échoué (rc=1) : 134217728\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nThe Pod \"scaling-pod\" is invalid: spec: Forbidden: only cpu and memory resources are mutable",
+  "duree_s": 206,
+  "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 1/3",
-   "ÉCHEC : la solution du formateur a échoué (rc=1) : 134217728\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nThe Pod \"scaling-pod\" is invalid: spec: Forbidden: only cpu and memory resources are mutable"
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-in-place-pod-vertical-scaling.log",
   "kubernetes": "v1.37.0",
-  "verdict": "ROUGE"
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
  },
  "ckad-init-container": {
   "apres": {

@@ -1,0 +1,35 @@
+id: ckad-in-place-pod-vertical-scaling
+title: "Redimensionner un Pod en place, sans le redémarrer"
+level: application-environment
+description: |
+  Augmenter le CPU et la mémoire d'un Pod qui tourne, sans le recréer ni
+  redémarrer son conteneur, par la sous-ressource resize. Prouver que le
+  noyau applique la nouvelle limite et que le conteneur est resté le même.
+skills:
+  - resources
+  - in-place-resize
+  - vertical-scaling
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKAD, domaine Application Environment, Configuration
+# and Security (25 %) : « Understand requests, limits, quotas ». Le lab hérité
+# le rangeait dans services-networking, et son script d'appariement proposait
+# la leçon VPA, un faux ami : le sujet est le redimensionnement en place,
+# activé par défaut depuis la 1.33.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
