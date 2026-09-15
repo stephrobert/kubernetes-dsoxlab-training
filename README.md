@@ -117,6 +117,8 @@ teaches on kind, this catalogue proves on machines.
 
 Total: **37 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
+**Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
+
 <!-- LABS:END -->
 
 ## Contributing

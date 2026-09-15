@@ -17,8 +17,18 @@
 # setup.
 #
 # Version enseignée par la formation : 1.37. Le dépôt pkgs.k8s.io est versionné
-# par mineure, il n'y a donc pas de dérive silencieuse d'une exécution à
-# l'autre.
+# par MINEURE : `v1.37` restera la 1.37 quoi qu'il arrive, mais rien n'y fige le
+# PATCH. Une installation faite dans six mois prendra la 1.37.x du jour, pas
+# celle sur laquelle les labs ont été validés.
+#
+# Ce n'est pas un défaut à corriger ici, et surtout pas en figeant un patch pour
+# l'éternité : un catalogue qui installerait indéfiniment la 1.37.0 enseignerait
+# un Kubernetes que plus personne n'exécute. Le bon dispositif est ailleurs —
+# `validation-labs.json` porte la version RÉELLEMENT jouée pour chaque lab, les
+# README l'affichent, et un patch qui bouge se traite en rejouant le catalogue.
+#
+# Mesuré le 2026-09-15 : le dépôt v1.37 ne publie encore que la 1.37.0, ce qui
+# bloque d'ailleurs le lab de montée de version (issue #32) faute de cible.
 
 # PIEGE CORRIGE LE 2026-09-14, ET IL MERITE D'ETRE RACONTE.
 # La premiere version gardait tout ce fichier derriere un unique

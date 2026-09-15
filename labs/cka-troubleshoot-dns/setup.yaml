@@ -13,12 +13,6 @@
     - name: Installer le socle, le cluster kubeadm du catalogue
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
 
-    - name: Déposer la bibliothèque de checks héritée sur le nœud
-      ansible.builtin.copy:
-        src: ../../shared/checks/
-        dest: /opt/checks/
-        mode: "0755"
-
     - name: Poser la situation du lab
       ansible.builtin.script: fixtures/prepare.sh
       args:

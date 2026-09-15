@@ -1,17 +1,24 @@
 ---
-# Collections Ansible que ce dépôt emploie réellement, hors `ansible.builtin`.
+# Collections Ansible employées par les setup/cleanup des labs.
 #
-# Elles se déclarent ici parce que l'inverse a déjà coûté cher au catalogue
-# Linux : deux collections s'y trouvaient installées par hasard sur la machine
-# de développement, la troisième non, et un capstone échouait sur un « rc=4 »
-# qui ressemblait à un problème de réseau.
+# La version est BORNÉE, et ce n'est pas de la frilosité.
 #
-# Le même piège guettait ici : `shared/kubeadm-cluster.yml` appelle
-# `community.general.modprobe`, et le premier lab est passé sans que rien ne
-# dise que cette collection était requise.
+# Sans borne, `ansible-galaxy collection install -r requirements.yml` prend la
+# dernière publiée. Mesuré le 2026-09-15 : la version qui a servi à valider les
+# 37 labs est la **11.4.7**, et la dernière publiée est la **13.4.0** — deux
+# majeures d'écart. Une installation faite aujourd'hui ne jouerait donc pas ce
+# qui a été éprouvé, et `validation-labs.json` annoncerait « VALIDE » pour une
+# combinaison que personne n'a jamais exécutée.
 #
-# Installation :
-#     ansible-galaxy collection install -r requirements.yml
-
+# La borne haute exclut la majeure suivante : c'est là que les collections
+# Ansible cassent leurs interfaces, jamais dans un correctif.
+#
+# POUR MONTER DE MAJEURE, l'ordre est le suivant, et il n'a pas de raccourci :
+#   1. relever la borne ici ;
+#   2. rejouer le catalogue entier (`python3 scripts/valider-labs.py`) ;
+#   3. ne committer que si les 37 labs rendent VALIDE.
+# Annoncer une version qu'on n'a pas jouée est précisément ce que ce dépôt
+# refuse de faire.
 collections:
   - name: community.general
+    version: ">=11.4.7,<12.0.0"
