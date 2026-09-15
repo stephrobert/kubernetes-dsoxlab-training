@@ -1,0 +1,38 @@
+id: ckad-troubleshoot-crashloop
+title: "Trois Pods en CrashLoopBackOff, trois causes"
+level: application-observability
+description: |
+  Trois Pods redémarrent en boucle pour trois raisons différentes : une
+  commande qui n'existe pas, une variable d'environnement absente, une
+  limite de mémoire trop basse. Lire pour chacun ce qui le tue, le
+  corriger, et prouver que les trois tiennent.
+skills:
+  - troubleshooting
+  - crashloopbackoff
+  - oomkilled
+  - logs
+  - events
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Observability and
+# Maintenance (15 %) : « Utilize container logs » et « Debugging in
+# Kubernetes ». Le lab CKA cka-troubleshoot-crashloopbackoff traite une
+# panne de configuration sur un Deployment ; celui-ci fait lire trois
+# diagnostics différents, dont un OOMKilled que seul le kubelet raconte.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

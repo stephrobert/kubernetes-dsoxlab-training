@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose les trois Pods
+# cassés, en supprimant ceux qu'un passage précédent aurait corrigés.
+#
+# Transposé de K8sExamLab. Confronté à Kubernetes 1.37 le 2026-09-15 : la
+# raison OOMKilled est toujours celle que le kubelet rapporte, et une limite
+# de 5Mi tue toujours nginx.
+- name: Préparer le lab ckad-troubleshoot-crashloop
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

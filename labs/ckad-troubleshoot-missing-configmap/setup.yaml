@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose un Pod qui
+# monte un ConfigMap inexistant, et retire le ConfigMap qu'un passage
+# précédent aurait créé.
+#
+# Transposé de K8sExamLab, qui vérifiait « le ConfigMap existe » sans
+# regarder son contenu : ici l'application lit le fichier, et le sert.
+# Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-troubleshoot-missing-configmap
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

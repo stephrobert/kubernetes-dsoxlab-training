@@ -351,6 +351,57 @@
   },
   "verdict": "VALIDE"
  },
+ "ckad-helm-install-upgrade": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 85,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-helm-install-upgrade.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-in-place-pod-vertical-scaling": {
+  "avant": {
+   "passed": 1,
+   "score": 33,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 97,
+  "erreur": "la solution du formateur a échoué (rc=1) : 134217728\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nThe Pod \"scaling-pod\" is invalid: spec: Forbidden: only cpu and memory resources are mutable",
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 1/3",
+   "ÉCHEC : la solution du formateur a échoué (rc=1) : 134217728\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nThe Pod \"scaling-pod\" is invalid: spec: Forbidden: only cpu and memory resources are mutable"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-in-place-pod-vertical-scaling.log",
+  "kubernetes": "v1.37.0",
+  "verdict": "ROUGE"
+ },
  "ckad-init-container": {
   "apres": {
    "passed": 3,
@@ -476,6 +527,38 @@
    "passed": 0,
    "score": 0,
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-networkpolicy-ingress-egress": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 220,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-networkpolicy-ingress-egress.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -636,6 +719,70 @@
    "passed": 0,
    "score": 0,
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-troubleshoot-crashloop": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 724,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-troubleshoot-crashloop.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-troubleshoot-missing-configmap": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 310,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-troubleshoot-missing-configmap.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
   },
   "verdict": "VALIDE"
  },

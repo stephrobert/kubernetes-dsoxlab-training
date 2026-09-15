@@ -1,0 +1,35 @@
+id: ckad-troubleshoot-missing-configmap
+title: "Un Pod bloqué par un ConfigMap qui n'existe pas"
+level: application-observability
+description: |
+  Un Pod ne démarre pas et ne dit rien dans ses logs, parce qu'il n'a pas
+  encore de conteneur : ce sont ses events qui parlent. Lire la cause,
+  créer la ressource manquante avec le contenu attendu, et prouver que
+  l'application sert.
+skills:
+  - troubleshooting
+  - configmap
+  - events
+  - volumes
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKAD, domaine Application Observability and
+# Maintenance (15 %) : « Utilize container logs » et « Debugging in
+# Kubernetes ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
