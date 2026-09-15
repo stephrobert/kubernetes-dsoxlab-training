@@ -12,13 +12,18 @@ Le workflow `release.yml` construit
 `kubernetes-dsoxlab-training-<version>.tar.gz` avec :
 
 - `labs/`, `shared/`, `meta.yml`, `conftest.py`, `requirements.yml`,
-  `pyproject.toml`, `ssh/` (la clé publique du lab),
+  `pyproject.toml` et `uv.lock`, `ssh/` (la clé publique du lab),
 - `scripts/` et `tests/`, parce qu'un catalogue qui prétend se valider doit
   livrer de quoi le faire,
 - `validation-labs.json`, la preuve que chaque lab a été joué dans les deux
   sens, avec sa date et la version de Kubernetes,
 - les documents de gouvernance (`README`, `LICENSE`, `CONTRIBUTING`,
-  `CODE_OF_CONDUCT`, `SECURITY`, `CHANGELOG`).
+  `CODE_OF_CONDUCT`, `SECURITY`, `CHANGELOG`), **dans les deux langues** :
+  l'archive est ce que reçoit quelqu'un qui n'a pas le dépôt.
+
+Le verrou voyage avec `pyproject.toml` délibérément. Une contrainte `>=` laisse
+chaque installation résoudre ce qu'elle veut ; une archive qui prétend livrer
+de quoi se valider ne dirait pas **avec quoi**.
 
 Il **exclut** le pilotage local (`.claude/`, `todo/`, `CLAUDE.md`) et les
 fichiers générés (caches, état runtime de dsoxlab). Ces trois premiers ne sont

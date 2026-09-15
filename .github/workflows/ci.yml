@@ -228,6 +228,13 @@ jobs:
       - name: Vérifier la structure et les leçons jumelées
         run: uvx dsoxlab validate-structure --check-urls
 
+      # Un verrou qui dérive de son pyproject ne verrouille plus rien : les
+      # scanners de vulnérabilités continuent de lire uv.lock, qui ne décrit
+      # plus ce qui s'installe. `--check` ne résout pas et n'écrit pas, il
+      # échoue si le verrou n'est plus à jour.
+      - name: Le verrou décrit bien le pyproject
+        run: uv lock --check
+
   # Analyse statique du Python du dépôt (tests de labs, conftest, vérificateurs
   # de catalogue). Les constats vont dans l'onglet Sécurité, aucun artefact
   # n'est publié.
