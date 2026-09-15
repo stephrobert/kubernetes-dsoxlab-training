@@ -82,10 +82,38 @@
   changed_when: true
   failed_when: false
 
-- name: Installer le CNI
+# Le CNI est Calico, et non Flannel : Flannel n'applique pas les NetworkPolicy.
+# Mesuré sur le socle Flannel le 2026-09-14 : une politique deny-all était
+# acceptée par l'API et sans aucun effet sur le trafic. Quatre labs hérités
+# éprouvent des NetworkPolicy, et la doctrine du dépôt exige un dernier test
+# qui exerce les deux côtés, ce qui suppose un CNI qui applique les règles.
+# Issue #3.
+#
+# get_url ne télécharge qu'en l'absence du fichier : le manifeste est figé
+# sur une version, et une exécution suivante ne le retire pas.
+- name: Récupérer le manifeste Calico
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
+    dest: /root/calico.yaml
+    mode: "0644"
+
+# Sans cela, Calico créerait son pool sur 192.168.0.0/16 alors que kubeadm a
+# réservé 10.244.0.0/16 aux Pods.
+- name: Aligner le pool d'adresses Calico sur le CIDR des Pods, le nom
+  ansible.builtin.replace:
+    path: /root/calico.yaml
+    regexp: '# - name: CALICO_IPV4POOL_CIDR'
+    replace: '- name: CALICO_IPV4POOL_CIDR'
+
+- name: Aligner le pool d'adresses Calico sur le CIDR des Pods, la valeur
+  ansible.builtin.replace:
+    path: /root/calico.yaml
+    regexp: '#   value: "192.168.0.0/16"'
+    replace: '  value: "10.244.0.0/16"'
+
+- name: Installer le CNI, Calico
   ansible.builtin.command: >-
-    kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
-    https://raw.githubusercontent.com/flannel-io/flannel/v0.27.4/Documentation/kube-flannel.yml
+    kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /root/calico.yaml
   changed_when: true
 
 - name: Attendre que le control plane soit Ready

@@ -118,6 +118,13 @@ def hints_yaml(vieux: dict) -> dict:
     `text_fr` vide, qui afficherait du blanc à l'apprenant. Le marqueur est
     dans le lab.yaml, pas ici, parce qu'un base64 marqué serait illisible.
     """
+    # Un lab hérité, rolling-update-strategy, a deux tags mal indentés dans sa
+    # liste d'indices : des chaînes au milieu des mappings. On ne garde que
+    # les mappings, et on le dit, plutôt que de planter.
+    indices = vieux.get("hints") or []
+    ignores = [h for h in indices if not isinstance(h, dict)]
+    if ignores:
+        print(f"      hints : {len(ignores)} entrée(s) ignorée(s), pas des indices : {ignores}")
     return {
         "points": 100,
         "hints": [
@@ -126,7 +133,8 @@ def hints_yaml(vieux: dict) -> dict:
                 "text_en": h["content"],
                 "cost": h.get("penalty", 10),
             }
-            for h in vieux.get("hints", [])
+            for h in indices
+            if isinstance(h, dict)
         ],
     }
 

@@ -11,8 +11,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 77,
+  "date": "2026-09-15",
+  "duree_s": 130,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -43,8 +43,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 181,
+  "date": "2026-09-15",
+  "duree_s": 158,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -75,8 +75,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 358,
+  "date": "2026-09-15",
+  "duree_s": 134,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -107,8 +107,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 213,
+  "date": "2026-09-15",
+  "duree_s": 192,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -139,8 +139,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 83,
+  "date": "2026-09-15",
+  "duree_s": 81,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -172,7 +172,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-15",
-  "duree_s": 587,
+  "duree_s": 578,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -203,8 +203,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 572,
+  "date": "2026-09-15",
+  "duree_s": 582,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -235,8 +235,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-14",
-  "duree_s": 105,
+  "date": "2026-09-15",
+  "duree_s": 110,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
