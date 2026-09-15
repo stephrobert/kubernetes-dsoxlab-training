@@ -24,9 +24,10 @@ trois à moitié.
 2. **Le portail répond dans le cluster** au nom `portail-svc`, sur le port
    `80`.
 
-3. **Le portail répond depuis l'extérieur du cluster**, sur le port **30080**
-   de **chaque** nœud. C'est l'accès que l'équipe n'a jamais mis en place, et
-   c'est par lui que la supervision vérifiera.
+3. **Le portail répond sur le port `30080` de chaque nœud**, y compris depuis
+   une machine qui n'appartient pas au cluster. C'est l'accès que l'équipe n'a
+   jamais mis en place, et c'est par lui que la supervision vérifiera : elle
+   interroge les nœuds depuis le réseau, pas depuis l'intérieur du cluster.
 
 4. **Le service d'archives dispose de son stockage.** La réclamation
    `portail-data` doit être effectivement satisfaite, et le Pod `archives`
@@ -36,27 +37,27 @@ trois à moitié.
 5. **Vous ne cassez rien d'autre.** Le cluster doit sortir de là comme il y
    est entré, CoreDNS compris.
 
-## Les repères utiles
+## Si vous bloquez
 
-Rien ici ne dit où sont les défauts. Ce sont les réflexes qui les trouvent.
+Un micro-lab vous donne ses repères gratuitement. Un capstone, non : trouver
+où regarder est justement ce qu'il mesure. Les quatre indices de ce lab vont
+du plus vague au plus explicite, ils **coûtent des points**, et le premier ne
+nomme aucun des trois défauts : il dit seulement par quoi commencer.
 
-- Un Pod qui ne démarre pas raconte toujours pourquoi, mais rarement dans
-  `kubectl get`. `kubectl describe pod`, et surtout la section *Events* en bas,
-  sont plus bavards, et `kubectl get events --sort-by=.lastTimestamp` donne
-  l'ordre des choses.
-- Un Service qui ne répond pas a soit aucun endpoint, soit les mauvais.
-  `kubectl get endpointslice` dit lequel des deux, et c'est un diagnostic
-  différent à chaque fois.
-- Un nœud a une quantité finie de CPU et de mémoire, que `kubectl describe
-  node` affiche, avec ce qui est déjà réservé.
-- Une réclamation de volume en attente cherche quelque chose qui n'existe pas.
-  `kubectl describe pvc` dit ce qu'elle cherche.
+```bash
+dsoxlab hint cka-capstone-portail
+```
+
+Vous avez donc le choix, comme le jour de l'épreuve : chercher, ou payer pour
+être orienté. Les deux sont des réponses légitimes, et votre score les
+distingue.
 
 ## Comment vous saurez que c'est bon
 
 Les tests lisent l'état du cluster, jamais les commandes tapées. Le dernier
 est le seul qui prouve vraiment quelque chose : il interroge le portail depuis
-**chacun** des deux nœuds, comme la supervision le fera.
+**chacun** des deux nœuds, puis depuis la machine qui pilote le lab, laquelle
+n'est pas dans le cluster. C'est ce que fera la supervision.
 
 ```bash
 dsoxlab check  cka-capstone-portail

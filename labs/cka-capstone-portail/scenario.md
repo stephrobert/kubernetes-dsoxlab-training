@@ -23,9 +23,10 @@ Budget about **45 minutes**, and treat it as an exam: the pass mark is
 2. **The portal answers inside the cluster** at the name `portail-svc`, on
    port `80`.
 
-3. **The portal answers from outside the cluster**, on port **30080** of
-   **every** node. That is the access the team never put in place, and it is
-   the one monitoring will check.
+3. **The portal answers on port `30080` of every node**, including from a
+   machine that does not belong to the cluster. That is the access the team
+   never put in place, and it is the one monitoring will check: it queries the
+   nodes from the network, not from inside the cluster.
 
 4. **The archive service has its storage.** The `portail-data` claim must
    actually be satisfied, and the `archives` Pod must be able to write in
@@ -34,27 +35,27 @@ Budget about **45 minutes**, and treat it as an exam: the pass mark is
 5. **You break nothing else.** The cluster must come out of this the way it
    went in, CoreDNS included.
 
-## Useful bearings
+## If you get stuck
 
-Nothing here says where the faults are. These are the reflexes that find them.
+A micro-lab gives you its bearings for free. A capstone does not: working out
+where to look is exactly what it measures. This lab's four hints go from vague
+to explicit, they **cost points**, and the first one names none of the three
+faults: it only says where to start.
 
-- A Pod that does not start always says why, but rarely in `kubectl get`.
-  `kubectl describe pod`, and above all the *Events* section at the bottom,
-  are more talkative, and `kubectl get events --sort-by=.lastTimestamp` gives
-  the order in which things happened.
-- A Service that does not answer has either no endpoint, or the wrong ones.
-  `kubectl get endpointslice` says which of the two, and that is a different
-  diagnosis each time.
-- A node has a finite amount of CPU and memory, which `kubectl describe node`
-  shows, along with what is already reserved.
-- A pending volume claim is looking for something that does not exist.
-  `kubectl describe pvc` says what it is looking for.
+```bash
+dsoxlab hint cka-capstone-portail
+```
+
+So the choice is yours, as it is on exam day: search, or pay to be pointed in
+the right direction. Both are legitimate answers, and your score tells them
+apart.
 
 ## How you will know it is done
 
 The tests read the state of the cluster, never the commands you typed. The
 last one is the only one that really proves anything: it queries the portal
-from **each** of the two nodes, the way monitoring will.
+from **each** of the two nodes, then from the machine driving the lab, which
+is not part of the cluster. That is what monitoring will do.
 
 ```bash
 dsoxlab check  cka-capstone-portail

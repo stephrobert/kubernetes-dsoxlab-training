@@ -133,6 +133,19 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Un chiffre publié par quelqu'un d'autre, recopié dans quarante fichiers,
+      # dérive sans que rien ne le signale. Le 2026-09-15, cinq issues ont vu
+      # les poids de Cluster Setup et System Hardening échangés par une
+      # « correction » qui affirmait avoir vérifié la source sans l'avoir
+      # ouverte. `curriculums.yml` tient ces chiffres une fois, avec leur source
+      # et leur date ; ce hook refuse toute mention qui les contredit.
+      - id: curriculums-coherents
+        name: aucun poids de domaine ne contredit le curriculum officiel
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_curriculums.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Garde-fou d'outillage : un test présent mais débranché ne protège plus
       # rien, et personne ne s'en aperçoit.
       - id: outillage-coherent

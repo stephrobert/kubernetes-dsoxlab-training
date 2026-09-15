@@ -26,9 +26,10 @@ are worth more than six half done.
    environment variable, and that value lives outside the Pod definition,
    under the name `catalogue-config`.
 
-3. **The database password never appears in a manifest.** It is
-   `s3cr3t-boutique`, held under the name `catalogue-db` in the `password`
-   key, and the container reads it from the file `/etc/db/password`.
+3. **The database password is neither written in the catalogue's definition
+   nor placed in its environment.** It is `s3cr3t-boutique`, held by a
+   dedicated object named `catalogue-db` under the `password` key, and the
+   container reads it from the file `/etc/db/password`.
 
 4. **The cluster knows when to send traffic, and when to restart.** Two checks
    on the HTTP port of the container: one decides whether a copy receives
@@ -42,20 +43,19 @@ are worth more than six half done.
    `catalogue-svc` on port `80` inside the namespace. Pods labelled
    `role=frontend` may reach it; anything else in the namespace may not.
 
-## Useful bearings
+## If you get stuck
 
-None of this hints at which object to use. These are the traps this capstone
-has actually caught.
+A micro-lab gives you its bearings for free. A capstone does not: finding them
+is what it measures. This lab's four hints go from vague to explicit, they
+**cost points**, and they carry exactly the traps this capstone catches.
 
-- A process that does not run as root cannot bind a port below 1024. This
-  image listens on **8080**, not on 80. The name and the port in requirement
-  6 are what the *client* sees, which is not necessarily what the container
-  listens on.
-- A network policy that allows nothing is not the same as no policy at all.
-  Once a policy selects a Pod, everything it does not name is denied,
-  including what used to work.
-- `kubectl explain` works without network access and knows the whole schema.
-  It is faster than hunting for an example.
+```bash
+dsoxlab hint ckad-capstone-boutique
+```
+
+So the choice is yours, as it is on exam day: search, or pay to be pointed in
+the right direction. Both are legitimate answers, and your score tells them
+apart.
 
 ## How you will know it is done
 

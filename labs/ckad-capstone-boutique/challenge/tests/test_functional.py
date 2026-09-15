@@ -174,9 +174,17 @@ def test_le_conteneur_recoit_vraiment_le_message(host):
 # ----------------------------------------------------------------------
 # Exigence 3. Le mot de passe est détenu ailleurs, et lu en fichier.
 # ----------------------------------------------------------------------
-def test_le_mot_de_passe_n_est_pas_en_clair_dans_le_deploiement(host):
-    """Un Secret qui existe pendant que la valeur est aussi écrite en dur dans
-    le Deployment ne protège rien. On vérifie les deux."""
+def test_le_mot_de_passe_n_est_ni_dans_la_definition_ni_dans_l_environnement(host):
+    """Trois affirmations qui ne font qu'une exigence : la valeur n'est lisible
+    que là où le cahier des charges l'a mise.
+
+    La première version de ce test ne regardait que le manifeste, et l'énoncé
+    disait « n'apparaît dans aucun manifeste ». C'était attaquable : un
+    candidat qui écrit son Secret en YAML avec `stringData` met bien la valeur
+    dans un manifeste, tout en faisant exactement ce qu'on attend de lui. Ce
+    qui compte n'est pas le fichier, c'est ce que porte le WORKLOAD, et ce que
+    le conteneur expose à ses processus. L'énoncé le dit maintenant ainsi.
+    """
     s = _json(host, f"-n {NAMESPACE} get secret {SECRET}", f"L'objet {SECRET}")
     assert "password" in (s.get("data") or {}), (
         f"L'objet {SECRET} existe mais n'a pas de clé password. Il porte "
@@ -185,9 +193,20 @@ def test_le_mot_de_passe_n_est_pas_en_clair_dans_le_deploiement(host):
     rc, manifeste, _ = _kubectl(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT} -o yaml")
     assert rc == 0
     assert MOT_DE_PASSE not in manifeste, (
-        "Le mot de passe apparaît en clair dans le Deployment. Le Secret ne "
-        "sert à rien tant que la valeur est aussi écrite à côté : le conteneur "
-        "doit la recevoir depuis l'objet, pas la porter lui-même."
+        "Le mot de passe apparaît en clair dans la définition du catalogue. "
+        "L'objet dédié ne sert à rien tant que la valeur est aussi écrite à "
+        "côté : le conteneur doit la recevoir de cet objet, pas la porter."
+    )
+    # Le mot de passe ne doit pas non plus être posé dans l'environnement du
+    # conteneur : `printenv` sans argument liste ce que voient TOUS ses
+    # processus, et un fichier monté n'y figure pas.
+    rc, environnement, _ = _dans_le_conteneur(host, "printenv")
+    assert rc == 0, "Impossible de lire l'environnement du conteneur."
+    assert MOT_DE_PASSE not in environnement, (
+        "Le mot de passe est posé dans l'environnement du conteneur. Toute "
+        "commande lancée dedans le voit, et il ressort dans un `kubectl "
+        "describe pod` comme dans la plupart des journaux de crash : le cahier "
+        "des charges demande un fichier, précisément pour éviter cela."
     )
 
 
