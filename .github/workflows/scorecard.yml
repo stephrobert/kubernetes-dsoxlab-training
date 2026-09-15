@@ -42,12 +42,45 @@ jobs:
         with:
           persist-credentials: false
 
+      # Deux tentatives, et ce n'est pas de la superstition.
+      #
+      # L'API GraphQL de GitHub rend par intermittence une erreur interne quand
+      # Scorecard tourne JUSTE APRÈS un push : « ListCommits: error during
+      # graphqlHandler.setup: internal error: githubv4.Query: Something went
+      # wrong while executing your query ». Le commit vient d'arriver, ses
+      # données associées ne sont pas encore propagées côté GitHub.
+      #
+      # Mesuré le 2026-09-15 sur ce dépôt et ses jumeaux : plusieurs runs de
+      # push en échec pendant une rafale de fusions, les MÊMES dépôts analysés
+      # sans erreur quelques minutes plus tard, sans qu'une ligne ait changé.
+      # La requête a été rejouée à la main : elle passe. Ce n'est donc pas une
+      # donnée cassée, c'est un moment.
+      #
+      # Sans second essai, la main reste rouge pour une panne qui n'est pas la
+      # nôtre, et une main rouge qu'on apprend à ignorer ne sert plus à rien.
       - name: Lancer Scorecard
+        id: scorecard
+        continue-on-error: true
         uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
         with:
           results_file: results.sarif
           results_format: sarif
           publish_results: true # publie au visualiseur OpenSSF, qui alimente le badge
+
+      - name: Laisser GitHub propager le commit
+        if: steps.scorecard.outcome == 'failure'
+        run: sleep 90
+
+      # Celle-ci ne porte PAS continue-on-error : si le second essai échoue
+      # aussi, le job échoue, et c'est bien ce qu'on veut. Un workflow qui ne
+      # peut plus échouer ne mesure plus rien.
+      - name: Lancer Scorecard (second essai)
+        if: steps.scorecard.outcome == 'failure'
+        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
 
       - name: Déposer le SARIF dans Code Scanning
         uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
