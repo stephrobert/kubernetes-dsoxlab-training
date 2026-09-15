@@ -6,6 +6,34 @@ projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Changé, la provenance passe au niveau SLSA 3
+
+Le workflow de release attestait depuis son job de build, ce qui donne le
+**niveau 2** : le processus qui fabrique l'archive était aussi celui qui signait
+ce qu'il en disait. Le badge, lui, annonçait 3 dans le dépôt Linux jumeau, et
+2 ici depuis la mise en conformité. Les deux disent maintenant 3, et le
+workflow le produit.
+
+- **`.github/workflows/attester.yml`**, workflow réutilisable, est désormais le
+  seul du dépôt à recevoir `attestations: write`. Il ne fait aucun `checkout`,
+  ne reçoit qu'un nom et une empreinte, et n'exécute aucun code du dépôt.
+- **`release.yml` est découpé en trois jobs** : construire, attester, publier.
+  Le job de publication écrit la release mais ne peut pas attester, faute de la
+  permission. L'archive est recomparée à son empreinte avant publication, pour
+  qu'un artefact altéré entre deux jobs ne parte pas avec une provenance qui ne
+  le décrit pas.
+- **Deux linters en désaccord, tranché avec une raison.** zizmor recommande la
+  forme `uses: $/...`, disponible sur github.com depuis juillet 2026 ;
+  actionlint 1.7.12, publié en mars, la rejette encore comme un format
+  invalide. La forme `$/` gagne sur le fond, puisqu'elle ne dépend pas de
+  l'état du système de fichiers et ne peut donc pas charger un fichier qu'une
+  étape précédente aurait déposé. L'exception actionlint est limitée à ce
+  message et à ce fichier, datée, et vérifiée ciblée en fabriquant une autre
+  faute dans le même fichier : la règle l'attrape toujours.
+
+La vérification qui prouve le niveau est dans `RELEASING.md` : elle nomme le
+workflow signataire, et échoue si la provenance vient d'ailleurs.
+
 ### Ajouté, la chaîne d'un dépôt public
 
 Le dépôt portait un catalogue et rien autour. Il reprend maintenant ce que le
