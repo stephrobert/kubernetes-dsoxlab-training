@@ -1,6 +1,8 @@
 id: ckad-in-place-pod-vertical-scaling
 title: "Resize a Pod in place, without restarting it"
 level: application-environment
+section: ckad
+difficulty: advanced
 description: |
   Raise the CPU and the memory of a running Pod, without recreating it and
   without restarting its container, through the resize subresource. Prove that

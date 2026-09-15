@@ -1,6 +1,8 @@
 id: ckad-networkpolicy-ingress-egress
 title: "Partition three tiers with ingress and egress NetworkPolicy"
 level: services-networking
+section: ckad
+difficulty: intermediate
 description: |
   Frontend, backend, database: allow only the intended flows, in both
   directions, DNS included, and forbid everything else. Prove every rule

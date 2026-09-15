@@ -121,6 +121,18 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Deux champs que dsoxlab remplit par défaut quand ils manquent, si bien
+      # que leur absence ne casse RIEN : `section` retombe sur `repo.category`
+      # et range les 37 labs au même endroit, `difficulty` vaut « beginner » et
+      # présente la restauration d'etcd comme un exercice pour débutant. Un
+      # réglage faux qui n'empêche rien ne se découvre qu'en regardant.
+      - id: section-et-difficulte
+        name: chaque lab déclare sa section et sa difficulté
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_section_et_difficulte.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Garde-fou d'outillage : un test présent mais débranché ne protège plus
       # rien, et personne ne s'en aperçoit.
       - id: outillage-coherent

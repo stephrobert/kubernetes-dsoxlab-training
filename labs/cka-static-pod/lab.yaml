@@ -1,6 +1,8 @@
 id: cka-static-pod
 title: "Place a static Pod on a worker, without going through the API"
 level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
 description: |
   Run a Pod that the worker's kubelet manages on its own, from a manifest
   dropped on the node, and see it appear in the API under its mirror name.

@@ -1,6 +1,8 @@
 id: ckad-troubleshoot-crashloop
 title: "Three Pods in CrashLoopBackOff, three causes"
 level: application-observability
+section: ckad
+difficulty: intermediate
 description: |
   Three Pods restart in a loop for three different reasons: a command that
   does not exist, a missing environment variable, a memory limit set too

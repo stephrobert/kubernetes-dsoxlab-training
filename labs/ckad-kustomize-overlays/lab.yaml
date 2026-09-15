@@ -1,6 +1,8 @@
 id: ckad-kustomize-overlays
 title: "One Kustomize base and two overlays, dev and prod"
 level: application-deployment
+section: ckad
+difficulty: intermediate
 description: |
   Describe an application only once, in a Kustomize base, and deploy it into
   two namespaces with overlays that change the replica count, prefix the

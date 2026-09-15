@@ -1,6 +1,8 @@
 id: cka-hpa-autoscaling
 title: "Scale out automatically with a HorizontalPodAutoscaler"
 level: workloads-scheduling
+section: cka
+difficulty: intermediate
 description: |
   Put an HPA on a Deployment, generate load, watch the replica count go up,
   then cut the load. The tests read the HPA, its current metrics, and the

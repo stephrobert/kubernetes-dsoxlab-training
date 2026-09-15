@@ -1,6 +1,8 @@
 id: cks-apparmor-confiner-un-pod
 title: "Confine a Pod with an AppArmor profile"
 level: system-hardening
+section: cks
+difficulty: advanced
 description: |
   Load an AppArmor profile on the node, apply it to a container through the
   securityContext field, and prove that the confinement holds by watching a

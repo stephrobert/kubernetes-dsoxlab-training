@@ -332,7 +332,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-15",
-  "duree_s": 337,
+  "duree_s": 344,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",

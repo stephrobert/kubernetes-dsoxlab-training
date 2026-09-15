@@ -1,6 +1,8 @@
 id: ckad-rbac-role-rolebinding
 title: "Grant read-only access to Pods with RBAC"
 level: application-environment
+section: ckad
+difficulty: intermediate
 description: |
   Let a user read the Pods of a namespace and their logs, and nothing more:
   no creating, no deleting, no looking into the other namespaces. Prove both

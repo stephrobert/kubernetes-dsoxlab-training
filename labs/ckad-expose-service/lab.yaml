@@ -1,6 +1,8 @@
 id: ckad-expose-service
 title: "Expose a Deployment through a ClusterIP Service"
 level: services-networking
+section: ckad
+difficulty: beginner
 description: |
   Deploy three replicas of a server and expose them through an internal
   Service. Prove from a client that the Service answers under its name, and

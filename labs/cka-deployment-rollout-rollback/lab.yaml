@@ -1,6 +1,8 @@
 id: cka-deployment-rollout-rollback
 title: "Roll back a stuck rollout, then ship the right version"
 level: workloads-scheduling
+section: cka
+difficulty: intermediate
 description: |
   An update went out with a wrong image name and the rollout is stuck. Go
   back to the revision that worked through the Deployment history, then ship

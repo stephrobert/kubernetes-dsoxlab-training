@@ -1,6 +1,8 @@
 id: cka-taints-tolerations-placement
 title: "Reserve a node: taint, toleration and nodeSelector"
 level: workloads-scheduling
+section: cka
+difficulty: intermediate
 description: |
   Reserve the worker for production with a taint and a label, then place a
   Pod that must go there, toleration and nodeSelector, and a Pod that must

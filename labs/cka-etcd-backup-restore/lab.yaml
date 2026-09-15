@@ -1,6 +1,8 @@
 id: cka-etcd-backup-restore
 title: "Back up etcd, then restore the cluster from a snapshot"
 level: cluster-architecture-installation-configuration
+section: cka
+difficulty: advanced
 description: |
   A namespace has disappeared. Take a fresh backup of the current state
   first, then restore the cluster from yesterday evening's snapshot, without

@@ -1,6 +1,8 @@
 id: ckad-rolling-update-strategy
 title: "Tune a rolling update: maxSurge and maxUnavailable"
 level: application-deployment
+section: ckad
+difficulty: intermediate
 description: |
   Constrain the way a Deployment replaces its Pods, never more than two
   extra ones nor more than one unavailable, then trigger an image update and

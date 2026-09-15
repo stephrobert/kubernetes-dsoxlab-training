@@ -1,6 +1,8 @@
 id: cka-node-drain-cordon
 title: "Drain a worker for maintenance, without cutting the service"
 level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
 description: |
   Protect an application with a PodDisruptionBudget, take the worker out of
   scheduling, evict it while respecting that budget and the DaemonSets, then

@@ -1,6 +1,8 @@
 id: cka-troubleshoot-imagepullbackoff
 title: "Get a Pod out of ImagePullBackOff"
 level: troubleshooting
+section: cka
+difficulty: beginner
 description: |
   A Pod does not start because its image will not download. Read the runtime's
   exact message in the events, fix the image reference, and prove that the

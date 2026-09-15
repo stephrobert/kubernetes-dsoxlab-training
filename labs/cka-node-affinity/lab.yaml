@@ -1,6 +1,8 @@
 id: cka-node-affinity
 title: "Placing with nodeAffinity: required constraint and preference"
 level: workloads-scheduling
+section: cka
+difficulty: intermediate
 description: |
   Place a Deployment with a required node affinity on a label that accepts
   several values, add a weighted preference to it, then unblock a Pod that

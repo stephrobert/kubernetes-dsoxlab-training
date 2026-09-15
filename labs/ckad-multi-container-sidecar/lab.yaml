@@ -1,6 +1,8 @@
 id: ckad-multi-container-sidecar
 title: "A native sidecar that tails the application logs"
 level: application-design
+section: ckad
+difficulty: intermediate
 description: |
   Have a second container read the logs an application writes to a file,
   with a native sidecar, declared as an init container with restartPolicy

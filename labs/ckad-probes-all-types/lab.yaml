@@ -1,6 +1,8 @@
 id: ckad-probes-all-types
 title: "Three probes on one Pod: startup, liveness, readiness"
 level: application-observability
+section: ckad
+difficulty: beginner
 description: |
   Fit an application with all three probes, with settings that make sense:
   a slow start tolerated, liveness watched, traffic that only arrives once

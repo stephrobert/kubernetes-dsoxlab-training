@@ -1,6 +1,8 @@
 id: cka-rbac-serviceaccount
 title: "Give an application an identity: ServiceAccount, Role, RoleBinding"
 level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
 description: |
   An application refuses to start because its ServiceAccount does not exist.
   Create it, grant it the right to read the Pods of its namespace and

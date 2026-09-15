@@ -1,6 +1,8 @@
 id: cka-troubleshoot-crashloopbackoff
 title: "Get a Deployment out of CrashLoopBackOff"
 level: troubleshooting
+section: cka
+difficulty: intermediate
 description: |
   The Pods of a Deployment have been restarting in a loop since the last
   release. Read what the process said before it died, work out what it is
