@@ -1,0 +1,19 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose les deux
+# namespaces, vides. Écrire la base et les overlays, c'est le travail.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup. kubectl embarque
+# Kustomize, rien à installer. Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-kustomize-overlays
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

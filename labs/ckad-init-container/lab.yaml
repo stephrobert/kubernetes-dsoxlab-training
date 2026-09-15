@@ -1,0 +1,33 @@
+id: ckad-init-container
+title: "Attendre une dépendance avec un init container"
+level: application-design
+description: |
+  Empêcher une application de démarrer avant que le Service dont elle dépend
+  ne réponde, avec un init container qui attend. Observer le Pod bloqué en
+  Init, poser la dépendance, et voir l'application partir toute seule.
+skills:
+  - init-container
+  - pod-design
+  - startup-dependency
+  - services
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# « Understand multi-container Pod design patterns (init containers) ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

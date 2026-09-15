@@ -319,6 +319,230 @@
   },
   "verdict": "VALIDE"
  },
+ "ckad-expose-service": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 201,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-expose-service.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-init-container": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 103,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-init-container.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-job-cronjob": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 110,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-job-cronjob.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-kustomize-overlays": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 80,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-kustomize-overlays.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-multi-container-sidecar": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 98,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-multi-container-sidecar.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-pod-resources-labels": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 110,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-pod-resources-labels.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-probes-all-types": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 85,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-probes-all-types.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "cks-apparmor-confiner-un-pod": {
   "apres": {
    "passed": 4,

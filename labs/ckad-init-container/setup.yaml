@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
+# le Service sans backend, et retire les Pods qu'un passage précédent aurait
+# laissés.
+#
+# Transposé de K8sExamLab, dont la consigne faisait attendre « que le Service
+# soit résolvable par DNS » : un Service se résout dès qu'il existe, même
+# sans endpoint, et cet init container n'aurait rien attendu. Ici il attend
+# une réponse HTTP. Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-init-container
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
+# retire le Pod qu'un passage précédent aurait laissé. Le reste est le travail.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup. Confronté à
+# Kubernetes 1.37 le 2026-09-15 : le sidecar natif, initContainer avec
+# restartPolicy Always, est la forme stable depuis la 1.33.
+- name: Préparer le lab ckad-multi-container-sidecar
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,34 @@
+id: ckad-expose-service
+title: "Exposer un Deployment par un Service ClusterIP"
+level: services-networking
+description: |
+  Déployer trois replicas d'un serveur et les exposer par un Service
+  interne. Prouver depuis un client que le Service répond par son nom, et
+  qu'il répartit réellement les requêtes entre les trois Pods.
+skills:
+  - service
+  - deployment
+  - clusterip
+  - dns
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+lab_type: lab
+estimated_time: 10m
+
+# Compétence du blueprint CKAD, domaine Services and Networking (20 %) :
+# « Demonstrate basic understanding of NetworkPolicies » et « Provide and
+# troubleshoot access to applications via services ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

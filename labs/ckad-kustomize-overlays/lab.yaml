@@ -1,0 +1,36 @@
+id: ckad-kustomize-overlays
+title: "Une base Kustomize et deux overlays, dev et prod"
+level: application-deployment
+description: |
+  Décrire une application une seule fois, dans une base Kustomize, et la
+  déployer dans deux namespaces avec des overlays qui changent le nombre de
+  replicas, préfixent les noms et ajoutent un label d'environnement. Prouver
+  que les deux environnements tournent et se ressemblent.
+skills:
+  - kustomize
+  - overlays
+  - deployment
+  - namespaces
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKAD, domaine Application Deployment (20 %) :
+# « Use the Helm package manager to deploy existing packages » et « Kustomize ».
+# La formation n'a pas de leçon Kustomize : la leçon jumelée est celle des
+# Deployments, et le trou remonte au backlog du blog.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

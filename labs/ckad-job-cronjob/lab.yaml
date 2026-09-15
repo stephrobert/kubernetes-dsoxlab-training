@@ -1,0 +1,35 @@
+id: ckad-job-cronjob
+title: "Un Job à complétions parallèles et un CronJob"
+level: application-design
+description: |
+  Exécuter un traitement quatre fois, deux à la fois, avec un Job, et
+  prouver que les exécutions se sont bien chevauchées. Puis planifier un
+  nettoyage toutes les cinq minutes avec un CronJob qui garde un historique
+  borné.
+skills:
+  - job
+  - cronjob
+  - batch
+  - completions
+  - parallelism
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# « Understand Jobs and CronJobs ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
+# retire le Job et le CronJob qu'un passage précédent aurait laissés.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup et ne vérifiait
+# que le spec du Job : ici on lit aussi les horodatages de ses Pods, pour
+# prouver le parallélisme. Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-job-cronjob
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

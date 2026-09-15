@@ -1,0 +1,35 @@
+id: ckad-multi-container-sidecar
+title: "Un sidecar natif qui suit les logs de l'application"
+level: application-design
+description: |
+  Faire lire par un second conteneur les logs qu'une application écrit dans
+  un fichier, avec un sidecar natif, déclaré comme init container à
+  restartPolicy Always, et un volume partagé. Prouver que le sidecar
+  transmet réellement les lignes.
+skills:
+  - sidecar
+  - multi-container
+  - native-sidecar
+  - emptydir
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# « Understand multi-container Pod design patterns (sidecar, init) ». Le
+# sidecar natif est stable depuis la 1.33 ; en 1.37, c'est la forme attendue.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
