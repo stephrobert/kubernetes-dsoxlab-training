@@ -26,6 +26,12 @@ from urllib.parse import urlparse
 
 import yaml
 
+# Le catalogue se lit par un seul chemin, qui tient le contrat « un YAML
+# illisible se signale, il ne fait pas tomber le vérificateur ». Voir
+# scripts/lecture_yaml.py.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lecture_yaml import YamlIllisible, lire_yaml
+
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 MARQUEUR = "A_COMPLETER"
@@ -48,7 +54,15 @@ def defauts(lab: Path) -> list[str]:
     fichier = lab / "lab.yaml"
     if not fichier.is_file():
         return ["lab.yaml absent"]
-    d = yaml.safe_load(fichier.read_text(encoding="utf-8")) or {}
+    try:
+        d = lire_yaml(fichier)
+    except YamlIllisible as exc:
+        # On s'arrête à ce lab, on ne s'arrête pas là. Tout ce qui suit
+        # interrogerait un dictionnaire qu'on n'a pas, et les AUTRES labs du
+        # catalogue méritent d'être vérifiés quand même : un contributeur qui
+        # se trompe sur un fichier ne doit pas aveugler le contrôle des 36
+        # autres.
+        return [str(exc)]
 
     url = str(d.get("doc_url", ""))
     # On compare le HÔTE, pas une sous-chaîne : un doc_url légitime qui
@@ -108,7 +122,11 @@ def defauts(lab: Path) -> list[str]:
     if not hints.is_file():
         out.append("challenge/hints.yaml absent")
     else:
-        h = yaml.safe_load(hints.read_text(encoding="utf-8")) or {}
+        try:
+            h = lire_yaml(hints)
+        except YamlIllisible as exc:
+            out.append(str(exc))
+            h = {}
         items = h.get("hints") or []
         if not items:
             out.append("hints : aucun indice")

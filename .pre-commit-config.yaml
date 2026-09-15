@@ -107,6 +107,20 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Les vérificateurs tournent en CI sur le contenu d'une pull request,
+      # donc sur du YAML écrit par quelqu'un d'autre. Un guillemet non fermé
+      # faisait remonter une yaml.scanner.ScannerError jusqu'au terminal : le
+      # contributeur recevait une trace, et les 36 autres labs n'étaient plus
+      # vérifiés du tout. Le contrat est celui que la CLI dsoxlab s'applique à
+      # elle-même : un lab malformé est écarté avec un message, jamais au prix
+      # du processus.
+      - id: yaml-malforme
+        name: un lab au YAML illisible se signale, il ne casse pas l'outil
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_yaml_malforme.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Garde-fou d'outillage : un test présent mais débranché ne protège plus
       # rien, et personne ne s'en aperçoit.
       - id: outillage-coherent
