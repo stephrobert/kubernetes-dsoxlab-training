@@ -22,12 +22,17 @@ import argparse
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 import yaml
 
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 MARQUEUR = "A_COMPLETER"
+
+#: Hôtes réservés à la documentation (RFC 2606 et 6761) : un lab qui en porte
+#: un n'a pas eu sa leçon jumelée.
+GABARITS = {"example.org", "example.com", "example.net", "example.invalid"}
 
 # Des mots qui ne peuvent pas se trouver dans un lab fini et francophone.
 ANGLAIS = re.compile(
@@ -46,7 +51,12 @@ def defauts(lab: Path) -> list[str]:
     d = yaml.safe_load(fichier.read_text(encoding="utf-8")) or {}
 
     url = str(d.get("doc_url", ""))
-    if MARQUEUR in url or "example.invalid" in url or "example.org" in url:
+    # On compare le HÔTE, pas une sous-chaîne : un doc_url légitime qui
+    # porterait « example.org » dans un paramètre de requête serait sinon pris
+    # pour un gabarit non rempli. CodeQL le signalait, à juste titre
+    # (py/incomplete-url-substring-sanitization).
+    hote = urlparse(url).hostname or ""
+    if MARQUEUR in url or hote in GABARITS:
         out.append("doc_url : la leçon du blog n'est pas renseignée")
     elif not url.startswith("https://blog.stephane-robert.info/"):
         out.append(f"doc_url : hors du blog ({url[:48]})")
