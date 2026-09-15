@@ -15,8 +15,17 @@
 # PRÉREQUIS DE CONFIGURATION, à faire une fois dans les réglages GitHub : créer
 # l'environnement `security`, restreint à la branche `main`, et y déposer le
 # secret `PLUMBER_ADMIN_TOKEN` (PAT à portée fine, Administration + Contents +
-# Metadata en lecture). Sans lui, le contrôle `branchMustBeProtected`
-# s'abstient : il ne rend pas le job rouge, il cesse simplement de vérifier.
+# Metadata en lecture). Sans lui, le contrôle `branchMustBeProtected` s'abstient
+# et le score reste incomplet.
+#
+# Le jeton sert à DEUX choses, ce qu'un premier jet avait manqué. Outre le
+# contrôle de protection de branche, l'action s'en sert pour vérifier
+# l'attestation de provenance du binaire qu'elle vient de télécharger, avec
+# `gh attestation verify`. Mesuré le 2026-09-15 : un jeton vide fait échouer
+# cette étape en `exit 4`, sur « set the GH_TOKEN environment variable », et le
+# job entier tombe avant d'avoir analysé quoi que ce soit. D'où le repli sur le
+# jeton du job : sans PAT, la vérification de provenance se fait quand même et
+# seul le contrôle de protection de branche s'abstient.
 name: Conformité Plumber
 
 on:
@@ -77,5 +86,7 @@ jobs:
           score-push: "true"            # publie le score, qui alimente le badge
           # PAT à portée fine (Administration + Contents + Metadata en lecture),
           # stocké comme secret de l'environnement protégé `security`, pour que
-          # branchMustBeProtected soit vérifié pour de vrai.
-          github-token: ${{ secrets.PLUMBER_ADMIN_TOKEN }}
+          # branchMustBeProtected soit vérifié pour de vrai. À défaut, le jeton
+          # du job : il suffit à vérifier la provenance du binaire, et laisse le
+          # seul contrôle de protection de branche s'abstenir.
+          github-token: ${{ secrets.PLUMBER_ADMIN_TOKEN || github.token }}

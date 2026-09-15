@@ -96,11 +96,12 @@ Deux workflows ont besoin d'une configuration qui ne vit pas dans le dépôt :
 
 - **`plumber.yml`** attend un environnement `security`, restreint à la branche
   `main`, portant le secret `PLUMBER_ADMIN_TOKEN` : un PAT à portée fine avec
-  Administration, Contents et Metadata en lecture. Sans lui, le contrôle
-  `branchMustBeProtected` s'abstient au lieu d'échouer, et le score reste
-  incomplet sans que rien ne le dise.
-- **La protection de la branche `main`** : c'est elle que Scorecard et Plumber
-  mesurent. Revue exigée d'un propriétaire (`.github/CODEOWNERS`), poussée en
-  force interdite.
+  Administration, Contents et Metadata en lecture. Sans lui, le workflow tourne
+  quand même, sur le jeton du job, mais le contrôle `branchMustBeProtected`
+  s'abstient et le score reste incomplet.
+- **La protection de la branche `main`**, par le ruleset « Protection de main » :
+  c'est elle que Scorecard et Plumber mesurent. Historique linéaire, suppression
+  et poussée en force interdites, passage par pull request avec résolution des
+  fils de discussion, et les six jobs de la CI en contrôles obligatoires.
 
 > Les commits et les tags sont créés par un humain, jamais par un assistant.
