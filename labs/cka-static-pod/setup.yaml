@@ -1,0 +1,33 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le cluster est en place,
+# le worker n'a aucun manifeste statique en trop, et l'image est déjà sur le
+# nœud pour que l'apprenant voie le Pod passer Running en quelques secondes.
+#
+# Transposé de K8sExamLab, dont la solution était un fichier tronqué : le
+# lab hérité n'a jamais été joué. Confronté à Kubernetes 1.37 le 2026-09-15 :
+# le Pod miroir s'appelle <nom>-<nœud>, porte l'annotation
+# kubernetes.io/config.source=file et un ownerReference vers le Node.
+- name: Préparer le lab cka-static-pod
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Retirer un manifeste laissé par un passage précédent
+      ansible.builtin.file:
+        path: /etc/kubernetes/manifests/static-web.yaml
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Mettre l'image sur le worker, pour que le Pod démarre vite
+      ansible.builtin.command: crictl pull docker.io/library/nginx:1.27-alpine
+      delegate_to: k8s-w1.lab
+      changed_when: false
+
+    - name: Attendre qu'un Pod miroir d'un passage précédent ait disparu
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

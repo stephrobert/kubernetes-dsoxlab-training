@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le worker est
+# schedulable, l'application tourne sur les deux nœuds, un Pod orphelin
+# traîne sur le worker. Tout ce que le candidat doit faire reste à faire.
+#
+# Transposé de K8sExamLab, qui faisait tout créer par le candidat, PDB et
+# application compris, sur kind. Confronté à Kubernetes 1.37 le 2026-09-15 :
+# un cordon puis un uncordon ne laissent aucun event sur le nœud, la preuve
+# du drain est donc la date de création des Pods et le nœud qui les porte.
+- name: Préparer le lab cka-node-drain-cordon
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application, le Pod orphelin, et noter l'heure
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

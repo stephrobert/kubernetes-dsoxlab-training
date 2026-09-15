@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab clean` : remet le worker schedulable, que l'apprenant
+# l'ait fait ou non, puis retire le namespace. Le cluster reste en place.
+- name: Nettoyer le lab cka-node-drain-cordon
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Remettre le worker dans le scheduling
+      ansible.builtin.command: kubectl --kubeconfig /etc/kubernetes/admin.conf uncordon k8s-w1.lab
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

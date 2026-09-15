@@ -1,0 +1,27 @@
+---
+# Joué par `dsoxlab clean` : retire le manifeste du worker, ce qui fait
+# disparaître le Pod miroir, et supprime un éventuel Pod ordinaire du même
+# nom. Le cluster reste en place.
+- name: Nettoyer le lab cka-static-pod
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le manifeste du Pod statique sur le worker
+      ansible.builtin.file:
+        path: /etc/kubernetes/manifests/static-web.yaml
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Supprimer un Pod ordinaire nommé static-web, s'il existe
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n default delete pod static-web
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Attendre que le Pod miroir ait disparu de l'API
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n default wait --for=delete
+        pod/static-web-k8s-w1.lab --timeout=120s
+      changed_when: false
+      failed_when: false

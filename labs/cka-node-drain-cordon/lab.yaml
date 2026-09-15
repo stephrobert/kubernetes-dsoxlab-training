@@ -1,0 +1,41 @@
+id: cka-node-drain-cordon
+title: "Vider un worker pour une maintenance, sans couper le service"
+level: cluster-architecture-installation-configuration
+description: |
+  Protéger une application par un PodDisruptionBudget, retirer le worker du
+  scheduling, l'évacuer en respectant ce budget et les DaemonSets, puis le
+  remettre en service et tracer l'opération. Les tests prouvent que les
+  Pods ont réellement été recréés ailleurs, que le nœud est revenu, et que
+  le DaemonSet du CNI n'a pas bougé.
+skills:
+  - cordon
+  - drain
+  - uncordon
+  - pod-disruption-budget
+  - node-maintenance
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
+# Configuration (25 %) : « Prepare underlying infrastructure » et « Manage
+# the lifecycle of Kubernetes clusters ». Le lab hérité tournait sur kind,
+# où un drain n'a pas de conséquence ; ici le worker est une vraie machine
+# et le CNI y tourne en DaemonSet.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+    - name: w1
+      host: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
