@@ -1,0 +1,40 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il installe Helm 4 sur
+# le control plane, pose un chart local à jour dans le répertoire de
+# l'apprenant, et retire la release qu'un passage précédent aurait laissée.
+#
+# Transposé de K8sExamLab, qui installait le chart bitnami/nginx : les
+# images Bitnami ne sont plus librement servies depuis 2025, et le lab
+# aurait dépendu d'un dépôt externe pendant l'examen blanc. Le chart vient
+# de `helm create`, image nginx alignée sur le reste du catalogue. Helm
+# 4.3.0, mesuré disponible sur get.helm.sh le 2026-09-15.
+- name: Préparer le lab ckad-helm-install-upgrade
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Récupérer l'archive de Helm 4.3.0
+      ansible.builtin.get_url:
+        url: https://get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz
+        dest: /root/helm-v4.3.0-linux-amd64.tar.gz
+        mode: "0644"
+
+    - name: Installer helm dans /usr/local/bin
+      ansible.builtin.unarchive:
+        src: /root/helm-v4.3.0-linux-amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+          - linux-amd64/helm
+        creates: /usr/local/bin/helm
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        UTILISATEUR: "{{ ansible_user | default('ubuntu') }}"

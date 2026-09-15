@@ -1,0 +1,26 @@
+---
+# Joué par `dsoxlab clean` : désinstalle la release et retire le namespace.
+# Helm reste installé, comme crictl : c'est un outil du nœud, pas un objet
+# du lab. Le cluster reste.
+- name: Nettoyer le lab ckad-helm-install-upgrade
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Désinstaller la release
+      ansible.builtin.command: helm uninstall web -n lab --ignore-not-found
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le chart du répertoire de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ubuntu') }}/charts"
+        state: absent

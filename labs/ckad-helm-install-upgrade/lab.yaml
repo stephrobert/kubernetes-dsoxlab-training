@@ -1,0 +1,37 @@
+id: ckad-helm-install-upgrade
+title: "Installer, mettre à jour et revenir en arrière avec Helm 4"
+level: application-deployment
+description: |
+  Déployer un chart avec Helm, le mettre à jour avec de nouvelles valeurs,
+  puis revenir à la première révision. Prouver par l'historique de la
+  release et par l'état du Deployment que les trois opérations ont eu lieu,
+  dans cet ordre.
+skills:
+  - helm
+  - release
+  - upgrade
+  - rollback
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Deployment (20 %) :
+# « Use the Helm package manager to deploy existing packages ». Helm 4.3.0,
+# la version courante : les labs sont à jour, et le blog a une leçon sur la
+# migration vers Helm 4. Le lab hérité passait par les charts Bitnami, dont
+# les images ne sont plus librement servies : le chart est local.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

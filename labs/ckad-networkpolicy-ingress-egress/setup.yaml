@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose les quatre
+# Pods, sans aucune politique, et retire celles qu'un passage précédent
+# aurait laissées.
+#
+# Transposé de K8sExamLab, dont les huit checks lisaient les specs des
+# politiques sans jamais tenter une connexion. Sur Flannel, ils n'auraient
+# rien pu prouver ; sur Calico, chaque règle se mesure. Confronté à
+# Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-networkpolicy-ingress-egress
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

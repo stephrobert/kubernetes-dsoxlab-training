@@ -1,0 +1,36 @@
+id: ckad-networkpolicy-ingress-egress
+title: "Cloisonner trois tiers avec des NetworkPolicy ingress et egress"
+level: services-networking
+description: |
+  Frontend, backend, base de données : n'autoriser que les flux prévus,
+  dans les deux sens, DNS compris, et interdire tout le reste. Prouver
+  chaque règle par une vraie connexion, celle qui passe et celle qui est
+  bloquée.
+skills:
+  - networkpolicy
+  - ingress
+  - egress
+  - three-tier
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKAD, domaine Services and Networking (20 %) :
+# « Demonstrate basic understanding of NetworkPolicies ». Les tests font de
+# vraies connexions, ce qui suppose un CNI qui applique les règles : Calico,
+# issue #3.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
