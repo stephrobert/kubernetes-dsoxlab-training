@@ -1,6 +1,8 @@
 id: ckad-job-cronjob
 title: "A Job with parallel completions, and a CronJob"
 level: application-design
+section: ckad
+difficulty: beginner
 description: |
   Run a workload four times, two at a time, with a Job, and prove that the
   runs really did overlap. Then schedule a cleanup every five minutes with

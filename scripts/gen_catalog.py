@@ -49,6 +49,23 @@ CERTIFICATIONS = [
     ("cks", "CKS, Certified Kubernetes Security Specialist"),
 ]
 
+#: Le curriculum de référence, et la version de Kubernetes réellement jouée.
+#:
+#: Ce sont DEUX choses différentes, et les confondre trompe le lecteur. Le
+#: curriculum est ce que la CNCF publie et sur quoi l'examen porte ; le runtime
+#: est ce sur quoi les labs ont été validés ici. Le second avance plus vite que
+#: le premier : au 2026-09-15, les labs tournent sur Kubernetes 1.37 alors que
+#: les curriculums publiés sont CKA/CKAD v1.35 et CKS v1.34.
+#:
+#: Cette information ne peut pas vivre dans meta.yml : son contrat rejette
+#: toute clé qu'il ne connaît pas, et `validate-structure` échoue. Vérifié.
+CURRICULUMS = {
+    "cka": "v1.35",
+    "ckad": "v1.35",
+    "cks": "v1.34",
+}
+CURRICULUM_SOURCE = "https://github.com/cncf/curriculum"
+
 LANGUES = {
     "en": {
         "fichier": "README.md",
@@ -58,11 +75,17 @@ LANGUES = {
         "aucune": "none",
         "non": "no",
         "rouge": "**RED**",
+        "capstone": "capstone, several domains",
         "pied": (
             "Total: **{n} lab(s)**. The validation column carries the date of the "
             "last run of `scripts/valider-labs.py`, which plays the lab in both "
             "directions and checks that it leaves no trace. A shippable lab is not "
-            "a validated lab."
+            "a validated lab.\n\n"
+            "**Runtime validated: Kubernetes {k8s}.** "
+            "**Reference curriculum: {curriculums}** "
+            "([cncf/curriculum]({source})). The two move at different speeds: the "
+            "labs run on a newer Kubernetes than the published exam curriculum, "
+            "which is why they are stated separately rather than as one version."
         ),
     },
     "fr": {
@@ -73,11 +96,18 @@ LANGUES = {
         "aucune": "aucune",
         "non": "non",
         "rouge": "**ROUGE**",
+        "capstone": "capstone, plusieurs domaines",
         "pied": (
             "Total : **{n} lab(s)**. La colonne « Validé » porte la date du dernier "
             "passage de `scripts/valider-labs.py`, qui joue le lab dans les deux "
             "sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est "
-            "pas un lab validé."
+            "pas un lab validé.\n\n"
+            "**Runtime validé : Kubernetes {k8s}.** "
+            "**Curriculum de référence : {curriculums}** "
+            "([cncf/curriculum]({source})). Les deux n'avancent pas à la même "
+            "vitesse : les labs tournent sur un Kubernetes plus récent que le "
+            "curriculum publié, et les annoncer séparément évite de laisser croire "
+            "que l'examen porte sur la version du runtime."
         ),
     },
 }
@@ -134,6 +164,19 @@ def _labs_sans_cache() -> list[dict]:
     return trouves
 
 
+def _version_kubernetes(mesures: dict[str, dict]) -> str:
+    """La version RÉELLEMENT jouée, lue dans validation-labs.json.
+
+    Elle n'est pas écrite à la main : une version annoncée qui ne serait plus
+    celle des validations serait pire que pas de version du tout. Plusieurs
+    versions coexistant, on les rend toutes plutôt que d'en choisir une.
+    """
+    versions = sorted({str(m.get("kubernetes", "")) for m in mesures.values() if m.get("kubernetes")})
+    if not versions:
+        return "non mesuré"
+    return ", ".join(versions)
+
+
 def _validations() -> dict[str, dict]:
     if not VALIDATION.is_file():
         return {}
@@ -156,9 +199,17 @@ def _table(langue: str) -> str:
     lignes: list[str] = []
 
     for tag, titre in CERTIFICATIONS:
+        # Les capstones passent en dernier, et ce n'est pas cosmétique : ils
+        # supposent les micro-labs de leur certification déjà joués, puisqu'ils
+        # ne disent plus quel objet employer ni où est la panne. Les lire en
+        # tête du tableau enverrait l'apprenant au mur.
         de_cette_certif = sorted(
             (lab for lab in labs if tag in (lab.get("certification_tags") or [])),
-            key=lambda lab: (str(lab.get("level", "")), str(lab.get("id", ""))),
+            key=lambda lab: (
+                lab.get("lab_type") == "capstone",
+                str(lab.get("level", "")),
+                str(lab.get("id", "")),
+            ),
         )
         if not de_cette_certif:
             continue
@@ -170,12 +221,16 @@ def _table(langue: str) -> str:
         lignes.append("|" + "|".join(["---"] * len(mots["colonnes"])) + "|")
         for lab in de_cette_certif:
             url = str(lab.get("doc_url", ""))
+            # Un capstone ne vise pas UN domaine du blueprint, il en croise
+            # plusieurs : afficher son `level` seul laisserait croire qu'il
+            # n'éprouve que celui-là, alors que c'est un examen blanc.
+            capstone = lab.get("lab_type") == "capstone"
             lignes.append(
                 "| [`{id}`](labs/{rep}/) | {titre} | {niveau} | {duree} | {valide} | {lecon} |".format(
                     id=lab.get("id", ""),
                     rep=lab["_repertoire"],
                     titre=lab["_titre_fr"] if langue == "fr" else lab["_titre_en"],
-                    niveau=lab.get("level", ""),
+                    niveau=mots["capstone"] if capstone else lab.get("level", ""),
                     duree=lab.get("estimated_time", ""),
                     valide=_cellule_validation(lab, mesures, mots),
                     lecon=f"[{mots['lecon']}]({url})" if url else mots["aucune"],
@@ -183,7 +238,14 @@ def _table(langue: str) -> str:
             )
         lignes.append("")
 
-    lignes.append(str(mots["pied"]).format(n=len(labs)))
+    lignes.append(
+        str(mots["pied"]).format(
+            n=len(labs),
+            k8s=_version_kubernetes(mesures),
+            curriculums=", ".join(f"{c.upper()} {v}" for c, v in CURRICULUMS.items()),
+            source=CURRICULUM_SOURCE,
+        )
+    )
     return "\n".join(lignes)
 
 

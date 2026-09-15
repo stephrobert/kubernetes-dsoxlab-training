@@ -89,14 +89,57 @@ sections:
       Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et
       c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui
       savent l'exploiter.
-    labs: []
+    labs:
+      - cka-static-pod
+      - cka-daemonset-all-nodes
+      - cka-rbac-serviceaccount
+      - cka-taints-tolerations-placement
+      - cka-node-affinity
+      - cka-networkpolicy-isolate-db
+      - cka-pv-pvc-storageclass
+      - cka-deployment-rollout-rollback
+      - cka-node-drain-cordon
+      - cka-hpa-autoscaling
+      - cka-troubleshoot-imagepullbackoff
+      - cka-troubleshoot-crashloopbackoff
+      - cka-kubectl-debug
+      - cka-troubleshoot-dns
+      - cka-troubleshoot-networking
+      - cka-troubleshoot-node-notready
+      - cka-troubleshoot-kubelet
+      - cka-troubleshoot-apiserver
+      - cka-etcd-backup-restore
+      # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
+      # puisqu'il ne dit plus quel est le sujet de la panne.
+      - cka-capstone-portail
 
   - id: ckad
     title: "CKAD, Certified Kubernetes Application Developer"
     description: |
       Cinq domaines orientés application. « Application Environment,
       Configuration and Security » pèse 25 %, le plus lourd des cinq.
-    labs: []
+    labs:
+      - ckad-pod-resources-labels
+      - ckad-configmap-secret-injection
+      - ckad-probes-all-types
+      - ckad-init-container
+      - ckad-multi-container-sidecar
+      - ckad-expose-service
+      - ckad-security-context-hardened
+      - ckad-rbac-role-rolebinding
+      - ckad-networkpolicy-ingress-egress
+      - ckad-rolling-update-strategy
+      - ckad-blue-green-deployment
+      - ckad-kustomize-overlays
+      - ckad-helm-install-upgrade
+      - ckad-job-cronjob
+      - ckad-in-place-pod-vertical-scaling
+      - ckad-troubleshoot-missing-configmap
+      - ckad-troubleshoot-crashloop
+      # Le capstone vient en dernier, et ce n'est pas qu'une question d'ordre :
+      # il ne s'adresse qu'à qui a déjà joué les dix-sept précédents, puisqu'il
+      # ne dit plus quel objet employer.
+      - ckad-capstone-boutique
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"
@@ -104,4 +147,5 @@ sections:
       Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux
       seuls. Plusieurs compétences y sont invérifiables sur un cluster en
       conteneur, ce qui est la raison d'être des VM de ce catalogue.
-    labs: []
+    labs:
+      - cks-apparmor-confiner-un-pod

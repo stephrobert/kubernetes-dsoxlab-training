@@ -1,6 +1,8 @@
 id: cka-kubectl-debug
 title: "Get inside a container with no shell using kubectl debug"
 level: troubleshooting
+section: cka
+difficulty: intermediate
 description: |
   A Pod whose image contains no shell offers nothing to kubectl exec. Attach
   an ephemeral container to it that shares its processes, reach the node's

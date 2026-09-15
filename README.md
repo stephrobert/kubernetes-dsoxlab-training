@@ -59,7 +59,7 @@ teaches on kind, this catalogue proves on machines.
 
 ### CKA, Certified Kubernetes Administrator
 
-19 lab(s).
+20 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
@@ -82,10 +82,11 @@ teaches on kind, this catalogue proves on machines.
 | [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/) | Scale out automatically with a HorizontalPodAutoscaler | workloads-scheduling | 20m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
 | [`cka-node-affinity`](labs/cka-node-affinity/) | Placing with nodeAffinity: required constraint and preference | workloads-scheduling | 15m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 | [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/) | Reserve a node: taint, toleration and nodeSelector | workloads-scheduling | 10m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
 
 ### CKAD, Certified Kubernetes Application Developer
 
-17 lab(s).
+18 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
@@ -106,6 +107,7 @@ teaches on kind, this catalogue proves on machines.
 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | A Pod blocked by a ConfigMap that does not exist | application-observability | 10m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 | [`ckad-expose-service`](labs/ckad-expose-service/) | Expose a Deployment through a ClusterIP Service | services-networking | 10m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 | [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/) | Partition three tiers with ingress and egress NetworkPolicy | services-networking | 20m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone: ship the shop, from the specification alone | capstone, several domains | 45m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -115,7 +117,9 @@ teaches on kind, this catalogue proves on machines.
 |---|---|---|---|---|---|
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confine a Pod with an AppArmor profile | system-hardening | 25m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 
-Total: **37 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **39 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+
+**Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
 <!-- LABS:END -->
 

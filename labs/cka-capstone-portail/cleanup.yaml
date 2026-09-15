@@ -1,0 +1,65 @@
+---
+# Joué par `dsoxlab clean` : défait le capstone et rend le cluster intact.
+#
+# Un capstone nettoie plus large qu'un micro-lab : le cahier des charges ne
+# dit pas quels objets employer, on ne sait donc pas ce que le candidat a
+# créé. Le namespace emporte tout ce qui y vit, mais un PersistentVolume et
+# une StorageClass sont des objets de CLUSTER, hors namespace : ils
+# survivraient, et le validateur rendrait ROUGE au motif que le cluster n'est
+# pas rendu intact. On les retire par ce qu'ils désignent, pas par leur nom,
+# puisque le candidat a choisi ce nom lui-même.
+- name: Nettoyer le capstone cka-capstone-portail
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les Deployments et la réclamation, avant le namespace
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n production
+        delete deployment,service,pvc --all --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace production
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Lister les PersistentVolumes que le candidat a pu créer
+      # Deux filets : ceux qui ont été réclamés par le namespace production, et
+      # ceux qui portent la classe de stockage propre à ce lab sans avoir jamais
+      # été liés.
+      ansible.builtin.shell: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get pv
+        -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.claimRef.namespace}{" "}{.spec.storageClassName}{"\n"}{end}'
+        | awk '$2=="production" || $3=="rapide" {print $1}'
+      register: volumes_du_lab
+      changed_when: false
+      failed_when: false
+
+    - name: Supprimer ces PersistentVolumes
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete pv {{ item }}
+        --ignore-not-found --wait=true --timeout=60s
+      loop: "{{ volumes_du_lab.stdout_lines | default([]) }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer une StorageClass rapide que le candidat aurait créée
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete storageclass rapide
+        --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de données du control plane
+      ansible.builtin.file:
+        path: /mnt/portail-data
+        state: absent
+
+    - name: Retirer le répertoire de données du worker
+      ansible.builtin.file:
+        path: /mnt/portail-data
+        state: absent
+      delegate_to: k8s-w1.lab

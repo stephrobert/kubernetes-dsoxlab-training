@@ -1,6 +1,8 @@
 id: cka-troubleshoot-apiserver
 title: "Bring the API server back into service"
 level: troubleshooting
+section: cka
+difficulty: advanced
 description: |
   kubectl no longer answers: the control plane's API server exits with an
   error at startup. With no API, diagnose on the node, in the containers and

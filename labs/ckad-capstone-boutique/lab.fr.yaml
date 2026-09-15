@@ -1,0 +1,7 @@
+title: "Capstone : livrer la boutique, à partir du seul cahier des charges"
+description: |
+  Une livraison complète, donnée comme un cahier des charges et non comme un
+  mode d'emploi. Six exigences à satisfaire dans un namespace : configuration,
+  secret, sondes, identité, exposition et isolation. Rien ne dit quel objet
+  créer, et le dernier test vérifie la seule chose qui compte : un Pod
+  frontend joint la boutique, un Pod qui n'en est pas un ne la joint pas.

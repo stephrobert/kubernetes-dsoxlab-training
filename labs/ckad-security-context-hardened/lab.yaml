@@ -1,6 +1,8 @@
 id: ckad-security-context-hardened
 title: "Harden a Pod with a securityContext"
 level: application-environment
+section: ckad
+difficulty: intermediate
 description: |
   Run a web server with no privilege: non-root user, no escalation,
   read-only root filesystem, every capability dropped. And still give it

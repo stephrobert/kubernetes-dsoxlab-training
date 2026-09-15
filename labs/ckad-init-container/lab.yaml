@@ -1,6 +1,8 @@
 id: ckad-init-container
 title: "Wait for a dependency with an init container"
 level: application-design
+section: ckad
+difficulty: intermediate
 description: |
   Keep an application from starting before the Service it depends on answers,
   with an init container that waits. Watch the Pod held in Init, put the

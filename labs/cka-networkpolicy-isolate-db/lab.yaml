@@ -1,6 +1,8 @@
 id: cka-networkpolicy-isolate-db
 title: "Isolate the database: only the backend gets in"
 level: services-networking
+section: cka
+difficulty: intermediate
 description: |
   Write the NetworkPolicy that lets nothing into the database but the backend
   of its own namespace, on its port. The tests attempt the connections: the

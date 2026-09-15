@@ -1,6 +1,8 @@
 id: ckad-troubleshoot-missing-configmap
 title: "A Pod blocked by a ConfigMap that does not exist"
 level: application-observability
+section: ckad
+difficulty: beginner
 description: |
   A Pod does not start and says nothing in its logs, because it has no
   container yet: its events are the ones that talk. Read the cause, create

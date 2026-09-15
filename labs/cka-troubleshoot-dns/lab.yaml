@@ -1,6 +1,8 @@
 id: cka-troubleshoot-dns
 title: "Restore the cluster's DNS resolution"
 level: troubleshooting
+section: cka
+difficulty: intermediate
 description: |
   No Pod resolves a service name any more. Find out why the cluster DNS has
   stopped answering, put it back in service, and prove that a client Pod

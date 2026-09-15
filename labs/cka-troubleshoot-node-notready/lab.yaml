@@ -1,6 +1,8 @@
 id: cka-troubleshoot-node-notready
 title: "Bring a NotReady node back into the cluster"
 level: troubleshooting
+section: cka
+difficulty: advanced
 description: |
   A worker has gone NotReady, and the application reserved for it is degraded.
   Find out on the node why it no longer talks to the control plane, put its

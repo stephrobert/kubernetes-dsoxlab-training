@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Un capstone pose MOINS
+# qu'un micro-lab : le namespace, et de quoi vérifier l'isolation à la fin.
+# Tout le reste est le travail du candidat, et c'est ce qui en fait un examen
+# blanc plutôt qu'un exercice guidé.
+- name: Préparer le capstone ckad-capstone-boutique
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du capstone
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

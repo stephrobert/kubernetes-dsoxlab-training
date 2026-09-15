@@ -1,6 +1,8 @@
 id: cka-troubleshoot-networking
 title: "Restore traffic to a Service"
 level: troubleshooting
+section: cka
+difficulty: advanced
 description: |
   A Service no longer serves its Pods: wrong selector, wrong port, and a
   network policy that closes everything. Set the Service straight, reopen

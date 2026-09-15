@@ -1,6 +1,8 @@
 id: cka-daemonset-all-nodes
 title: "An agent on every node, including the control plane"
 level: workloads-scheduling
+section: cka
+difficulty: beginner
 description: |
   Deploy a DaemonSet that places an agent on every node of the cluster,
   including the control plane, protected by its taint. The tests count one

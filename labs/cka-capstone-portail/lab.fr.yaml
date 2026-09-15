@@ -1,0 +1,6 @@
+title: "Capstone : remettre le portail en service, sans personne à qui demander"
+description: |
+  Un namespace laissé par une équipe partie, un portail qui ne répond rien, et
+  aucun ticket pour dire pourquoi. Trois défauts indépendants à trouver, deux
+  exigences qui n'ont jamais été satisfaites, et une seule mesure de réussite :
+  le portail répond sur chaque nœud du cluster.

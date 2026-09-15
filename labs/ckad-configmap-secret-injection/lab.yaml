@@ -1,6 +1,8 @@
 id: ckad-configmap-secret-injection
 title: "Inject configuration and secrets into a Pod"
 level: application-environment
+section: ckad
+difficulty: beginner
 description: |
   Give an application its configuration through environment variables and
   through a mounted file, and its credentials through a Secret, without ever

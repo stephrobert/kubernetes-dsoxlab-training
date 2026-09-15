@@ -1,6 +1,8 @@
 id: cka-troubleshoot-kubelet
 title: "Repair a kubelet that refuses to start"
 level: troubleshooting
+section: cka
+difficulty: advanced
 description: |
   A worker's kubelet stops as soon as it is launched, and the node is NotReady.
   Read in the journal what it holds against its configuration, fix the file

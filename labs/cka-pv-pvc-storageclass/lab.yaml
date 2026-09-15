@@ -1,6 +1,8 @@
 id: cka-pv-pvc-storageclass
 title: "A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes"
 level: storage
+section: cka
+difficulty: intermediate
 description: |
   On a cluster with no dynamic provisioning, create a PersistentVolume on a
   node's disk, claim it with a PersistentVolumeClaim, mount it in a Pod that

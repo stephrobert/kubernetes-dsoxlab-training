@@ -1,0 +1,52 @@
+id: ckad-capstone-boutique
+title: "Capstone: ship the shop, from the specification alone"
+level: application-deployment
+section: ckad
+difficulty: advanced
+description: |
+  A full delivery, given as a specification rather than a walkthrough. Six
+  requirements to satisfy in one namespace: configuration, secret, probes,
+  identity, exposure and isolation. Nothing says which object to create, and
+  the last test checks the only thing that matters: a frontend Pod reaches
+  the shop, and a Pod that is not one does not.
+skills:
+  - deployment
+  - configmap
+  - secret
+  - probes
+  - security-context
+  - service
+  - networkpolicy
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+lab_type: capstone
+estimated_time: 45m
+
+# Un capstone ne vise pas UNE compétence du blueprint, il en croise plusieurs.
+# Celui-ci couvre les cinq domaines du CKAD : Application Design and Build
+# (20 %), Application Deployment (20 %), Application Environment,
+# Configuration and Security (25 %), Application Observability (15 %) et
+# Services and Networking (20 %).
+#
+# Ce que les micro-labs n'éprouvent pas, et qui est pourtant la moitié de
+# l'examen : passer d'une tâche à l'autre sous contrainte, sans qu'on vous
+# annonce le sujet de chacune.
+certification_tags:
+  - ckad
+
+# Le seuil de l'examen CKAD est de 66 %. On le pose ici, faute de quoi
+# `dsoxlab submit` ne rend aucun verdict : le moteur le dit sans détour, « un
+# capstone sans seuil de réussite n'en est pas un ».
+exam_passing_score: 66
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

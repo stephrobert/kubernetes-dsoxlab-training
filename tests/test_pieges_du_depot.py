@@ -19,6 +19,15 @@ se voit à la relecture : ils se manifestent tous comme autre chose.
    parce que chaque lab l'installe. Un lab qui oublie l'inclusion tourne tant
    qu'un autre lab est passé avant, et échoue seul sur un cluster neuf.
 
+5. **Un test qui décide sur `stdout + stderr`.** Le client SSH écrit
+   « Warning: Permanently added '10.10.50.11' (ED25519) to the list of known
+   hosts. » sur stderr. Un test qui concatène les deux flux puis conclut
+   « chaîne vide = objet absent » conclut donc TOUJOURS l'inverse : la chaîne
+   n'est jamais vide. Mesuré le 2026-09-15 sur le lab DNS réécrit — il passait
+   AVANT le travail, sur un cluster où CoreDNS était à zéro replica. Ce qui
+   mesure une présence lit la sortie STANDARD ; stderr sert aux messages
+   d'erreur, pas à décider.
+
 4. **Un namespace créé mais jamais supprimé.** Le lab suivant hérite alors d'un
    namespace qu'il ne connaît pas, ou attend un `Terminating` qui ne vient
    jamais. Le validateur l'attrape, mais seulement après avoir joué le lab ;
@@ -144,4 +153,42 @@ def test_tout_namespace_cree_est_supprime_au_nettoyage(lab: Path) -> None:
         "les supprime pas.\n"
         "Le lab suivant en hérite, ou attend un Terminating qui ne vient jamais. "
         "Le cluster, lui, reste en place : c'est le namespace qui part."
+    )
+
+
+@pytest.mark.parametrize("lab", REPERTOIRES, ids=IDS)
+def test_aucun_test_ne_decide_sur_stdout_plus_stderr(lab: Path) -> None:
+    """Le cinquième piège, payé le 2026-09-15.
+
+    Concaténer les deux flux pour composer un MESSAGE est sain, et cinq labs le
+    font. Décider sur le résultat ne l'est pas : le client SSH pollue stderr
+    d'un avertissement sur les known_hosts, si bien qu'une assertion du type
+    `assert (stdout + stderr).strip()` est vraie même quand la commande n'a
+    rien rendu.
+
+    Le lab DNS y a perdu un cycle de validation : son premier test passait avant
+    le travail, alors que CoreDNS était à zéro replica. Seule la règle des deux
+    sens l'a vu — un test qui ne sait pas échouer ne mesure rien.
+    """
+    fichier = lab / "challenge" / "tests" / "test_functional.py"
+    if not fichier.is_file():
+        pytest.skip("pas de test fonctionnel")
+
+    fautives = []
+    for numero, ligne in enumerate(fichier.read_text(encoding="utf-8").splitlines(), 1):
+        depouillee = ligne.strip()
+        if not depouillee.startswith("assert"):
+            continue
+        # On ne vise QUE les assertions : la même expression dans un f-string
+        # de message est légitime, et c'est le cas le plus fréquent.
+        sans_message = depouillee.split(",", 1)[0]
+        if "stdout" in sans_message and "stderr" in sans_message:
+            fautives.append(f"ligne {numero} : {depouillee[:90]}")
+
+    assert not fautives, (
+        f"{lab.name} décide sur stdout + stderr :\n  "
+        + "\n  ".join(fautives)
+        + "\nLe client SSH écrit un avertissement sur stderr : la chaîne n'est "
+        "jamais vide, et un test qui conclut « vide = absent » passe toujours. "
+        "Lisez la sortie standard seule."
     )

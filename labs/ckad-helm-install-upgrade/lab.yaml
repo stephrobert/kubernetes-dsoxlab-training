@@ -1,6 +1,8 @@
 id: ckad-helm-install-upgrade
 title: "Install, upgrade and roll back with Helm 4"
 level: application-deployment
+section: ckad
+difficulty: intermediate
 description: |
   Deploy a chart with Helm, upgrade it with new values, then go back to the
   first revision. Prove through the release history and the state of the

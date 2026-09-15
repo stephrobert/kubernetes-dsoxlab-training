@@ -1,6 +1,8 @@
 id: ckad-pod-resources-labels
 title: "A two-container Pod, with budgets, labels and an annotation"
 level: application-design
+section: ckad
+difficulty: beginner
 description: |
   Write by hand a Pod with two containers, each with its own requests and
   limits, with labels and an annotation, and prove from inside each container

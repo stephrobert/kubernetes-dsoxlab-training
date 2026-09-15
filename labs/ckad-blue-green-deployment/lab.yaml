@@ -1,6 +1,8 @@
 id: ckad-blue-green-deployment
 title: "Switch traffic from one version to the other: blue-green"
 level: application-deployment
+section: ckad
+difficulty: intermediate
 description: |
   Run two versions of an application side by side, then switch all the traffic
   from one to the other by changing a Service selector. Prove the switch from
