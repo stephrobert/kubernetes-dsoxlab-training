@@ -22,6 +22,8 @@ from conftest import lab_host, lab_target_host
 PROFIL = "k8s-refuser-ecriture"
 NAMESPACE = "confinement"
 POD = "confine"
+#: L'annotation que la 1.30 a rendue obsolète. Le nom du conteneur la suit.
+ANNOTATION_OBSOLETE = "container.apparmor.security.beta.kubernetes.io/"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
 
@@ -93,7 +95,9 @@ def test_profil_declare_dans_le_security_context(host):
     pod = json.loads(res.stdout)
 
     annotations = pod.get("metadata", {}).get("annotations", {}) or {}
-    obsoletes = [c for c in annotations if "apparmor.security.beta.kubernetes.io" in c]
+    # Le préfixe est fixe, seul le nom du conteneur varie après le « / » : on
+    # teste donc le début de la clé et non une sous-chaîne quelque part dedans.
+    obsoletes = [c for c in annotations if c.startswith(ANNOTATION_OBSOLETE)]
     assert not obsoletes, (
         "Le profil est rattaché par une ANNOTATION obsolète "
         f"({obsoletes[0]}). Depuis la 1.30, il se déclare dans "
