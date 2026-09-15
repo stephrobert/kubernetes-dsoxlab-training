@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un Service qui ne dessert rien, et une politique qui
+# ferme tout.
+#
+# Transposé de K8sExamLab. Ce lab attendait un CNI qui applique les
+# NetworkPolicy : sur Flannel, block-all n'aurait rien bloqué, et le dernier
+# test n'aurait rien prouvé. Calico depuis l'issue #3. Confronté à
+# Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab cka-troubleshoot-networking
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

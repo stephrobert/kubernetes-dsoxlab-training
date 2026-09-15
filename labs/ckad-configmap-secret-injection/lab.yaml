@@ -1,0 +1,36 @@
+id: ckad-configmap-secret-injection
+title: "Injecter configuration et secrets dans un Pod"
+level: application-environment
+description: |
+  Donner à une application sa configuration par des variables d'environnement
+  et par un fichier monté, et ses identifiants par un Secret, sans jamais
+  écrire un mot de passe dans le manifeste du Pod. Prouver, de l'intérieur du
+  conteneur, que tout est arrivé.
+skills:
+  - configmap
+  - secret
+  - environment-variables
+  - volume-mount
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Environment, Configuration
+# and Security (25 %, le plus lourd des cinq) : « Understand ConfigMaps »,
+# « Understand Secrets ». Le lab hérité ckad-configmaps-secrets, issue #16,
+# couvrait un sous-ensemble de celui-ci : fermé en doublon.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

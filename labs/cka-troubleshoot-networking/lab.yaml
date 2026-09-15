@@ -1,0 +1,35 @@
+id: cka-troubleshoot-networking
+title: "Rétablir le trafic vers un Service"
+level: troubleshooting
+description: |
+  Un Service ne dessert plus ses Pods : selector faux, port faux, et une
+  politique réseau qui ferme tout. Remettre le Service d'aplomb, rouvrir
+  exactement ce qu'il faut sans retirer la politique de sécurité, et prouver
+  qu'un client joint le Service par son nom.
+skills:
+  - troubleshooting
+  - services
+  - endpoints
+  - networkpolicy
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# services and networking ». Le dernier test prouve que le trafic passe, ce
+# qui suppose un CNI qui applique les NetworkPolicy : Calico, issue #3.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

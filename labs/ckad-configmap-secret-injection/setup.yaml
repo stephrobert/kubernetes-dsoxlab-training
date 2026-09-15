@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace, et
+# retire ce qu'un passage précédent aurait laissé. Le reste est le travail.
+#
+# Transposé de K8sExamLab, où le lab n'avait pas de setup. Confronté à
+# Kubernetes 1.37 le 2026-09-15 : ConfigMap, Secret, envFrom et volumes
+# configMap n'ont pas bougé.
+- name: Préparer le lab ckad-configmap-secret-injection
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

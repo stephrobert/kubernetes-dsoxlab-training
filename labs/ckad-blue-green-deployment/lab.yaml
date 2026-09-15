@@ -1,0 +1,36 @@
+id: ckad-blue-green-deployment
+title: "Basculer le trafic d'une version à l'autre : blue-green"
+level: application-deployment
+description: |
+  Faire tourner deux versions d'une application côte à côte, et basculer tout
+  le trafic de l'une à l'autre en changeant le selector d'un Service. Prouver
+  la bascule depuis un client : toutes les requêtes atteignent la nouvelle
+  version, aucune l'ancienne.
+skills:
+  - blue-green
+  - deployment-strategy
+  - services
+  - selectors
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKAD, domaine Application Deployment (20 %) :
+# « Understand Deployments and how to perform rolling updates » et « Use
+# Kubernetes primitives to implement common deployment strategies (blue/green
+# or canary) ».
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

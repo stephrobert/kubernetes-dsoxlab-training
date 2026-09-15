@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
+# un client, et retire ce qu'un passage précédent aurait laissé.
+#
+# Transposé de K8sExamLab, qui vérifiait le selector du Service sans jamais
+# faire de requête : ici chaque version répond son nom, et le client mesure
+# la bascule. Confronté à Kubernetes 1.37 le 2026-09-15.
+- name: Préparer le lab ckad-blue-green-deployment
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
