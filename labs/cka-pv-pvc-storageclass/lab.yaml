@@ -1,0 +1,41 @@
+id: cka-pv-pvc-storageclass
+title: "Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit"
+level: storage
+description: |
+  Sur un cluster sans provisionnement dynamique, créer un PersistentVolume
+  sur le disque d'un nœud, le réclamer par un PersistentVolumeClaim, le
+  monter dans un Pod qui y écrit. Les tests lisent le volume, la liaison,
+  le montage, le fichier dans le Pod, puis le même fichier sur le disque du
+  nœud : c'est là que se prouve la persistance.
+skills:
+  - persistentvolume
+  - persistentvolumeclaim
+  - storageclass
+  - hostPath
+  - volume-mounts
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Storage (10 %) : « Understand
+# persistent volumes and know how to create them », « Understand volume
+# modes, access modes and reclaim policies », « Understand persistent
+# volume claims ». Le lab hérité lisait le fichier dans le Pod ; ici le
+# dernier test le lit sur le disque du nœud, par ssh.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+    - name: w1
+      host: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

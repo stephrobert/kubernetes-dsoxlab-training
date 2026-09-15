@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : retire les deux namespaces et tout ce qu'ils
+# contiennent, politique comprise. Le cluster reste en place.
+- name: Nettoyer le lab cka-networkpolicy-isolate-db
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace database autre
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

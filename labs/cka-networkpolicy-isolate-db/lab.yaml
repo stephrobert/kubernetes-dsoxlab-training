@@ -1,0 +1,38 @@
+id: cka-networkpolicy-isolate-db
+title: "Isoler la base de données : seul le backend y accède"
+level: services-networking
+description: |
+  Écrire la NetworkPolicy qui ne laisse entrer vers la base que le backend
+  de son namespace, sur son port, et rien d'autre. Les tests tentent les
+  connexions : celle qui doit passer, celle du frontend qui doit être
+  bloquée, celle d'un Pod au bon label mais dans un autre namespace, et
+  vérifient que la base peut encore sortir.
+skills:
+  - networkpolicy
+  - ingress-rules
+  - podSelector
+  - network-isolation
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Services and Networking (20 %) :
+# « Define and enforce Network Policies ». Le lab hérité lisait le spec de
+# la politique et une connexion dans chaque sens ; ici un Pod intrus, au bon
+# label mais dans un autre namespace, doit rester dehors, ce qu'un
+# namespaceSelector vide laisserait passer. Calico applique les politiques.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,39 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, le PV, une StorageClass
+# que l'apprenant aurait créée, et le répertoire réservé sur chaque nœud.
+# Le cluster reste en place.
+- name: Nettoyer le lab cka-pv-pvc-storageclass
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le Pod et la réclamation, puis le namespace
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n lab delete pod data-pod pvc lab-pvc
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le PersistentVolume et une StorageClass manual éventuelle
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete pv lab-pv storageclass manual
+        --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire réservé du control plane
+      ansible.builtin.file:
+        path: /mnt/lab-data
+        state: absent
+
+    - name: Retirer le répertoire réservé du worker
+      ansible.builtin.file:
+        path: /mnt/lab-data
+        state: absent
+      delegate_to: k8s-w1.lab

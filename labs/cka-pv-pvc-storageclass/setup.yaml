@@ -1,0 +1,39 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le répertoire réservé
+# existe sur chaque nœud, vide ; aucun PV, aucune StorageClass ; le
+# namespace existe. Tout ce que le candidat doit faire reste à faire.
+#
+# Transposé de K8sExamLab, dont le PV pointait /tmp/lab-data et dont le
+# dernier check lisait le fichier dans le Pod. Confronté à Kubernetes 1.37
+# le 2026-09-15 : sans StorageClass par défaut, un PVC sans volume reste
+# Pending, et c'est la situation.
+- name: Préparer le lab cka-pv-pvc-storageclass
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le namespace, retirer ce qu'un passage précédent a laissé
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+    # Le répertoire est vidé APRÈS le retrait du Pod et du PV : un Pod d'un
+    # passage précédent y écrirait encore sinon.
+    - name: Vider puis recréer le répertoire réservé sur le control plane
+      ansible.builtin.file:
+        path: /mnt/lab-data
+        state: "{{ item }}"
+        mode: "0777"
+      loop: [absent, directory]
+
+    - name: Vider puis recréer le répertoire réservé sur le worker
+      ansible.builtin.file:
+        path: /mnt/lab-data
+        state: "{{ item }}"
+        mode: "0777"
+      loop: [absent, directory]
+      delegate_to: k8s-w1.lab
