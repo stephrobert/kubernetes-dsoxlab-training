@@ -28,9 +28,12 @@ from __future__ import annotations
 
 import json
 import sys
+from functools import lru_cache
 from pathlib import Path
 
-import yaml
+# Un seul chemin de lecture pour tout le catalogue : voir scripts/lecture_yaml.py.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lecture_yaml import YamlIllisible, lire_yaml
 
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
@@ -80,16 +83,50 @@ LANGUES = {
 }
 
 
+@lru_cache(maxsize=1)
+def _labs_caches() -> tuple[dict, ...]:
+    """Mémorise la lecture : `_labs()` est appelé une fois par README.
+
+    Sans ce cache, un lab illisible était signalé TROIS fois pour une seule
+    faute. Un message répété se lit comme trois problèmes, et on cherche les
+    deux autres.
+    """
+    return tuple(_labs_sans_cache())
+
+
 def _labs() -> list[dict]:
-    """Chaque lab, avec son titre dans les deux langues."""
+    # Copie superficielle : les appelants enrichissent les dictionnaires, et le
+    # cache ne doit pas se faire modifier sous les pieds.
+    return [dict(lab) for lab in _labs_caches()]
+
+
+def _labs_sans_cache() -> list[dict]:
+    """Chaque lab, avec son titre dans les deux langues.
+
+    Un lab dont le YAML est illisible est ÉCARTÉ du catalogue, avec un message
+    sur la sortie d'erreur. Il ne fait pas tomber la génération : le README doit
+    rester générable, et c'est `check-labs-completude.py` qui a pour rôle de
+    refuser le lab fautif. Deux outils, deux responsabilités.
+    """
     trouves = []
     for fichier in sorted(LABS.glob("*/lab.yaml")):
-        donnees = yaml.safe_load(fichier.read_text(encoding="utf-8")) or {}
+        try:
+            donnees = lire_yaml(fichier)
+        except YamlIllisible as exc:
+            print(
+                f"  lab écarté du catalogue — {fichier.parent.name}/{exc}",
+                file=sys.stderr,
+            )
+            continue
         donnees["_repertoire"] = fichier.parent.name
         donnees["_titre_en"] = str(donnees.get("title", "")).strip('"')
         surcharge = fichier.parent / "lab.fr.yaml"
         if surcharge.is_file():
-            fr = yaml.safe_load(surcharge.read_text(encoding="utf-8")) or {}
+            try:
+                fr = lire_yaml(surcharge)
+            except YamlIllisible as exc:
+                print(f"  {fichier.parent.name}/{exc}", file=sys.stderr)
+                fr = {}
             donnees["_titre_fr"] = str(fr.get("title", donnees["_titre_en"])).strip('"')
         else:
             donnees["_titre_fr"] = donnees["_titre_en"]
