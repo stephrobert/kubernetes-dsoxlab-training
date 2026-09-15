@@ -8,10 +8,14 @@
 [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 [![Licence : CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
 
-Catalogue de **micro-labs vérifiables** pour la
+Catalogue de **labs et de capstones vérifiables** pour la
 [formation Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/)
 du blog de Stéphane Robert. Joué par la CLI
 [dsoxlab](https://github.com/stephrobert/dsoxlab).
+
+Un **micro-lab** éprouve une compétence nommée par le blueprint et le dit dans
+son titre. Un **capstone** n'en nomme aucune : il donne une situation, un seuil
+de réussite à 66 % comme l'examen, et laisse choisir les outils.
 
 **Les trois certifications Kubernetes sont entièrement pratiques.** Le candidat
 répare ou construit sur un cluster réel : il ne reconnaît pas une bonne réponse
@@ -57,7 +61,63 @@ enseigne sur kind, ce catalogue éprouve sur des machines.
 
 <!-- LABS:START -->
 
-### CKA, Certified Kubernetes Administrator
+### Le parcours recommandé
+
+C'est l'ordre dans lequel les labs sont faits pour être joués, tel que `meta.yml` le déclare. C'est une progression pédagogique, pas la structure de l'examen : elle va de ce dont un cluster est fait vers son diagnostic, et se termine par le capstone, qui suppose le reste joué. Le tableau plus bas répond à l'autre question, celle de la couverture : quel domaine du blueprint chaque lab éprouve.
+
+**CKA, Certified Kubernetes Administrator**
+
+1. [`cka-static-pod`](labs/cka-static-pod/) : Poser un Pod statique sur un worker, sans passer par l'API
+2. [`cka-daemonset-all-nodes`](labs/cka-daemonset-all-nodes/) : Un agent sur chaque nœud, control plane compris
+3. [`cka-rbac-serviceaccount`](labs/cka-rbac-serviceaccount/) : Donner une identité à une application : ServiceAccount, Role, RoleBinding
+4. [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/) : Réserver un nœud : taint, tolérance et nodeSelector
+5. [`cka-node-affinity`](labs/cka-node-affinity/) : Placer avec nodeAffinity : contrainte obligatoire et préférence
+6. [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/) : Isoler la base de données : seul le backend y accède
+7. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) : Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit
+8. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/) : Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version
+9. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) : Vider un worker pour une maintenance, sans couper le service
+10. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/) : Faire monter en charge automatiquement avec un HorizontalPodAutoscaler
+11. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/) : Sortir un Pod de l'ImagePullBackOff
+12. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/) : Sortir un Deployment du CrashLoopBackOff
+13. [`cka-kubectl-debug`](labs/cka-kubectl-debug/) : Entrer dans un conteneur sans shell avec kubectl debug
+14. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/) : Rétablir la résolution DNS du cluster
+15. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/) : Rétablir le trafic vers un Service
+16. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/) : Ramener un nœud NotReady dans le cluster
+17. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/) : Réparer un kubelet qui refuse de démarrer
+18. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/) : Remettre l'API server en service
+19. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) : Sauvegarder etcd, puis restaurer le cluster depuis un instantané
+20. [`cka-capstone-portail`](labs/cka-capstone-portail/) : Capstone : remettre le portail en service, sans personne à qui demander · **capstone**
+
+**CKAD, Certified Kubernetes Application Developer**
+
+1. [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/) : Un Pod à deux conteneurs, avec budgets, labels et annotation
+2. [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/) : Injecter configuration et secrets dans un Pod
+3. [`ckad-probes-all-types`](labs/ckad-probes-all-types/) : Trois sondes sur un Pod : startup, liveness, readiness
+4. [`ckad-init-container`](labs/ckad-init-container/) : Attendre une dépendance avec un init container
+5. [`ckad-multi-container-sidecar`](labs/ckad-multi-container-sidecar/) : Un sidecar natif qui suit les logs de l'application
+6. [`ckad-expose-service`](labs/ckad-expose-service/) : Exposer un Deployment par un Service ClusterIP
+7. [`ckad-security-context-hardened`](labs/ckad-security-context-hardened/) : Durcir un Pod avec un securityContext
+8. [`ckad-rbac-role-rolebinding`](labs/ckad-rbac-role-rolebinding/) : Donner un accès en lecture seule aux Pods avec RBAC
+9. [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/) : Cloisonner trois tiers avec des NetworkPolicy ingress et egress
+10. [`ckad-rolling-update-strategy`](labs/ckad-rolling-update-strategy/) : Régler une mise à jour progressive : maxSurge et maxUnavailable
+11. [`ckad-blue-green-deployment`](labs/ckad-blue-green-deployment/) : Basculer le trafic d'une version à l'autre : blue-green
+12. [`ckad-kustomize-overlays`](labs/ckad-kustomize-overlays/) : Une base Kustomize et deux overlays, dev et prod
+13. [`ckad-helm-install-upgrade`](labs/ckad-helm-install-upgrade/) : Installer, mettre à jour et revenir en arrière avec Helm 4
+14. [`ckad-job-cronjob`](labs/ckad-job-cronjob/) : Un Job à complétions parallèles et un CronJob
+15. [`ckad-in-place-pod-vertical-scaling`](labs/ckad-in-place-pod-vertical-scaling/) : Redimensionner un Pod en place, sans le redémarrer
+16. [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) : Un Pod bloqué par un ConfigMap qui n'existe pas
+17. [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) : Trois Pods en CrashLoopBackOff, trois causes
+18. [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) : Capstone : livrer la boutique, à partir du seul cahier des charges · **capstone**
+
+**CKS, Certified Kubernetes Security Specialist**
+
+1. [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) : Confiner un Pod avec un profil AppArmor
+
+### La couverture du blueprint
+
+Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui répond à « qu'est-ce que je peux prouver ? », et elle n'est délibérément pas l'ordre dans lequel les jouer.
+
+#### CKA, Certified Kubernetes Administrator
 
 20 lab(s).
 
@@ -84,7 +144,7 @@ enseigne sur kind, ce catalogue éprouve sur des machines.
 | [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/) | Réserver un nœud : taint, tolérance et nodeSelector | workloads-scheduling | 10m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone : remettre le portail en service, sans personne à qui demander | capstone, plusieurs domaines | 45m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
 
-### CKAD, Certified Kubernetes Application Developer
+#### CKAD, Certified Kubernetes Application Developer
 
 18 lab(s).
 
@@ -109,7 +169,7 @@ enseigne sur kind, ce catalogue éprouve sur des machines.
 | [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/) | Cloisonner trois tiers avec des NetworkPolicy ingress et egress | services-networking | 20m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone : livrer la boutique, à partir du seul cahier des charges | capstone, plusieurs domaines | 45m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 
-### CKS, Certified Kubernetes Security Specialist
+#### CKS, Certified Kubernetes Security Specialist
 
 1 lab(s).
 

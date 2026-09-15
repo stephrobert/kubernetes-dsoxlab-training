@@ -11,9 +11,18 @@ depuis `lab.fr.yaml`, qui surcharge le titre et la description. Un lab dont le
 verrait : `dsoxlab validate-structure` le refuse d'ailleurs avant, avec
 `content_missing_english`.
 
-Les labs sont groupés par CERTIFICATION (`certification_tags`), puis triés par
-domaine du blueprint (`level`) : c'est ainsi que se lit la seule question qui
-pilote ce dépôt, « combien de compétences de l'examen puis-je démontrer ? ».
+Le catalogue rend DEUX vues, parce qu'un lecteur pose deux questions
+différentes et qu'une seule table ne peut pas répondre aux deux.
+
+- **Le parcours recommandé**, numéroté, lu dans `meta.yml` : dans quel ordre
+  jouer les labs. C'est une progression pédagogique.
+- **La couverture du blueprint**, groupée par certification puis par domaine
+  (`level`) : quelle compétence de l'examen chaque lab éprouve. C'est la
+  question qui pilote ce dépôt.
+
+Les confondre a un coût mesuré : tant que le catalogue n'a rendu que la
+seconde, le lecteur du README tombait sur `cka-etcd-backup-restore` avant
+`cka-static-pod`, alors que `meta.yml` déclare l'inverse.
 
 La colonne de validation vient de `validation-labs.json`, écrit par
 `scripts/valider-labs.py`. Un lab livrable n'est pas un lab validé, et cette
@@ -38,6 +47,7 @@ from lecture_yaml import YamlIllisible, lire_yaml
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 VALIDATION = RACINE / "validation-labs.json"
+META = RACINE / "meta.yml"
 DEBUT, FIN = "<!-- LABS:START -->", "<!-- LABS:END -->"
 
 #: Ordre d'affichage des certifications, et leur titre. Repris de `meta.yml`,
@@ -57,14 +67,26 @@ CERTIFICATIONS = [
 #: le premier : au 2026-09-15, les labs tournent sur Kubernetes 1.37 alors que
 #: les curriculums publiés sont CKA/CKAD v1.35 et CKS v1.34.
 #:
-#: Cette information ne peut pas vivre dans meta.yml : son contrat rejette
-#: toute clé qu'il ne connaît pas, et `validate-structure` échoue. Vérifié.
-CURRICULUMS = {
-    "cka": "v1.35",
-    "ckad": "v1.35",
-    "cks": "v1.34",
-}
-CURRICULUM_SOURCE = "https://github.com/cncf/curriculum"
+#: Les versions ne sont plus écrites ici : elles vivent dans `curriculums.yml`,
+#: avec le poids de chaque domaine, leur source et la date de la dernière
+#: confrontation au PDF de la CNCF. Ce fichier est né d'un chiffre recopié qui
+#: avait dérivé dans cinq issues sans que rien ne le signale.
+#:
+#: Le runtime, lui, reste MESURÉ et non déclaré : il est lu dans
+#: `validation-labs.json`. Ne jamais le recopier dans curriculums.yml.
+CURRICULUMS_YML = RACINE / "curriculums.yml"
+
+
+def _curriculums() -> dict[str, str]:
+    donnees = lire_yaml(CURRICULUMS_YML)
+    return {
+        nom: str(certification.get("version", ""))
+        for nom, certification in (donnees.get("certifications") or {}).items()
+    }
+
+
+def _source_curriculums() -> str:
+    return str(lire_yaml(CURRICULUMS_YML).get("source", ""))
 
 LANGUES = {
     "en": {
@@ -76,6 +98,24 @@ LANGUES = {
         "non": "no",
         "rouge": "**RED**",
         "capstone": "capstone, several domains",
+        "titre_parcours": "The recommended path",
+        "intro_parcours": (
+            "This is the order in which the labs are meant to be played, as "
+            "declared in `meta.yml`. It is a teaching progression, not the "
+            "structure of the exam: it goes from what a cluster is made of to "
+            "diagnosing it, and ends with the capstone, which assumes the rest "
+            "has been played. The table further down answers the other "
+            "question, the one about coverage: which blueprint domain does each "
+            "lab exercise."
+        ),
+        "absent": "declared, missing from the catalogue",
+        "deux_points": ": ",
+        "titre_couverture": "Blueprint coverage",
+        "intro_couverture": (
+            "The same labs, grouped by the domain the exam names. This is the "
+            "view that answers \"what can I actually prove?\", and it is "
+            "deliberately not the order in which you should play them."
+        ),
         "pied": (
             "Total: **{n} lab(s)**. The validation column carries the date of the "
             "last run of `scripts/valider-labs.py`, which plays the lab in both "
@@ -97,6 +137,23 @@ LANGUES = {
         "non": "non",
         "rouge": "**ROUGE**",
         "capstone": "capstone, plusieurs domaines",
+        "titre_parcours": "Le parcours recommandé",
+        "intro_parcours": (
+            "C'est l'ordre dans lequel les labs sont faits pour être joués, tel "
+            "que `meta.yml` le déclare. C'est une progression pédagogique, pas "
+            "la structure de l'examen : elle va de ce dont un cluster est fait "
+            "vers son diagnostic, et se termine par le capstone, qui suppose le "
+            "reste joué. Le tableau plus bas répond à l'autre question, celle "
+            "de la couverture : quel domaine du blueprint chaque lab éprouve."
+        ),
+        "absent": "déclaré, absent du catalogue",
+        "deux_points": " : ",
+        "titre_couverture": "La couverture du blueprint",
+        "intro_couverture": (
+            "Les mêmes labs, groupés par le domaine que l'examen nomme. C'est "
+            "la vue qui répond à « qu'est-ce que je peux prouver ? », et elle "
+            "n'est délibérément pas l'ordre dans lequel les jouer."
+        ),
         "pied": (
             "Total : **{n} lab(s)**. La colonne « Validé » porte la date du dernier "
             "passage de `scripts/valider-labs.py`, qui joue le lab dans les deux "
@@ -183,6 +240,24 @@ def _validations() -> dict[str, dict]:
     return json.loads(VALIDATION.read_text(encoding="utf-8"))
 
 
+def _parcours() -> dict[str, list[str]]:
+    """L'ordre pédagogique, lu dans `meta.yml` et nulle part ailleurs.
+
+    Le catalogue répondait jusqu'ici à une seule question, « quel domaine du
+    blueprint ce lab éprouve-t-il ? », et il groupait par domaine. C'est la
+    bonne réponse à la question de la COUVERTURE, et la mauvaise à celle de
+    l'APPRENTISSAGE : un lecteur du README tombait sur `cka-etcd-backup-restore`
+    avant `cka-static-pod`, alors que `meta.yml` déclare l'inverse depuis que
+    ses sections sont remplies. Deux questions, deux vues, une seule source
+    pour chacune.
+    """
+    donnees = lire_yaml(META)
+    return {
+        str(section.get("id", "")): [str(lab) for lab in (section.get("labs") or [])]
+        for section in (donnees.get("sections") or [])
+    }
+
+
 def _cellule_validation(lab: dict, mesures: dict[str, dict], mots: dict) -> str:
     mesure = mesures.get(str(lab.get("id", "")))
     if not mesure:
@@ -192,11 +267,48 @@ def _cellule_validation(lab: dict, mesures: dict[str, dict], mots: dict) -> str:
     return str(mesure.get("date", ""))[:10]
 
 
+def _liste_parcours(langue: str) -> list[str]:
+    """La vue « dans quel ordre jouer », numérotée, une section par examen.
+
+    Un lab déclaré dans `meta.yml` mais absent du disque n'est pas listé en
+    silence : il est rendu avec une mention, parce qu'un parcours qui saute un
+    numéro sans rien dire est plus trompeur qu'un parcours qui signale son
+    trou. Le contrôle de complétude, lui, refusera le lab.
+    """
+    mots = LANGUES[langue]
+    connus = {str(lab.get("id", "")): lab for lab in _labs()}
+    lignes = [f"### {mots['titre_parcours']}", "", str(mots["intro_parcours"]), ""]
+
+    for tag, titre in CERTIFICATIONS:
+        ids = _parcours().get(tag) or []
+        if not ids:
+            continue
+        lignes.append(f"**{titre}**")
+        lignes.append("")
+        for rang, identifiant in enumerate(ids, start=1):
+            lab = connus.get(identifiant)
+            if lab is None:
+                lignes.append(f"{rang}. `{identifiant}` ({mots['absent']})")
+                continue
+            nom = lab["_titre_fr"] if langue == "fr" else lab["_titre_en"]
+            marque = " · **capstone**" if lab.get("lab_type") == "capstone" else ""
+            lignes.append(
+                f"{rang}. [`{identifiant}`](labs/{lab['_repertoire']}/)"
+                f"{mots['deux_points']}{nom}{marque}"
+            )
+        lignes.append("")
+    return lignes
+
+
 def _table(langue: str) -> str:
     mots = LANGUES[langue]
     labs = _labs()
     mesures = _validations()
-    lignes: list[str] = []
+    lignes: list[str] = _liste_parcours(langue)
+    lignes.append(f"### {mots['titre_couverture']}")
+    lignes.append("")
+    lignes.append(str(mots["intro_couverture"]))
+    lignes.append("")
 
     for tag, titre in CERTIFICATIONS:
         # Les capstones passent en dernier, et ce n'est pas cosmétique : ils
@@ -213,7 +325,7 @@ def _table(langue: str) -> str:
         )
         if not de_cette_certif:
             continue
-        lignes.append(f"### {titre}")
+        lignes.append(f"#### {titre}")
         lignes.append("")
         lignes.append(str(mots["compte"]).format(n=len(de_cette_certif)))
         lignes.append("")
@@ -223,7 +335,7 @@ def _table(langue: str) -> str:
             url = str(lab.get("doc_url", ""))
             # Un capstone ne vise pas UN domaine du blueprint, il en croise
             # plusieurs : afficher son `level` seul laisserait croire qu'il
-            # n'éprouve que celui-là, alors que c'est un examen blanc.
+            # n'éprouve que celui-là, alors qu'il en croise plusieurs.
             capstone = lab.get("lab_type") == "capstone"
             lignes.append(
                 "| [`{id}`](labs/{rep}/) | {titre} | {niveau} | {duree} | {valide} | {lecon} |".format(
@@ -242,8 +354,8 @@ def _table(langue: str) -> str:
         str(mots["pied"]).format(
             n=len(labs),
             k8s=_version_kubernetes(mesures),
-            curriculums=", ".join(f"{c.upper()} {v}" for c, v in CURRICULUMS.items()),
-            source=CURRICULUM_SOURCE,
+            curriculums=", ".join(f"{c.upper()} {v}" for c, v in _curriculums().items()),
+            source=_source_curriculums(),
         )
     )
     return "\n".join(lignes)

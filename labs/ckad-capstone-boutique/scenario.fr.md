@@ -26,9 +26,10 @@ exigences entièrement satisfaites valent mieux que six à moitié faites.
    d'environnement `MESSAGE`, et cette valeur vit en dehors de la définition
    du Pod, sous le nom `catalogue-config`.
 
-3. **Le mot de passe de la base n'apparaît dans aucun manifeste.** Il vaut
-   `s3cr3t-boutique`, il est détenu sous le nom `catalogue-db` dans la clé
-   `password`, et le conteneur le lit dans le fichier `/etc/db/password`.
+3. **Le mot de passe de la base n'est ni écrit dans la définition du
+   catalogue, ni posé dans son environnement.** Il vaut `s3cr3t-boutique`, il
+   est détenu par un objet dédié nommé `catalogue-db` sous la clé `password`,
+   et le conteneur le lit dans le fichier `/etc/db/password`.
 
 4. **Le cluster sait quand envoyer du trafic, et quand redémarrer.** Deux
    contrôles sur le port HTTP du conteneur : l'un décide si un exemplaire
@@ -43,20 +44,20 @@ exigences entièrement satisfaites valent mieux que six à moitié faites.
    label `role=frontend` peuvent le joindre ; rien d'autre dans le namespace
    ne le peut.
 
-## Les repères utiles
+## Si vous bloquez
 
-Rien ici ne dit quel objet employer. Ce sont les pièges que ce capstone a
-réellement attrapés.
+Un micro-lab vous donne ses repères gratuitement. Un capstone, non : c'est
+justement ce qu'il mesure. Les quatre indices de ce lab vont du plus vague au
+plus explicite, ils **coûtent des points**, et ils portent exactement les
+pièges que ce capstone attrape.
 
-- Un processus qui ne tourne pas en root ne peut pas ouvrir un port inférieur
-  à 1024. Cette image écoute sur **8080**, pas sur 80. Le nom et le port de
-  l'exigence 6 sont ce que voit le *client*, ce qui n'est pas forcément ce
-  sur quoi le conteneur écoute.
-- Une politique réseau qui n'autorise rien n'est pas la même chose qu'aucune
-  politique. Dès qu'une politique sélectionne un Pod, tout ce qu'elle ne
-  nomme pas est interdit, y compris ce qui marchait avant.
-- `kubectl explain` fonctionne sans accès réseau et connaît tout le schéma.
-  C'est plus rapide que de chercher un exemple.
+```bash
+dsoxlab hint ckad-capstone-boutique
+```
+
+Vous avez donc le choix, comme le jour de l'épreuve : chercher, ou payer pour
+être orienté. Les deux sont des réponses légitimes, et votre score les
+distingue.
 
 ## Comment vous saurez que c'est bon
 

@@ -16,6 +16,8 @@ fera.
 from __future__ import annotations
 
 import json
+import subprocess
+import time
 
 import pytest
 
@@ -105,6 +107,30 @@ def _curl(host, url: str, patience_s: int = 12) -> tuple[bool, str]:
     )
     res = host.run(boucle)
     return res.stdout.strip() == "200", res.stdout.strip() or res.stderr.strip()
+
+
+def _curl_hors_du_cluster(url: str, patience_s: int = 12) -> tuple[bool, str]:
+    """La même requête, mais depuis la machine qui PILOTE le lab.
+
+    Elle n'est pas un nœud du cluster : elle en est l'hyperviseur, et elle
+    atteint les nœuds par le réseau, exactement comme le ferait une sonde de
+    supervision. C'est la seule façon de prouver l'exigence telle qu'elle est
+    écrite. Interroger un nœud depuis lui-même prouve que kube-proxy a
+    programmé sa règle, ce qui est utile mais différent : le paquet ne
+    traverse alors jamais le réseau.
+    """
+    for _ in range(patience_s):
+        res = subprocess.run(
+            ["curl", "-sS", "-o", "/dev/null", "-w", "%{http_code}", "-m", "3", url],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        code = res.stdout.strip()
+        if code == "200":
+            return True, code
+        time.sleep(1)
+    return False, code or res.stderr.strip()
 
 
 # ----------------------------------------------------------------------
@@ -231,6 +257,23 @@ def test_le_portail_repond_sur_chaque_noeud(host):
         "ceux qui ne portent aucun exemplaire, et le trafic est routé vers un "
         "Pod prêt. S'il répond sur un nœud et pas sur l'autre, ce n'est pas le "
         "Service qu'il faut regarder mais le réseau du cluster."
+    )
+
+    # Et depuis l'EXTÉRIEUR, ce que les deux mesures précédentes ne prouvent
+    # pas : elles interrogent chaque nœud depuis un nœud, donc sans jamais
+    # sortir du cluster. L'exigence parle d'une supervision qui vient du
+    # réseau. La machine qui joue ce test est l'hyperviseur du lab : elle
+    # n'appartient pas au cluster, et c'est exactement le point de vue voulu.
+    dehors = []
+    for ip in ips:
+        repond, code = _curl_hors_du_cluster(f"http://{ip}:{NODE_PORT}/")
+        if not repond:
+            dehors.append(f"{ip} a rendu {code}")
+    assert not dehors, (
+        f"Le portail répond sur le port {NODE_PORT} quand on l'interroge depuis "
+        "un nœud, mais pas depuis une machine extérieure au cluster : "
+        f"{', '.join(dehors)}. Le Service est donc correct et le blocage est "
+        "ailleurs, sur le chemin réseau entre l'extérieur et le nœud."
     )
 
 

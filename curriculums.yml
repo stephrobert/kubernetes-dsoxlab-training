@@ -1,0 +1,66 @@
+---
+# Les curriculums officiels des trois certifications, et le poids de chaque
+# domaine. Source unique du dépôt pour ces chiffres.
+#
+# POURQUOI CE FICHIER EXISTE, et il a une date de naissance.
+#
+# Le 2026-09-15, cinq issues du backlog ont été « corrigées » en échangeant les
+# poids de Cluster Setup et de System Hardening, sur la foi d'une page de site
+# et d'un raisonnement, pas de la source. L'erreur portait même un encadré
+# affirmant qu'elle avait été vérifiée. Elle n'a été rattrapée que parce qu'une
+# relecture a demandé de revérifier, et le PDF officiel a tranché en deux
+# minutes.
+#
+# Une donnée externe recopiée à cinq endroits dérive toujours. Elle vit donc
+# ici, une fois, avec sa source et sa date de vérification, et
+# `tests/test_curriculums.py` refuse toute mention du dépôt qui la contredit.
+#
+# COMMENT REVÉRIFIER, en deux commandes qui ne supposent rien :
+#
+#   gh api repos/cncf/curriculum/contents --jq '.[].name'   # les versions publiées
+#   curl -sSL -o cks.pdf "https://raw.githubusercontent.com/cncf/curriculum/master/CKS_Curriculum%20v1.34.pdf"
+#   pdftotext cks.pdf - | grep -E '^[0-9]+%'
+#
+# Le nom du fichier PDF porte la version : c'est lui qui dit quel curriculum
+# est courant, pas une page de marketing.
+source: https://github.com/cncf/curriculum
+verifie_le: 2026-09-15
+
+# La version du curriculum n'est PAS la version de Kubernetes sur laquelle les
+# labs tournent. Le runtime réellement joué est mesuré, pas déclaré : il est lu
+# dans `validation-labs.json`, que `scripts/valider-labs.py` écrit. Au
+# 2026-09-15, les labs tournent sur Kubernetes 1.37 alors que le curriculum
+# CKA publié est la v1.35. Ne jamais recopier le runtime ici : une version
+# annoncée qui ne serait plus celle des validations est pire que pas de
+# version du tout.
+certifications:
+  cka:
+    version: v1.35
+    titre: "CKA, Certified Kubernetes Administrator"
+    domaines:
+      "Troubleshooting": 30
+      "Cluster Architecture, Installation and Configuration": 25
+      "Services and Networking": 20
+      "Workloads and Scheduling": 15
+      "Storage": 10
+
+  ckad:
+    version: v1.35
+    titre: "CKAD, Certified Kubernetes Application Developer"
+    domaines:
+      "Application Environment, Configuration and Security": 25
+      "Application Design and Build": 20
+      "Application Deployment": 20
+      "Services and Networking": 20
+      "Application Observability and Maintenance": 15
+
+  cks:
+    version: v1.34
+    titre: "CKS, Certified Kubernetes Security Specialist"
+    domaines:
+      "Minimize Microservice Vulnerabilities": 20
+      "Supply Chain Security": 20
+      "Monitoring, Logging and Runtime Security": 20
+      "Cluster Setup": 15
+      "Cluster Hardening": 15
+      "System Hardening": 10

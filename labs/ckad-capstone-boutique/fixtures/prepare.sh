@@ -3,7 +3,7 @@
 # prouver l'isolation à la fin.
 #
 # Un capstone pose le MINIMUM. Tout ce que le cahier des charges demande est le
-# travail du candidat : c'est la différence entre un examen blanc et un
+# travail du candidat : c'est la différence entre un capstone et un
 # exercice guidé.
 #
 # Les deux clients, eux, sont fournis : ils ne sont pas le sujet, ils sont
