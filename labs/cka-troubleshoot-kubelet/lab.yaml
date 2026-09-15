@@ -1,0 +1,38 @@
+id: cka-troubleshoot-kubelet
+title: "Réparer un kubelet qui refuse de démarrer"
+level: troubleshooting
+description: |
+  Le kubelet d'un worker s'arrête aussitôt lancé, et le nœud est NotReady.
+  Lire dans le journal ce qu'il reproche à sa configuration, corriger le
+  fichier sans rien casser d'autre, et prouver que le nœud et son application
+  sont revenus.
+skills:
+  - troubleshooting
+  - kubelet
+  - journalctl
+  - kubelet-config
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# clusters and nodes » et « Troubleshoot cluster components ». La vague 1 du
+# backlog le réclamait sous le nom cka-reparer-un-kubelet : l'attestation
+# cluster-troubleshooting du blog n'a pas pu l'éprouver sur kind.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+    - name: w1
+      host: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

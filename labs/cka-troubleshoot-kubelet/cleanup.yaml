@@ -1,0 +1,36 @@
+---
+# Joué par `dsoxlab clean` : rend au kubelet une configuration saine et le
+# relance, que l'apprenant l'ait réparé ou non, puis retire l'application. Le
+# cluster reste en place, et il faut attendre que le nœud soit Ready, sinon
+# le lab suivant partirait d'un cluster amputé.
+- name: Nettoyer le lab cka-troubleshoot-kubelet
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer l'adresse impossible de la configuration du kubelet
+      ansible.builtin.lineinfile:
+        path: /var/lib/kubelet/config.yaml
+        regexp: '999\.999\.999\.999'
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Relancer le kubelet du worker, activé
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+        enabled: true
+      delegate_to: k8s-w1.lab
+
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace production
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Attendre que le worker soit Ready
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+        node/k8s-w1.lab --timeout=180s
+      changed_when: false
+      failed_when: false

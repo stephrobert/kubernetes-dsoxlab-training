@@ -1,0 +1,48 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un worker dont le kubelet est arrêté et désactivé.
+#
+# Transposé de K8sExamLab, dont le setup arrêtait le kubelet depuis un Pod
+# privilégié avec chroot /host, faute d'accès au nœud. Ici Ansible joint le
+# worker directement. Confronté à Kubernetes 1.37 le 2026-09-14.
+- name: Préparer le lab cka-troubleshoot-node-notready
+  hosts: lab_target
+  become: true
+  tasks:
+    # Si un passage précédent a laissé le kubelet arrêté, le socle attendrait
+    # en vain que tous les nœuds soient Ready : on le remet d'abord.
+    - name: Remettre le kubelet du worker en service, au cas où
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: started
+        enabled: true
+      delegate_to: k8s-w1.lab
+
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application réservée au worker
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+    # La panne : l'agent arrêté ET désactivé. Le démarrer ne suffira pas.
+    - name: Arrêter et désactiver le kubelet du worker
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: stopped
+        enabled: false
+      delegate_to: k8s-w1.lab
+
+    # Le control plane met une quarantaine de secondes à constater le silence.
+    - name: Attendre que le control plane voie le nœud NotReady
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get node k8s-w1.lab
+        -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: pret
+      until: pret.stdout != "True"
+      retries: 40
+      delay: 5
+      changed_when: false

@@ -1,0 +1,68 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un kubelet dont la configuration porte une adresse DNS
+# impossible, et qui refuse donc de démarrer.
+#
+# Transposé de K8sExamLab, qui cassait le worker par ssh depuis le control
+# plane. Ici Ansible joint le worker directement. Confronté à Kubernetes 1.37
+# le 2026-09-14 : le kubelet refuse toujours une clusterDNS invalide.
+- name: Préparer le lab cka-troubleshoot-kubelet
+  hosts: lab_target
+  become: true
+  tasks:
+    # Si un passage précédent a laissé la faute, le socle attendrait en vain
+    # que tous les nœuds soient Ready : on repart d'une configuration saine.
+    - name: Retirer une faute laissée par un passage précédent
+      ansible.builtin.lineinfile:
+        path: /var/lib/kubelet/config.yaml
+        regexp: '999\.999\.999\.999'
+        state: absent
+      delegate_to: k8s-w1.lab
+      register: faute_retiree
+
+    - name: Remettre le kubelet du worker en service, au cas où
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: "{{ 'restarted' if faute_retiree.changed else 'started' }}"
+        enabled: true
+      delegate_to: k8s-w1.lab
+
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application réservée au worker
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+    # La panne : un résolveur ajouté à la main sous clusterDNS, avec une
+    # indentation que le YAML de kubeadm n'a pas. Le kubelet ne peut plus lire
+    # son fichier et sort en le disant dans le journal, fichier et ligne
+    # compris. Mesuré le 2026-09-14 : la même ligne bien indentée est acceptée
+    # sans un mot, le kubelet ne valide pas les adresses de clusterDNS ; c'est
+    # donc l'indentation qui casse, comme quand on édite ce fichier à la main.
+    - name: Ajouter un résolveur mal indenté à la configuration du kubelet
+      ansible.builtin.lineinfile:
+        path: /var/lib/kubelet/config.yaml
+        insertafter: '^clusterDNS:'
+        line: "  - 999.999.999.999"
+      delegate_to: k8s-w1.lab
+
+    - name: Relancer le kubelet, qui va refuser de démarrer
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+      delegate_to: k8s-w1.lab
+      failed_when: false
+
+    - name: Attendre que le control plane voie le nœud NotReady
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get node k8s-w1.lab
+        -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: pret
+      until: pret.stdout != "True"
+      retries: 40
+      delay: 5
+      changed_when: false

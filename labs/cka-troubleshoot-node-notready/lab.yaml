@@ -1,0 +1,38 @@
+id: cka-troubleshoot-node-notready
+title: "Ramener un nœud NotReady dans le cluster"
+level: troubleshooting
+description: |
+  Un worker est passé NotReady, et l'application qui lui est réservée est
+  dégradée. Trouver sur le nœud pourquoi il ne parle plus au control plane,
+  remettre son agent en service de façon durable, et prouver que
+  l'application est revenue.
+skills:
+  - troubleshooting
+  - node-notready
+  - kubelet
+  - systemd
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
+# clusters and nodes ». Un des sujets que kind ne peut pas prouver : le kubelet
+# est un service systemd d'une vraie machine, et il faut un second nœud pour
+# en casser un sans casser l'API.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+    - name: w1
+      host: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
