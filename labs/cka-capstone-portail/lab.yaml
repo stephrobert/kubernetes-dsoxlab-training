@@ -1,0 +1,46 @@
+id: cka-capstone-portail
+title: "Capstone: bring the portal back, with nobody left to ask"
+level: troubleshooting
+section: cka
+difficulty: advanced
+description: |
+  A namespace handed over by a team that is gone, a portal that answers
+  nothing, and no ticket saying why. Three independent faults to find, two
+  requirements that were never met, and a single measure of success: the
+  portal answers on every node of the cluster.
+skills:
+  - troubleshooting
+  - scheduling
+  - storage
+  - services
+  - nodeport
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+lab_type: capstone
+estimated_time: 45m
+
+# Un capstone ne vise pas UNE compétence du blueprint, il en croise plusieurs.
+# Celui-ci couvre quatre des cinq domaines du CKA : Troubleshooting (30 %),
+# Services and Networking (20 %), Workloads and Scheduling (15 %) et
+# Storage (10 %), soit 75 % de l'épreuve.
+#
+# Ce que les micro-labs n'éprouvent pas, et qui est pourtant l'essentiel du
+# CKA : trouver OÙ regarder. Un lab nommé « troubleshoot-dns » a déjà répondu
+# à la moitié de la question avant que le candidat n'ouvre un terminal.
+certification_tags:
+  - cka
+
+# Le seuil de l'examen CKA est de 66 %, comme celui du CKAD.
+exam_passing_score: 66
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

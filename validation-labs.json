@@ -1,4 +1,36 @@
 {
+ "cka-capstone-portail": {
+  "apres": {
+   "passed": 8,
+   "score": 100,
+   "total": 8
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 8
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 243,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/8",
+   "après la solution : 8/8",
+   "après clean et run : 0/8",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-capstone-portail.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 8
+  },
+  "verdict": "VALIDE"
+ },
  "cka-daemonset-all-nodes": {
   "apres": {
    "passed": 4,
@@ -636,6 +668,38 @@
    "passed": 0,
    "score": 0,
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-capstone-boutique": {
+  "apres": {
+   "passed": 10,
+   "score": 100,
+   "total": 10
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 10
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-15",
+  "duree_s": 233,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-capstone-boutique.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 10
   },
   "verdict": "VALIDE"
  },

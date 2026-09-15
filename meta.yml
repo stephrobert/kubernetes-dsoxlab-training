@@ -109,6 +109,9 @@ sections:
       - cka-troubleshoot-kubelet
       - cka-troubleshoot-apiserver
       - cka-etcd-backup-restore
+      # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
+      # puisqu'il ne dit plus quel est le sujet de la panne.
+      - cka-capstone-portail
 
   - id: ckad
     title: "CKAD, Certified Kubernetes Application Developer"
@@ -133,6 +136,10 @@ sections:
       - ckad-in-place-pod-vertical-scaling
       - ckad-troubleshoot-missing-configmap
       - ckad-troubleshoot-crashloop
+      # Le capstone vient en dernier, et ce n'est pas qu'une question d'ordre :
+      # il ne s'adresse qu'à qui a déjà joué les dix-sept précédents, puisqu'il
+      # ne dit plus quel objet employer.
+      - ckad-capstone-boutique
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le capstone a créé. Tout vit dans le
+# namespace boutique, y compris ce que le candidat y a produit, le supprimer
+# suffit. Le cluster, lui, reste en place.
+#
+# Un capstone nettoie plus large qu'un micro-lab, et c'est délibéré : on ne
+# sait pas ce que le candidat a créé pour arriver au résultat, puisque le
+# cahier des charges ne dit pas quels objets employer. Supprimer le namespace
+# est la seule façon de garantir que rien ne survit à la session, y compris un
+# objet auquel personne n'avait pensé.
+- name: Nettoyer le capstone ckad-capstone-boutique
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace boutique
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

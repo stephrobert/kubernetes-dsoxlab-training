@@ -75,6 +75,7 @@ LANGUES = {
         "aucune": "none",
         "non": "no",
         "rouge": "**RED**",
+        "capstone": "capstone, several domains",
         "pied": (
             "Total: **{n} lab(s)**. The validation column carries the date of the "
             "last run of `scripts/valider-labs.py`, which plays the lab in both "
@@ -95,6 +96,7 @@ LANGUES = {
         "aucune": "aucune",
         "non": "non",
         "rouge": "**ROUGE**",
+        "capstone": "capstone, plusieurs domaines",
         "pied": (
             "Total : **{n} lab(s)**. La colonne « Validé » porte la date du dernier "
             "passage de `scripts/valider-labs.py`, qui joue le lab dans les deux "
@@ -197,9 +199,17 @@ def _table(langue: str) -> str:
     lignes: list[str] = []
 
     for tag, titre in CERTIFICATIONS:
+        # Les capstones passent en dernier, et ce n'est pas cosmétique : ils
+        # supposent les micro-labs de leur certification déjà joués, puisqu'ils
+        # ne disent plus quel objet employer ni où est la panne. Les lire en
+        # tête du tableau enverrait l'apprenant au mur.
         de_cette_certif = sorted(
             (lab for lab in labs if tag in (lab.get("certification_tags") or [])),
-            key=lambda lab: (str(lab.get("level", "")), str(lab.get("id", ""))),
+            key=lambda lab: (
+                lab.get("lab_type") == "capstone",
+                str(lab.get("level", "")),
+                str(lab.get("id", "")),
+            ),
         )
         if not de_cette_certif:
             continue
@@ -211,12 +221,16 @@ def _table(langue: str) -> str:
         lignes.append("|" + "|".join(["---"] * len(mots["colonnes"])) + "|")
         for lab in de_cette_certif:
             url = str(lab.get("doc_url", ""))
+            # Un capstone ne vise pas UN domaine du blueprint, il en croise
+            # plusieurs : afficher son `level` seul laisserait croire qu'il
+            # n'éprouve que celui-là, alors que c'est un examen blanc.
+            capstone = lab.get("lab_type") == "capstone"
             lignes.append(
                 "| [`{id}`](labs/{rep}/) | {titre} | {niveau} | {duree} | {valide} | {lecon} |".format(
                     id=lab.get("id", ""),
                     rep=lab["_repertoire"],
                     titre=lab["_titre_fr"] if langue == "fr" else lab["_titre_en"],
-                    niveau=lab.get("level", ""),
+                    niveau=mots["capstone"] if capstone else lab.get("level", ""),
                     duree=lab.get("estimated_time", ""),
                     valide=_cellule_validation(lab, mesures, mots),
                     lecon=f"[{mots['lecon']}]({url})" if url else mots["aucune"],
