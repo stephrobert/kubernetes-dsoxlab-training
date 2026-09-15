@@ -235,17 +235,29 @@ jobs:
       - name: Le verrou décrit bien le pyproject
         run: uv lock --check
 
-  # Analyse statique du Python du dépôt (tests de labs, conftest, vérificateurs
-  # de catalogue). Les constats vont dans l'onglet Sécurité, aucun artefact
-  # n'est publié.
+  # Analyse statique du dépôt. Les constats vont dans l'onglet Sécurité, aucun
+  # artefact n'est publié.
+  #
+  # DEUX langages, et le second n'est pas une coquetterie : ce dépôt est fait de
+  # Python (tests de labs, conftest, vérificateurs de catalogue) et de workflows
+  # GitHub Actions. N'analyser que le Python laissait sans regard la moitié du
+  # code qui, elle, s'exécute avec un jeton.
+  #
+  # `security-extended` plutôt que le jeu par défaut : le défaut vise le bruit
+  # zéro sur un gros dépôt applicatif, ce qui n'est pas le compromis d'un dépôt
+  # de cette taille. C'est déjà le réglage du dépôt scankit jumeau.
   codeql:
-    name: CodeQL (python)
+    name: CodeQL (${{ matrix.language }})
     needs: zizmor
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
       security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, actions]
     steps:
       - name: Durcir le runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -260,8 +272,12 @@ jobs:
       - name: Initialiser CodeQL
         uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
-          languages: python
-          build-mode: none # Python est interprété, aucun build à observer
+          languages: ${{ matrix.language }}
+          # Ni Python ni les workflows ne se compilent : il n'y a aucun build à
+          # observer, et le déclarer évite à CodeQL de chercher une commande de
+          # construction qui n'existe pas.
+          build-mode: none
+          queries: security-extended
 
       - name: Analyser
         uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
