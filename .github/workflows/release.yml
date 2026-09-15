@@ -59,8 +59,15 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           PKG="kubernetes-dsoxlab-training-${VERSION}"
           # Contenu publié : le catalogue, le socle, le contrat, la
-          # gouvernance, et les mesures de validation, qui sont la preuve que
-          # chaque lab a été joué dans les deux sens.
+          # gouvernance DANS LES DEUX LANGUES, le verrou de dépendances, et les
+          # mesures de validation, qui sont la preuve que chaque lab a été joué
+          # dans les deux sens.
+          #
+          # `uv.lock` accompagne `pyproject.toml` : sans lui, une contrainte
+          # `>=` laisse chaque installation résoudre ce qu'elle veut, et une
+          # archive qui prétend embarquer de quoi se valider ne dirait pas avec
+          # QUOI. Les .fr.md ne sont pas décoratifs non plus : l'archive est ce
+          # que reçoit quelqu'un qui n'a pas le dépôt.
           #
           # Exclus : le pilotage local, le généré, le VCS. `.claude/`, `todo/`
           # et `CLAUDE.md` ne sont de toute façon pas versionnés (voir
@@ -79,10 +86,13 @@ jobs:
               --exclude=".dsoxlab-context.json" \
               --exclude=".dsoxlab.db" \
               -czf "${PKG}.tar.gz" \
-              labs shared meta.yml conftest.py pyproject.toml requirements.yml \
-              scripts tests validation-labs.json ssh \
-              README.md LICENSE CONTRIBUTING.md CODE_OF_CONDUCT.md \
-              SECURITY.md CHANGELOG.md
+              labs shared meta.yml conftest.py pyproject.toml uv.lock \
+              requirements.yml scripts tests validation-labs.json ssh \
+              README.md README.fr.md LICENSE \
+              CONTRIBUTING.md CONTRIBUTING.fr.md \
+              CODE_OF_CONDUCT.md CODE_OF_CONDUCT.fr.md \
+              SECURITY.md SECURITY.fr.md \
+              CHANGELOG.md CHANGELOG.fr.md
           sha256sum "${PKG}.tar.gz" > "${PKG}.tar.gz.sha256"
           # L'empreinte nue, pour la passer au workflow d'attestation : il
           # signe une empreinte, pas un fichier, et n'a donc jamais l'archive
