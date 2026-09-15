@@ -1,0 +1,6 @@
+title: "Un Pod bloqué par un ConfigMap qui n'existe pas"
+description: |
+  Un Pod ne démarre pas et ne dit rien dans ses logs, parce qu'il n'a pas
+  encore de conteneur : ce sont ses events qui parlent. Lire la cause,
+  créer la ressource manquante avec le contenu attendu, et prouver que
+  l'application sert.

@@ -1,24 +1,24 @@
-# Réparer un kubelet qui refuse de démarrer
+# Repair a kubelet that refuses to start
 
-Lab **CKA**, domaine *Troubleshooting* (30 % de l'épreuve), compétences
-« Troubleshoot clusters and nodes » et « Troubleshoot cluster components ».
+**CKA** lab, *Troubleshooting* domain (30 % of the exam), competencies
+"Troubleshoot clusters and nodes" and "Troubleshoot cluster components".
 
-Ce lab existe parce que la formation **ne peut pas le prouver sur kind** : un
-kubelet est un service systemd, son journal est celui d'une vraie machine, et
-sa configuration est celle que `kubeadm` a écrite. La vague 1 du backlog le
-réclamait sous le nom `cka-reparer-un-kubelet`.
+This lab exists because the training **cannot prove it on kind**: a kubelet is
+a systemd service, its journal is that of a real machine, and its configuration
+is the one `kubeadm` wrote. Wave 1 of the backlog asked for it under the name
+`cka-reparer-un-kubelet`.
 
 | | |
 |---|---|
-| Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer une panne du cluster](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
+| Duration | about 15 minutes |
+| Companion lesson | [Diagnosing a cluster failure](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-kubelet
 dsoxlab check cka-troubleshoot-kubelet
 ```
 
-Transposé de K8sExamLab le 2026-09-14, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-14, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

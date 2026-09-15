@@ -1,0 +1,7 @@
+title: "Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit"
+description: |
+  Sur un cluster sans provisionnement dynamique, créer un PersistentVolume
+  sur le disque d'un nœud, le réclamer par un PersistentVolumeClaim, le
+  monter dans un Pod qui y écrit. Les tests lisent le volume, la liaison,
+  le montage, le fichier dans le Pod, puis le même fichier sur le disque du
+  nœud : c'est là que se prouve la persistance.

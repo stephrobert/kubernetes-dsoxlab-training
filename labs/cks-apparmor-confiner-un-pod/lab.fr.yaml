@@ -1,0 +1,5 @@
+title: "Confiner un Pod avec un profil AppArmor"
+description: |
+  Charger un profil AppArmor sur le nœud, l'appliquer à un conteneur par le
+  champ securityContext, et prouver que le confinement agit en constatant
+  l'échec d'une écriture que le profil interdit.

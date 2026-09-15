@@ -1,45 +1,44 @@
-# Rétablir le trafic vers un Service
+# Restore traffic to a Service
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, le Deployment **`web-app`** tourne en deux
-replicas, et chacun de ses Pods répond sur son port 80. Le Service
-**`web-svc`** doit les desservir, et pourtant rien ne passe : le Pod
-**`client`** du même namespace, qui l'interroge par son nom, n'obtient rien.
+In the **`lab`** namespace, the **`web-app`** Deployment runs two replicas, and
+each of its Pods answers on its port 80. The **`web-svc`** Service is supposed
+to serve them, and yet nothing gets through: the **`client`** Pod in the same
+namespace, which queries it by its name, gets nothing.
 
-Deux choses se sont produites depuis la dernière fois où ça marchait. Un
-collègue a « refait le Service ». Et l'équipe sécurité a posé une politique
-réseau **`block-all`**, qui ferme tout le trafic entrant du namespace. Cette
-politique est **voulue** : elle reste. À vous de rouvrir exactement ce qu'il
-faut, et rien de plus.
+Two things have happened since the last time it worked. A colleague "redid the
+Service". And the security team put in place a **`block-all`** network policy,
+which closes all incoming traffic in the namespace. That policy is
+**intended**: it stays. It is up to you to reopen exactly what is needed, and
+nothing more.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. `web-svc` a des **endpoints**, et ce sont les Pods de `web-app`.
+1. `web-svc` has **endpoints**, and they are the `web-app` Pods.
 
-2. `web-svc` transmet le trafic sur le **port où nginx écoute**.
+2. `web-svc` forwards traffic on the **port where nginx listens**.
 
-3. Une NetworkPolicy **`allow-web-ingress`** autorise le trafic entrant vers
-   les Pods **`app=web`** sur le **port 80**, depuis n'importe quelle source.
-   `block-all` est toujours là.
+3. An **`allow-web-ingress`** NetworkPolicy allows incoming traffic towards the
+   **`app=web`** Pods on **port 80**, from any source. `block-all` is still
+   there.
 
-4. Depuis le Pod `client`, `http://web-svc/` **répond**.
+4. From the `client` Pod, `http://web-svc/` **answers**.
 
-## Les repères utiles
+## Useful bearings
 
-Un Service n'est qu'un selector et des ports. Un Service sans endpoint, c'est
-un selector qui ne correspond aux labels d'aucun Pod. Des endpoints mais
-rien qui passe, c'est souvent un port. Tout est bon et toujours rien : une
-politique bloque.
+A Service is nothing but a selector and ports. A Service with no endpoint is a
+selector that matches no Pod's labels. Endpoints but nothing getting through is
+often a port. Everything correct and still nothing: a policy is blocking.
 
-Les NetworkPolicy s'additionnent : une politique qui ferme tout et une autre
-qui ouvre un port précis donnent un port ouvert. Rien n'oblige à retirer la
-première.
+NetworkPolicy rules add up: a policy that closes everything and another that
+opens a precise port give an open port. Nothing requires removing the first
+one.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les endpoints du Service, ses ports, les deux politiques, et
-ils font réellement une requête depuis le Pod `client`.
+The tests read the Service's endpoints, its ports, both policies, and they
+really make a request from the `client` Pod.
 
 ```bash
 dsoxlab check cka-troubleshoot-networking

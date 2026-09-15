@@ -1,46 +1,44 @@
-# Durcir un Pod avec un securityContext
+# Harden a Pod with a securityContext
 
-## La situation
+## The situation
 
-L'équipe sécurité a fixé la règle pour tout ce qui tourne dans le namespace
-**`lab`** : pas de root, pas d'escalade de privilèges, une racine en lecture
-seule, et aucune capability Linux. L'application à livrer est un serveur
-web, image **`nginxinc/nginx-unprivileged:1.27-alpine`**, qui écoute sur le
-port **8080**.
+The security team has set the rule for everything running in the **`lab`**
+namespace: no root, no privilege escalation, a read-only root filesystem,
+and no Linux capability. The application to deliver is a web server, image
+**`nginxinc/nginx-unprivileged:1.27-alpine`**, which listens on port
+**8080**.
 
-Ce serveur a besoin d'écrire quelque part pour démarrer. Avec une racine en
-lecture seule, il ne le peut plus, et il le dira dans ses logs. À vous de
-lui donner exactement les espaces d'écriture qu'il lui faut, et rien de
-plus.
+That server needs to write somewhere in order to start. With a read-only
+root filesystem it no longer can, and it will say so in its logs. It is up
+to you to give it exactly the writable spaces it needs, and nothing more.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Pod **`hardened`** dans `lab`, avec cette image, en **`Running`**.
+1. A Pod **`hardened`** in `lab`, with that image, **`Running`**.
 
-2. Le Pod tourne avec l'utilisateur **1000**, et refuse de tourner en root.
-   Le conteneur n'autorise **aucune escalade de privilèges**, sa racine est
-   en **lecture seule**, et il retire **toutes** les capabilities.
+2. The Pod runs as user **1000**, and refuses to run as root. The container
+   allows **no privilege escalation**, its root filesystem is
+   **read-only**, and it drops **all** the capabilities.
 
-3. Le serveur **répond** en HTTP sur son port 8080.
+3. The server **answers** over HTTP on its port 8080.
 
-4. De l'intérieur : le processus est bien l'utilisateur 1000, une écriture à
-   la racine est refusée, et l'application a bien ses espaces d'écriture.
+4. From the inside: the process really is user 1000, a write at the root is
+   denied, and the application really has its writable spaces.
 
-## Les repères utiles
+## Useful bearings
 
-Le `securityContext` existe à deux niveaux, et tous les champs ne sont pas
-acceptés aux deux. Ce qui concerne l'utilisateur se déclare au niveau du Pod
-ou du conteneur ; ce qui concerne le système de fichiers, l'escalade et les
-capabilities se déclare au niveau du conteneur.
+The `securityContext` exists at two levels, and not every field is accepted
+at both. What concerns the user is declared at the Pod level or at the
+container level; what concerns the filesystem, escalation and capabilities
+is declared at the container level.
 
-Un volume `emptyDir` est un espace d'écriture qui naît et meurt avec le Pod.
-Il se monte où on veut, y compris par-dessus un répertoire de l'image.
+An `emptyDir` volume is a writable space that is born and dies with the Pod.
+It mounts wherever you want, including on top of a directory of the image.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent la définition du Pod, entrent dans le conteneur pour
-vérifier l'utilisateur et tenter une écriture, et interrogent le serveur
-depuis le nœud.
+The tests read the Pod definition, enter the container to check the user and
+attempt a write, and query the server from the node.
 
 ```bash
 dsoxlab check ckad-security-context-hardened

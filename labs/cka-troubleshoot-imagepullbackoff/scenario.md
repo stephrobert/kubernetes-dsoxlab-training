@@ -1,40 +1,40 @@
-# Sortir un Pod de l'ImagePullBackOff
+# Get a Pod out of ImagePullBackOff
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, le Pod **`broken-pod`** ne démarre plus depuis
-la dernière mise à jour. L'équipe voulait passer sur la **variante Alpine de
-nginx 1.27**, plus légère, et affirme que l'image existe sur le Docker Hub.
-Pourtant `kubectl get pods` montre le Pod tantôt en `ErrImagePull`, tantôt en
-`ImagePullBackOff`, jamais en `Running`.
+In the **`lab`** namespace, the **`broken-pod`** Pod has not started since the
+last update. The team wanted to move to the **Alpine variant of nginx 1.27**,
+which is lighter, and claims the image exists on Docker Hub. Yet
+`kubectl get pods` shows the Pod sometimes in `ErrImagePull`, sometimes in
+`ImagePullBackOff`, never in `Running`.
 
-Le nœud a accès à Internet, et d'autres images se téléchargent sans problème.
-Le défaut est dans ce que le Pod demande, pas dans ce que le nœud peut faire.
+The node has Internet access, and other images download without trouble. The
+fault is in what the Pod asks for, not in what the node can do.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le Pod `broken-pod` **tourne**, conteneur prêt.
+1. The `broken-pod` Pod is **running**, container ready.
 
-2. Son image est une image **nginx publique**, celle que l'équipe voulait,
-   et elle a été réellement téléchargée sur le nœud.
+2. Its image is a **public nginx image**, the one the team wanted, and it has
+   really been downloaded onto the node.
 
-3. Le serveur **répond en HTTP** : la page d'accueil de nginx est servie.
+3. The server **answers over HTTP**: the nginx welcome page is served.
 
-## Les repères utiles
+## Useful bearings
 
-`ImagePullBackOff` et `ErrImagePull` sont deux faces du même problème : le
-runtime a essayé de télécharger l'image, a échoué, et le kubelet espace ses
-tentatives. Le message **exact** du runtime, celui qui dit si c'est le
-registre, le nom ou le tag qui cloche, n'est pas dans le statut du Pod : il est
-dans ses events.
+`ImagePullBackOff` and `ErrImagePull` are two faces of the same problem: the
+runtime tried to download the image, failed, and the kubelet spaces out its
+attempts. The runtime's **exact** message, the one that says whether the
+registry, the name or the tag is at fault, is not in the Pod's status: it is in
+its events.
 
-Un Pod nu accepte qu'on change son image en place ; le supprimer et le
-recréer est aussi une réponse valable, tant que le résultat porte le même nom.
+A bare Pod allows its image to be changed in place; deleting it and recreating
+it is just as valid an answer, as long as the result carries the same name.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent l'état du Pod, l'image que le runtime a réellement tirée, et
-ils interrogent le serveur depuis le nœud.
+The tests read the state of the Pod, the image the runtime really pulled, and
+they query the server from the node.
 
 ```bash
 dsoxlab check cka-troubleshoot-imagepullbackoff

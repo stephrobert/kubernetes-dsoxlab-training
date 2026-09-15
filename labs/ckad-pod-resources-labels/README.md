@@ -1,24 +1,24 @@
-# Un Pod à deux conteneurs, avec budgets, labels et annotation
+# A two-container Pod, with budgets, labels and an annotation
 
-Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
-compétences « Define, build and modify container images » et « Understand
-multi-container Pod design patterns ».
+**CKAD** lab, *Application Design and Build* domain (20 % of the exam),
+competencies "Define, build and modify container images" and "Understand
+multi-container Pod design patterns".
 
-Le geste de base du CKAD, écrit à la main : deux conteneurs, leurs
-`resources`, des labels, une annotation. Le dernier test lit la limite de
-mémoire dans le cgroup du conteneur, là où le noyau l'applique.
+The basic CKAD gesture, written by hand: two containers, their `resources`,
+labels, an annotation. The last test reads the memory limit in the
+container's cgroup, where the kernel enforces it.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Requests et Limits](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [Requests and Limits](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
 
 ```bash
 dsoxlab run   ckad-pod-resources-labels
 dsoxlab check ckad-pod-resources-labels
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

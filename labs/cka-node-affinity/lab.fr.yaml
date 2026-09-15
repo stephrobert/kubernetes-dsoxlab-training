@@ -1,0 +1,7 @@
+title: "Placer avec nodeAffinity : contrainte obligatoire et préférence"
+description: |
+  Placer un Deployment par une affinité de nœud obligatoire sur un label à
+  plusieurs valeurs, y ajouter une préférence pondérée, puis débloquer un
+  Pod qui attend un nœud qui n'existe pas encore en posant le label qu'il
+  exige. Les tests lisent les labels des nœuds, les affinités déclarées et
+  le nœud réel de chaque Pod.

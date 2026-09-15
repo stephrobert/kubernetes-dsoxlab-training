@@ -1,10 +1,10 @@
 id: cks-apparmor-confiner-un-pod
-title: "Confiner un Pod avec un profil AppArmor"
+title: "Confine a Pod with an AppArmor profile"
 level: system-hardening
 description: |
-  Charger un profil AppArmor sur le nœud, l'appliquer à un conteneur par le
-  champ securityContext, et prouver que le confinement agit en constatant
-  l'échec d'une écriture que le profil interdit.
+  Load an AppArmor profile on the node, apply it to a container through the
+  securityContext field, and prove that the confinement holds by watching a
+  write the profile forbids fail.
 skills:
   - apparmor
   - securitycontext

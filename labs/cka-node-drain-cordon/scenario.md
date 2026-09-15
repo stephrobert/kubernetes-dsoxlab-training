@@ -1,51 +1,49 @@
-# Vider un worker pour une maintenance, sans couper le service
+# Drain a worker for maintenance, without cutting the service
 
-## La situation
+## The situation
 
-Le worker **`k8s-w1.lab`** doit recevoir une mise à jour de noyau ce soir,
-avec redémarrage. L'application **`web`**, dans le namespace **`lab`**,
-tourne en quatre replicas répartis sur les deux nœuds, et le service ne doit
-pas être interrompu pendant l'opération.
+The worker **`k8s-w1.lab`** is due for a kernel update tonight, with a
+reboot. The **`web`** application, in the **`lab`** namespace, runs four
+replicas spread over the two nodes, and the service must not be interrupted
+during the operation.
 
-Un Pod hors de tout contrôleur, **`outil-diag`**, traîne aussi sur ce
-worker : un collègue l'a lancé à la main la semaine dernière et il peut
-disparaître.
+A Pod outside any controller, **`outil-diag`**, is also lying around on that
+worker: a colleague started it by hand last week and it can disappear.
 
-Vous êtes sur le control plane, avec `kubectl` configuré.
+You are on the control plane, with `kubectl` configured.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un **PodDisruptionBudget** nommé **`web-pdb`**, dans le namespace `lab`,
-   qui garantit qu'**au moins deux** Pods de `web` restent disponibles à tout
-   moment. Il doit viser les Pods de l'application, pas un label inventé.
+1. A **PodDisruptionBudget** named **`web-pdb`**, in the `lab` namespace,
+   guaranteeing that **at least two** Pods of `web` stay available at all
+   times. It must target the application's Pods, not a made-up label.
 
-2. Le worker `k8s-w1.lab` **retiré du scheduling puis évacué** de tous les
-   Pods qui peuvent l'être : ceux de `web` sont recréés sur l'autre nœud,
-   `outil-diag` est supprimé, et le DaemonSet du réseau, lui, reste en place.
+2. The worker `k8s-w1.lab` **taken out of scheduling and then evicted** of
+   every Pod that can be: those of `web` are recreated on the other node,
+   `outil-diag` is deleted, and the network DaemonSet stays in place.
 
-3. La maintenance faite, le worker **remis en service** : il accepte de
-   nouveau des Pods.
+3. Once the maintenance is done, the worker **back in service**: it accepts
+   Pods again.
 
-4. Un ConfigMap **`drain-evidence`** dans `lab`, avec deux clés :
-   `drained-node` qui vaut le nom du nœud vidé, et `status` qui vaut
-   `completed`.
+4. A ConfigMap **`drain-evidence`** in `lab`, with two keys: `drained-node`
+   holding the name of the drained node, and `status` holding `completed`.
 
-## Les repères utiles
+## Useful bearings
 
-Retirer un nœud du scheduling et l'évacuer sont deux gestes distincts, et
-l'ordre compte. L'évacuation passe par l'API d'éviction, qui respecte les
-budgets de disruption : c'est ce qui rend l'opération sûre, et c'est aussi
-ce qui la fait attendre quand le budget est atteint.
+Taking a node out of scheduling and evicting it are two distinct gestures,
+and the order matters. Eviction goes through the eviction API, which honours
+disruption budgets: that is what makes the operation safe, and it is also
+what makes it wait when the budget is reached.
 
-L'évacuation refuse par défaut ce qu'elle ne saurait pas recréer : les Pods
-gérés par un DaemonSet, ceux qui n'ont aucun contrôleur, et ceux qui
-portent des volumes `emptyDir`. Chacun de ces refus a son option, et la
-consigne dit ce qu'il faut en faire.
+By default, eviction refuses what it would not know how to recreate: Pods
+managed by a DaemonSet, those with no controller at all, and those carrying
+`emptyDir` volumes. Each of these refusals has its own option, and the brief
+says what to do about it.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le budget et son état, la date de création de chaque Pod
-de `web` et le nœud qui le porte, l'état du worker, et le ConfigMap.
+The tests read the budget and its status, the creation time of each `web`
+Pod and the node carrying it, the state of the worker, and the ConfigMap.
 
 ```bash
 dsoxlab check cka-node-drain-cordon

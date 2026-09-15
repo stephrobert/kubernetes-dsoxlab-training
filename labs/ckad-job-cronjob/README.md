@@ -1,23 +1,22 @@
-# Un Job à complétions parallèles et un CronJob
+# A Job with parallel completions, and a CronJob
 
-Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
-compétence « Understand Jobs and CronJobs ».
+**CKAD** lab, *Application Design and Build* domain (20 % of the exam),
+competency "Understand Jobs and CronJobs".
 
-Le lab hérité ne lisait que le spec du Job. Celui-ci lit aussi les
-horodatages de ses Pods, pour prouver que deux exécutions ont réellement
-tourné en même temps.
+The inherited lab only read the Job spec. This one also reads the timestamps
+of its Pods, to prove that two runs really were running at the same time.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Les Jobs et CronJobs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Jobs and CronJobs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/) |
 
 ```bash
 dsoxlab run   ckad-job-cronjob
 dsoxlab check ckad-job-cronjob
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

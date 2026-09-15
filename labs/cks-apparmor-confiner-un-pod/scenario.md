@@ -1,56 +1,55 @@
-# Confiner un Pod avec un profil AppArmor
+# Confine a Pod with an AppArmor profile
 
-## La situation
+## The situation
 
-Vous administrez un cluster sur lequel une équipe déploie un conteneur dont
-vous ne maîtrisez pas le code. Vous voulez qu'il tourne, mais qu'il lui soit
-**impossible d'écrire dans `/tmp`**, quoi que fasse le programme à l'intérieur.
+You administer a cluster on which a team deploys a container whose code you
+do not control. You want it to run, but you want it to be **impossible for
+it to write in `/tmp`**, whatever the program inside does.
 
-Un `securityContext` classique ne répond pas à cette demande : il sait retirer
-des capacités, forcer un utilisateur non root, rendre la racine en lecture
-seule, mais il ne sait pas dire « ce processus n'écrira jamais dans ce
-répertoire précis ». C'est le travail d'**AppArmor**, un module de sécurité du
-noyau Linux.
+A plain `securityContext` does not answer that demand: it knows how to drop
+capabilities, force a non-root user, make the root filesystem read-only, but
+it does not know how to say "this process will never write in that precise
+directory". That is the job of **AppArmor**, a security module of the Linux
+kernel.
 
-Le profil est déjà déposé sur le control plane **`k8s-cp.lab`**, dans
-`/etc/apparmor.d/k8s-refuser-ecriture`, et nulle part ailleurs. Il n'est
-**pas chargé** : un fichier de profil posé sur le disque ne confine rien tant
-que le noyau ne l'a pas lu. Et un profil chargé sur un nœud ne vaut que sur
-ce nœud : le Pod devra tourner là où le profil est.
+The profile is already dropped on the control plane **`k8s-cp.lab`**, in
+`/etc/apparmor.d/k8s-refuser-ecriture`, and nowhere else. It is **not
+loaded**: a profile file sitting on disk confines nothing as long as the
+kernel has not read it. And a profile loaded on one node counts only on that
+node: the Pod will have to run where the profile is.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le profil **`k8s-refuser-ecriture` est chargé** dans le noyau du nœud, en
-   mode **enforce** et non en mode `complain`.
+1. The profile **`k8s-refuser-ecriture` is loaded** in the node's kernel, in
+   **enforce** mode and not in `complain` mode.
 
-2. Un Pod nommé **`confine`** tourne dans le namespace **`confinement`**, sur
-   le nœud où le profil est chargé, et son conteneur est **confiné par ce
-   profil**.
+2. A Pod named **`confine`** runs in the namespace **`confinement`**, on the
+   node where the profile is loaded, and its container is **confined by that
+   profile**.
 
-3. Le confinement est **effectif** : une écriture dans `/tmp` depuis ce
-   conteneur est refusée, alors que la lecture du système de fichiers
-   fonctionne normalement.
+3. The confinement is **effective**: a write in `/tmp` from that container
+   is denied, while reading the filesystem works normally.
 
-## Les repères utiles
+## Useful bearings
 
-Sur le nœud, `aa-status` liste les profils chargés et leur mode. Un profil se
-charge avec `apparmor_parser`, et le drapeau qui vous intéresse est celui qui
-remplace un profil déjà présent.
+On the node, `aa-status` lists the loaded profiles and their mode. A profile
+is loaded with `apparmor_parser`, and the flag you are interested in is the
+one that replaces an already present profile.
 
-Côté Kubernetes, le rattachement d'un profil à un conteneur se déclare **dans
-le `securityContext`** depuis la 1.30. L'annotation `container.apparmor.
-security.beta.kubernetes.io/<conteneur>` fonctionne encore mais elle est
-obsolète, et l'examen attend la forme moderne.
+On the Kubernetes side, attaching a profile to a container is declared **in
+the `securityContext`** since 1.30. The annotation
+`container.apparmor.security.beta.kubernetes.io/<container>` still works but
+it is deprecated, and the exam expects the modern form.
 
-Le nom du profil déclaré côté Kubernetes doit correspondre **exactement** à
-celui que le noyau connaît, qui n'est pas le nom du fichier mais celui écrit
-après le mot `profile` dans le fichier.
+The profile name declared on the Kubernetes side must match **exactly** the
+one the kernel knows, which is not the file name but the one written after
+the word `profile` in the file.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Le test vérifie l'état du **système**, pas les commandes que vous avez tapées :
-il lit les profils chargés sur le nœud, la définition du Pod, et il tente
-réellement une écriture dans le conteneur pour constater qu'elle est refusée.
+The test checks the state of the **system**, not the commands you typed: it
+reads the profiles loaded on the node, the Pod definition, and it really
+attempts a write in the container to see it denied.
 
 ```bash
 dsoxlab check cks-apparmor-confiner-un-pod

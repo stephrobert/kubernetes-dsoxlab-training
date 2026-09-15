@@ -1,115 +1,134 @@
-# Journal des modifications
+# Changelog
 
-Tous les changements notables de ce projet sont consignés dans ce fichier. Le
-format s'appuie sur [Keep a Changelog](https://keepachangelog.com/), et le
-projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
+**Language:** [English](./CHANGELOG.md) · [Français](./CHANGELOG.fr.md)
 
-## [Non publié]
+All notable changes to this project are documented in this file. The format is
+based on [Keep a Changelog](https://keepachangelog.com/), and the project
+follows [semantic versioning](https://semver.org/).
 
-### Changé, la provenance passe au niveau SLSA 3
+## [Unreleased]
 
-Le workflow de release attestait depuis son job de build, ce qui donne le
-**niveau 2** : le processus qui fabrique l'archive était aussi celui qui signait
-ce qu'il en disait. Le badge, lui, annonçait 3 dans le dépôt Linux jumeau, et
-2 ici depuis la mise en conformité. Les deux disent maintenant 3, et le
-workflow le produit.
+### Changed, the catalogue speaks two languages
 
-- **`.github/workflows/attester.yml`**, workflow réutilisable, est désormais le
-  seul du dépôt à recevoir `attestations: write`. Il ne fait aucun `checkout`,
-  ne reçoit qu'un nom et une empreinte, et n'exécute aucun code du dépôt.
-- **`release.yml` est découpé en trois jobs** : construire, attester, publier.
-  Le job de publication écrit la release mais ne peut pas attester, faute de la
-  permission. L'archive est recomparée à son empreinte avant publication, pour
-  qu'un artefact altéré entre deux jobs ne parte pas avec une provenance qui ne
-  le décrit pas.
-- **Deux linters en désaccord, tranché avec une raison.** zizmor recommande la
-  forme `uses: $/...`, disponible sur github.com depuis juillet 2026 ;
-  actionlint 1.7.12, publié en mars, la rejette encore comme un format
-  invalide. La forme `$/` gagne sur le fond, puisqu'elle ne dépend pas de
-  l'état du système de fichiers et ne peut donc pas charger un fichier qu'une
-  étape précédente aurait déposé. L'exception actionlint est limitée à ce
-  message et à ce fichier, datée, et vérifiée ciblée en fabriquant une autre
-  faute dans le même fichier : la règle l'attrape toujours.
+Everything the learner reads now exists in English and in French, English being
+the file without a suffix, as in the sibling Linux catalogue. That covers the
+lab titles and descriptions (`lab.yaml` / `lab.fr.yaml`), the situations
+(`scenario.md` / `scenario.fr.md`), the fact sheets (`README.md` /
+`README.fr.md`) and the governance documents. The hints were already bilingual,
+carrying `text_en` and `text_fr` side by side.
 
-La vérification qui prouve le niveau est dans `RELEASING.md` : elle nomme le
-workflow signataire, et échoue si la provenance vient d'ailleurs.
+`dsoxlab validate-structure` reports `content_missing_english` for a document
+translated on one side only: a half-translated lab does not pass.
 
-### Ajouté, la chaîne d'un dépôt public
+Two things stay in French and it is deliberate: the **assertion messages** of
+the tests, and the **comments** in playbooks and scripts. The sibling Linux
+catalogue keeps its assertion messages in French too.
 
-Le dépôt portait un catalogue et rien autour. Il reprend maintenant ce que le
-catalogue Linux jumeau a éprouvé, adapté à Kubernetes et au français.
+### Changed, provenance reaches SLSA level 3
 
-- **Intégration continue** (`.github/workflows/ci.yml`), six barrières. zizmor
-  analyse les workflows, actionlint les vérifie et passe chaque bloc `run:` au
-  shellcheck, poutine cherche les chaînes d'exploitation CI/CD, CodeQL lit le
-  Python, un job de parité rejoue **tous** les hooks pre-commit, et un dernier
-  vérifie le contrat du catalogue avec le réseau.
-  - Chaque action est épinglée par SHA de commit complet, et les dix SHA repris
-    du dépôt Linux ont été **vérifiés un par un** contre le tag qu'ils
-    annoncent avant d'être écrits ici. Copier un épinglage sans le vérifier,
-    c'est faire confiance au presse-papier.
-  - Le job de parité installe `ansible-core`. Sans `ansible-playbook` sur le
-    PATH, le contrôle de syntaxe des playbooks se met en `skip` : le job serait
-    resté vert en n'ayant rien vérifié.
-  - Le contrôle des leçons jumelées passe par
-    `dsoxlab validate-structure --check-urls`, et n'est câblé en aucun hook : un
-    commit hors ligne ne doit pas échouer, et une indisponibilité du blog n'a
-    rien à voir avec la justesse d'un lab.
-- **Six vérificateurs de catalogue** (`tests/`), câblés en pre-commit. Chacun a
-  été éprouvé en fabriquant le défaut qu'il vise, sur un lab factice : les neuf
-  défauts fabriqués sont tous attrapés.
-  - `test_pieges_du_depot.py` couvre les quatre pièges que ce dépôt a payés au
-    moins une fois : un `ssh` sans `-n` dans une solution lue par `bash -s`, un
-    `prepare.sh` qui ne trace pas sur le nœud, un `setup.yaml` qui n'installe
-    pas le socle, un namespace créé mais jamais supprimé.
-  - `test_indices.py` refuse un indice en clair, une traduction qui n'en est pas
-    une (`text_fr` copie de l'anglais), et des coûts qui ne croissent pas.
-  - `test_style_apprenant.py` refuse emoji et tiret cadratin dans ce que
-    l'apprenant lit, indices décodés compris.
-  - `test_collections_declarees.py` inclut `shared/` dans son périmètre : le
-    socle porte le seul appel à une collection externe du dépôt, et l'oublier
-    n'aurait contrôlé que la moitié du catalogue.
-  - `test_playbooks_syntaxe.py` charge aussi le socle pour lui-même : il arrive
-    par `include_tasks`, qu'Ansible ne résout qu'à l'exécution, donc aucun
-    `setup.yaml` ne le vérifie.
-  - `test_outillage_coherent.py` refuse qu'un vérificateur existe sans être
-    câblé : un test débranché ne protège plus rien, en silence.
-- **Aucun de ces tests ne refait ce que le moteur rend déjà.** `dsoxlab
-  validate-structure` vérifie les liens relatifs cassés, les fixtures déclarées
-  et la cohérence des cibles avec `meta.yml` : un second contrôle qui diverge du
-  premier est pire qu'aucun.
-- **Gouvernance** : `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
-  `RELEASING.md`, ce journal. En français seulement, contrairement au dépôt
-  Linux qui est bilingue : la formation que ce catalogue éprouve est en
-  français.
-- **Durcissement de la chaîne** : `.github/CODEOWNERS`, `dependabot.yml` groupé
-  par lot hebdomadaire avec un délai de décantation, `.poutine.yml`,
-  `.plumber.yaml`, workflows OpenSSF Scorecard et Plumber, et un workflow de
-  release qui publie un bundle `tar.gz` signé en keyless avec sa provenance
-  SLSA.
-- **Catalogue généré** (`scripts/gen_catalog.py`) : le README liste les labs par
-  certification, avec leur domaine de blueprint, leur leçon jumelée et la date
-  de leur dernière validation. Un catalogue écrit à la main se périme en
-  silence ; un hook `pre-push` refuse désormais un README périmé.
+The release workflow used to attest from its own build job, which yields
+**level 2**: the process that builds the archive was also the one signing what
+it said about it. The badge claimed 3 in the sibling Linux repository, and 2
+here. Both now say 3, and the workflow produces it.
 
-### Changé
+- `.github/workflows/attester.yml`, a reusable workflow, is now the only one in
+  the repository granted `attestations: write`. It performs no `checkout`,
+  receives only a name and a digest, and runs no repository code.
+- `release.yml` is split into three jobs: build, attest, publish. The publish
+  job writes the release but cannot attest, lacking the permission. The archive
+  is re-checked against its digest before publication, so that an artifact
+  altered between two jobs does not go out with provenance that does not
+  describe it.
+- **Two linters disagreed, and the tie was broken on the merits.** zizmor
+  recommends the `uses: $/...` form, available on github.com since July 2026;
+  actionlint 1.7.12, released in March, still rejects it as an invalid format.
+  `$/` wins because it does not depend on the runtime filesystem state and so
+  cannot load a file a previous step dropped in place. The actionlint exception
+  is scoped to that one message in that one file, dated, and verified narrow by
+  planting another fault in the same file: the rule still catches it.
+- **The zizmor version pinned in the CI had to move too.** 1.26.1 refuses to
+  load a workflow using `$/` and answers `fatal: no audit was performed`, so it
+  was auditing nothing at all. 1.30.1, the latest published, is refused by the
+  action itself with `Unknown version`: the action embeds its own table of known
+  versions, which stops at the last one published before its own release. The
+  CI now runs 1.30.0, the most recent the action accepts.
 
-- **`CLAUDE.md` et `todo/` ne sont plus versionnés**, comme dans le dépôt Linux
-  jumeau : c'est du pilotage local. La doctrine que `CLAUDE.md` portait et dont
-  un contributeur a besoin est passée dans `CONTRIBUTING.md`, qui est publié.
+The check that proves the level is in `RELEASING.md`: it names the signing
+workflow and fails if the provenance came from anywhere else.
 
-### Ajouté, le catalogue
+### Added, the chain of a public repository
 
-- **37 labs transposés de K8sExamLab et validés**, chacun joué dans les deux
-  sens sur un cluster kubeadm 1.37 à deux nœuds : 0 avant le travail, 100 après
-  la solution du formateur, rejouable, et sans laisser de trace sur le cluster.
-  Le jalon CKAD est complet. Les mesures sont dans `validation-labs.json`.
-- **`scripts/valider-labs.py`**, qui rend ce verdict. Il photographie le
-  cluster, joue le cycle complet, puis compare : un lab qui laisse un namespace,
-  un `ClusterRole` ou un taint derrière lui est ROUGE, parce que c'est le lab
-  suivant qui en paierait le prix. Le validateur a lui-même été éprouvé dans les
-  deux sens, sur un `cleanup.yaml` privé de sa suppression de namespace.
-- **Le socle à deux nœuds** (`shared/kubeadm-cluster.yml`) : le control plane,
-  puis chaque worker déclaré dans `meta.yml`, préparé et joint par délégation.
-  Calico remplace Flannel, qui n'applique pas les NetworkPolicy et rendait
-  invérifiables quatre labs.
+The repository carried a catalogue and nothing around it. It now takes up what
+the sibling Linux catalogue proved out, adapted to Kubernetes.
+
+- **Continuous integration** (`.github/workflows/ci.yml`), six gates. zizmor
+  analyses the workflows, actionlint checks them and runs shellcheck over every
+  `run:` block, poutine looks for CI/CD exploit chains, CodeQL reads the Python,
+  a parity job replays **every** pre-commit hook, and a last one checks the
+  catalogue contract with the network.
+  - Every action is pinned to a full commit SHA, and the ten SHAs taken from the
+    Linux repository were **verified one by one** against the tag they claim
+    before being written here. Copying a pin without checking it is trusting the
+    clipboard.
+  - The parity job installs `ansible-core`. Without `ansible-playbook` on the
+    PATH, the playbook syntax check turns into a `skip`: the job would have
+    stayed green having checked nothing.
+  - The companion-lesson check goes through
+    `dsoxlab validate-structure --check-urls`, and is wired into no hook: an
+    offline commit must not fail, and the blog being down has nothing to do with
+    whether a lab is correct.
+- **Six catalogue checkers** (`tests/`), wired into pre-commit. Each was proven
+  by planting the defect it targets on a decoy lab: all nine planted defects are
+  caught.
+  - `test_pieges_du_depot.py` covers the four traps this repository has paid for
+    at least once: an `ssh` without `-n` in a solution read by `bash -s`, a
+    `prepare.sh` that does not log on the node, a `setup.yaml` that does not
+    install the foundation, a namespace created but never deleted.
+  - `test_indices.py` refuses a plaintext hint, a translation that is not one
+    (`text_fr` a copy of the English), and costs that do not increase.
+  - `test_style_apprenant.py` refuses emoji and em dashes in what the learner
+    reads, decoded hints included.
+  - `test_collections_declarees.py` includes `shared/` in its scope: the
+    foundation carries the repository's only call to an external collection, and
+    leaving it out would have checked half the catalogue.
+  - `test_playbooks_syntaxe.py` also loads the foundation for itself: it arrives
+    through `include_tasks`, which Ansible only resolves at run time, so no
+    `setup.yaml` checks it.
+  - `test_outillage_coherent.py` refuses a checker that exists without being
+    wired: an unplugged test protects nothing, silently.
+- **None of these tests redo what the engine already provides.** `dsoxlab
+  validate-structure` checks broken relative links, declared fixtures and target
+  consistency with `meta.yml`: a second check that drifts from the first is
+  worse than none.
+- **Governance**: `CONTRIBUTING`, `SECURITY`, `CODE_OF_CONDUCT`, `RELEASING`,
+  this changelog.
+- **Supply-chain hardening**: `.github/CODEOWNERS`, a `dependabot.yml` grouped
+  into a weekly batch with a cooldown, `.poutine.yml`, `.plumber.yaml`, the
+  OpenSSF Scorecard and Plumber workflows, and a release workflow that publishes
+  a keyless-signed `tar.gz` bundle with its SLSA provenance.
+- **Generated catalogue** (`scripts/gen_catalog.py`): the README lists the labs
+  by certification, with their blueprint domain, their companion lesson and the
+  date of their last validation. A hand-written catalogue goes stale in silence;
+  a `pre-push` hook now refuses a stale README.
+
+### Changed
+
+- **`CLAUDE.md` and `todo/` are no longer versioned**, as in the sibling Linux
+  repository: they are local steering. The doctrine `CLAUDE.md` carried, and
+  that a contributor needs, moved into `CONTRIBUTING.md`, which is published.
+
+### Added, the catalogue
+
+- **37 labs ported from K8sExamLab and validated**, each played in both
+  directions on a two-node kubeadm 1.37 cluster: 0 before the work, 100 after
+  the trainer's solution, replayable, and leaving no trace on the cluster. The
+  CKAD milestone is complete. The measurements are in `validation-labs.json`.
+- **`scripts/valider-labs.py`**, which delivers that verdict. It photographs the
+  cluster, plays the full cycle, then compares: a lab that leaves a namespace, a
+  `ClusterRole` or a taint behind is RED, because it is the next lab that would
+  pay for it. The validator was itself proven in both directions, on a
+  `cleanup.yaml` stripped of its namespace deletion.
+- **The two-node foundation** (`shared/kubeadm-cluster.yml`): the control plane,
+  then every worker declared in `meta.yml`, prepared and joined by delegation.
+  Calico replaces Flannel, which does not enforce NetworkPolicies and left four
+  labs unverifiable.

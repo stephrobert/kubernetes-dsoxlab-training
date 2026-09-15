@@ -1,0 +1,6 @@
+title: "Un Job à complétions parallèles et un CronJob"
+description: |
+  Exécuter un traitement quatre fois, deux à la fois, avec un Job, et
+  prouver que les exécutions se sont bien chevauchées. Puis planifier un
+  nettoyage toutes les cinq minutes avec un CronJob qui garde un historique
+  borné.

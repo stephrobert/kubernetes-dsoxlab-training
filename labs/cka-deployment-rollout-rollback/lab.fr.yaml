@@ -1,0 +1,7 @@
+title: "Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version"
+description: |
+  Une mise à jour est partie avec un nom d'image faux et le déploiement est
+  bloqué. Revenir à la révision qui marchait par l'historique du Deployment,
+  puis livrer l'image correcte avec une cause de changement. Les tests
+  lisent les ReplicaSets et leurs numéros de révision : ils racontent ce qui
+  s'est passé, et un Deployment recréé de zéro ne raconte rien.

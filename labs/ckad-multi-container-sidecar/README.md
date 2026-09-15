@@ -1,23 +1,23 @@
-# Un sidecar natif qui suit les logs de l'application
+# A native sidecar that tails the application logs
 
-Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
-compétence « Understand multi-container Pod design patterns ».
+**CKAD** lab, *Application Design and Build* domain (20 % of the exam),
+competency "Understand multi-container Pod design patterns".
 
-Le sidecar natif, init container à `restartPolicy: Always`, est stable
-depuis la 1.33 : c'est la forme que l'examen attend, et ce lab refuse le
-second conteneur ordinaire qui la remplaçait avant.
+The native sidecar, an init container with `restartPolicy: Always`, has been
+stable since 1.33: it is the form the exam expects, and this lab rejects the
+plain second container that used to stand in for it.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Init Containers et Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Init Containers and Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
 
 ```bash
 dsoxlab run   ckad-multi-container-sidecar
 dsoxlab check ckad-multi-container-sidecar
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

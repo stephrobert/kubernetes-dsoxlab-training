@@ -1,11 +1,11 @@
 id: ckad-probes-all-types
-title: "Trois sondes sur un Pod : startup, liveness, readiness"
+title: "Three probes on one Pod: startup, liveness, readiness"
 level: application-observability
 description: |
-  Équiper une application des trois sondes, avec des réglages qui ont un
-  sens : un démarrage lent toléré, une vivacité surveillée, un trafic
-  qui n'arrive qu'une fois prête. Prouver que les sondes agissent : le Pod
-  n'est Ready que parce qu'elles répondent.
+  Fit an application with all three probes, with settings that make sense:
+  a slow start tolerated, liveness watched, traffic that only arrives once
+  the Pod is ready. Prove the probes act: the Pod is Ready only because
+  they answer.
 skills:
   - probes
   - liveness

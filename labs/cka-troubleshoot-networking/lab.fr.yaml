@@ -1,0 +1,6 @@
+title: "Rétablir le trafic vers un Service"
+description: |
+  Un Service ne dessert plus ses Pods : selector faux, port faux, et une
+  politique réseau qui ferme tout. Remettre le Service d'aplomb, rouvrir
+  exactement ce qu'il faut sans retirer la politique de sécurité, et prouver
+  qu'un client joint le Service par son nom.

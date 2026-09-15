@@ -1,42 +1,42 @@
-# Réserver un nœud : taint, tolérance et nodeSelector
+# Reserve a node: taint, toleration and nodeSelector
 
-## La situation
+## The situation
 
-Le worker **`k8s-w1.lab`** vient de recevoir des disques SSD, et l'équipe
-veut le **réserver à la production** : rien d'autre ne doit s'y planifier,
-et l'application de production doit y aller, et nulle part ailleurs.
+The worker **`k8s-w1.lab`** has just been fitted with SSD disks, and the
+team wants to **reserve it for production**: nothing else must be scheduled
+on it, and the production application must go there, and nowhere else.
 
-Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
-**`lab`** existe.
+You are on the control plane, with `kubectl` configured. The **`lab`**
+namespace exists.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le nœud `k8s-w1.lab` porte le taint **`env=prod:NoSchedule`** et le
+1. The node `k8s-w1.lab` carries the taint **`env=prod:NoSchedule`** and the
    label **`disktype=ssd`**.
 
-2. Un Pod **`prod-app`** dans `lab`, image `nginx:1.27-alpine`, qui
-   **tolère** ce taint et **exige** un nœud `disktype=ssd`. Il tourne sur
-   `k8s-w1.lab`.
+2. A Pod **`prod-app`** in `lab`, image `nginx:1.27-alpine`, that
+   **tolerates** this taint and **requires** a `disktype=ssd` node. It runs
+   on `k8s-w1.lab`.
 
-3. Un Pod **`dev-app`** dans `lab`, même image, sans tolérance ni
-   sélecteur. Il tourne, mais **pas** sur `k8s-w1.lab`.
+3. A Pod **`dev-app`** in `lab`, same image, with neither toleration nor
+   selector. It runs, but **not** on `k8s-w1.lab`.
 
-## Les repères utiles
+## Useful bearings
 
-Un taint et une tolérance ne font que **permettre** : un Pod qui tolère un
-taint peut aller sur ce nœud, rien ne l'y oblige. Pour l'y **contraindre**,
-il faut en plus lui demander un nœud, par un `nodeSelector` sur un label.
-Les deux mécanismes se lisent dans le spec du Pod, et les tests les y
-cherchent : un Pod épinglé sur le nœud par `nodeName` saute le scheduler et
-le taint avec lui, ce n'est pas la réponse.
+A taint and a toleration only **allow**: a Pod that tolerates a taint may go
+on that node, nothing forces it to. To **constrain** it to go there, you
+also have to ask it for a node, through a `nodeSelector` on a label. Both
+mechanisms are read in the Pod spec, and the tests look for them there: a
+Pod pinned to the node with `nodeName` skips the scheduler, and the taint
+with it, which is not the answer.
 
-`kubectl describe node` montre les taints et les labels d'un nœud ;
-`kubectl get pods -o wide` montre où chaque Pod a atterri.
+`kubectl describe node` shows the taints and the labels of a node;
+`kubectl get pods -o wide` shows where each Pod landed.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les taints et les labels du nœud, le nœud réel de chaque
-Pod, et ce que le spec de `prod-app` déclare.
+The tests read the taints and the labels of the node, the actual node of
+each Pod, and what the `prod-app` spec declares.
 
 ```bash
 dsoxlab check cka-taints-tolerations-placement

@@ -1,10 +1,10 @@
 id: cka-troubleshoot-crashloopbackoff
-title: "Sortir un Deployment du CrashLoopBackOff"
+title: "Get a Deployment out of CrashLoopBackOff"
 level: troubleshooting
 description: |
-  Les Pods d'un Deployment redémarrent en boucle depuis la dernière livraison.
-  Lire ce que le processus a dit avant de mourir, comprendre ce qui lui
-  manque, corriger le Deployment, et prouver que l'application sert à nouveau.
+  The Pods of a Deployment have been restarting in a loop since the last
+  release. Read what the process said before it died, work out what it is
+  missing, fix the Deployment, and prove the application serves again.
 skills:
   - troubleshooting
   - crashloopbackoff

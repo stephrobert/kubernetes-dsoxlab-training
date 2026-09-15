@@ -1,0 +1,7 @@
+title: "Poser un Pod statique sur un worker, sans passer par l'API"
+description: |
+  Faire tourner un Pod que le kubelet du worker gère seul, à partir d'un
+  manifeste déposé sur le nœud, et le voir apparaître dans l'API sous son
+  nom de miroir. Le fichier doit être au bon endroit, celui que la
+  configuration du kubelet désigne, et le runtime du worker doit
+  réellement exécuter le conteneur.

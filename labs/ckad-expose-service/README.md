@@ -1,23 +1,23 @@
-# Exposer un Deployment par un Service ClusterIP
+# Expose a Deployment through a ClusterIP Service
 
-Lab **CKAD**, domaine *Services and Networking* (20 % de l'épreuve),
-compétence « Provide and troubleshoot access to applications via services ».
+**CKAD** lab, *Services and Networking* domain (20 % of the exam), competency
+"Provide and troubleshoot access to applications via services".
 
-Le lab hérité lisait six specs sans jamais faire de requête. Ici chaque Pod
-répond son nom, et dix requêtes depuis un client doivent atteindre au moins
-deux Pods.
+The inherited lab read six specs without ever making a request. Here each Pod
+answers with its own name, and ten requests from a client must reach at least
+two Pods.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Les Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 
 ```bash
 dsoxlab run   ckad-expose-service
 dsoxlab check ckad-expose-service
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

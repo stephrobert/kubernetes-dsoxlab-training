@@ -1,0 +1,6 @@
+title: "Donner un accès en lecture seule aux Pods avec RBAC"
+description: |
+  Permettre à une utilisatrice de lire les Pods d'un namespace et leurs logs,
+  et rien de plus : ni créer, ni supprimer, ni voir les autres namespaces.
+  Prouver les deux côtés avec kubectl auth can-i, ce qui est permis et ce qui
+  reste refusé.

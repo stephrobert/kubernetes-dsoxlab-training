@@ -1,24 +1,24 @@
-# Basculer le trafic d'une version à l'autre : blue-green
+# Switch traffic from one version to the other: blue-green
 
-Lab **CKAD**, domaine *Application Deployment* (20 % de l'épreuve),
-compétence « Use Kubernetes primitives to implement common deployment
-strategies (blue/green or canary) ».
+**CKAD** lab, *Application Deployment* domain (20 % of the exam), competency
+"Use Kubernetes primitives to implement common deployment strategies
+(blue/green or canary)".
 
-Le lab hérité vérifiait le selector du Service sans jamais faire de
-requête. Ici chaque version répond son nom, et six requêtes depuis un client
-doivent toutes répondre `green`.
+The inherited lab checked the Service selector without ever making a request.
+Here each version answers with its own name, and six requests from a client
+must all answer `green`.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Les Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 
 ```bash
 dsoxlab run   ckad-blue-green-deployment
 dsoxlab check ckad-blue-green-deployment
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

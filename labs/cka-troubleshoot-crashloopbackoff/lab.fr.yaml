@@ -1,0 +1,5 @@
+title: "Sortir un Deployment du CrashLoopBackOff"
+description: |
+  Les Pods d'un Deployment redémarrent en boucle depuis la dernière livraison.
+  Lire ce que le processus a dit avant de mourir, comprendre ce qui lui
+  manque, corriger le Deployment, et prouver que l'application sert à nouveau.

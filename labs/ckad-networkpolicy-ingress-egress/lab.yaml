@@ -1,11 +1,11 @@
 id: ckad-networkpolicy-ingress-egress
-title: "Cloisonner trois tiers avec des NetworkPolicy ingress et egress"
+title: "Partition three tiers with ingress and egress NetworkPolicy"
 level: services-networking
 description: |
-  Frontend, backend, base de données : n'autoriser que les flux prévus,
-  dans les deux sens, DNS compris, et interdire tout le reste. Prouver
-  chaque règle par une vraie connexion, celle qui passe et celle qui est
-  bloquée.
+  Frontend, backend, database: allow only the intended flows, in both
+  directions, DNS included, and forbid everything else. Prove every rule
+  with a real connection, the one that goes through and the one that is
+  blocked.
 skills:
   - networkpolicy
   - ingress

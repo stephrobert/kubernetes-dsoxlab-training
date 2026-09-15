@@ -1,0 +1,5 @@
+title: "Rétablir la résolution DNS du cluster"
+description: |
+  Plus aucun Pod ne résout de nom de service. Trouver pourquoi le DNS du
+  cluster ne répond plus, le remettre en service, et prouver qu'un Pod client
+  résout et joint à nouveau un Service par son nom.

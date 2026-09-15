@@ -1,0 +1,7 @@
+title: "Réserver un nœud : taint, tolérance et nodeSelector"
+description: |
+  Réserver le worker à la production par un taint et un label, puis placer
+  un Pod qui doit y aller, tolérance et nodeSelector, et un Pod qui ne doit
+  pas y aller. Les tests lisent le nœud, le placement réel de chaque Pod et
+  les mécanismes déclarés : un Pod épinglé par nodeName contourne le taint
+  et ne passe pas.

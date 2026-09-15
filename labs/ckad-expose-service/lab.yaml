@@ -1,10 +1,10 @@
 id: ckad-expose-service
-title: "Exposer un Deployment par un Service ClusterIP"
+title: "Expose a Deployment through a ClusterIP Service"
 level: services-networking
 description: |
-  Déployer trois replicas d'un serveur et les exposer par un Service
-  interne. Prouver depuis un client que le Service répond par son nom, et
-  qu'il répartit réellement les requêtes entre les trois Pods.
+  Deploy three replicas of a server and expose them through an internal
+  Service. Prove from a client that the Service answers under its name, and
+  that it really spreads the requests across the three Pods.
 skills:
   - service
   - deployment

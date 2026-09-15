@@ -1,10 +1,10 @@
 id: ckad-init-container
-title: "Attendre une dépendance avec un init container"
+title: "Wait for a dependency with an init container"
 level: application-design
 description: |
-  Empêcher une application de démarrer avant que le Service dont elle dépend
-  ne réponde, avec un init container qui attend. Observer le Pod bloqué en
-  Init, poser la dépendance, et voir l'application partir toute seule.
+  Keep an application from starting before the Service it depends on answers,
+  with an init container that waits. Watch the Pod held in Init, put the
+  dependency in place, and see the application start on its own.
 skills:
   - init-container
   - pod-design

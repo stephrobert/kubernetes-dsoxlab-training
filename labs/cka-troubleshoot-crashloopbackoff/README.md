@@ -1,23 +1,23 @@
-# Sortir un Deployment du CrashLoopBackOff
+# Get a Deployment out of CrashLoopBackOff
 
-Lab **CKA**, domaine *Troubleshooting* (30 % de l'épreuve), compétences
-« Manage and evaluate container output streams » et « Troubleshoot clusters
-and nodes ».
+**CKA** lab, *Troubleshooting* domain (30 % of the exam), competencies
+"Manage and evaluate container output streams" and "Troubleshoot clusters
+and nodes".
 
-Le Pod qui redémarre en boucle est la panne la plus fréquente de l'examen, et
-la plus fréquente en production. Elle se lit dans les logs, pas dans les
+The Pod that restarts in a loop is the most frequent failure in the exam, and
+the most frequent one in production. It is read in the logs, not in the
 events.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer un CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Diagnosing a CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-crashloopbackoff
 dsoxlab check cka-troubleshoot-crashloopbackoff
 ```
 
-Transposé de K8sExamLab le 2026-09-14, puis joué : 0 avant le travail,
-100 après la solution du formateur.
+Ported from K8sExamLab on 2026-09-14, then played: 0 before the work,
+100 after the trainer's solution.

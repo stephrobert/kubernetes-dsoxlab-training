@@ -1,11 +1,10 @@
 id: ckad-rbac-role-rolebinding
-title: "Donner un accès en lecture seule aux Pods avec RBAC"
+title: "Grant read-only access to Pods with RBAC"
 level: application-environment
 description: |
-  Permettre à une utilisatrice de lire les Pods d'un namespace et leurs logs,
-  et rien de plus : ni créer, ni supprimer, ni voir les autres namespaces.
-  Prouver les deux côtés avec kubectl auth can-i, ce qui est permis et ce qui
-  reste refusé.
+  Let a user read the Pods of a namespace and their logs, and nothing more:
+  no creating, no deleting, no looking into the other namespaces. Prove both
+  sides with kubectl auth can-i, what is allowed and what stays denied.
 skills:
   - rbac
   - role

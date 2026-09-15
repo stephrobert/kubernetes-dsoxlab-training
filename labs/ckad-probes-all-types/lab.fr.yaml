@@ -1,0 +1,6 @@
+title: "Trois sondes sur un Pod : startup, liveness, readiness"
+description: |
+  Équiper une application des trois sondes, avec des réglages qui ont un
+  sens : un démarrage lent toléré, une vivacité surveillée, un trafic
+  qui n'arrive qu'une fois prête. Prouver que les sondes agissent : le Pod
+  n'est Ready que parce qu'elles répondent.

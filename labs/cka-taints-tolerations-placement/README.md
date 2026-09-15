@@ -1,24 +1,24 @@
-# Réserver un nœud : taint, tolérance et nodeSelector
+# Reserve a node: taint, toleration and nodeSelector
 
-Lab **CKA**, domaine *Workloads and Scheduling* (15 % de l'épreuve),
-compétences de placement : taints, tolérances, sélection par label.
+**CKA** lab, *Workloads and Scheduling* domain (15 % of the exam),
+placement competencies: taints, tolerations, selection by label.
 
-Le lab hérité tournait sur kind et vérifiait qu'un Pod était « sur un
-worker ». Ici le nœud est nommé, et le dernier test lit ce que le Pod
-déclare : un Pod épinglé par `nodeName` arrive au même endroit en sautant le
-scheduler, et le taint avec lui, ce que le test refuse.
+The lab inherited from K8sExamLab ran on kind and checked that a Pod was
+"on a worker". Here the node is named, and the last test reads what the Pod
+declares: a Pod pinned with `nodeName` lands in the same place while
+skipping the scheduler, and the taint with it, which the test refuses.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Scheduling avancé : Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 10 minutes |
+| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 
 ```bash
 dsoxlab run   cka-taints-tolerations-placement
 dsoxlab check cka-taints-tolerations-placement
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

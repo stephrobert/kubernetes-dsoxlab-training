@@ -1,0 +1,7 @@
+title: "Isoler la base de données : seul le backend y accède"
+description: |
+  Écrire la NetworkPolicy qui ne laisse entrer vers la base que le backend
+  de son namespace, sur son port, et rien d'autre. Les tests tentent les
+  connexions : celle qui doit passer, celle du frontend qui doit être
+  bloquée, celle d'un Pod au bon label mais dans un autre namespace, et
+  vérifient que la base peut encore sortir.

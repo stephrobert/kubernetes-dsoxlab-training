@@ -1,28 +1,28 @@
-# Faire monter en charge automatiquement avec un HorizontalPodAutoscaler
+# Scale out automatically with a HorizontalPodAutoscaler
 
-Lab **CKA**, domaine *Workloads and Scheduling* (15 % de l'épreuve),
-compétence « Configure workload autoscaling ».
+**CKA** lab, *Workloads and Scheduling* domain (15 % of the exam),
+competency "Configure workload autoscaling".
 
-Le lab hérité lisait le spec du HPA et un ConfigMap qui recopiait ses
-valeurs ; aucune charge n'était générée, aucune montée observée. Ici les
-tests lisent les métriques courantes du HPA et l'event `SuccessfulRescale`
-que le contrôleur émet quand il fait grossir le Deployment : un HPA qui n'a
-jamais redimensionné n'est pas un HPA validé, comme le dit la leçon.
+The inherited lab read the spec of the HPA and a ConfigMap that copied its
+values; no load was generated, no scale-up was observed. Here the tests read
+the current metrics of the HPA and the `SuccessfulRescale` event that the
+controller emits when it grows the Deployment: an HPA that has never rescaled
+is not a validated HPA, as the lesson puts it.
 
-metrics-server 0.9.0, la version courante, est installé par le setup avec
-l'option que kubeadm impose, et retiré par le nettoyage.
+metrics-server 0.9.0, the current version, is installed by the setup with the
+option that kubeadm requires, and removed by the cleanup.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 20 minutes |
-| Leçon jumelée | [Horizontal Pod Autoscaler](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 20 minutes |
+| Companion lesson | [Horizontal Pod Autoscaler](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
 
 ```bash
 dsoxlab run   cka-hpa-autoscaling
 dsoxlab check cka-hpa-autoscaling
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

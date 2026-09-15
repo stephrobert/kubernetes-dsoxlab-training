@@ -1,23 +1,23 @@
-# Entrer dans un conteneur sans shell avec kubectl debug
+# Get inside a container with no shell using kubectl debug
 
-Lab **CKA**, domaine *Troubleshooting* (30 % de l'épreuve), compétences
-« Troubleshoot clusters and nodes » et « Manage and evaluate container output
-streams ».
+**CKA** lab, *Troubleshooting* domain (30 % of the exam), competencies
+"Troubleshoot clusters and nodes" and "Manage and evaluate container output
+streams".
 
-Les images distroless n'ont ni shell ni outils, et `kubectl exec` y échoue.
-L'examen attend qu'on sache y entrer quand même, et qu'on sache atteindre un
-nœud sans session SSH.
+Distroless images have neither a shell nor tools, and `kubectl exec` fails on
+them. The exam expects you to know how to get in anyway, and how to reach a
+node without an SSH session.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Débugger une application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Debugging an application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
 ```bash
 dsoxlab run   cka-kubectl-debug
 dsoxlab check cka-kubectl-debug
 ```
 
-Transposé de K8sExamLab le 2026-09-14, puis joué : 0 avant le travail,
-100 après la solution du formateur.
+Ported from K8sExamLab on 2026-09-14, then played through: 0 before the work,
+100 after the trainer's solution.

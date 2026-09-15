@@ -1,43 +1,42 @@
-# Donner un accès en lecture seule aux Pods avec RBAC
+# Grant read-only access to Pods with RBAC
 
-## La situation
+## The situation
 
-Une développeuse, connue du cluster sous le nom **`dev-user`**, doit suivre
-ses déploiements dans le namespace **`lab`** : voir les Pods, et lire leurs
-logs. Rien de plus. Elle ne doit ni créer ni supprimer quoi que ce soit, ni
-voir ce qui tourne dans les autres namespaces.
+A developer, known to the cluster as **`dev-user`**, has to follow her
+deployments in the **`lab`** namespace: see the Pods, and read their logs.
+Nothing more. She must neither create nor delete anything, nor see what is
+running in the other namespaces.
 
-Le namespace existe, avec une application dedans, le Pod **`journal`**, qui
-écrit dans ses logs. Pour l'instant, `dev-user` n'a aucun droit.
+The namespace exists, with an application inside, the **`journal`** Pod,
+which writes to its logs. For now, `dev-user` has no rights at all.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un Role **`pod-reader`** dans `lab`, qui autorise à lire les Pods et
-   leurs logs.
+1. A Role **`pod-reader`** in `lab`, which allows reading the Pods and their
+   logs.
 
-2. Un RoleBinding **`read-pods-binding`** dans `lab`, qui donne ce Role à
-   l'utilisatrice `dev-user`.
+2. A RoleBinding **`read-pods-binding`** in `lab`, which grants that Role to
+   the user `dev-user`.
 
-3. `dev-user` peut lister les Pods de `lab` et lire les logs de `journal`.
+3. `dev-user` can list the Pods of `lab` and read the logs of `journal`.
 
-4. `dev-user` ne peut **pas** créer de Pod dans `lab`, et ne peut **pas**
-   lister les Pods de `default`.
+4. `dev-user` can **not** create a Pod in `lab`, and can **not** list the
+   Pods of `default`.
 
-## Les repères utiles
+## Useful bearings
 
-`kubectl auth can-i <verbe> <ressource> -n <namespace> --as <utilisateur>`
-répond `yes` ou `no` sans rien créer : c'est votre instrument de mesure,
-avant comme après. Vous pouvez aussi exécuter une commande **en tant que**
-`dev-user`, avec `--as`.
+`kubectl auth can-i <verb> <resource> -n <namespace> --as <user>` answers
+`yes` or `no` without creating anything: it is your measuring instrument,
+before as well as after. You can also run a command **as** `dev-user`, with
+`--as`.
 
-Les logs d'un Pod ne sont pas le Pod : ils sont une sous-ressource, qui se
-nomme à part.
+A Pod's logs are not the Pod: they are a subresource, and it is named
+separately.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le Role et le RoleBinding, puis ils interrogent l'API en
-tant que `dev-user`, pour ce qui doit passer comme pour ce qui doit être
-refusé.
+The tests read the Role and the RoleBinding, then they query the API as
+`dev-user`, for what must pass as well as for what must be denied.
 
 ```bash
 dsoxlab check ckad-rbac-role-rolebinding

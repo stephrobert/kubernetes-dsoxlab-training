@@ -1,55 +1,55 @@
-# Entrer dans un conteneur sans shell avec kubectl debug
+# Get inside a container with no shell using kubectl debug
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, une équipe fait tourner son propre résolveur
-DNS, le Pod **`distroless-app`**. Son image est bâtie sur CoreDNS, et elle
-est **distroless** : un seul binaire statique, ni shell, ni `ls`, ni `ps`.
-C'est une bonne pratique de sécurité, jusqu'au jour où il faut regarder ce
-qui se passe dedans. `kubectl exec` répond que `sh` n'existe pas, et les logs
-ne disent rien de ce que fait le processus.
+In the namespace **`lab`**, a team runs its own DNS resolver, the Pod
+**`distroless-app`**. Its image is built on CoreDNS, and it is **distroless**:
+a single static binary, no shell, no `ls`, no `ps`. That is a good security
+practice, until the day you have to look at what is going on inside.
+`kubectl exec` answers that `sh` does not exist, and the logs say nothing about
+what the process is doing.
 
-L'équipe vous demande deux choses. D'abord, obtenir la liste des processus qui
-tournent **réellement** dans ce conteneur, vue de l'intérieur. Ensuite, un
-cran plus bas : déposer un fichier témoin sur le nœud lui-même, **sans ouvrir
-de session SSH**, comme on le ferait sur un nœud managé auquel personne n'a
-d'accès direct.
+The team asks you for two things. First, get the list of the processes that are
+**really** running in that container, seen from the inside. Then, one notch
+deeper: drop a witness file on the node itself, **without opening an SSH
+session**, as you would on a managed node that nobody has direct access to.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le Pod `distroless-app` porte un conteneur éphémère nommé **`debugger`**,
-   qui partage l'espace des processus du conteneur `distroless-app`.
+1. The Pod `distroless-app` carries an ephemeral container named
+   **`debugger`**, which shares the process namespace of the container
+   `distroless-app`.
 
-2. Depuis ce conteneur, la liste des processus a été écrite dans
-   **`/tmp/debug-output.txt`** : on doit y lire le processus `coredns` de
-   l'application. Le conteneur `debugger` **reste en vie**, pour qu'on puisse
-   relire ce fichier.
+2. From that container, the list of processes has been written to
+   **`/tmp/debug-output.txt`**: the `coredns` process of the application must
+   be readable in it. The `debugger` container **stays alive**, so that the
+   file can be read again.
 
-3. Un Pod de débogage du nœud **`k8s-cp.lab`** existe et tourne, avec l'accès
-   aux processus et au système de fichiers du nœud que `kubectl` lui donne.
+3. A debug Pod for the node **`k8s-cp.lab`** exists and is running, with the
+   access to the node's processes and filesystem that `kubectl` gives it.
 
-4. Par ce Pod, le fichier **`/tmp/node-debug.txt`** a été écrit **sur le
-   nœud lui-même**, avec le contenu `node-debug-ok`. Sur le nœud, pas dans
-   le Pod.
+4. Through that Pod, the file **`/tmp/node-debug.txt`** has been written **on
+   the node itself**, with the content `node-debug-ok`. On the node, not in the
+   Pod.
 
-## Les repères utiles
+## Useful bearings
 
-Un conteneur éphémère s'ajoute à un Pod qui tourne, sans le redémarrer, et
-ne peut plus en être retiré. Il ne voit les processus d'un autre conteneur
-que si on le lui demande explicitement.
+An ephemeral container is added to a running Pod, without restarting it, and
+can never be removed from it. It sees the processes of another container only
+if you ask for it explicitly.
 
-Un Pod de débogage de nœud monte la racine du nœud sous un répertoire du Pod.
-Ce qui est écrit dans `/tmp` du Pod disparaît avec lui ; ce qui est écrit
-sous ce point de montage reste sur le nœud.
+A node debug Pod mounts the root of the node under a directory of the Pod. What
+is written in the `/tmp` of the Pod disappears with it; what is written under
+that mount point stays on the node.
 
-L'image d'outillage n'a pas d'importance, pourvu qu'elle ait un shell et
-`ps` : busybox suffit.
+The tooling image does not matter, as long as it has a shell and `ps`: busybox
+is enough.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent la définition du Pod, relisent le fichier dans le conteneur
-`debugger`, cherchent un Pod qui a l'accès au nœud, et lisent
-`/tmp/node-debug.txt` directement sur `k8s-cp.lab`.
+The tests read the definition of the Pod, read back the file in the `debugger`
+container, look for a Pod that has access to the node, and read
+`/tmp/node-debug.txt` directly on `k8s-cp.lab`.
 
 ```bash
 dsoxlab check cka-kubectl-debug

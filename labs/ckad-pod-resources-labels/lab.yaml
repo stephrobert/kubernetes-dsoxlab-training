@@ -1,10 +1,10 @@
 id: ckad-pod-resources-labels
-title: "Un Pod à deux conteneurs, avec budgets, labels et annotation"
+title: "A two-container Pod, with budgets, labels and an annotation"
 level: application-design
 description: |
-  Écrire à la main un Pod à deux conteneurs, chacun avec ses requests et ses
-  limits, avec des labels et une annotation, et prouver depuis l'intérieur de
-  chaque conteneur que la limite de mémoire est celle que le noyau applique.
+  Write by hand a Pod with two containers, each with its own requests and
+  limits, with labels and an annotation, and prove from inside each container
+  that the memory limit is the one the kernel enforces.
 skills:
   - pods
   - resources

@@ -1,41 +1,40 @@
-# Redimensionner un Pod en place, sans le redémarrer
+# Resize a Pod in place, without restarting it
 
-## La situation
+## The situation
 
-Le Pod **`scaling-pod`** du namespace **`lab`** tourne depuis des semaines
-avec un budget devenu trop juste : `100m` de CPU demandés, `128Mi` de
-mémoire en limite. Il tient une session longue qu'on ne veut **pas
-interrompre**. Il faut lui donner plus, maintenant, sans le recréer et sans
-que son conteneur redémarre.
+The Pod **`scaling-pod`** in the **`lab`** namespace has been running for weeks
+on a budget that has grown too tight: `100m` of CPU requested, `128Mi` of
+memory as its limit. It holds a long session that must **not be interrupted**.
+It needs more, now, without being recreated and without its container
+restarting.
 
-Le Pod a été livré avec une politique de redimensionnement qui l'autorise.
-Longtemps, changer les ressources d'un Pod signifiait le supprimer ; ce
-n'est plus vrai.
+The Pod was shipped with a resize policy that allows it. For a long time,
+changing the resources of a Pod meant deleting it; that is no longer true.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. `scaling-pod` demande **`200m`** de CPU et se limite à **`256Mi`** de
-   mémoire.
+1. `scaling-pod` requests **`200m`** of CPU and is limited to **`256Mi`** of
+   memory.
 
-2. Le Pod n'a **pas été recréé** : c'est le même objet, avec la même date de
-   création, et son conteneur affiche **zéro redémarrage**.
+2. The Pod has **not been recreated**: it is the same object, with the same
+   creation timestamp, and its container shows **zero restarts**.
 
-3. Le noyau applique la nouvelle limite : lue depuis l'intérieur du
-   conteneur, elle vaut 256Mi.
+3. The kernel applies the new limit: read from inside the container, it is
+   256Mi.
 
-## Les repères utiles
+## Useful bearings
 
-`kubectl edit` refuse de changer les ressources d'un Pod : ce champ passe
-par une **sous-ressource** dédiée, que `kubectl patch` sait viser. Le
-statut du Pod indique ensuite les ressources réellement allouées par le
-kubelet, qui peuvent différer un instant de celles demandées.
+`kubectl edit` refuses to change the resources of a Pod: that field goes
+through a dedicated **subresource**, which `kubectl patch` knows how to target.
+The Pod status then reports the resources actually allocated by the kubelet,
+which may differ for a moment from those requested.
 
-La limite de mémoire qu'un conteneur subit se lit dans son cgroup.
+The memory limit a container is subject to can be read from its cgroup.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent les ressources du Pod, sa date de création, son compteur
-de redémarrages, et la limite dans le cgroup du conteneur.
+The tests read the resources of the Pod, its creation timestamp, its restart
+counter, and the limit in the container cgroup.
 
 ```bash
 dsoxlab check ckad-in-place-pod-vertical-scaling

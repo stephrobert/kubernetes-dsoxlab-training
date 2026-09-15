@@ -1,52 +1,52 @@
-# Donner une identité à une application : ServiceAccount, Role, RoleBinding
+# Give an application an identity: ServiceAccount, Role, RoleBinding
 
-## La situation
+## The situation
 
-L'équipe applicative a déployé **`inventaire`** dans le namespace
-**`app-team`** : un outil qui doit lister les Pods de son namespace pour en
-tenir l'inventaire. Le Deployment est là, mais aucun Pod ne démarre. Le
-manifeste déclare un ServiceAccount **`pod-reader`** que personne n'a créé,
-et sans identité, le ReplicaSet ne peut rien lancer.
+The application team has deployed **`inventaire`** in the **`app-team`**
+namespace: a tool that must list the Pods of its namespace to keep their
+inventory. The Deployment is there, but no Pod starts. The manifest declares
+a ServiceAccount **`pod-reader`** that nobody created, and with no identity,
+the ReplicaSet cannot launch anything.
 
-Vous êtes sur le control plane, avec `kubectl` configuré.
+You are on the control plane, with `kubectl` configured.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Le ServiceAccount **`pod-reader`** existe dans `app-team`, et le Pod
-   d'`inventaire` tourne avec cette identité.
+1. The ServiceAccount **`pod-reader`** exists in `app-team`, and the
+   `inventaire` Pod runs with that identity.
 
-2. Un Role **`pod-reader-role`** dans `app-team`, qui autorise à lire les
-   Pods : `get`, `list`, `watch`. Rien d'autre : ni les supprimer, ni les
-   créer, ni toucher à une autre ressource.
+2. A Role **`pod-reader-role`** in `app-team`, allowing the Pods to be read:
+   `get`, `list`, `watch`. Nothing else: neither deleting them, nor creating
+   them, nor touching any other resource.
 
-3. Un RoleBinding **`pod-reader-binding`** dans `app-team`, qui donne ce
-   Role au ServiceAccount.
+3. A RoleBinding **`pod-reader-binding`** in `app-team`, granting that Role
+   to the ServiceAccount.
 
-4. Depuis le Pod, avec le jeton qu'il trouve dans
-   `/var/run/secrets/kubernetes.io/serviceaccount`, lister les Pods
-   d'`app-team` répond `200`. Supprimer un Pod, lire les Secrets, ou lister
-   les Pods de `default` répondent `403`.
+4. From the Pod, with the token it finds in
+   `/var/run/secrets/kubernetes.io/serviceaccount`, listing the Pods of
+   `app-team` answers `200`. Deleting a Pod, reading the Secrets, or listing
+   the Pods of `default` answer `403`.
 
-## Les repères utiles
+## Useful bearings
 
-Un Pod ne parle jamais à l'API en son nom propre : il présente le jeton de
-son ServiceAccount, projeté dans un volume, et l'API l'identifie comme
-`system:serviceaccount:<namespace>:<nom>`. C'est ce sujet, et pas un
-utilisateur, que le RoleBinding doit nommer.
+A Pod never talks to the API in its own name: it presents its
+ServiceAccount's token, projected into a volume, and the API identifies it
+as `system:serviceaccount:<namespace>:<name>`. That subject, and not a user,
+is what the RoleBinding must name.
 
-`kubectl auth can-i <verbe> <ressource> -n <namespace> --as
-system:serviceaccount:app-team:pod-reader` répond `yes` ou `no` sans rien
-créer. Le Pod, lui, a `curl`, le certificat de l'API et son jeton sous la
-main : `kubectl exec` vous y mène.
+`kubectl auth can-i <verb> <resource> -n <namespace> --as
+system:serviceaccount:app-team:pod-reader` answers `yes` or `no` without
+creating anything. The Pod, for its part, has `curl`, the API certificate
+and its token at hand: `kubectl exec` takes you there.
 
-Un ReplicaSet qui ne peut pas créer ses Pods le dit dans les events du
-namespace, pas dans des logs qui n'existent pas encore.
+A ReplicaSet that cannot create its Pods says so in the namespace events,
+not in logs that do not exist yet.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le Role et le RoleBinding, puis entrent dans le Pod et
-interrogent l'API avec son jeton, pour ce qui doit passer comme pour ce qui
-doit être refusé.
+The tests read the Role and the RoleBinding, then enter the Pod and query
+the API with its token, for what must go through as well as for what must be
+denied.
 
 ```bash
 dsoxlab check cka-rbac-serviceaccount

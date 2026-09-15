@@ -1,12 +1,12 @@
 id: cka-taints-tolerations-placement
-title: "Réserver un nœud : taint, tolérance et nodeSelector"
+title: "Reserve a node: taint, toleration and nodeSelector"
 level: workloads-scheduling
 description: |
-  Réserver le worker à la production par un taint et un label, puis placer
-  un Pod qui doit y aller, tolérance et nodeSelector, et un Pod qui ne doit
-  pas y aller. Les tests lisent le nœud, le placement réel de chaque Pod et
-  les mécanismes déclarés : un Pod épinglé par nodeName contourne le taint
-  et ne passe pas.
+  Reserve the worker for production with a taint and a label, then place a
+  Pod that must go there, toleration and nodeSelector, and a Pod that must
+  not. The tests read the node, the actual placement of each Pod and the
+  declared mechanisms: a Pod pinned with nodeName bypasses the taint and
+  does not pass.
 skills:
   - taints
   - tolerations

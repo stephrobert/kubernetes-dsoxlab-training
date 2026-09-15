@@ -1,0 +1,6 @@
+title: "Installer, mettre à jour et revenir en arrière avec Helm 4"
+description: |
+  Déployer un chart avec Helm, le mettre à jour avec de nouvelles valeurs,
+  puis revenir à la première révision. Prouver par l'historique de la
+  release et par l'état du Deployment que les trois opérations ont eu lieu,
+  dans cet ordre.

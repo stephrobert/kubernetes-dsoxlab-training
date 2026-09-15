@@ -1,13 +1,13 @@
 id: cka-etcd-backup-restore
-title: "Sauvegarder etcd, puis restaurer le cluster depuis un instantané"
+title: "Back up etcd, then restore the cluster from a snapshot"
 level: cluster-architecture-installation-configuration
 description: |
-  Un namespace a disparu. Prendre d'abord une sauvegarde fraîche de l'état
-  courant, puis restaurer le cluster depuis l'instantané de la veille, sans
-  arrêter le mauvais composant et sans laisser l'API server sur un cache
-  périmé. Les tests prouvent qu'etcd tourne sur un répertoire produit
-  pendant le lab, que les objets reviennent avec leur UID d'origine, et que
-  ce qui a été écrit après la sauvegarde a disparu.
+  A namespace has disappeared. Take a fresh backup of the current state
+  first, then restore the cluster from yesterday evening's snapshot, without
+  stopping the wrong component and without leaving the API server on a stale
+  cache. The tests prove that etcd runs on a data directory produced during
+  the lab, that the objects come back with their original UID, and that what
+  was written after the backup is gone.
 skills:
   - etcd
   - etcdctl

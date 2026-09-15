@@ -1,25 +1,25 @@
-# Placer avec nodeAffinity : contrainte obligatoire et préférence
+# Placing with nodeAffinity: required constraint and preference
 
-Lab **CKA**, domaine *Workloads and Scheduling* (15 % de l'épreuve),
-compétences de placement : `nodeAffinity` obligatoire et préférée.
+**CKA** lab, *Workloads and Scheduling* domain (15 % of the exam),
+placement competencies: required and preferred `nodeAffinity`.
 
-Le lab hérité exigeait `kubernetes.io/os=linux`, une contrainte que tout
-nœud satisfait, et ne mesurait donc rien. Ici l'obligation porte sur un
-label que seul le worker a, et les trois Pods doivent y être ; le Pod
-`gpu-app` doit avoir attendu son label, ce que la condition `PodScheduled`
-raconte.
+The lab inherited from K8sExamLab required `kubernetes.io/os=linux`, a
+constraint every node satisfies, so it measured nothing. Here the required
+rule bears on a label only the worker has, and all three Pods must land
+there; the `gpu-app` Pod must have waited for its label, which the
+`PodScheduled` condition tells.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Scheduling avancé : Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 
 ```bash
 dsoxlab run   cka-node-affinity
 dsoxlab check cka-node-affinity
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

@@ -1,0 +1,5 @@
+title: "Un Pod à deux conteneurs, avec budgets, labels et annotation"
+description: |
+  Écrire à la main un Pod à deux conteneurs, chacun avec ses requests et ses
+  limits, avec des labels et une annotation, et prouver depuis l'intérieur de
+  chaque conteneur que la limite de mémoire est celle que le noyau applique.

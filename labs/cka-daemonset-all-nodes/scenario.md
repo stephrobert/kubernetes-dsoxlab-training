@@ -1,41 +1,41 @@
-# Un agent sur chaque nœud, control plane compris
+# An agent on every node, including the control plane
 
-## La situation
+## The situation
 
-L'équipe supervision veut un agent sur **chaque nœud** du cluster, qui
-signale sa présence dans ses logs. Le control plane **`k8s-cp.lab`** est
-protégé, comme il se doit, par le taint
-`node-role.kubernetes.io/control-plane:NoSchedule` : rien ne s'y planifie
-sans le dire explicitement. L'agent doit pourtant y tourner aussi.
+The monitoring team wants an agent on **every node** of the cluster, one that
+signals its presence in its logs. The control plane **`k8s-cp.lab`** is
+protected, as it should be, by the taint
+`node-role.kubernetes.io/control-plane:NoSchedule`: nothing is scheduled there
+without saying so explicitly. The agent must still run on it too.
 
-Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
-**`monitoring`** existe.
+You are on the control plane, with `kubectl` configured. The namespace
+**`monitoring`** exists.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un DaemonSet **`monitor-agent`** dans `monitoring`, image
-   **`busybox:1.37`**, dont le conteneur écrit `heartbeat` dans ses logs
-   toutes les soixante secondes, indéfiniment.
+1. A DaemonSet **`monitor-agent`** in `monitoring`, image
+   **`busybox:1.37`**, whose container writes `heartbeat` to its logs every
+   sixty seconds, forever.
 
-2. Ses Pods portent le label **`app: monitor`**.
+2. Its Pods carry the label **`app: monitor`**.
 
-3. Un Pod de ce DaemonSet tourne sur **chaque nœud**, `k8s-cp.lab` compris,
-   **sans retirer le taint** du control plane.
+3. A Pod of that DaemonSet runs on **every node**, `k8s-cp.lab` included,
+   **without removing the taint** from the control plane.
 
-## Les repères utiles
+## Useful bearings
 
-Un DaemonSet ne choisit pas les nœuds : il en met un partout où son Pod est
-admis. Un taint `NoSchedule` refuse tout Pod qui ne le tolère pas, et c'est
-dans le template du DaemonSet que la tolérance s'écrit, clé, opérateur et
-effet, recopiés depuis ce que `kubectl describe node` affiche.
+A DaemonSet does not pick nodes: it puts one wherever its Pod is admitted. A
+`NoSchedule` taint turns away any Pod that does not tolerate it, and the
+toleration is written in the DaemonSet template, key, operator and effect,
+copied from what `kubectl describe node` displays.
 
-Un DaemonSet dont un nœud manque le dit dans son statut : le nombre de Pods
-voulus, planifiés et prêts.
+A DaemonSet that is missing a node says so in its status: the number of Pods
+desired, scheduled and ready.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le DaemonSet et son statut, le nœud de chaque Pod, le taint
-du control plane, et les logs de chaque agent.
+The tests read the DaemonSet and its status, the node of each Pod, the control
+plane taint, and the logs of each agent.
 
 ```bash
 dsoxlab check cka-daemonset-all-nodes

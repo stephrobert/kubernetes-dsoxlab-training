@@ -1,22 +1,22 @@
-# Une base Kustomize et deux overlays, dev et prod
+# One Kustomize base and two overlays, dev and prod
 
-Lab **CKAD**, domaine *Application Deployment* (20 % de l'épreuve),
-compétence « Understand and use Kustomize ».
+**CKAD** lab, *Application Deployment* domain (20 % of the exam), competency
+"Understand and use Kustomize".
 
-La formation n'a pas encore de leçon sur Kustomize : la leçon jumelée est
-celle des Deployments, et le trou est remonté au backlog du blog.
+The training has no Kustomize lesson yet: the companion lesson is the one on
+Deployments, and the gap has been raised in the blog backlog.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 20 minutes |
-| Leçon jumelée | [Les Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 20 minutes |
+| Companion lesson | [Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 
 ```bash
 dsoxlab run   ckad-kustomize-overlays
 dsoxlab check ckad-kustomize-overlays
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

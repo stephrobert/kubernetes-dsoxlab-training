@@ -1,0 +1,7 @@
+title: "Durcir un Pod avec un securityContext"
+description: |
+  Faire tourner un serveur web sans privilège : utilisateur non root,
+  aucune escalade, racine en lecture seule, toutes les capabilities retirées.
+  Et lui donner quand même de quoi écrire là où il en a besoin, sinon il ne
+  démarre pas. Prouver, de l'intérieur, que le confinement agit et que
+  l'application sert.

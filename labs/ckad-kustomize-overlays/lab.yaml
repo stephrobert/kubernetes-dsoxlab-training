@@ -1,11 +1,11 @@
 id: ckad-kustomize-overlays
-title: "Une base Kustomize et deux overlays, dev et prod"
+title: "One Kustomize base and two overlays, dev and prod"
 level: application-deployment
 description: |
-  Décrire une application une seule fois, dans une base Kustomize, et la
-  déployer dans deux namespaces avec des overlays qui changent le nombre de
-  replicas, préfixent les noms et ajoutent un label d'environnement. Prouver
-  que les deux environnements tournent et se ressemblent.
+  Describe an application only once, in a Kustomize base, and deploy it into
+  two namespaces with overlays that change the replica count, prefix the
+  names and add an environment label. Prove that both environments are
+  running and look alike.
 skills:
   - kustomize
   - overlays

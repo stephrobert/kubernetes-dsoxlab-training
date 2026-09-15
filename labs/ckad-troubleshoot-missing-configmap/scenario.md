@@ -1,41 +1,40 @@
-# Un Pod bloqué par un ConfigMap qui n'existe pas
+# A Pod blocked by a ConfigMap that does not exist
 
-## La situation
+## The situation
 
-Dans le namespace **`lab`**, le Pod **`broken-app`** a été livré il y a une
-heure, et il n'a toujours pas démarré. `kubectl logs` ne rend rien : il n'y
-a même pas de conteneur à interroger. L'application lit un fichier de
-configuration au démarrage, **`/config/settings.conf`**, puis sert des
-pages web.
+In the **`lab`** namespace, the Pod **`broken-app`** was delivered an hour
+ago, and it still has not started. `kubectl logs` returns nothing: there is
+not even a container to query. The application reads a configuration file at
+startup, **`/config/settings.conf`**, then serves web pages.
 
-Le collègue qui l'a livrée est parti en congé. Son manifeste est dans le
-cluster ; sa configuration, apparemment, non.
+The colleague who delivered it has left on holiday. Its manifest is in the
+cluster; its configuration, apparently, is not.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. La cause du blocage, lue dans les **events** du Pod.
+1. The cause of the blockage, read in the Pod's **events**.
 
-2. La ressource manquante créée, avec la clé **`settings.conf`** dont le
-   contenu comporte la ligne `mode=production`.
+2. The missing resource created, with the key **`settings.conf`** whose
+   content carries the line `mode=production`.
 
-3. Le Pod `broken-app` en **`Running`**, sans que vous l'ayez recréé :
-   Kubernetes réessaie tout seul dès que ce qui manque apparaît.
+3. The Pod `broken-app` **`Running`**, without your having recreated it:
+   Kubernetes retries on its own as soon as what was missing appears.
 
-4. L'application **sert** : sa page répond en HTTP.
+4. The application **serves**: its page answers over HTTP.
 
-## Les repères utiles
+## Useful bearings
 
-Un Pod en `ContainerCreating` qui ne bouge pas n'a pas de logs : le
-conteneur n'existe pas encore. Ce qui l'empêche de naître est raconté dans
-ses events, en bas de `kubectl describe pod`, avec le nom de ce qui manque.
+A Pod in `ContainerCreating` that does not move has no logs: the container
+does not exist yet. What keeps it from being born is told in its events, at
+the bottom of `kubectl describe pod`, with the name of what is missing.
 
-Un volume qui référence un ConfigMap absent bloque le Pod indéfiniment, et
-le débloque dès que le ConfigMap existe : pas besoin de le supprimer.
+A volume that references an absent ConfigMap blocks the Pod indefinitely,
+and unblocks it as soon as the ConfigMap exists: no need to delete it.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le ConfigMap, l'état du Pod, et interrogent l'application
-depuis le nœud.
+The tests read the ConfigMap, the state of the Pod, and query the
+application from the node.
 
 ```bash
 dsoxlab check ckad-troubleshoot-missing-configmap

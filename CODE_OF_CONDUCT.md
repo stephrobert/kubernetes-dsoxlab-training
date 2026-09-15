@@ -1,69 +1,69 @@
-# Code de conduite du Contributor Covenant
+# Contributor Covenant Code of Conduct
 
-## Notre engagement
+**Language:** [English](./CODE_OF_CONDUCT.md) · [Français](./CODE_OF_CONDUCT.fr.md)
 
-En tant que membres, contributeurs et responsables, nous nous engageons à faire
-de la participation à notre communauté une expérience exempte de harcèlement
-pour tout le monde, quels que soient l'âge, la taille corporelle, le handicap
-visible ou invisible, l'origine ethnique, les caractéristiques sexuelles,
-l'identité et l'expression de genre, le niveau d'expérience, l'éducation, le
-statut socio-économique, la nationalité, l'apparence personnelle, la race, la
-religion ou l'identité et l'orientation sexuelles.
+## Our Pledge
 
-Nous nous engageons à agir et à interagir de manière à contribuer à une
-communauté ouverte, accueillante, diverse, inclusive et saine.
+We as members, contributors, and leaders pledge to make participation in our
+community a harassment-free experience for everyone, regardless of age, body
+size, visible or invisible disability, ethnicity, sex characteristics, gender
+identity and expression, level of experience, education, socio-economic status,
+nationality, personal appearance, race, religion, or sexual identity and
+orientation.
 
-## Nos critères
+We pledge to act and interact in ways that contribute to an open, welcoming,
+diverse, inclusive, and healthy community.
 
-Exemples de comportements qui contribuent à un environnement positif :
+## Our Standards
 
-- Faire preuve d'empathie et de bienveillance envers autrui
-- Respecter les opinions, points de vue et expériences différents
-- Donner et accepter avec grâce les retours constructifs
-- Assumer nos responsabilités, présenter nos excuses aux personnes affectées par
-  nos erreurs, et apprendre de l'expérience
-- Se concentrer sur ce qui est le mieux, non seulement pour nous en tant
-  qu'individus, mais pour l'ensemble de la communauté
+Examples of behavior that contributes to a positive environment for our
+community include:
 
-Exemples de comportements inacceptables :
+- Demonstrating empathy and kindness toward other people
+- Being respectful of differing opinions, viewpoints, and experiences
+- Giving and gracefully accepting constructive feedback
+- Accepting responsibility and apologizing to those affected by our mistakes,
+  and learning from the experience
+- Focusing on what is best not just for us as individuals, but for the overall
+  community
 
-- L'usage de langage ou d'imagerie sexualisés, et les avances sexuelles de toute
-  nature
-- Le trolling, les commentaires insultants ou désobligeants, et les attaques
-  personnelles ou politiques
-- Le harcèlement public ou privé
-- La publication d'informations privées d'autrui, telles qu'une adresse
-  physique ou électronique, sans permission explicite
-- Tout autre comportement qui pourrait raisonnablement être considéré comme
-  inapproprié dans un cadre professionnel
+Examples of unacceptable behavior include:
 
-## Responsabilités d'application
+- The use of sexualized language or imagery, and sexual attention or advances of
+  any kind
+- Trolling, insulting or derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information, such as a physical or email address,
+  without their explicit permission
+- Other conduct which could reasonably be considered inappropriate in a
+  professional setting
 
-Les responsables de la communauté ont la charge de clarifier et de faire
-respecter nos critères de comportement acceptable et prendront des mesures
-correctives appropriées et justes en réponse à tout comportement qu'ils jugent
-inapproprié, menaçant, offensant ou nuisible.
+## Enforcement Responsibilities
 
-## Portée
+Community leaders are responsible for clarifying and enforcing our standards of
+acceptable behavior and will take appropriate and fair corrective action in
+response to any behavior that they deem inappropriate, threatening, offensive,
+or harmful.
 
-Ce code de conduite s'applique dans tous les espaces communautaires, ainsi que
-lorsqu'une personne représente officiellement la communauté dans les espaces
-publics.
+## Scope
 
-## Application
+This Code of Conduct applies within all community spaces, and also applies when
+an individual is officially representing the community in public spaces.
 
-Les cas de comportement abusif, harcelant ou autrement inacceptable peuvent être
-signalés au responsable du projet via les coordonnées publiées sur
-<https://blog.stephane-robert.info>. Toutes les plaintes seront examinées et
-instruites rapidement et équitablement.
+## Enforcement
 
-Tous les responsables de la communauté sont tenus de respecter la vie privée et
-la sécurité de la personne qui signale un incident.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported to the project maintainer through the contact details published on
+<https://blog.stephane-robert.info>. All complaints will be reviewed and
+investigated promptly and fairly.
+
+All community leaders are obligated to respect the privacy and security of the
+reporter of any incident.
 
 ## Attribution
 
-Ce code de conduite est adapté du [Contributor Covenant][origine], version 2.1,
-disponible sur
+This Code of Conduct is adapted from the [Contributor Covenant][homepage],
+version 2.1, available at
 <https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>.
 
-[origine]: https://www.contributor-covenant.org
+[homepage]: https://www.contributor-covenant.org

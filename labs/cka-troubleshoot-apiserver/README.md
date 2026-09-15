@@ -1,24 +1,24 @@
-# Remettre l'API server en service
+# Bring the API server back into service
 
-Lab **CKA**, domaine *Troubleshooting* (30 % de l'épreuve), compétence
-« Troubleshoot cluster components ».
+**CKA** lab, *Troubleshooting* domain (30 % of the exam), competency
+"Troubleshoot cluster components".
 
-Ce lab existe parce que la formation **ne peut pas le prouver sur kind** : le
-manifeste statique, le kubelet qui le relit et le runtime qui garde les
-journaux du conteneur mort sont ceux d'une vraie machine. Sans API, il faut
-savoir se passer de `kubectl`.
+This lab exists because the course **cannot prove it on kind**: the static
+manifest, the kubelet that rereads it and the runtime that keeps the logs of
+the dead container are those of a real machine. With no API, you have to
+know how to do without `kubectl`.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer une panne du cluster](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Target | `k8s-cp.lab`, control plane of the kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Diagnosing a cluster failure](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-apiserver
 dsoxlab check cka-troubleshoot-apiserver
 ```
 
-Transposé de K8sExamLab le 2026-09-14, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-14, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

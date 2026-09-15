@@ -1,79 +1,79 @@
-# Politique de sécurité
+# Security Policy
 
-## Versions supportées
+**Language:** [English](./SECURITY.md) · [Français](./SECURITY.fr.md)
 
-`kubernetes-dsoxlab-training` est en développement actif. Les correctifs de
-sécurité sont appliqués à la dernière version de la branche `main`.
+## Supported versions
 
-| Version | Supportée |
+`kubernetes-dsoxlab-training` is under active development. Security fixes are
+applied to the latest version of the `main` branch.
+
+| Version | Supported |
 | --- | --- |
-| dernière (`main`) | oui |
-| plus anciennes | non |
+| latest (`main`) | yes |
+| older | no |
 
-## Signaler une vulnérabilité
+## Reporting a vulnerability
 
-**N'ouvrez pas d'issue publique pour une vulnérabilité de sécurité.**
+**Do not open a public issue for a security vulnerability.**
 
-Si vous pensez avoir trouvé une vulnérabilité, signalez-la en privé :
+If you believe you have found a vulnerability, report it privately:
 
-- De préférence : ouvrez un
-  [avis de sécurité privé](https://github.com/stephrobert/kubernetes-dsoxlab-training/security/advisories/new)
-  sur GitHub.
-- Sinon, utilisez les coordonnées publiées sur
+- Preferably: open a
+  [private security advisory](https://github.com/stephrobert/kubernetes-dsoxlab-training/security/advisories/new)
+  on GitHub.
+- Otherwise, use the contact details published on
   <https://blog.stephane-robert.info>.
 
-Merci d'inclure :
+Please include:
 
-- une description de la vulnérabilité et de son impact,
-- les étapes pour la reproduire (commande, environnement, `dsoxlab --version`),
-- tout journal ou preuve de concept pertinent.
+- a description of the vulnerability and its impact,
+- the steps to reproduce it (command, environment, `dsoxlab --version`),
+- any relevant log or proof of concept.
 
-Nous vous tiendrons informé de l'avancement du correctif et vous créditerons
-dans les notes de version si vous le souhaitez.
+We will keep you posted on the progress of the fix, and credit you in the
+release notes if you wish.
 
-## Politique de divulgation
+## Disclosure policy
 
-Nous pratiquons la divulgation coordonnée et nous engageons sur les délais
-suivants, décomptés à partir de la réception de votre signalement :
+We practise coordinated disclosure and commit to the following timelines,
+counted from the moment we receive your report:
 
-| Étape | Délai visé |
+| Step | Target |
 | --- | --- |
-| Accusé de réception de votre signalement | sous **48 heures** |
-| Évaluation initiale et qualification de la sévérité | sous **5 jours** |
-| Correctif publié, ou plan de remédiation écrit | sous **30 jours** |
-| Divulgation publique de la vulnérabilité | sous **90 jours** |
+| Acknowledgement of your report | within **48 hours** |
+| Initial assessment and severity triage | within **5 days** |
+| Fix published, or a written remediation plan | within **30 days** |
+| Public disclosure of the vulnerability | within **90 days** |
 
-Nous publions l'avis dès qu'un correctif est disponible, ou au plus tard à
-l'échéance des **90 jours**, selon ce qui arrive en premier. Si une
-vulnérabilité est activement exploitée, nous pouvons la divulguer plus tôt pour
-protéger les utilisateurs. Si un correctif complexe demande plus de temps, nous
-vous prévenons avant l'échéance et convenons d'une nouvelle date avec vous,
-plutôt que de la laisser expirer sans rien dire.
+We publish the advisory as soon as a fix is available, or at the **90 day**
+mark at the latest, whichever comes first. If a vulnerability is being actively
+exploited, we may disclose earlier to protect users. If a complex fix needs more
+time, we tell you before the deadline and agree a new date with you, rather than
+letting it lapse in silence.
 
-## Périmètre
+## Scope
 
-Ce dépôt livre du **contenu de labs** exécuté par la CLI externe `dsoxlab` :
-scénarios, tests, playbooks de mise en place et de nettoyage, socle de cluster
-kubeadm, clé SSH publique.
+This repository ships **lab content** executed by the external `dsoxlab` CLI:
+scenarios, tests, setup and cleanup playbooks, a kubeadm cluster foundation, and
+a public SSH key.
 
-Sont **dans** le périmètre :
+**In** scope:
 
-- du matériel de lab dangereux ou malveillant : un `setup.yaml`, un
-  `cleanup.yaml`, un script de fixture ou un test qui ferait autre chose que ce
-  qu'il annonce ;
-- une fuite de secret, ou une clé privée commitée par erreur ;
-- un défaut du socle `shared/` : il est inclus par tous les labs et s'exécute en
-  `root` sur les deux machines.
+- dangerous or malicious lab material: a `setup.yaml`, a `cleanup.yaml`, a
+  fixture script or a test that does something other than what it announces;
+- a leaked secret, or a private key committed by mistake;
+- a flaw in the `shared/` foundation: it is included by every lab and runs as
+  `root` on both machines.
 
-Une remarque particulière sur ce catalogue : **plusieurs labs installent
-délibérément un état cassé ou affaibli**, parce que c'est leur sujet. Un lab de
-diagnostic casse le kubelet, un lab AppArmor charge un profil, un lab RBAC crée
-un compte volontairement trop peu doté. Ce n'est pas une vulnérabilité : c'est
-la matière de l'exercice, et chaque `cleanup.yaml` défait ce que son lab a posé.
-Ces labs sont conçus pour des **machines jetables**, provisionnées par
-`dsoxlab provision` et détruites par `dsoxlab destroy`, jamais pour une machine
-qui sert à autre chose.
+One remark is specific to this catalogue: **several labs deliberately install a
+broken or weakened state**, because that is their subject. A troubleshooting lab
+breaks the kubelet, an AppArmor lab loads a profile, an RBAC lab creates an
+account that is deliberately under-privileged. That is not a vulnerability: it
+is the substance of the exercise, and every `cleanup.yaml` undoes what its lab
+set up. These labs are built for **disposable machines**, provisioned by
+`dsoxlab provision` and destroyed by `dsoxlab destroy`, never for a machine that
+serves another purpose.
 
-Sont **hors** périmètre : les vulnérabilités du moteur `dsoxlab` lui-même, qui
-relèvent de [son propre dépôt](https://github.com/stephrobert/dsoxlab), et les
-problèmes des dépendances tierces, à signaler à leurs projets respectifs.
+**Out** of scope: vulnerabilities in the `dsoxlab` engine itself, which belong in
+[its own repository](https://github.com/stephrobert/dsoxlab), and issues in
+third-party dependencies, to be reported to their respective projects.

@@ -1,0 +1,6 @@
+title: "Trois Pods en CrashLoopBackOff, trois causes"
+description: |
+  Trois Pods redémarrent en boucle pour trois raisons différentes : une
+  commande qui n'existe pas, une variable d'environnement absente, une
+  limite de mémoire trop basse. Lire pour chacun ce qui le tue, le
+  corriger, et prouver que les trois tiennent.

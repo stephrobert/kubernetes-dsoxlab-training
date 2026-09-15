@@ -1,26 +1,26 @@
-# Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version
+# Roll back a stuck rollout, then ship the right version
 
-Lab **CKA**, domaine *Workloads and Scheduling* (15 % de l'épreuve),
-compétence « Understand application deployments and how to perform rolling
-update and rollbacks ».
+**CKA** lab, *Workloads and Scheduling* domain (15 % of the exam),
+competency "Understand application deployments and how to perform rolling
+update and rollbacks".
 
-Le lab hérité faisait faire une mise à jour qui marche puis un retour
-arrière sans raison, et lisait l'image finale. Ici le déploiement est
-bloqué sur une image qui n'existe pas, comme à l'examen, et les tests
-lisent les numéros de révision des ReplicaSets : ils disent si un retour
-arrière a eu lieu, dans quel ordre, et si l'historique a été conservé.
+The inherited lab had you run an update that works, then roll it back for no
+reason, and it read the final image. Here the rollout is stuck on an image that
+does not exist, as in the exam, and the tests read the revision numbers of the
+ReplicaSets: they say whether a rollback took place, in what order, and whether
+the history was kept.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [Deployments Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [Kubernetes Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 
 ```bash
 dsoxlab run   cka-deployment-rollout-rollback
 dsoxlab check cka-deployment-rollout-rollback
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

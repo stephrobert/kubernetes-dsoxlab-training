@@ -1,0 +1,5 @@
+title: "Attendre une dépendance avec un init container"
+description: |
+  Empêcher une application de démarrer avant que le Service dont elle dépend
+  ne réponde, avec un init container qui attend. Observer le Pod bloqué en
+  Init, poser la dépendance, et voir l'application partir toute seule.

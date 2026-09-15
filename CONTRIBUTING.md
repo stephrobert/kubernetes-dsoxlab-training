@@ -1,155 +1,178 @@
-# Contribuer à kubernetes-dsoxlab-training
+# Contributing to kubernetes-dsoxlab-training
 
-Ce dépôt est un **catalogue de labs** consommé par la CLI
-[`dsoxlab`](https://github.com/stephrobert/dsoxlab). Les contributions sont de
-nouveaux labs et des correctifs. La CLI vit dans son propre dépôt : n'ajoutez
-pas de code moteur ici, et si vous butez sur une limite du moteur, ouvrez-y une
-issue plutôt que de la contourner localement.
+**Language:** [English](./CONTRIBUTING.md) · [Français](./CONTRIBUTING.fr.md)
 
-## Mise en place
+This repository is a **lab catalogue** consumed by the
+[`dsoxlab`](https://github.com/stephrobert/dsoxlab) CLI. Contributions are new
+labs and fixes. The CLI lives in its own repository: do not add engine code
+here, and if you hit a limit of the engine, open an issue there rather than
+working around it locally.
+
+## Setting up
 
 ```bash
-uv tool install dsoxlab        # la CLI, outil externe
+uv tool install dsoxlab        # the CLI, an external tool
 git clone https://github.com/stephrobert/kubernetes-dsoxlab-training.git
 cd kubernetes-dsoxlab-training
 ansible-galaxy collection install -r requirements.yml
 pre-commit install --install-hooks
-dsoxlab doctor                 # vérifier l'environnement
+dsoxlab doctor                 # check the environment
 ```
 
-## La règle non négociable : un lab s'éprouve dans les deux sens
+## The non-negotiable rule: a lab is proven in both directions
 
-Un test qui passe ne prouve rien tant qu'on n'a pas vu **échouer** ce qui doit
-échouer. Un lab dont les tests passent **avant** le travail ne mesure rien, et
-c'est le défaut le plus coûteux du domaine parce qu'il ne se voit qu'ainsi.
+A passing test proves nothing until you have seen **fail** what must fail. A lab
+whose tests pass **before** the work measures nothing, and that is the costliest
+defect in this field precisely because it shows up no other way.
 
 ```bash
 python3 scripts/valider-labs.py --lab <id>
 ```
 
-Le validateur photographie le cluster, pose l'état initial, vérifie que les
-tests rendent **0**, joue la solution du formateur, vérifie qu'ils rendent
-**100**, nettoie, rejoue, nettoie encore, puis compare le cluster à sa
-photographie. Un namespace oublié, un `ClusterRole`, un taint ou un CoreDNS
-laissé à zéro replica rend le lab **ROUGE** : ce n'est pas lui qui en paierait
-le prix, c'est le lab suivant. Le verdict de chaque lab est consigné dans
-[`validation-labs.json`](validation-labs.json), et le catalogue du README en
-porte la date.
+The validator photographs the cluster, sets the initial state, checks that the
+tests return **0**, plays the trainer's solution, checks that they return
+**100**, cleans up, replays, cleans up again, then compares the cluster to its
+photograph. A forgotten namespace, a `ClusterRole`, a taint or a CoreDNS left at
+zero replicas turns the lab **RED**: it is not that lab that would pay the
+price, it is the next one. Every lab's verdict is recorded in
+[`validation-labs.json`](validation-labs.json), and the README catalogue carries
+its date.
 
-Les deux contrôles mécaniques ci-dessous ne disent **rien** de la justesse d'un
-lab, mais ils refusent un lab non conforme avant qu'un humain ne le lise :
+The two mechanical checks below say **nothing** about whether a lab is correct,
+but they refuse a non-conforming lab before a human reads it:
 
 ```bash
-dsoxlab validate-structure                       # le contrat déclaratif
-python3 scripts/check-labs-completude.py --check # ce qui reste à faire
+dsoxlab validate-structure                       # the declarative contract
+python3 scripts/check-labs-completude.py --check # what is left to do
 ```
 
-## Les tests lisent l'état du système, jamais les commandes tapées
+## Tests read the state of the system, never the commands typed
 
-Le candidat arrive au résultat par le chemin qu'il veut. On interroge donc le
-cluster et le nœud, pas un historique.
+The candidate reaches the result by whatever path they choose. So we query the
+cluster and the node, not a history.
 
 ```python
-# NON : on relit ce que l'apprenant a écrit
-assert "apparmor_parser" in historique
+# NO: re-reading what the learner typed
+assert "apparmor_parser" in history
 
-# OUI : on interroge l'état réel
-profils = json.loads(host.run("sudo aa-status --json").stdout)["profiles"]
-assert profils["k8s-refuser-ecriture"] == "enforce"
+# YES: querying the real state
+profiles = json.loads(host.run("sudo aa-status --json").stdout)["profiles"]
+assert profiles["k8s-refuser-ecriture"] == "enforce"
 ```
 
-Un test par affirmation, **dont un qui prouve vraiment**. Vérifier qu'un profil
-est chargé et qu'un Pod le déclare ne prouve pas que le confinement agit : un
-profil vide passerait. Le dernier test d'un lab doit exercer les deux côtés, ce
-qui est interdit et ce qui reste permis.
+One test per claim, **including one that really proves something**. Checking
+that a profile is loaded and that a Pod declares it does not prove the
+confinement acts: an empty profile would pass. A lab's last test must exercise
+both sides, what is forbidden and what remains allowed.
 
-## Anatomie d'un lab
+## Anatomy of a lab
 
 ```text
-labs/<examen>-<sujet>/
-├── lab.yaml                          # le contrat : level = domaine du blueprint,
-│                                     # doc_url = la leçon jumelée
-├── scenario.md                       # la situation et l'objectif, pas la solution
-├── README.md                         # la fiche du lab
-├── setup.yaml                        # pose l'état initial, inclut le socle
-├── cleanup.yaml                      # défait le lab, LAISSE le cluster en place
-├── fixtures/prepare.sh               # la situation, côté cluster
+labs/<exam>-<subject>/
+├── lab.yaml                          # the contract: level = blueprint domain,
+│                                     # doc_url = the companion lesson
+├── lab.fr.yaml                       # French override of title and description ONLY
+├── scenario.md / scenario.fr.md      # the situation and the goal, not the solution
+├── README.md / README.fr.md          # the lab's fact sheet
+├── setup.yaml                        # sets the initial state, includes the foundation
+├── cleanup.yaml                      # undoes the lab, LEAVES the cluster in place
+├── fixtures/prepare.sh               # the situation, cluster side
 └── challenge/
-    ├── hints.yaml                    # indices base64, bilingues, à coût croissant
-    ├── solution.sh                   # la solution du formateur, rejouable
-    └── tests/test_functional.py      # la preuve : l'état du cluster
+    ├── hints.yaml                    # base64 hints, bilingual, increasing cost
+    ├── solution.sh                   # the trainer's solution, replayable
+    └── tests/test_functional.py      # the proof: the cluster's state
 ```
 
-`dsoxlab new lab <id> --runtime vm` crée le squelette. L'identifiant suit
-`<examen>-<sujet>`, en minuscules : `cks-apparmor-confiner-un-pod`.
+`dsoxlab new lab <id> --runtime vm` creates the skeleton. The identifier follows
+`<exam>-<subject>`, lowercase: `cks-apparmor-confiner-un-pod`.
 
-`level` reprend le **domaine officiel du blueprint** mot pour mot
-(`troubleshooting`, `system-hardening`, `workloads-scheduling`…) : c'est ce qui
-permet de répondre à la seule question qui pilote ce dépôt, « combien de
-compétences de l'examen puis-je démontrer ? ».
+`level` repeats the **official blueprint domain** word for word
+(`troubleshooting`, `system-hardening`, `workloads-scheduling`…): that is what
+lets the repository answer the only question that drives it, "how many exam
+competencies can I actually demonstrate?".
 
-`doc_url` pointe la leçon du blog que le lab éprouve. Un lab sans leçon jumelée
-est un lab qui enseigne au lieu d'éprouver, et enseigner est le rôle du site.
+`doc_url` points at the blog lesson the lab puts to the test. A lab with no
+companion lesson is a lab that teaches instead of testing, and teaching is the
+site's job.
 
-## Quatre pièges, chacun a coûté un cycle de validation
+## Two languages, English first
 
-Ils sont vérifiés par `tests/test_pieges_du_depot.py`, mais les connaître évite
-d'attendre le hook pour les découvrir.
+Everything the learner reads exists in both languages, English being the file
+without a suffix:
 
-- **Tout `ssh` d'une solution porte `-n`.** La solution est lue par `bash -s`
-  depuis l'entrée standard : sans `-n`, `ssh` avale le reste du script comme
-  entrée, rien après lui ne s'exécute, et le script rend 0.
-- **Tout `fixtures/prepare.sh` trace sur le nœud.** dsoxlab ne rend que
-  « non-zero return code » quand un script de fixture échoue ; sans le journal,
-  le diagnostic repart de zéro. Reprenez l'en-tête d'un lab existant.
-- **Tout `setup.yaml` inclut le socle.** Il n'y a aucun point d'accroche après
-  le provisionnement : le cluster n'existe que parce que chaque lab l'installe.
-  Un lab qui oublie l'inclusion tourne tant qu'un autre est passé avant, et
-  échoue seul sur un cluster neuf.
-- **Tout namespace créé est supprimé au nettoyage.** Le cluster, lui, reste en
-  place : c'est le namespace qui part.
+| Content | English | French |
+| --- | --- | --- |
+| Lab title and description | `lab.yaml` | `lab.fr.yaml` (these two keys only) |
+| Situation | `scenario.md` | `scenario.fr.md` |
+| Fact sheet | `README.md` | `README.fr.md` |
+| Hints | `text_en` | `text_fr` |
+| Governance | `SECURITY.md`, … | `SECURITY.fr.md`, … |
 
-## Style de rédaction
+`dsoxlab validate-structure` reports `content_missing_english` when a document
+is translated on one side only: a half-translated lab does not pass.
 
-Le français du blog : clair, pragmatique, sans jargon inutile.
+Two things stay in French and it is deliberate: the **assertion messages** of
+the tests, and the **comments** in playbooks and scripts. The former teach at
+the moment a test fails and the sibling Linux catalogue keeps them in French
+too; the latter are addressed at whoever maintains the lab.
 
-- **Pas d'emoji, pas de tiret cadratin** dans ce que l'apprenant lit :
-  `scenario.md`, `README.md`, les indices, les messages d'assertion. Un hook le
-  vérifie.
-- **Les messages d'assertion enseignent.** Un test qui échoue doit dire ce qui
-  ne va pas et pourquoi, pas seulement ce qui était attendu. C'est souvent le
-  seul texte que l'apprenant lira attentivement.
-- Le `scenario.md` décrit une **situation**, pas une liste de commandes. Un
-  candidat reçoit un contexte et un objectif, jamais un mode d'emploi.
-- Les indices sont **encodés en base64** et **bilingues**, quatre de coût
-  croissant, du plus vague au plus explicite, sans jamais donner le YAML
-  complet.
+## Four traps, each cost a validation cycle
 
-## Avant d'ouvrir une pull request
+They are checked by `tests/test_pieges_du_depot.py`, but knowing them saves you
+from discovering them through a hook.
 
-Les hooks font le travail si vous les avez installés. À la main :
+- **Every `ssh` in a solution carries `-n`.** The solution is read by `bash -s`
+  from standard input: without `-n`, `ssh` swallows the rest of the script as
+  its input, nothing after it runs, and the script returns 0.
+- **Every `fixtures/prepare.sh` logs on the node.** dsoxlab only returns
+  "non-zero return code" when a fixture script fails; without the log, the
+  diagnosis starts from nothing. Copy the header of an existing lab.
+- **Every `setup.yaml` includes the foundation.** There is no hook after
+  provisioning: the cluster exists only because each lab installs it. A lab that
+  forgets the include works as long as another lab ran before it, and fails
+  alone on a fresh cluster.
+- **Every namespace created is deleted on cleanup.** The cluster itself stays:
+  it is the namespace that goes.
+
+## Writing style
+
+The blog's register: clear, pragmatic, no needless jargon.
+
+- **No emoji, no em dash** in what the learner reads: `scenario`, `README`,
+  hints, assertion messages. A hook checks it.
+- **Assertion messages teach.** A failing test must say what is wrong and why,
+  not only what was expected. It is often the only text the learner reads
+  closely.
+- `scenario.md` describes a **situation**, not a list of commands. A candidate
+  gets a context and a goal, never a walkthrough.
+- Hints are **base64-encoded** and **bilingual**, four of increasing cost, from
+  the vaguest to the most explicit, never giving away the full YAML.
+
+## Before opening a pull request
+
+The hooks do the work if you installed them. By hand:
 
 ```bash
-pre-commit run --all-files                      # hygiène, lint, vérificateurs
-pre-commit run --all-files --hook-stage pre-push # contrat + fraîcheur du README
-python3 scripts/gen_catalog.py                  # régénère le catalogue du README
+pre-commit run --all-files                       # hygiene, lint, checkers
+pre-commit run --all-files --hook-stage pre-push # contract + README freshness
+python3 scripts/gen_catalog.py                   # regenerate the README catalogue
 ```
 
-Le `README.md` doit lister **tous** les labs avec leur leçon jumelée. Le
-catalogue est généré depuis les `lab.yaml` réels : lancez `gen_catalog.py` après
-avoir ajouté ou renommé un lab. La CI et le hook `pre-push` refusent tous deux
-un catalogue périmé.
+`README.md` and `README.fr.md` must list **every** lab with its companion
+lesson. The catalogue is generated from the real `lab.yaml` files: run
+`gen_catalog.py` after adding or renaming a lab. Both the CI and the `pre-push`
+hook refuse a stale catalogue.
 
 ## Conventions
 
-- **Commits** : messages en français, sujet factuel qui dit ce qui a changé et
-  pourquoi, pas de préfixe conventionnel. Le corps raconte ce qui a été
-  **mesuré**, y compris les mesures jetées en route : elles valent souvent plus
-  que le résultat.
-- **Branche dédiée**, description claire, et le lab joué dans les deux sens
-  avant de demander la revue.
+- **Commits**: messages in French, a factual subject line saying what changed
+  and why, no conventional prefix. The body tells what was **measured**,
+  including measurements discarded along the way: they are often worth more than
+  the result.
+- **A dedicated branch**, a clear description, and the lab played in both
+  directions before asking for review.
 
-## Sécurité
+## Security
 
-Les vulnérabilités se signalent en privé, jamais par une issue publique : voir
+Vulnerabilities are reported privately, never through a public issue: see
 [`SECURITY.md`](SECURITY.md).

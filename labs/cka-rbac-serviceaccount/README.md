@@ -1,25 +1,26 @@
-# Donner une identité à une application : ServiceAccount, Role, RoleBinding
+# Give an application an identity: ServiceAccount, Role, RoleBinding
 
-Lab **CKA**, domaine *Cluster Architecture, Installation and Configuration*
-(25 % de l'épreuve), compétence « Manage role based access control (RBAC) ».
+**CKA** lab, *Cluster Architecture, Installation and Configuration* domain
+(25 % of the exam), competency "Manage role based access control (RBAC)".
 
-Le lab hérité faisait tout créer par le candidat et vérifiait les droits
-avec `kubectl auth can-i`. Ici l'application existe et ne démarre pas, faute
-d'identité ; une fois les droits posés, la preuve vient du Pod lui-même,
-qui interroge l'API avec son jeton projeté : lister répond 200, supprimer,
-lire les Secrets ou regarder un autre namespace répondent 403.
+The lab inherited from K8sExamLab had the candidate create everything and
+checked the rights with `kubectl auth can-i`. Here the application exists
+and does not start, for want of an identity; once the rights are in place,
+the proof comes from the Pod itself, which queries the API with its
+projected token: listing answers 200, while deleting, reading Secrets or
+looking into another namespace answer 403.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 15 minutes |
-| Leçon jumelée | [ServiceAccounts pour développeurs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
+| Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
+| Duration | about 15 minutes |
+| Companion lesson | [ServiceAccounts for developers](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
 
 ```bash
 dsoxlab run   cka-rbac-serviceaccount
 dsoxlab check cka-rbac-serviceaccount
 ```
 
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.
+Ported from K8sExamLab on 2026-09-15, then validated by
+`scripts/valider-labs.py`: 0 before the work, 100 after the trainer's
+solution, replayable and leaving no trace.

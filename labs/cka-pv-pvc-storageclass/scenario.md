@@ -1,46 +1,46 @@
-# Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit
+# A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes
 
-## La situation
+## The situation
 
-Ce cluster n'a **aucune StorageClass** et aucun provisionneur : une
-réclamation de volume y reste `Pending` pour toujours. L'équipe a besoin
-d'un Pod, **`data-pod`**, qui écrive un fichier et le retrouve quand on le
-recrée. Le répertoire **`/mnt/lab-data`** existe sur chaque nœud, réservé à
-cet usage.
+This cluster has **no StorageClass** and no provisioner: a volume claim
+stays `Pending` on it forever. The team needs a Pod, **`data-pod`**, that
+writes a file and finds it again when it is recreated. The
+**`/mnt/lab-data`** directory exists on every node, reserved for this use.
 
-Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
-**`lab`** existe.
+You are on the control plane, with `kubectl` configured. The **`lab`**
+namespace exists.
 
-## Ce que vous devez obtenir
+## What you must achieve
 
-1. Un PersistentVolume **`lab-pv`** de **1Gi**, en `ReadWriteOnce`, de
-   StorageClass **`manual`**, adossé au répertoire `/mnt/lab-data` du nœud.
+1. A PersistentVolume **`lab-pv`** of **1Gi**, in `ReadWriteOnce`, of
+   StorageClass **`manual`**, backed by the node's `/mnt/lab-data`
+   directory.
 
-2. Un PersistentVolumeClaim **`lab-pvc`** dans `lab`, qui demande
-   **500Mi** avec le même mode d'accès et la même StorageClass, et qui est
-   **`Bound`** à `lab-pv`.
+2. A PersistentVolumeClaim **`lab-pvc`** in `lab`, asking for **500Mi**
+   with the same access mode and the same StorageClass, and which is
+   **`Bound`** to `lab-pv`.
 
-3. Un Pod **`data-pod`** dans `lab` qui monte cette réclamation sur
-   **`/data`** et écrit `hello` dans **`/data/test.txt`** au démarrage.
+3. A Pod **`data-pod`** in `lab` that mounts this claim on **`/data`** and
+   writes `hello` into **`/data/test.txt`** at startup.
 
-4. Le fichier est **sur le disque du nœud**, dans `/mnt/lab-data`, là où le
-   volume est adossé : c'est ce qui survivra au Pod.
+4. The file is **on the node's disk**, in `/mnt/lab-data`, where the volume
+   is backed: that is what will outlive the Pod.
 
-## Les repères utiles
+## Useful bearings
 
-Sans provisionneur, c'est l'administrateur qui crée le PersistentVolume, et
-la réclamation se lie à un volume dont la capacité, le mode d'accès et la
-StorageClass conviennent. Une StorageClass nommée dans un PV et un PVC n'a
-pas besoin d'exister comme objet : le nom suffit à les apparier.
+With no provisioner, it is the administrator who creates the
+PersistentVolume, and the claim binds to a volume whose capacity, access
+mode and StorageClass suit it. A StorageClass named in a PV and a PVC does
+not need to exist as an object: the name is enough to match them.
 
-Un volume adossé au disque d'un nœud vaut ce que vaut ce nœud : le Pod qui
-le monte doit tourner là où sont les données. `hostPath` ne l'impose pas,
-`local` l'impose par une affinité de nœud ; les deux sont acceptés ici.
+A volume backed by a node's disk is worth what that node is worth: the Pod
+mounting it must run where the data is. `hostPath` does not enforce it,
+`local` enforces it through a node affinity; both are accepted here.
 
-## Comment vous saurez que c'est bon
+## How you will know it works
 
-Les tests lisent le PV, le PVC et sa liaison, le Pod et son montage, le
-fichier dans le Pod, puis le même fichier sur le nœud où le Pod tourne.
+The tests read the PV, the PVC and its binding, the Pod and its mount, the
+file inside the Pod, then the same file on the node where the Pod runs.
 
 ```bash
 dsoxlab check cka-pv-pvc-storageclass
