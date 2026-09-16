@@ -1,0 +1,38 @@
+id: cks-pod-security-admission
+title: "Refuser un Pod privilégié à l'admission, avec Pod Security Admission"
+level: minimize-vulnerabilities
+section: cks
+difficulty: intermediate
+description: |
+  A namespace that accepts anything, including a Pod that shares the host's
+  PID namespace and runs as root. Turn on the restricted standard so the
+  cluster refuses it at admission, and prove the refusal without creating
+  anything: a server-side dry run goes through admission and writes nothing.
+skills:
+  - pod-security-admission
+  - pod-security-standards
+  - admission-control
+  - restricted
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+lab_type: lab
+estimated_time: 15m
+
+# Compétence du blueprint CKS, domaine Minimize Microservice Vulnerabilities
+# (20 %) : « Use appropriate pod security standards ». C'est le contrôle qui
+# remplace PodSecurityPolicy, retiré en 1.25, et il est intégré à l'API server :
+# aucun composant à installer, ce qui en fait le premier lab CKS à écrire.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

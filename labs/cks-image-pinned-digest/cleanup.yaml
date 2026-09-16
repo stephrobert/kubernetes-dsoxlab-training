@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : tout vit dans le namespace chaine, le supprimer
+# suffit. Le cluster et ses images restent en place.
+- name: Nettoyer le lab cks-image-pinned-digest
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace chaine
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

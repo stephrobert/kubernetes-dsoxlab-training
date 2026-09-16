@@ -112,6 +112,8 @@ This is the order in which the labs are meant to be played, as declared in `meta
 **CKS, Certified Kubernetes Security Specialist**
 
 1. [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/): Confine a Pod with an AppArmor profile
+2. [`cks-pod-security-admission`](labs/cks-pod-security-admission/): Refuser un Pod privilégié à l'admission, avec Pod Security Admission
+3. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/): Épingler une image par son digest, et prouver que le tag ne suffit pas
 
 ### Blueprint coverage
 
@@ -171,13 +173,15 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 
 #### CKS, Certified Kubernetes Security Specialist
 
-1 lab(s).
+3 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
+| [`cks-pod-security-admission`](labs/cks-pod-security-admission/) | Refuser un Pod privilégié à l'admission, avec Pod Security Admission | minimize-vulnerabilities | 15m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) | Épingler une image par son digest, et prouver que le tag ne suffit pas | supply-chain-security | 15m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confine a Pod with an AppArmor profile | system-hardening | 25m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 
-Total: **39 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **41 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

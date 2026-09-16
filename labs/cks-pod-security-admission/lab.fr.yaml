@@ -1,0 +1,6 @@
+title: "Refuser un Pod privilégié à l'admission, avec Pod Security Admission"
+description: |
+  Un namespace qui accepte tout, y compris un Pod qui partage le namespace PID
+  de l'hôte et tourne en root. Activez le standard restricted pour que le
+  cluster le refuse à l'admission, et prouvez le refus sans rien créer : un
+  essai côté serveur traverse l'admission et n'écrit rien.

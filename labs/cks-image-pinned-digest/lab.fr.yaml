@@ -1,0 +1,6 @@
+title: "Épingler une image par son digest, et prouver que le tag ne suffit pas"
+description: |
+  Un Deployment qui fait confiance à un tag mutable. Épinglez-le sur le digest
+  immuable de l'image qu'il exécute réellement, et prouvez que l'épinglage
+  tient : le digest déclaré doit correspondre à ce que le runtime a résolu, et
+  pas seulement y ressembler.

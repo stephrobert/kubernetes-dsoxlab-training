@@ -1,0 +1,14 @@
+---
+# Joué par `dsoxlab clean` : tout ce que le lab crée vit dans le namespace
+# secure-ns, y compris les labels de standard que l'apprenant a posés. Le
+# supprimer suffit, et le cluster reste en place.
+- name: Nettoyer le lab cks-pod-security-admission
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace secure-ns
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

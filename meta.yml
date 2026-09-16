@@ -149,3 +149,5 @@ sections:
       conteneur, ce qui est la raison d'être des VM de ce catalogue.
     labs:
       - cks-apparmor-confiner-un-pod
+      - cks-pod-security-admission
+      - cks-image-pinned-digest
