@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab cks-cis-benchmark-remediate
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Déposer le Job kube-bench sur le nœud
+      ansible.builtin.copy:
+        src: fixtures/kube-bench-job.yaml
+        dest: /root/kube-bench-job.yaml
+        mode: "0644"
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

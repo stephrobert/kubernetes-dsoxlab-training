@@ -1,0 +1,42 @@
+id: cks-seccomp-profile
+title: "Interdire un appel système à un conteneur, et le prouver de l'intérieur"
+level: system-hardening
+section: cks
+difficulty: advanced
+description: |
+  A container that may call anything the kernel offers. Write a seccomp
+  profile that refuses one family of system calls, apply it, and prove the
+  confinement holds: the forbidden call fails from inside, and everything else
+  still works.
+skills:
+  - seccomp
+  - system-hardening
+  - syscall-filtering
+  - kubelet
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine System Hardening (10 %) : « Minimize
+# host OS footprint (reduce attack surface) ».
+#
+# Le profil vit sur le NŒUD, dans un répertoire que le kubelet est seul à
+# connaître, et il n'est pas un objet Kubernetes. C'est la même famille que
+# cks-apparmor-confiner-un-pod, et la même raison d'être des VM : un nœud en
+# conteneur ne permet pas de poser un filtre d'appels système et de le
+# vérifier.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,7 @@
+title: "Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application"
+description: |
+  Un Dockerfile qui construit et qui tourne, et que l'analyse statique refuse
+  sur cinq points. Corrigez-les tous sans changer ce que fait l'image, et
+  prouvez-le en relançant l'analyse : les cinq constats doivent avoir disparu,
+  identifiés par leur numéro et non par un total qu'une nouvelle règle
+  fausserait.

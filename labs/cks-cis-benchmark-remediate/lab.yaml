@@ -1,0 +1,40 @@
+id: cks-cis-benchmark-remediate
+title: "Faire baisser le compte d'un audit CIS, et le prouver par un second audit"
+level: cluster-setup
+section: cks
+difficulty: advanced
+description: |
+  kube-bench audits the control plane against the CIS benchmark and fails ten
+  checks on a stock kubeadm cluster. Fix the three that share one cause, then
+  prove it the only honest way: run the audit again and count.
+skills:
+  - cis-benchmark
+  - kube-bench
+  - control-plane
+  - remediation
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+lab_type: lab
+estimated_time: 30m
+
+# Compétence du blueprint CKS, domaine Cluster Setup (15 %) : « Use CIS
+# benchmark to review the security configuration of Kubernetes components ».
+#
+# kube-bench n'est pas dans mise, contrairement à trivy et cosign. Il n'en a
+# pas besoin : il tourne comme Job DANS le cluster, avec les répertoires du
+# nœud montés en lecture seule. C'est aussi ainsi qu'on l'emploie en
+# production, et cela évite d'installer quoi que ce soit sur le nœud.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

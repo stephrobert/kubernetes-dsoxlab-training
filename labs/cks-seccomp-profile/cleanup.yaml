@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab clean` : le namespace emporte les Pods, mais le PROFIL vit
+# sur le nœud et n'est pas un objet Kubernetes. Le laisser ferait passer le
+# premier test du prochain passage avant tout travail, et le validateur ne le
+# verrait pas : il photographie le cluster, pas le disque du nœud.
+- name: Nettoyer le lab cks-seccomp-profile
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace confinement
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le profil seccomp déposé sur le nœud
+      ansible.builtin.file:
+        path: /var/lib/kubelet/seccomp/profiles/restrict-chmod.json
+        state: absent

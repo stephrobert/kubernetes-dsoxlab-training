@@ -1,0 +1,6 @@
+title: "Remplacer une image criblée de failles, et le prouver par un second scan"
+description: |
+  Un Deployment tourne sur une image vieille de trois ans. Analysez-la,
+  choisissez son remplacement, et prouvez ce choix : le test analyse les deux
+  et exige strictement moins de failles critiques que l'original, ce qu'aucun
+  seuil fixe ne pourrait mesurer honnêtement.

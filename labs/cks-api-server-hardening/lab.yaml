@@ -1,0 +1,39 @@
+id: cks-api-server-hardening
+title: "Fermer le profileur de l'API server, sans fermer l'API"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  The API server exposes its Go profiler to anyone who can reach it, and a
+  kubeadm cluster leaves it on. Close it and raise the TLS floor, then prove
+  both halves: the profiler answers 404, and the cluster still works.
+skills:
+  - api-server
+  - profiling
+  - tls
+  - static-pod
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine Cluster Hardening (15 %) : « Restrict
+# access to Kubernetes API ».
+#
+# Ce lab modifie le manifeste statique de l'API server, comme
+# cks-audit-log-policy. C'est le genre de geste qu'un cluster en conteneur ne
+# permet pas d'éprouver, et une des raisons d'être des VM de ce catalogue.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

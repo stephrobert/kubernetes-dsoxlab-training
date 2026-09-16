@@ -60,15 +60,32 @@ def _heure_de_pose(host) -> str:
 
 
 def _evacuation_a_eu_lieu(host) -> None:
-    """Chaque Pod de web est né après la pose, et aucun n'est sur le worker."""
+    """Aucun Pod de web ne tourne sur le worker, et il y en a eu de recréés.
+
+    CE QUE CE TEST NE DEMANDE PLUS, et pourquoi.
+
+    Il exigeait que TOUS les Pods soient nés après la pose du lab. C'était
+    faux, et intermittent : un drain n'évince que les Pods du nœud drainé.
+    Ceux que le scheduler avait placés sur le control plane ne bougent pas, et
+    datent donc légitimement d'avant le lab. Le test ne passait que lorsque le
+    hasard du placement avait mis les quatre Pods sur le worker.
+
+    Mesuré le 2026-09-16 pendant une validation complète du catalogue : deux
+    Pods sur quatre étaient restés sur le control plane, et le lab est sorti
+    ROUGE alors que le travail était juste.
+
+    Ce qui prouve l'évacuation est ailleurs, et c'est mesurable sans dépendre
+    du placement : plus aucun Pod sur le worker, et au moins un Pod recréé
+    APRÈS la pose, signe qu'une éviction a bien eu lieu.
+    """
     pose = _heure_de_pose(host)
     pods = _pods_web(host)
     assert len(pods) == 4, f"{len(pods)} Pod(s) de {DEPLOYMENT} au lieu de 4 : il ne fallait pas toucher aux replicas."
-    anciens = [p["metadata"]["name"] for p in pods if p["metadata"]["creationTimestamp"] <= pose]
-    assert not anciens, (
-        f"Ces Pods de {DEPLOYMENT} datent d'avant le début du lab : {anciens}. Un drain évince "
-        "chaque Pod du nœud et le contrôleur le recrée ailleurs : les Pods d'origine ne "
-        "survivent pas à l'opération. Ceux-ci n'ont jamais été évincés."
+    recrees = [p["metadata"]["name"] for p in pods if p["metadata"]["creationTimestamp"] > pose]
+    assert recrees, (
+        f"Aucun Pod de {DEPLOYMENT} n'a été recréé depuis le début du lab. Un drain évince "
+        "chaque Pod du nœud drainé, et le contrôleur le recrée ailleurs : sans un seul Pod "
+        "plus récent que la pose, aucune éviction n'a eu lieu."
     )
     sur_worker = [p["metadata"]["name"] for p in pods if p["spec"].get("nodeName") == WORKER]
     assert not sur_worker, (

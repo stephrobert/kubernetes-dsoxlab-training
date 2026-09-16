@@ -145,6 +145,19 @@ repos:
       # ont disparu de meta.yml sans qu'un seul contrôle ne bronche, et un
       # répertoire de lab s'est retrouvé amputé de son lab.yaml, donc invisible
       # pour tout l'outillage, qui part des lab.yaml existants.
+      # Le convertisseur copie tous les compagnons du lab herite, a raison :
+      # un solution.sh herite en appelle souvent un. Mais quand la solution est
+      # reecrite pour le catalogue, le compagnon reste sans que rien ne
+      # l'appelle. Le 2026-09-16, deux de ces orphelins ont fait echouer la CI
+      # sur check-yaml, et le defaut n'etait pas dans leur YAML mais dans leur
+      # presence.
+      - id: pas-de-compagnon-orphelin
+        name: aucun fichier de challenge/ n'est là sans que rien ne l'appelle
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_pas_de_compagnon_orphelin.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: meta-declare-les-labs
         name: meta.yml et labs/ décrivent le même catalogue
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_meta_declare_les_labs.py -q

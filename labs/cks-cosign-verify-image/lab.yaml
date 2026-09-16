@@ -1,0 +1,40 @@
+id: cks-cosign-verify-image
+title: "Signer une image, et prouver la signature en faisant refuser une autre"
+level: supply-chain-security
+section: cks
+difficulty: advanced
+description: |
+  A local registry holds two images, neither signed. Sign one with cosign,
+  publish the public key, and prove the chain works: the same key must accept
+  the signed image and refuse the other. A verification that accepts
+  everything proves nothing.
+skills:
+  - supply-chain-security
+  - cosign
+  - image-signing
+  - registry
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+lab_type: lab
+estimated_time: 30m
+
+# Compétence du blueprint CKS, domaine Supply Chain Security (20 %) :
+# « Verify platform binaries before deploying » appliquée aux images.
+#
+# Le registre est LOCAL, monté par le setup : signer suppose de POUSSER la
+# signature à côté de l'image, ce qu'aucun registre public ne permettrait sans
+# identifiants. cosign et crane sont posés par mise.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

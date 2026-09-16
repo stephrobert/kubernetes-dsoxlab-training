@@ -1,0 +1,6 @@
+title: "Fermer le profileur de l'API server, sans fermer l'API"
+description: |
+  L'API server expose son profileur Go à qui sait l'atteindre, et un cluster
+  kubeadm le laisse actif. Fermez-le et relevez le plancher TLS, puis prouvez
+  les deux moitiés : le profileur répond 404, et le cluster fonctionne
+  toujours.
