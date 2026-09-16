@@ -152,3 +152,4 @@ sections:
       - cks-pod-security-admission
       - cks-image-pinned-digest
       - cks-rbac-least-privilege
+      - cks-audit-log-policy

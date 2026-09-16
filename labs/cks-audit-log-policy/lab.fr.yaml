@@ -1,0 +1,6 @@
+title: "Enregistrer qui lit les Secrets, et seulement les métadonnées du reste"
+description: |
+  Le cluster ne garde aucune trace de qui lit quoi. Donnez à l'API server une
+  politique d'audit à deux niveaux, corps complets pour les Secrets et
+  métadonnées pour le reste, et prouvez qu'elle agit en relisant le journal
+  que le cluster vient d'écrire.
