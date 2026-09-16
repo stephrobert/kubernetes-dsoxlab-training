@@ -139,21 +139,46 @@ def hints_yaml(vieux: dict) -> dict:
 
 
 def tests_py(vieux: dict) -> str:
-    """Un test pytest par check, qui appelle la bibliothèque héritée.
+    """Un squelette de tests, un par check hérité, À ÉCRIRE.
 
-    C'est le choix qui préserve l'investissement : 1954 lignes et 150 types de
-    check, vérifiés portables sur kubeadm. Les réécrire en pytest coûterait des
-    semaines pour un résultat équivalent, et perdrait les cas limites que ces
-    scripts ont accumulés.
+    CE QUE CETTE FONCTION NE FAIT PLUS, et pourquoi.
 
-    Ils restent conformes à la doctrine dsoxlab : ils interrogent l'état du
-    cluster avec kubectl, jamais les commandes tapées.
+    Jusqu'au 2026-09-15 elle produisait des tests qui appelaient la
+    bibliothèque héritée déposée sous `/opt/checks` sur le nœud. C'était un
+    gain apparent, et deux défauts réels :
+
+    - le lab fini dépendait d'un reste de l'ancêtre archivé, déposé par son
+      setup : une pièce de plus à maintenir, invisible depuis le test et
+      introuvable pour qui le lit. Le dernier lab à en dépendre a été réécrit,
+      et la règle est sans exception ;
+    - le gabarit concaténait `stdout + stderr` pour décider. C'est exactement
+      le défaut qui a fait passer `cka-troubleshoot-dns` AVANT le travail : le
+      client SSH écrit un avertissement sur stderr, la chaîne n'est jamais
+      vide, et un test qui conclut « chaîne vide = absent » conclut toujours
+      « présent ».
+
+    Le squelette produit ici ne prétend donc plus vérifier quoi que ce soit. Il
+    conserve la SUBSTANCE du check hérité, sa description et ses arguments, et
+    il échoue bruyamment tant qu'un humain n'a pas écrit la mesure. Un lab
+    transposé qui passerait ses tests sans que personne ne les ait écrits
+    serait le pire des deux mondes.
+
+    La bibliothèque héritée reste lisible sous `shared/checks/` : elle sert de
+    RÉFÉRENCE pour savoir ce que chaque check vérifiait, jamais de dépendance
+    d'exécution.
     """
     corps = [
-        '"""Tests transposés de K8sExamLab.\n',
-        "Chaque test appelle la bibliothèque de checks héritée, conservée telle",
-        "quelle sous /opt/checks sur le nœud. Elle interroge le cluster avec",
-        "kubectl : c'est bien l'état du système qui est lu.",
+        '"""test_functional.py : squelette transposé de K8sExamLab, À ÉCRIRE.\n',
+        "Chaque test porte la description du check hérité et ses arguments, et",
+        "rien d'autre : la mesure est à écrire, en interrogeant le cluster avec",
+        "kubectl. Tant qu'elle ne l'est pas, le test échoue, et c'est voulu.",
+        "",
+        "La règle du dépôt : on lit l'état du système, jamais les commandes",
+        "tapées, et on décide sur la SORTIE STANDARD. stderr sert aux messages",
+        "d'erreur, pas à trancher : le client SSH y écrit un avertissement, et",
+        "un test qui concatène les deux ne mesure plus rien.",
+        "",
+        "Ce que vérifiait chaque check hérité se relit dans `shared/checks/`.",
         '"""',
         "",
         "from __future__ import annotations",
@@ -162,7 +187,7 @@ def tests_py(vieux: dict) -> str:
         "",
         "from conftest import lab_host, lab_target_host",
         "",
-        'DISPATCH = "/opt/checks/dispatch.sh"',
+        'KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"',
         "",
         "",
         '@pytest.fixture(scope="module")',
@@ -170,11 +195,14 @@ def tests_py(vieux: dict) -> str:
         '    return lab_host(lab_target_host("k8s-cp.lab"))',
         "",
         "",
-        "def _check(host, *args: str):",
-        '    """Joue un check hérité et rend (code de retour, sortie)."""',
-        '    cmd = " ".join(str(a) for a in args)',
-        '    res = host.run(f"sudo -E bash {DISPATCH} {cmd}")',
-        "    return res.rc, (res.stdout + res.stderr).strip()",
+        "def _kubectl(host, args: str):",
+        '    """Joue une commande kubectl sur le control plane.',
+        "",
+        "    Rend (code, sortie standard, diagnostic), et les trois restent",
+        "    SÉPARÉS. Ne jamais les concaténer pour décider.",
+        '    """',
+        '    res = host.run(f"sudo {KUBECTL} {args}")',
+        "    return res.rc, res.stdout.strip(), res.stderr.strip()",
         "",
     ]
     for c in vieux.get("checks", []):
@@ -187,9 +215,15 @@ def tests_py(vieux: dict) -> str:
         corps += [
             "",
             f"def test_{nom}(host):",
-            f'    """{desc}"""',
-            f"    rc, sortie = _check(host, {args})",
-            f'    assert rc == 0, f"{desc} : {{sortie}}"',
+            f'    """{desc}',
+            "",
+            f"    Check hérité : {c['id']}({args})",
+            '    """',
+            '    pytest.fail(',
+            f'        "A_COMPLETER : écrire la mesure de « {desc} ». "',
+            f'        "Le check hérité s\'appelait {c["id"]} avec les arguments "',
+            '        "ci-dessus ; shared/checks/ dit ce qu\'il vérifiait."',
+            "    )",
         ]
     return "\n".join(corps) + "\n"
 
@@ -198,12 +232,6 @@ def setup_yaml(vieux: dict, a_un_script: bool) -> str:
     taches = [
         """    - name: Installer le socle, un cluster kubeadm à un nœud
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml""",
-        """
-    - name: Déposer la bibliothèque de checks héritée sur le nœud
-      ansible.builtin.copy:
-        src: ../../shared/checks/
-        dest: /opt/checks/
-        mode: "0755\"""",
     ]
     if a_un_script:
         taches.append(
