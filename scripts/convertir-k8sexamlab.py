@@ -219,10 +219,10 @@ def tests_py(vieux: dict) -> str:
             "",
             f"    Check hérité : {c['id']}({args})",
             '    """',
-            f'    pytest.fail(',
+            '    pytest.fail(',
             f'        "A_COMPLETER : écrire la mesure de « {desc} ». "',
             f'        "Le check hérité s\'appelait {c["id"]} avec les arguments "',
-            f'        "ci-dessus ; shared/checks/ dit ce qu\'il vérifiait."',
+            '        "ci-dessus ; shared/checks/ dit ce qu\'il vérifiait."',
             "    )",
         ]
     return "\n".join(corps) + "\n"
