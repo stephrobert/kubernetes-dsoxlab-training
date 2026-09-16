@@ -1,0 +1,6 @@
+title: "Reprendre un Pod privilégié en production, sans le priver de son travail"
+description: |
+  Un Pod tourne avec le namespace de processus de l'hôte, en root, privilégié,
+  depuis un tag flottant. Reconstruisez-le sans rien de tout cela, et prouvez
+  la différence là où elle se voit : de l'intérieur, le conteneur ne voit plus
+  l'hôte.

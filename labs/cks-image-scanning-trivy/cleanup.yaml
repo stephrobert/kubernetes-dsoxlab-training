@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab clean` : le namespace emporte le Deployment. Trivy et sa
+# base de vulnérabilités restent sur le nœud, et c'est délibéré : la base pèse
+# plusieurs dizaines de mégaoctets, la retélécharger à chaque passage rendrait
+# le lab tributaire du réseau au pire moment. L'outil ne change rien au
+# cluster, que le validateur photographie.
+- name: Nettoyer le lab cks-image-scanning-trivy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace chaine-appro
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

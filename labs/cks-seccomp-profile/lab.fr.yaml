@@ -1,0 +1,6 @@
+title: "Interdire un appel système à un conteneur, et le prouver de l'intérieur"
+description: |
+  Un conteneur qui peut appeler tout ce que le noyau propose. Écrivez un
+  profil seccomp qui refuse une famille d'appels système, appliquez-le, et
+  prouvez que le confinement tient : l'appel interdit échoue depuis
+  l'intérieur, et tout le reste continue de fonctionner.

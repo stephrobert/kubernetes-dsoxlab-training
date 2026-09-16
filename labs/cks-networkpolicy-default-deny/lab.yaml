@@ -1,0 +1,42 @@
+id: cks-networkpolicy-default-deny
+title: "Tout interdire, puis rouvrir le strict nécessaire, DNS compris"
+level: cluster-setup
+section: cks
+difficulty: intermediate
+description: |
+  A namespace where everything talks to everything. Close it completely in
+  both directions, then reopen exactly two things: the one flow the
+  application needs, and name resolution, which a default-deny egress breaks
+  in a way nothing warns you about.
+skills:
+  - networkpolicy
+  - default-deny
+  - zero-trust
+  - dns-egress
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKS, domaine Cluster Setup (15 %) : « Use Network
+# security policies to restrict cluster level access ».
+#
+# Le catalogue a déjà deux labs NetworkPolicy, CKA et CKAD, qui apprennent à
+# AUTORISER un flux. Celui-ci part de l'inverse, le modèle zéro-confiance :
+# on ferme tout, puis on rouvre. Le piège qu'il éprouve n'existe que dans ce
+# sens-là, et il est le plus coûteux du domaine : une sortie fermée par
+# défaut casse le DNS, et rien ne le signale.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

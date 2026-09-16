@@ -11,8 +11,8 @@
    "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 245,
+  "date": "2026-09-16",
+  "duree_s": 230,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -43,8 +43,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 130,
+  "date": "2026-09-16",
+  "duree_s": 127,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -75,8 +75,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 288,
+  "date": "2026-09-16",
+  "duree_s": 278,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -107,8 +107,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 158,
+  "date": "2026-09-16",
+  "duree_s": 157,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -139,8 +139,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 261,
+  "date": "2026-09-16",
+  "duree_s": 240,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -171,8 +171,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 130,
+  "date": "2026-09-16",
+  "duree_s": 86,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -203,8 +203,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 227,
+  "date": "2026-09-16",
+  "duree_s": 194,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -235,7 +235,7 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
+  "date": "2026-09-16",
   "duree_s": 279,
   "ecarts": [],
   "etapes": [
@@ -267,8 +267,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 152,
+  "date": "2026-09-16",
+  "duree_s": 157,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -299,8 +299,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 138,
+  "date": "2026-09-16",
+  "duree_s": 118,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -331,8 +331,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 720,
+  "date": "2026-09-16",
+  "duree_s": 725,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -363,8 +363,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 344,
+  "date": "2026-09-16",
+  "duree_s": 341,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -386,7 +386,7 @@
  "cka-taints-tolerations-placement": {
   "apres": {
    "passed": 4,
-   "score": 100,
+   "score": 95,
    "total": 4
   },
   "avant": {
@@ -395,8 +395,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 79,
+  "date": "2026-09-16",
+  "duree_s": 85,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -427,8 +427,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 158,
+  "date": "2026-09-16",
+  "duree_s": 235,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -459,8 +459,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 134,
+  "date": "2026-09-16",
+  "duree_s": 132,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -491,8 +491,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 197,
+  "date": "2026-09-16",
+  "duree_s": 191,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -523,8 +523,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 81,
+  "date": "2026-09-16",
+  "duree_s": 84,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -555,8 +555,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 578,
+  "date": "2026-09-16",
+  "duree_s": 561,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -587,8 +587,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 188,
+  "date": "2026-09-16",
+  "duree_s": 183,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -619,8 +619,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 582,
+  "date": "2026-09-16",
+  "duree_s": 579,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -651,7 +651,7 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
+  "date": "2026-09-16",
   "duree_s": 198,
   "ecarts": [],
   "etapes": [
@@ -683,8 +683,8 @@
    "total": 10
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 229,
+  "date": "2026-09-16",
+  "duree_s": 226,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -715,8 +715,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 87,
+  "date": "2026-09-16",
+  "duree_s": 81,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -747,8 +747,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 201,
+  "date": "2026-09-16",
+  "duree_s": 189,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -779,8 +779,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 85,
+  "date": "2026-09-16",
+  "duree_s": 82,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -811,8 +811,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 206,
+  "date": "2026-09-16",
+  "duree_s": 204,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -843,8 +843,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 103,
+  "date": "2026-09-16",
+  "duree_s": 87,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -875,8 +875,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 110,
+  "date": "2026-09-16",
+  "duree_s": 101,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -907,8 +907,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 80,
+  "date": "2026-09-16",
+  "duree_s": 78,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -939,8 +939,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 98,
+  "date": "2026-09-16",
+  "duree_s": 97,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -971,8 +971,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 220,
+  "date": "2026-09-16",
+  "duree_s": 210,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1003,8 +1003,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 110,
+  "date": "2026-09-16",
+  "duree_s": 135,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1035,8 +1035,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 85,
+  "date": "2026-09-16",
+  "duree_s": 84,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1067,8 +1067,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 171,
+  "date": "2026-09-16",
+  "duree_s": 172,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1099,8 +1099,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 112,
+  "date": "2026-09-16",
+  "duree_s": 81,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1131,8 +1131,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 93,
+  "date": "2026-09-16",
+  "duree_s": 78,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1163,8 +1163,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 724,
+  "date": "2026-09-16",
+  "duree_s": 726,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1212,6 +1212,38 @@
    "passed": 0,
    "score": 0,
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-api-server-hardening": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 177,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-api-server-hardening.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  },
@@ -1279,6 +1311,102 @@
   },
   "verdict": "VALIDE"
  },
+ "cks-cis-benchmark-remediate": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 256,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-cis-benchmark-remediate.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-cosign-verify-image": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 123,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-cosign-verify-image.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-dockerfile-static-analysis": {
+  "apres": {
+   "passed": 1,
+   "score": 100,
+   "total": 1
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 1
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 84,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/1",
+   "après la solution : 1/1",
+   "après clean et run : 0/1",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-dockerfile-static-analysis.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 1
+  },
+  "verdict": "VALIDE"
+ },
  "cks-image-pinned-digest": {
   "apres": {
    "passed": 3,
@@ -1308,6 +1436,70 @@
    "passed": 0,
    "score": 0,
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-image-scanning-trivy": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 130,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-image-scanning-trivy.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-networkpolicy-default-deny": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 215,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-networkpolicy-default-deny.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -1366,6 +1558,70 @@
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-rbac-least-privilege.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-seccomp-profile": {
+  "apres": {
+   "passed": 3,
+   "score": 100,
+   "total": 3
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 153,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-seccomp-profile.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-secure-existing-pod": {
+  "apres": {
+   "passed": 4,
+   "score": 100,
+   "total": 4
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 142,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-secure-existing-pod.log",
   "kubernetes": "v1.37.0",
   "raisons": [],
   "rejeu": {

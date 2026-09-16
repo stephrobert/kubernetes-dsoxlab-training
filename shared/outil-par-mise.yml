@@ -1,0 +1,71 @@
+---
+# Pose un outil sur le nœud avec `mise`, et le rend appelable sans préfixe.
+#
+# À inclure depuis le `setup.yaml` d'un lab qui a besoin d'un outil externe :
+#
+#     - name: Installer Trivy sur le nœud
+#       ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+#       vars:
+#         outil_nom: trivy
+#         outil_version: "0.74.0"
+#
+# POURQUOI MISE, et pas un téléchargement d'archive.
+#
+# Un `curl` d'archive GitHub épingle une URL de release qui bouge, ne dit pas
+# quelle version tourne une fois posée, et se réécrit dans chaque lab. `mise`
+# donne une version NOMMÉE, reproductible, et interrogeable après coup.
+# Décision de Stéphane du 2026-09-16.
+#
+# Tous les outils n'y sont pas : vérifier avec `mise ls-remote <outil>` avant
+# d'écrire un lab qui en dépend. Mesuré ce jour-là, trivy et cosign sont
+# connus, kube-bench ne l'est pas.
+#
+# Le lab qui inclut ce fichier retire ce qu'il a posé dans son `cleanup.yaml` :
+# un nœud modifié est une trace, et c'est le lab suivant qui la paierait.
+
+- name: Poser mise sur le nœud, une fois pour toutes
+  ansible.builtin.shell:
+    cmd: curl -sSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
+    creates: /usr/local/bin/mise
+
+- name: "Installer {{ outil_nom }} {{ outil_version }} avec mise"
+  # `install` et non `use` : `use` écrit en plus dans la configuration d'un
+  # répertoire ou d'un utilisateur, ce qui n'a aucun sens pour un outil posé
+  # à l'échelle de la machine, et qui a coûté un diagnostic.
+  ansible.builtin.command:
+    cmd: /usr/local/bin/mise install -y {{ outil_nom }}@{{ outil_version }}
+    creates: "/usr/local/share/mise/installs/{{ outil_nom }}/{{ outil_version }}"
+  environment:
+    MISE_DATA_DIR: /usr/local/share/mise
+
+- name: "Rendre {{ outil_nom }} appelable sans préfixe"
+  # Le chemin est CONSTRUIT, pas demandé à `mise which`.
+  #
+  # Mesuré le 2026-09-16 : sous `sudo`, `mise which` échoue avec « trivy is a
+  # mise bin however it is not currently active », parce qu'il cherche une
+  # configuration d'utilisateur ou de répertoire que root n'a pas. L'outil est
+  # pourtant bien installé. Construire le chemin ne dépend d'aucune
+  # configuration, et la structure de mise est stable :
+  # <data-dir>/installs/<outil>/<version>/<outil>.
+  #
+  # Sans ce lien, le candidat devrait connaître le chemin interne de mise pour
+  # appeler l'outil, ce qui n'a rien à voir avec ce que le lab enseigne.
+  ansible.builtin.file:
+    src: "/usr/local/share/mise/installs/{{ outil_nom }}/{{ outil_version }}/{{ outil_nom }}"
+    dest: "/usr/local/bin/{{ outil_nom }}"
+    state: link
+    force: true
+
+- name: "Vérifier que {{ outil_nom }} répond"
+  # Un lien qui pointe vers un fichier absent ne se voit pas à la création :
+  # `state: link` n'exige pas que la cible existe. On l'exerce donc.
+  #
+  # L'argument est PARAMÉTRABLE, et ce n'est pas du zèle. Mesuré le
+  # 2026-09-16 : `trivy --version` et `crane version` répondent, mais
+  # `cosign --version` rend « unknown flag: --version », cosign n'acceptant
+  # que la sous-commande `version`. Supposer une convention commune à tous les
+  # outils a fait échouer le setup d'un lab entier, alors que le binaire était
+  # correctement posé.
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/{{ outil_nom }} {{ outil_verification | default('--version') }}"
+  changed_when: false

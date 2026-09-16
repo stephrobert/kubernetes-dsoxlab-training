@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : les deux Pods vivent dans le namespace production,
+# le supprimer suffit. Le cluster reste en place.
+- name: Nettoyer le lab cks-secure-existing-pod
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace production
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

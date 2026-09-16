@@ -1,0 +1,12 @@
+---
+# Joué par `dsoxlab clean` : ce lab ne crée aucun objet dans le cluster, il ne
+# travaille que sur un fichier du nœud. Le retirer suffit ; Trivy reste posé,
+# c'est un outil et il ne change rien à ce que le validateur photographie.
+- name: Nettoyer le lab cks-dockerfile-static-analysis
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le répertoire de l'application
+      ansible.builtin.file:
+        path: /root/inventaire
+        state: absent

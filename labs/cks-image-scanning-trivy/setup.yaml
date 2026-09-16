@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab cks-image-scanning-trivy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser Trivy sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: trivy
+        outil_version: "0.74.0"
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,43 @@
+---
+# Joué par `dsoxlab clean` : rend l'API server tel qu'il était, que le
+# candidat ait réussi ou non.
+#
+# Comme pour cks-audit-log-policy, le nettoyage ne peut pas se contenter de
+# supprimer des objets : il restaure le manifeste depuis la sauvegarde prise
+# par le setup, puis attend que l'API réponde ET que son Pod statique soit
+# revenu Running. Mesuré le 2026-09-16 : /healthz répond avant que l'objet Pod
+# ne soit sorti de Pending, et le validateur photographie le cluster dans cette
+# fenêtre.
+- name: Nettoyer le lab cks-api-server-hardening
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Restaurer le manifeste de l'API server
+      ansible.builtin.copy:
+        src: /var/backups/kube-apiserver.avant-durcissement.yaml
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        remote_src: true
+        mode: "0600"
+      failed_when: false
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que le Pod statique de l'API server soit Running
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pods -l component=kube-apiserver
+        -o jsonpath={.items[*].status.phase}
+      register: phase_api
+      until: phase_api.stdout.split() | unique == ["Running"]
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

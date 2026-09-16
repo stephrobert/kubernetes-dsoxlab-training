@@ -1,0 +1,39 @@
+id: cks-image-scanning-trivy
+title: "Remplacer une image criblée de failles, et le prouver par un second scan"
+level: supply-chain-security
+section: cks
+difficulty: intermediate
+description: |
+  A Deployment runs an image three years old. Scan it, pick a replacement, and
+  prove the choice: the test scans both and demands strictly fewer critical
+  findings than the original, which no fixed threshold could measure honestly.
+skills:
+  - supply-chain-security
+  - image-scanning
+  - trivy
+  - cve
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine Supply Chain Security (20 %) :
+# « Scan images for known vulnerabilities ».
+#
+# Trivy est posé sur le nœud par `mise`, depuis shared/outil-par-mise.yml.
+# Décision de Stéphane du 2026-09-16 : les outils des labs s'installent avec
+# mise, jamais par un téléchargement d'archive.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

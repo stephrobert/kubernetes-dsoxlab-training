@@ -1,0 +1,40 @@
+id: cks-secure-existing-pod
+title: "Reprendre un Pod privilégié en production, sans le priver de son travail"
+level: minimize-vulnerabilities
+section: cks
+difficulty: intermediate
+description: |
+  A Pod runs with the host's process namespace, as root, privileged, from a
+  floating tag. Rebuild it without any of that, and prove the difference where
+  it is visible: from inside, the container no longer sees the host.
+skills:
+  - security-context
+  - privileged
+  - host-namespaces
+  - remediation
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKS, domaine Minimize Microservice Vulnerabilities
+# (20 %) : « Use appropriate pod security standards », côté remédiation.
+#
+# Le catalogue a déjà ckad-security-context-hardened, qui apprend à CONSTRUIRE
+# un Pod durci. Celui-ci part d'un Pod existant, privilégié, qui tourne et que
+# personne n'a signalé : reprendre l'existant est le geste du CKS, et il est
+# plus difficile, parce qu'il faut trouver ce qui ne va pas avant de corriger.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

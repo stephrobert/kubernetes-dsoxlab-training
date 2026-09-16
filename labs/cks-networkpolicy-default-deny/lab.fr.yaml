@@ -1,0 +1,6 @@
+title: "Tout interdire, puis rouvrir le strict nécessaire, DNS compris"
+description: |
+  Un namespace où tout parle à tout. Fermez-le entièrement dans les deux
+  directions, puis rouvrez exactement deux choses : le seul flux dont
+  l'application a besoin, et la résolution de noms, qu'une sortie fermée par
+  défaut casse sans que rien ne vous prévienne.

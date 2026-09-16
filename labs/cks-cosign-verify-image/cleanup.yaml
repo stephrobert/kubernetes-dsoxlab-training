@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab clean` : le namespace emporte le registre, et les clés que
+# le candidat a générées sont retirées du nœud. cosign et crane restent posés,
+# comme Trivy : ce sont des outils, ils ne changent rien au cluster que le
+# validateur photographie.
+- name: Nettoyer le lab cks-cosign-verify-image
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace chaine-signature
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les clés de signature du nœud
+      # Une clé privée laissée sur un nœud partagé est exactement ce que le
+      # domaine Supply Chain Security apprend à ne pas faire.
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /root/cosign.key
+        - /root/cosign.pub

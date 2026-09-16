@@ -1,0 +1,30 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab cks-dockerfile-static-analysis
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser Trivy sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: trivy
+        outil_version: "0.74.0"
+
+    - name: Créer le répertoire de l'application
+      ansible.builtin.file:
+        path: /root/inventaire
+        state: directory
+        mode: "0755"
+
+    - name: Déposer le Dockerfile fautif, en écrasant un travail précédent
+      # `force: true` est indispensable : sans lui, un second `run` après un
+      # travail réussi repartirait du Dockerfile CORRIGÉ, et le lab rendrait
+      # 100 avant que le candidat n'ait rien fait.
+      ansible.builtin.copy:
+        src: fixtures/Dockerfile
+        dest: /root/inventaire/Dockerfile
+        mode: "0644"
+        force: true

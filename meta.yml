@@ -149,7 +149,15 @@ sections:
       conteneur, ce qui est la raison d'être des VM de ce catalogue.
     labs:
       - cks-apparmor-confiner-un-pod
+      - cks-seccomp-profile
       - cks-pod-security-admission
+      - cks-secure-existing-pod
       - cks-image-pinned-digest
+      - cks-image-scanning-trivy
+      - cks-cosign-verify-image
+      - cks-dockerfile-static-analysis
       - cks-rbac-least-privilege
+      - cks-api-server-hardening
       - cks-audit-log-policy
+      - cks-networkpolicy-default-deny
+      - cks-cis-benchmark-remediate
