@@ -1471,6 +1471,38 @@
   },
   "verdict": "VALIDE"
  },
+ "cks-istio-mtls-lockdown": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 337,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-istio-mtls-lockdown.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "cks-networkpolicy-default-deny": {
   "apres": {
    "passed": 4,
@@ -1564,6 +1596,38 @@
    "passed": 0,
    "score": 0,
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-runtime-sandbox-gvisor": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 189,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 14 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-runtime-sandbox-gvisor.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  },

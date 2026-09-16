@@ -115,15 +115,17 @@ C'est l'ordre dans lequel les labs sont faits pour être joués, tel que `meta.y
 2. [`cks-seccomp-profile`](labs/cks-seccomp-profile/) : Interdire un appel système à un conteneur, et le prouver de l'intérieur
 3. [`cks-pod-security-admission`](labs/cks-pod-security-admission/) : Refuser un Pod privilégié à l'admission, avec Pod Security Admission
 4. [`cks-secure-existing-pod`](labs/cks-secure-existing-pod/) : Reprendre un Pod privilégié en production, sans le priver de son travail
-5. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) : Épingler une image par son digest, et prouver que le tag ne suffit pas
-6. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/) : Remplacer une image criblée de failles, et le prouver par un second scan
-7. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/) : Signer une image, et prouver la signature en faisant refuser une autre
-8. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/) : Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
-9. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/) : Retirer cluster-admin à un compte de service, sans le priver de son travail
-10. [`cks-api-server-hardening`](labs/cks-api-server-hardening/) : Fermer le profileur de l'API server, sans fermer l'API
-11. [`cks-audit-log-policy`](labs/cks-audit-log-policy/) : Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
-12. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/) : Tout interdire, puis rouvrir le strict nécessaire, DNS compris
-13. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) : Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+5. [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/) : Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
+6. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) : Épingler une image par son digest, et prouver que le tag ne suffit pas
+7. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/) : Remplacer une image criblée de failles, et le prouver par un second scan
+8. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/) : Signer une image, et prouver la signature en faisant refuser une autre
+9. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/) : Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
+10. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/) : Retirer cluster-admin à un compte de service, sans le priver de son travail
+11. [`cks-api-server-hardening`](labs/cks-api-server-hardening/) : Fermer le profileur de l'API server, sans fermer l'API
+12. [`cks-audit-log-policy`](labs/cks-audit-log-policy/) : Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
+13. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/) : Tout interdire, puis rouvrir le strict nécessaire, DNS compris
+14. [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/) : Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
+15. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) : Faire baisser le compte d'un audit CIS, et le prouver par un second audit
 
 ### La couverture du blueprint
 
@@ -183,7 +185,7 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 
 #### CKS, Certified Kubernetes Security Specialist
 
-13 lab(s).
+15 lab(s).
 
 | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|
@@ -192,8 +194,10 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Faire baisser le compte d'un audit CIS, et le prouver par un second audit | cluster-setup | 30m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/) | Tout interdire, puis rouvrir le strict nécessaire, DNS compris | cluster-setup | 20m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`cks-pod-security-admission`](labs/cks-pod-security-admission/) | Refuser un Pod privilégié à l'admission, avec Pod Security Admission | minimize-vulnerabilities | 15m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/) | Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version | minimize-vulnerabilities | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
 | [`cks-secure-existing-pod`](labs/cks-secure-existing-pod/) | Reprendre un Pod privilégié en production, sans le priver de son travail | minimize-vulnerabilities | 20m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 | [`cks-audit-log-policy`](labs/cks-audit-log-policy/) | Enregistrer qui lit les Secrets, et seulement les métadonnées du reste | monitoring-logging | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
+| [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/) | Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors | monitoring-logging | 30m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
 | [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/) | Signer une image, et prouver la signature en faisant refuser une autre | supply-chain-security | 30m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/) | Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application | supply-chain-security | 20m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) | Épingler une image par son digest, et prouver que le tag ne suffit pas | supply-chain-security | 15m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
@@ -201,7 +205,7 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confiner un Pod avec un profil AppArmor | system-hardening | 25m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 | [`cks-seccomp-profile`](labs/cks-seccomp-profile/) | Interdire un appel système à un conteneur, et le prouver de l'intérieur | system-hardening | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 
-Total : **51 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **53 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0.** **Curriculum de référence : CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

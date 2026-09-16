@@ -1,0 +1,51 @@
+---
+# Joué par `dsoxlab clean` : retire le maillage ENTIER, puis les namespaces.
+#
+# Istio pose des objets de CLUSTER, CRD et webhooks compris, qui survivraient
+# aux namespaces et laisseraient le validateur rendre ROUGE. `istioctl
+# uninstall --purge` reprend ceux-là.
+#
+# Il en reste un qu'il ne reprend PAS, et c'est le validateur qui l'a trouvé,
+# le 2026-09-16 : istiod pousse son certificat de CA racine dans un ConfigMap
+# `istio-ca-root-cert` de CHAQUE namespace, kube-system compris, et le purge
+# laisse ces copies derrière lui. Comme chaque installation génère un nouveau
+# CA, le ConfigMap n'est pas seulement laissé : son contenu CHANGE d'un
+# passage à l'autre. Le lab rendait ROUGE sur « kube-system
+# configmap/istio-ca-root-cert : 'f6df77835939' devenu '0d2005cac2d8' ».
+- name: Nettoyer le lab cks-istio-mtls-lockdown
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace maillage dehors
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Désinstaller Istio en entier
+      ansible.builtin.command: >-
+        istioctl uninstall --purge -y
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace d'Istio
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace istio-system
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    # `kubectl delete` n'accepte pas `--all-namespaces` : il faut énumérer.
+    - name: Retirer le ConfigMap du CA racine de tous les namespaces restants
+      ansible.builtin.shell: |
+        set -eu
+        kubectl get namespace -o name | sed 's|namespace/||' | while read -r ns; do
+          kubectl delete configmap istio-ca-root-cert -n "$ns" --ignore-not-found >/dev/null
+        done
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false

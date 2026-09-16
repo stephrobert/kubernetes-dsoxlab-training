@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab cks-istio-mtls-lockdown
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser istioctl sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: istioctl
+        outil_version: "1.31.0"
+        # istioctl n'accepte pas --version seul : il attend une sous-commande.
+        outil_verification: version --remote=false
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

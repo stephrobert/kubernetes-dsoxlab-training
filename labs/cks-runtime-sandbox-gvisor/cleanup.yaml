@@ -1,0 +1,36 @@
+---
+# Joué par `dsoxlab clean` : rend containerd tel qu'il était, et retire la
+# RuntimeClass.
+#
+# La RuntimeClass est un objet de CLUSTER, hors namespace : elle survivrait au
+# namespace, et le validateur rendrait ROUGE au motif que le cluster n'est pas
+# rendu intact. La configuration de containerd, elle, est un fichier du nœud
+# que le validateur ne photographie pas : la laisser modifiée ferait passer le
+# prochain passage avant tout travail.
+- name: Nettoyer le lab cks-runtime-sandbox-gvisor
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer la RuntimeClass
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete runtimeclass gvisor
+        --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace bac-a-sable
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Attendre que l'API server réponde
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

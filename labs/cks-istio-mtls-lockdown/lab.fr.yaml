@@ -1,0 +1,6 @@
+title: "Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors"
+description: |
+  Un maillage de services accepte du trafic en clair, de n'importe qui, du
+  maillage ou du dehors. Exigez le TLS mutuel, et prouvez-le de la seule façon
+  qui compte : un Pod muni d'un sidecar joint toujours le service, un Pod qui
+  n'en a pas ne le joint plus.

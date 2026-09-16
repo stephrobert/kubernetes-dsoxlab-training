@@ -1,0 +1,6 @@
+title: "Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version"
+description: |
+  Le nœud propose un second runtime de conteneurs, qui exécute un noyau
+  applicatif à lui. Placez-y un Pod, et prouvez l'isolation de la seule façon
+  qui ne se truque pas : de l'intérieur, la version du noyau n'est plus celle
+  du nœud.
