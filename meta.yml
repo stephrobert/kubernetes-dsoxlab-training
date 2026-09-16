@@ -151,3 +151,4 @@ sections:
       - cks-apparmor-confiner-un-pod
       - cks-pod-security-admission
       - cks-image-pinned-digest
+      - cks-rbac-least-privilege
