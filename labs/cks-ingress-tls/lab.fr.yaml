@@ -1,0 +1,5 @@
+title: "Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur"
+description: |
+  Le site répond déjà en HTTPS, et c'est précisément le piège : le contrôleur
+  Ingress sert son propre certificat par défaut à qui le demande. Terminez le
+  TLS avec un certificat qui nomme vraiment l'hôte.

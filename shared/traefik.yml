@@ -1,0 +1,76 @@
+---
+# Pose un contrôleur Ingress sur le cluster, pour les labs qui éprouvent
+# l'Ingress, le TLS ou la Gateway API.
+#
+# À inclure depuis le `setup.yaml` d'un lab, après le socle kubeadm :
+#
+#     - name: Installer le contrôleur Ingress
+#       ansible.builtin.include_tasks: ../../shared/traefik.yml
+#
+# POURQUOI TRAEFIK, et pas ingress-nginx.
+#
+# ingress-nginx est ARCHIVÉ depuis le 24 mars 2026 : son dépôt GitHub porte
+# `archived: true`. La leçon `ingress.mdx` du blog a basculé sur Traefik par
+# Helm, et un lab doit éprouver ce que la formation enseigne.
+#
+# POURQUOI DES NODEPORT FIXES.
+#
+# Le Service du chart est un LoadBalancer par défaut. Sur un cluster kubeadm
+# sans fournisseur de cloud, il reste `Pending` indéfiniment et rien ne
+# répond, sans message qui le dise. Les NodePort 30080 et 30443 sont donc
+# imposés, et c'est par eux que les tests interrogent le contrôleur depuis le
+# nœud.
+#
+# Les entrypoints gardent leurs ports internes par défaut, 8000 et 8443 : les
+# faire écouter sur 80 et 443 exigerait le sysctl
+# `net.ipv4.ip_unprivileged_port_start=0`, et n'apporterait rien puisque les
+# tests passent par les NodePort.
+#
+# Le lab qui inclut ce fichier appelle `shared/traefik-retirer.yml` dans son
+# `cleanup.yaml` : le chart pose une IngressClass et des CRD, qui sont des
+# objets de CLUSTER et que la photographie du validateur compterait comme une
+# trace laissée au lab suivant.
+
+- name: Installer helm avec mise
+  ansible.builtin.include_tasks: outil-par-mise.yml
+  vars:
+    outil_nom: helm
+    outil_version: "4.3.0"
+    # `helm --version` n'existe pas : helm attend la sous-commande `version`.
+    outil_verification: version --short
+
+- name: Déclarer le dépôt de charts de Traefik
+  ansible.builtin.command:
+    cmd: /usr/local/bin/helm repo add traefik https://traefik.github.io/charts
+  register: _depot_traefik
+  changed_when: "'has been added' in _depot_traefik.stdout"
+  failed_when: _depot_traefik.rc != 0 and 'already exists' not in _depot_traefik.stderr
+
+- name: Rafraîchir l'index des charts
+  ansible.builtin.command:
+    cmd: /usr/local/bin/helm repo update traefik
+  changed_when: false
+
+- name: Installer Traefik, exposé en NodePort
+  # Chart 41.6.0, appVersion v3.7.13, mesuré disponible le 2026-09-16.
+  # La version est ÉPINGLÉE : un chart qui bouge sous le lab en change le
+  # comportement sans que rien ne le signale.
+  ansible.builtin.command:
+    cmd: >-
+      /usr/local/bin/helm upgrade --install traefik traefik/traefik
+      --namespace traefik --create-namespace --version 41.6.0
+      --set service.type=NodePort
+      --set ports.web.nodePort=30080
+      --set ports.websecure.nodePort=30443
+      --set deployment.replicas=1
+      --wait --timeout 6m
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: true
+
+- name: Attendre que le contrôleur soit prêt
+  ansible.builtin.command:
+    cmd: >-
+      kubectl --kubeconfig /etc/kubernetes/admin.conf -n traefik
+      rollout status deployment/traefik --timeout=300s
+  changed_when: false

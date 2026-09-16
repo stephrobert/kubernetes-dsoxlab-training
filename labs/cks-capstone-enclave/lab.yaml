@@ -1,0 +1,48 @@
+id: cks-capstone-enclave
+title: "Capstone: open an enclave for a team you do not trust"
+level: minimize-vulnerabilities
+section: cks
+difficulty: advanced
+description: |
+  An outside team needs room in your cluster. Give them one that stays safe
+  even if they are not: the cluster itself must refuse what they should not
+  deploy, their identity must be able to do almost nothing, and nothing
+  outside the enclave may reach what runs inside it.
+skills:
+  - pod-security-admission
+  - rbac
+  - serviceaccount
+  - networkpolicy
+  - securitycontext
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+lab_type: capstone
+estimated_time: 45m
+
+# Un capstone ne vise pas UNE compétence du blueprint, il en croise plusieurs.
+# Celui-ci couvre trois des six domaines du CKS : Minimize Microservice
+# Vulnerabilities (20 %), Cluster Hardening (15 %) et Cluster Setup (15 %),
+# soit 50 % de l'épreuve.
+#
+# Ce que les micro-labs n'éprouvent pas, et qui est pourtant l'essentiel du
+# CKS : décider CE QU'IL FAUT POSER. Un lab nommé « networkpolicy-default-deny »
+# a déjà nommé l'objet avant que le candidat n'ouvre un terminal. Ici, aucune
+# des cinq exigences ne nomme un objet Kubernetes.
+certification_tags:
+  - cks
+
+# Le seuil de l'examen CKS est de 67 %, arrondi ici comme pour les deux autres
+# capstones du catalogue : quatre exigences sur cinq.
+exam_passing_score: 66
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

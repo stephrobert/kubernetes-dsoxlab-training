@@ -1311,6 +1311,38 @@
   },
   "verdict": "VALIDE"
  },
+ "cks-capstone-enclave": {
+  "apres": {
+   "passed": 5,
+   "score": 100,
+   "total": 5
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 341,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-capstone-enclave.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "cks-cis-benchmark-remediate": {
   "apres": {
    "passed": 2,
@@ -1359,7 +1391,7 @@
   "duree_s": 123,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -1388,10 +1420,10 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-16",
-  "duree_s": 84,
+  "duree_s": 70,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/1",
    "après la solution : 1/1",
    "après clean et run : 0/1",
@@ -1452,16 +1484,48 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-16",
-  "duree_s": 130,
+  "duree_s": 93,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-image-scanning-trivy.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-ingress-tls": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 397,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-ingress-tls.log",
   "kubernetes": "v1.37.0",
   "raisons": [],
   "rejeu": {
@@ -1484,7 +1548,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-16",
-  "duree_s": 337,
+  "duree_s": 348,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 13 objets hors kube-system",
@@ -1692,6 +1756,38 @@
    "passed": 0,
    "score": 0,
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-security-context-immutable": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 211,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-security-context-immutable.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  }

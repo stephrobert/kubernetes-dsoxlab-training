@@ -1,0 +1,6 @@
+title: "Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance"
+description: |
+  Une équipe extérieure a besoin de place dans votre cluster. Donnez-lui un
+  espace qui reste sûr même si elle ne l'est pas : le cluster doit refuser
+  lui-même ce qu'elle ne devrait pas déployer, son identité ne doit presque
+  rien pouvoir, et rien hors de l'enclave ne doit atteindre ce qui y tourne.

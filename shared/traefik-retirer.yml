@@ -1,0 +1,43 @@
+---
+# Retire le contrôleur Ingress et TOUT ce que son chart a posé.
+#
+# À inclure depuis le `cleanup.yaml` d'un lab qui a inclus `traefik.yml` :
+#
+#     - name: Retirer le contrôleur Ingress
+#       ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
+#
+# `helm uninstall` ne suffit PAS. Helm laisse derrière lui les CRD qu'il a
+# posées, délibérément, parce que les supprimer détruirait les objets qui en
+# dépendent. Ces CRD sont des objets de CLUSTER : la photographie du
+# validateur les verrait apparaître, et le lab serait rendu ROUGE pour une
+# trace qui n'est pas de son fait mais dont il est responsable.
+
+- name: Désinstaller la release Traefik
+  ansible.builtin.command:
+    cmd: /usr/local/bin/helm uninstall traefik --namespace traefik --wait --timeout 5m
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: true
+  failed_when: false
+
+- name: Supprimer le namespace du contrôleur
+  ansible.builtin.command:
+    cmd: >-
+      kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace traefik
+      --ignore-not-found --wait=true --timeout=180s
+  changed_when: true
+  failed_when: false
+
+- name: Supprimer les CRD que helm laisse derrière lui
+  # `kubectl delete crd -l` ne suffit pas : le chart n'étiquette pas toutes
+  # ses CRD. On les énumère par leur suffixe de groupe, qui les désigne sans
+  # ambiguïté.
+  ansible.builtin.shell: |
+    set -eu
+    kubectl get crd -o name \
+      | grep -E 'traefik\.io$|gateway\.networking\.k8s\.io$' \
+      | xargs -r kubectl delete --ignore-not-found >/dev/null
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: true
+  failed_when: false
