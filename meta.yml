@@ -152,6 +152,7 @@ sections:
       - cks-seccomp-profile
       - cks-pod-security-admission
       - cks-secure-existing-pod
+      - cks-runtime-sandbox-gvisor
       - cks-image-pinned-digest
       - cks-image-scanning-trivy
       - cks-cosign-verify-image
@@ -160,4 +161,10 @@ sections:
       - cks-api-server-hardening
       - cks-audit-log-policy
       - cks-networkpolicy-default-deny
+      # Le mTLS vient juste après la NetworkPolicy, et dans cet ordre : l'un
+      # décide QUI a le droit de parler, l'autre exige que celui qui parle
+      # prouve son identité. Les deux répondent à des questions différentes,
+      # et l'apprenant qui a posé un default-deny voit mieux ce que le
+      # chiffrement ajoute par-dessus.
+      - cks-istio-mtls-lockdown
       - cks-cis-benchmark-remediate

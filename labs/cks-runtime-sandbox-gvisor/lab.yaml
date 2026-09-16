@@ -1,0 +1,41 @@
+id: cks-runtime-sandbox-gvisor
+title: "Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version"
+level: minimize-vulnerabilities
+section: cks
+difficulty: advanced
+description: |
+  The node offers a second container runtime that runs an application kernel of
+  its own. Put a Pod inside it, and prove the isolation the only way that
+  cannot be faked: from inside, the kernel version is no longer the node's.
+skills:
+  - runtimeclass
+  - gvisor
+  - sandbox
+  - containerd
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine Minimize Microservice Vulnerabilities
+# (20 %) : « Use appropriate pod security standards » et l'isolation par
+# bac à sable.
+#
+# Ce lab lève une attestation NÉGATIVE de la formation : « runtime-sandboxes,
+# containerd ne déclare que runc ». Le setup installe gVisor et le déclare
+# auprès de containerd, ce qui rend la compétence éprouvable pour la première
+# fois dans le catalogue.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

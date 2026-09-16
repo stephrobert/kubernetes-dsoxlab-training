@@ -1,0 +1,40 @@
+id: cks-istio-mtls-lockdown
+title: "Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors"
+level: monitoring-logging
+section: cks
+difficulty: advanced
+description: |
+  A service mesh accepts plain traffic from anyone, inside the mesh or out.
+  Require mutual TLS, and prove it the only way that counts: a Pod with a
+  sidecar still reaches the service, a Pod without one no longer does.
+skills:
+  - istio
+  - mtls
+  - peerauthentication
+  - service-mesh
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+lab_type: lab
+estimated_time: 30m
+
+# Compétence du blueprint CKS, domaine Monitoring, Logging and Runtime
+# Security (20 %) : le chiffrement du trafic entre Pods.
+#
+# Istio est posé par le setup avec `istioctl`, lui-même installé par mise.
+# Mesuré le 2026-09-16 : le profil `minimal` ne déploie qu'istiod et consomme
+# environ 194 Mo, ce qui tient largement sur ce socle. Le profil par défaut,
+# avec ses passerelles, n'aurait rien apporté au sujet.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
