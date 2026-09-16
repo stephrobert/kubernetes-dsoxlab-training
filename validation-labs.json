@@ -127,6 +127,38 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-gateway-api-httproute": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 536,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-gateway-api-httproute.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "cka-hpa-autoscaling": {
   "apres": {
    "passed": 4,
@@ -156,6 +188,38 @@
    "passed": 0,
    "score": 0,
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-ingress-path-routing": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-16",
+  "duree_s": 272,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-ingress-path-routing.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  },
@@ -1516,7 +1580,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-09-16",
-  "duree_s": 397,
+  "duree_s": 268,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 13 objets hors kube-system",

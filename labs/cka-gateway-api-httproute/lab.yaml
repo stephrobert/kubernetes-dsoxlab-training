@@ -1,0 +1,40 @@
+id: cka-gateway-api-httproute
+title: "Router avec la Gateway API, et voir la Gateway se déclarer programmée"
+level: services-networking
+section: cka
+difficulty: advanced
+description: |
+  Same two applications, same single hostname, and the successor to Ingress.
+  Declare a Gateway, attach a route to it, and prove the routing: each path
+  answers with its own application's name, an undeclared path answers with
+  neither.
+skills:
+  - gateway-api
+  - httproute
+  - services
+  - routage
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKA, domaine Services and Networking (20 %) :
+# « Use the Gateway API to manage Ingress traffic », entrée ajoutée au
+# curriculum et qui n'était couverte nulle part dans ce catalogue.
+#
+# Les CRD et la GatewayClass sont posées par le setup. Ce que le lab mesure
+# est la Gateway et sa route, pas l'installation d'un contrôleur.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,6 @@
+title: "Router avec la Gateway API, et voir la Gateway se déclarer programmée"
+description: |
+  Les deux mêmes applications, le même nom d'hôte unique, et le successeur de
+  l'Ingress. Déclarez une Gateway, attachez-lui une route, et prouvez le
+  routage : chaque chemin répond le nom de son application, un chemin non
+  déclaré ne répond ni l'une ni l'autre.

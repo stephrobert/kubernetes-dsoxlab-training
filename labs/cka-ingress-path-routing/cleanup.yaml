@@ -1,0 +1,15 @@
+---
+# Joué par `dsoxlab clean`.
+- name: Nettoyer le lab cka-ingress-path-routing
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le contrôleur Ingress et ses CRD
+      ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml

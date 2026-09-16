@@ -1,0 +1,37 @@
+id: cka-ingress-path-routing
+title: "Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne"
+level: services-networking
+section: cka
+difficulty: intermediate
+description: |
+  Two applications, one hostname, and no rule saying which is which. Route by
+  path, and prove it the only way that counts: each path answers with its own
+  application's name, and an undeclared path answers with neither.
+skills:
+  - ingress
+  - services
+  - routage
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKA, domaine Services and Networking (20 %) :
+# « Understand connectivity between Pods » et l'exposition par Ingress.
+#
+# Le contrôleur est posé par le setup : ce que le lab mesure est la règle de
+# routage, pas l'installation d'un contrôleur.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

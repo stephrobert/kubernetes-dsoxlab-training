@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab cka-gateway-api-httproute
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Installer le contrôleur et la Gateway API
+      ansible.builtin.include_tasks: ../../shared/traefik.yml
+      vars:
+        # Pose les CRD de la Gateway API et active le provider correspondant,
+        # ce qui crée la GatewayClass. La Gateway elle-même reste à la charge
+        # du candidat : c'est l'objet du lab.
+        traefik_gateway_api: true
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

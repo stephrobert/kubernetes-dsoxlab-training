@@ -21,10 +21,26 @@
 # imposés, et c'est par eux que les tests interrogent le contrôleur depuis le
 # nœud.
 #
-# Les entrypoints gardent leurs ports internes par défaut, 8000 et 8443 : les
-# faire écouter sur 80 et 443 exigerait le sysctl
-# `net.ipv4.ip_unprivileged_port_start=0`, et n'apporterait rien puisque les
-# tests passent par les NodePort.
+# POURQUOI L'ENTRYPOINT WEB ÉCOUTE SUR 80.
+#
+# Le chart le met sur 8000 par défaut, le conteneur ne tournant pas en root.
+# Cela suffirait aux labs Ingress, qui passent par le NodePort. Mais le
+# listener d'une Gateway déclare un port qui doit correspondre à celui d'un
+# entrypoint Traefik : un candidat qui écrit `port: 80`, ce que toute
+# documentation de la Gateway API lui montre, verrait sa Gateway rester non
+# programmée sans message utile. Plutôt que de lui faire écrire `port: 8000`,
+# on aligne l'entrypoint, avec le sysctl sûr
+# `net.ipv4.ip_unprivileged_port_start=0`.
+#
+# GATEWAY API.
+#
+# Passer `traefik_gateway_api: true` installe les CRD de la Gateway API et
+# active le provider correspondant, ce qui crée la GatewayClass `traefik`. La
+# Gateway elle-même reste à la charge du candidat : `gateway.enabled=false`.
+#
+# Les CRD sont posées par NOUS, et non par le chart, qui prévient d'ailleurs
+# qu'il cessera de les livrer : « Gateway API CRDs will no longer be shipped
+# with this chart in a future major version ».
 #
 # Le lab qui inclut ce fichier appelle `shared/traefik-retirer.yml` dans son
 # `cleanup.yaml` : le chart pose une IngressClass et des CRD, qui sont des
@@ -38,6 +54,18 @@
     outil_version: "4.3.0"
     # `helm --version` n'existe pas : helm attend la sous-commande `version`.
     outil_verification: version --short
+
+- name: Installer les CRD de la Gateway API
+  # v1.6.2, canal `standard`, mesuré disponible le 2026-09-16. Le fichier pose
+  # dix CRD ET une ValidatingAdmissionPolicy nommée
+  # `safe-upgrades.gateway.networking.k8s.io`, que le retrait doit reprendre :
+  # ce sont toutes des objets de CLUSTER.
+  ansible.builtin.command:
+    cmd: >-
+      kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
+      https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.2/standard-install.yaml
+  changed_when: true
+  when: traefik_gateway_api | default(false) | bool
 
 - name: Déclarer le dépôt de charts de Traefik
   ansible.builtin.command:
@@ -61,8 +89,13 @@
       --namespace traefik --create-namespace --version 41.6.0
       --set service.type=NodePort
       --set ports.web.nodePort=30080
+      --set ports.web.port=80
       --set ports.websecure.nodePort=30443
       --set deployment.replicas=1
+      --set-string podSecurityContext.sysctls[0].name=net.ipv4.ip_unprivileged_port_start
+      --set-string podSecurityContext.sysctls[0].value=0
+      --set providers.kubernetesGateway.enabled={{ traefik_gateway_api | default(false) | bool | lower }}
+      --set gateway.enabled=false
       --wait --timeout 6m
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,6 @@
+title: "Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne"
+description: |
+  Deux applications, un seul nom d'hôte, et aucune règle disant laquelle est
+  laquelle. Routez par le chemin, et prouvez-le de la seule façon qui compte :
+  chaque chemin répond le nom de son application, et un chemin non déclaré ne
+  répond ni l'une ni l'autre.
