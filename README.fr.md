@@ -73,20 +73,22 @@ C'est l'ordre dans lequel les labs sont faits pour être joués, tel que `meta.y
 4. [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/) : Réserver un nœud : taint, tolérance et nodeSelector
 5. [`cka-node-affinity`](labs/cka-node-affinity/) : Placer avec nodeAffinity : contrainte obligatoire et préférence
 6. [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/) : Isoler la base de données : seul le backend y accède
-7. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) : Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit
-8. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/) : Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version
-9. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) : Vider un worker pour une maintenance, sans couper le service
-10. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/) : Faire monter en charge automatiquement avec un HorizontalPodAutoscaler
-11. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/) : Sortir un Pod de l'ImagePullBackOff
-12. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/) : Sortir un Deployment du CrashLoopBackOff
-13. [`cka-kubectl-debug`](labs/cka-kubectl-debug/) : Entrer dans un conteneur sans shell avec kubectl debug
-14. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/) : Rétablir la résolution DNS du cluster
-15. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/) : Rétablir le trafic vers un Service
-16. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/) : Ramener un nœud NotReady dans le cluster
-17. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/) : Réparer un kubelet qui refuse de démarrer
-18. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/) : Remettre l'API server en service
-19. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) : Sauvegarder etcd, puis restaurer le cluster depuis un instantané
-20. [`cka-capstone-portail`](labs/cka-capstone-portail/) : Capstone : remettre le portail en service, sans personne à qui demander · **capstone**
+7. [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/) : Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne
+8. [`cka-gateway-api-httproute`](labs/cka-gateway-api-httproute/) : Router avec la Gateway API, et voir la Gateway se déclarer programmée
+9. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) : Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit
+10. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/) : Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version
+11. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) : Vider un worker pour une maintenance, sans couper le service
+12. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/) : Faire monter en charge automatiquement avec un HorizontalPodAutoscaler
+13. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/) : Sortir un Pod de l'ImagePullBackOff
+14. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/) : Sortir un Deployment du CrashLoopBackOff
+15. [`cka-kubectl-debug`](labs/cka-kubectl-debug/) : Entrer dans un conteneur sans shell avec kubectl debug
+16. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/) : Rétablir la résolution DNS du cluster
+17. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/) : Rétablir le trafic vers un Service
+18. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/) : Ramener un nœud NotReady dans le cluster
+19. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/) : Réparer un kubelet qui refuse de démarrer
+20. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/) : Remettre l'API server en service
+21. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) : Sauvegarder etcd, puis restaurer le cluster depuis un instantané
+22. [`cka-capstone-portail`](labs/cka-capstone-portail/) : Capstone : remettre le portail en service, sans personne à qui demander · **capstone**
 
 **CKAD, Certified Kubernetes Application Developer**
 
@@ -136,7 +138,7 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 
 #### CKA, Certified Kubernetes Administrator
 
-20 lab(s).
+22 lab(s).
 
 | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|
@@ -144,6 +146,8 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 | [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) | Vider un worker pour une maintenance, sans couper le service | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 | [`cka-rbac-serviceaccount`](labs/cka-rbac-serviceaccount/) | Donner une identité à une application : ServiceAccount, Role, RoleBinding | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
 | [`cka-static-pod`](labs/cka-static-pod/) | Poser un Pod statique sur un worker, sans passer par l'API | cluster-architecture-installation-configuration | 10m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
+| [`cka-gateway-api-httproute`](labs/cka-gateway-api-httproute/) | Router avec la Gateway API, et voir la Gateway se déclarer programmée | services-networking | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
+| [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/) | Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne | services-networking | 20m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/) | Isoler la base de données : seul le backend y accède | services-networking | 15m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) | Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit | storage | 15m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
 | [`cka-kubectl-debug`](labs/cka-kubectl-debug/) | Entrer dans un conteneur sans shell avec kubectl debug | troubleshooting | 15m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
@@ -211,7 +215,7 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 | [`cks-seccomp-profile`](labs/cks-seccomp-profile/) | Interdire un appel système à un conteneur, et le prouver de l'intérieur | system-hardening | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 
-Total : **56 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **58 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0.** **Curriculum de référence : CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

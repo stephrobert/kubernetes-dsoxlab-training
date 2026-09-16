@@ -73,20 +73,22 @@ This is the order in which the labs are meant to be played, as declared in `meta
 4. [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/): Reserve a node: taint, toleration and nodeSelector
 5. [`cka-node-affinity`](labs/cka-node-affinity/): Placing with nodeAffinity: required constraint and preference
 6. [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/): Isolate the database: only the backend gets in
-7. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/): A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes
-8. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/): Roll back a stuck rollout, then ship the right version
-9. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/): Drain a worker for maintenance, without cutting the service
-10. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/): Scale out automatically with a HorizontalPodAutoscaler
-11. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/): Get a Pod out of ImagePullBackOff
-12. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/): Get a Deployment out of CrashLoopBackOff
-13. [`cka-kubectl-debug`](labs/cka-kubectl-debug/): Get inside a container with no shell using kubectl debug
-14. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/): Restore the cluster's DNS resolution
-15. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/): Restore traffic to a Service
-16. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/): Bring a NotReady node back into the cluster
-17. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/): Repair a kubelet that refuses to start
-18. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/): Bring the API server back into service
-19. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/): Back up etcd, then restore the cluster from a snapshot
-20. [`cka-capstone-portail`](labs/cka-capstone-portail/): Capstone: bring the portal back, with nobody left to ask · **capstone**
+7. [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/): Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne
+8. [`cka-gateway-api-httproute`](labs/cka-gateway-api-httproute/): Router avec la Gateway API, et voir la Gateway se déclarer programmée
+9. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/): A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes
+10. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/): Roll back a stuck rollout, then ship the right version
+11. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/): Drain a worker for maintenance, without cutting the service
+12. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/): Scale out automatically with a HorizontalPodAutoscaler
+13. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/): Get a Pod out of ImagePullBackOff
+14. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/): Get a Deployment out of CrashLoopBackOff
+15. [`cka-kubectl-debug`](labs/cka-kubectl-debug/): Get inside a container with no shell using kubectl debug
+16. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/): Restore the cluster's DNS resolution
+17. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/): Restore traffic to a Service
+18. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/): Bring a NotReady node back into the cluster
+19. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/): Repair a kubelet that refuses to start
+20. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/): Bring the API server back into service
+21. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/): Back up etcd, then restore the cluster from a snapshot
+22. [`cka-capstone-portail`](labs/cka-capstone-portail/): Capstone: bring the portal back, with nobody left to ask · **capstone**
 
 **CKAD, Certified Kubernetes Application Developer**
 
@@ -136,7 +138,7 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 
 #### CKA, Certified Kubernetes Administrator
 
-20 lab(s).
+22 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
@@ -144,6 +146,8 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) | Drain a worker for maintenance, without cutting the service | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 | [`cka-rbac-serviceaccount`](labs/cka-rbac-serviceaccount/) | Give an application an identity: ServiceAccount, Role, RoleBinding | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
 | [`cka-static-pod`](labs/cka-static-pod/) | Place a static Pod on a worker, without going through the API | cluster-architecture-installation-configuration | 10m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
+| [`cka-gateway-api-httproute`](labs/cka-gateway-api-httproute/) | Router avec la Gateway API, et voir la Gateway se déclarer programmée | services-networking | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
+| [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/) | Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne | services-networking | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/) | Isolate the database: only the backend gets in | services-networking | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) | A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes | storage | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
 | [`cka-kubectl-debug`](labs/cka-kubectl-debug/) | Get inside a container with no shell using kubectl debug | troubleshooting | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
@@ -211,7 +215,7 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cks-seccomp-profile`](labs/cks-seccomp-profile/) | Interdire un appel système à un conteneur, et le prouver de l'intérieur | system-hardening | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 
-Total: **56 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **58 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

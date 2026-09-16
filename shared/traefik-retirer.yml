@@ -31,12 +31,30 @@
 - name: Supprimer les CRD que helm laisse derrière lui
   # `kubectl delete crd -l` ne suffit pas : le chart n'étiquette pas toutes
   # ses CRD. On les énumère par leur suffixe de groupe, qui les désigne sans
-  # ambiguïté.
+  # ambiguïté. Le motif `traefik\.io$` couvre aussi le groupe `hub.traefik.io`,
+  # puisqu'il se termine de la même façon.
   ansible.builtin.shell: |
     set -eu
     kubectl get crd -o name \
       | grep -E 'traefik\.io$|gateway\.networking\.k8s\.io$' \
       | xargs -r kubectl delete --ignore-not-found >/dev/null
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: true
+  failed_when: false
+
+- name: Supprimer la politique d'admission de la Gateway API
+  # `standard-install.yaml` ne pose pas que des CRD : il pose aussi une
+  # ValidatingAdmissionPolicy et son binding, nommés
+  # `safe-upgrades.gateway.networking.k8s.io`. Ce sont des objets de CLUSTER,
+  # que la photographie du validateur verrait apparaître, et qu'aucun
+  # `delete crd` ne reprend.
+  ansible.builtin.shell: |
+    set -eu
+    kubectl delete validatingadmissionpolicybinding \
+      safe-upgrades.gateway.networking.k8s.io --ignore-not-found >/dev/null
+    kubectl delete validatingadmissionpolicy \
+      safe-upgrades.gateway.networking.k8s.io --ignore-not-found >/dev/null
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
   changed_when: true

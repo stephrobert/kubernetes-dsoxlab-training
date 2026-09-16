@@ -96,6 +96,12 @@ sections:
       - cka-taints-tolerations-placement
       - cka-node-affinity
       - cka-networkpolicy-isolate-db
+      # Les deux labs de routage se suivent, et dans cet ordre : ils posent la
+      # MÊME situation de départ, et seule la façon de la router change.
+      # L'apprenant qui vient d'écrire un Ingress voit alors ce que la Gateway
+      # API sépare, et ce qu'elle ne change pas.
+      - cka-ingress-path-routing
+      - cka-gateway-api-httproute
       - cka-pv-pvc-storageclass
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
