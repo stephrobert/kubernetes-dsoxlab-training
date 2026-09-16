@@ -139,6 +139,19 @@ repos:
       # « correction » qui affirmait avoir vérifié la source sans l'avoir
       # ouverte. `curriculums.yml` tient ces chiffres une fois, avec leur source
       # et leur date ; ce hook refuse toute mention qui les contredit.
+      # Deux sources décrivent le catalogue : les répertoires de `labs/` et le
+      # parcours de `meta.yml`. Chaque outil lit la sienne et a raison de son
+      # côté ; le trou est ENTRE les deux. Le 2026-09-16, deux labs CKS validés
+      # ont disparu de meta.yml sans qu'un seul contrôle ne bronche, et un
+      # répertoire de lab s'est retrouvé amputé de son lab.yaml, donc invisible
+      # pour tout l'outillage, qui part des lab.yaml existants.
+      - id: meta-declare-les-labs
+        name: meta.yml et labs/ décrivent le même catalogue
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_meta_declare_les_labs.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: curriculums-coherents
         name: aucun poids de domaine ne contredit le curriculum officiel
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_curriculums.py -q
