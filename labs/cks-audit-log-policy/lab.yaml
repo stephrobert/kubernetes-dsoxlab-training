@@ -1,0 +1,41 @@
+id: cks-audit-log-policy
+title: "Enregistrer qui lit les Secrets, et seulement les métadonnées du reste"
+level: monitoring-logging
+section: cks
+difficulty: advanced
+description: |
+  The cluster keeps no trace of who reads what. Give the API server an audit
+  policy with two levels, full bodies for Secrets and metadata for everything
+  else, and prove it works by reading the log the cluster has just written.
+skills:
+  - audit-policy
+  - audit-log
+  - kube-apiserver
+  - static-pod
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine Monitoring, Logging and Runtime
+# Security (20 %) : « Ensure immutability of containers at runtime » et
+# l'audit qui va avec. Ce domaine pèse un cinquième de l'épreuve et n'avait
+# aucun lab.
+#
+# Ce lab modifie le manifeste statique de l'API server, ce qu'un cluster en
+# conteneur ne permet pas de faire proprement : c'est une des raisons d'être
+# des VM de ce catalogue.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

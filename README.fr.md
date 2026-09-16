@@ -180,6 +180,7 @@ Les mêmes labs, groupés par le domaine que l'examen nomme. C'est la vue qui r�
 |---|---|---|---|---|---|
 | [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/) | Retirer cluster-admin à un compte de service, sans le priver de son travail | cluster-hardening | 20m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 | [`cks-pod-security-admission`](labs/cks-pod-security-admission/) | Refuser un Pod privilégié à l'admission, avec Pod Security Admission | minimize-vulnerabilities | 15m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| [`cks-audit-log-policy`](labs/cks-audit-log-policy/) | Enregistrer qui lit les Secrets, et seulement les métadonnées du reste | monitoring-logging | 25m | 2026-09-16 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
 | [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) | Épingler une image par son digest, et prouver que le tag ne suffit pas | supply-chain-security | 15m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confiner un Pod avec un profil AppArmor | system-hardening | 25m | 2026-09-15 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 

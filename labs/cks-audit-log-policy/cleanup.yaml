@@ -1,0 +1,64 @@
+---
+# Joué par `dsoxlab clean` : rend l'API server tel qu'il était, que le
+# candidat ait réussi ou non.
+#
+# Ce lab est le seul du catalogue, avec cka-troubleshoot-apiserver, à modifier
+# un fichier dont dépend tout le cluster. Le nettoyage ne peut donc pas se
+# contenter de supprimer des objets : il restaure le manifeste depuis la
+# sauvegarde prise par le setup, puis ATTEND que l'API réponde. Sans cette
+# attente, le lab suivant partirait d'un cluster sans API.
+- name: Nettoyer le lab cks-audit-log-policy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Restaurer le manifeste de l'API server
+      ansible.builtin.copy:
+        src: /var/backups/kube-apiserver.avant-audit.yaml
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        remote_src: true
+        mode: "0600"
+      failed_when: false
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    # `/healthz` répond avant que le Pod statique ne soit revenu Running : le
+    # kubelet a recréé le conteneur, mais l'objet Pod passe par Pending le
+    # temps que son état remonte. Mesuré le 2026-09-16 : le validateur
+    # photographiait le cluster pendant cette fenêtre et rendait ROUGE au motif
+    # que kube-apiserver était Pending, alors que tout allait bien une seconde
+    # plus tard. On attend donc ce que le validateur regarde, pas seulement ce
+    # qui répond.
+    - name: Attendre que le Pod statique de l'API server soit Running
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pods -l component=kube-apiserver
+        -o jsonpath={.items[*].status.phase}
+      register: phase_api
+      until: phase_api.stdout.split() | unique == ["Running"]
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer la politique et le journal d'audit du nœud
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes/audit-policy.yaml
+        - /var/log/kubernetes/audit.log
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace coffre
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
