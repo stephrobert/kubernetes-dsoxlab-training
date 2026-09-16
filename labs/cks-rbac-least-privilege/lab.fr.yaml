@@ -1,0 +1,6 @@
+title: "Retirer cluster-admin à un compte de service, sans le priver de son travail"
+description: |
+  Un ServiceAccount détient cluster-admin parce que c'était plus rapide.
+  Reprenez ce pouvoir et donnez-lui exactement ce dont son application a
+  besoin, rien de plus. La preuve n'est pas dans le manifeste : elle est dans
+  ce que l'API server répond quand ce compte demande.

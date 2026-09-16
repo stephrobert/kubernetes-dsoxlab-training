@@ -1,0 +1,38 @@
+id: cks-rbac-least-privilege
+title: "Retirer cluster-admin à un compte de service, sans le priver de son travail"
+level: cluster-hardening
+section: cks
+difficulty: intermediate
+description: |
+  A ServiceAccount holds cluster-admin because it was quicker. Take that power
+  back and give it exactly what its application needs, no more. The proof is
+  not the manifest: it is what the API server answers when that account asks.
+skills:
+  - rbac
+  - least-privilege
+  - clusterrolebinding
+  - auth-can-i
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKS, domaine Cluster Hardening (15 %) : « Use Role
+# Based Access Controls to minimize exposure » et « Exercise caution in using
+# service accounts ». Le catalogue a déjà deux labs RBAC, CKA et CKAD, qui
+# apprennent à DONNER un droit. Celui-ci apprend à en RETIRER un sans casser
+# l'application, ce qui est le geste du CKS et le plus difficile des deux.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab clean` : le namespace emporte le compte, son application et
+# les Role/RoleBinding que le candidat a créés. Le ClusterRoleBinding, lui, est
+# un objet de CLUSTER : il survivrait au namespace, et le validateur rendrait
+# ROUGE au motif que le cluster n'est pas rendu intact. On le retire donc
+# explicitement, qu'il ait été supprimé par le candidat ou non.
+- name: Nettoyer le lab cks-rbac-least-privilege
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le ClusterRoleBinding du raccourci
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete clusterrolebinding
+        dev-admin-binding --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace equipe-dev
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
