@@ -152,6 +152,11 @@ sections:
       - cks-seccomp-profile
       - cks-pod-security-admission
       - cks-secure-existing-pod
+      # L'immuabilité suit la reprise d'un Pod privilégié, et ne la répète
+      # pas : le lab précédent porte sur le privilège et le partage de
+      # namespaces avec l'hôte, celui-ci sur le système de fichiers et sur ce
+      # que le fermer coûte à une application qui écrit pour démarrer.
+      - cks-security-context-immutable
       - cks-runtime-sandbox-gvisor
       - cks-image-pinned-digest
       - cks-image-scanning-trivy
@@ -167,4 +172,10 @@ sections:
       # et l'apprenant qui a posé un default-deny voit mieux ce que le
       # chiffrement ajoute par-dessus.
       - cks-istio-mtls-lockdown
+      - cks-ingress-tls
       - cks-cis-benchmark-remediate
+
+      # Le capstone vient en dernier, comme ceux du CKA et du CKAD : il ne
+      # nomme plus aucun objet Kubernetes, et ne s'adresse donc qu'à qui a
+      # déjà joué les quinze précédents.
+      - cks-capstone-enclave

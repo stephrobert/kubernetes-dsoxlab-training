@@ -1,0 +1,38 @@
+id: cks-ingress-tls
+title: "Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur"
+level: cluster-setup
+section: cks
+difficulty: intermediate
+description: |
+  The site already answers over HTTPS, which is exactly the trap: the Ingress
+  controller serves its own default certificate to anyone who asks. Terminate
+  TLS with a certificate that actually names the host.
+skills:
+  - ingress
+  - tls
+  - secret
+  - certificat
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKS, domaine Cluster Setup (15 %) : « Use Ingress
+# with TLS to secure application access ».
+#
+# Le contrôleur est posé par le setup. Ce que le lab mesure est la
+# terminaison TLS, pas l'installation d'un contrôleur Ingress.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

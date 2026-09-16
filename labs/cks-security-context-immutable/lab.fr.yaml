@@ -1,0 +1,6 @@
+title: "Rendre un conteneur immuable sans le faire tomber"
+description: |
+  Un Deployment qui tourne peut encore être modifié de l'intérieur. Rendez sa
+  racine non inscriptible, retirez-lui toutes les capacités, interdisez
+  l'escalade, et faites en sorte que l'application continue de servir : nginx
+  a besoin de quelques chemins inscriptibles, et les trouver est l'exercice.

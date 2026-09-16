@@ -38,20 +38,58 @@
   environment:
     MISE_DATA_DIR: /usr/local/share/mise
 
-- name: "Rendre {{ outil_nom }} appelable sans préfixe"
-  # Le chemin est CONSTRUIT, pas demandé à `mise which`.
+- name: "Localiser le binaire de {{ outil_nom }} dans l'arborescence de mise"
+  # Le chemin est CHERCHÉ, et non demandé à `mise which` ni construit en dur.
   #
   # Mesuré le 2026-09-16 : sous `sudo`, `mise which` échoue avec « trivy is a
   # mise bin however it is not currently active », parce qu'il cherche une
   # configuration d'utilisateur ou de répertoire que root n'a pas. L'outil est
-  # pourtant bien installé. Construire le chemin ne dépend d'aucune
-  # configuration, et la structure de mise est stable :
-  # <data-dir>/installs/<outil>/<version>/<outil>.
+  # pourtant bien installé.
   #
+  # La première version construisait donc le chemin
+  # <data-dir>/installs/<outil>/<version>/<outil>, en affirmant ici même que
+  # « la structure de mise est stable ». Elle ne l'est pas, et cela a coûté un
+  # cycle de validation le même jour : helm 4.3.0 est posé sous
+  # `4.3.0/linux-amd64/helm`, parce que mise déplie l'archive amont telle
+  # quelle. Le lien pointait dans le vide, `state: link` ne s'en plaint pas, et
+  # l'échec n'apparaissait qu'à la tâche suivante.
+  #
+  # On regarde donc d'abord à l'endroit direct, qui couvre trivy, cosign,
+  # crane, regctl et istioctl, puis on descend dans l'arborescence. `-quit`
+  # arrête `find` au premier résultat sans passer par un `| head` qui
+  # provoquerait un SIGPIPE sous `pipefail`.
+  ansible.builtin.shell: |
+    set -eu
+    base="/usr/local/share/mise/installs/{{ outil_nom }}/{{ outil_version }}"
+    if [ -x "$base/{{ outil_nom }}" ]; then
+      printf '%s\n' "$base/{{ outil_nom }}"
+    else
+      find "$base" -type f -name '{{ outil_nom }}' -perm -u+x -print -quit
+    fi
+  register: _chemin_outil
+  changed_when: false
+
+- name: "Exiger que le binaire de {{ outil_nom }} ait été trouvé"
+  # Une recherche infructueuse rend une chaîne vide, et `state: link` sur une
+  # source vide échouerait plus loin avec un message qui ne nommerait pas la
+  # cause. La garde est une tâche À PART, et non un `failed_when` sur la tâche
+  # suivante : `failed_when` REMPLACE l'évaluation d'échec, il masquerait donc
+  # toute autre erreur de cette tâche dès que la condition est fausse.
+  ansible.builtin.assert:
+    that:
+      - _chemin_outil.stdout | trim | length > 0
+    fail_msg: >-
+      Aucun exécutable nommé « {{ outil_nom }} » sous
+      /usr/local/share/mise/installs/{{ outil_nom }}/{{ outil_version }}.
+      mise a-t-il bien installé cette version, et l'archive amont nomme-t-elle
+      son binaire autrement ?
+    quiet: true
+
+- name: "Rendre {{ outil_nom }} appelable sans préfixe"
   # Sans ce lien, le candidat devrait connaître le chemin interne de mise pour
   # appeler l'outil, ce qui n'a rien à voir avec ce que le lab enseigne.
   ansible.builtin.file:
-    src: "/usr/local/share/mise/installs/{{ outil_nom }}/{{ outil_version }}/{{ outil_nom }}"
+    src: "{{ _chemin_outil.stdout | trim }}"
     dest: "/usr/local/bin/{{ outil_nom }}"
     state: link
     force: true

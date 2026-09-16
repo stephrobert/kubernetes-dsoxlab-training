@@ -1,0 +1,41 @@
+id: cks-security-context-immutable
+title: "Rendre un conteneur immuable sans le faire tomber"
+level: minimize-vulnerabilities
+section: cks
+difficulty: intermediate
+description: |
+  A running Deployment can still be written to from the inside. Make its root
+  filesystem read-only, drop every capability, forbid escalation, and keep the
+  application serving: nginx needs a few writable paths, and finding them is
+  the exercise.
+skills:
+  - securitycontext
+  - readonlyrootfilesystem
+  - capabilities
+  - emptydir
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKS, domaine Minimize Microservice Vulnerabilities
+# (20 %) : le conteneur immuable.
+#
+# Distinct de cks-secure-existing-pod, qui porte sur le privilège, le partage
+# de namespaces avec l'hôte et l'identité du processus. Celui-ci porte sur le
+# système de fichiers, et sur le coût réel de cette contrainte : une
+# application qui écrit pendant son démarrage ne redémarre pas.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

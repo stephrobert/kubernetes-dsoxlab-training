@@ -115,17 +115,20 @@ This is the order in which the labs are meant to be played, as declared in `meta
 2. [`cks-seccomp-profile`](labs/cks-seccomp-profile/): Interdire un appel système à un conteneur, et le prouver de l'intérieur
 3. [`cks-pod-security-admission`](labs/cks-pod-security-admission/): Refuser un Pod privilégié à l'admission, avec Pod Security Admission
 4. [`cks-secure-existing-pod`](labs/cks-secure-existing-pod/): Reprendre un Pod privilégié en production, sans le priver de son travail
-5. [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/): Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
-6. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/): Épingler une image par son digest, et prouver que le tag ne suffit pas
-7. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/): Remplacer une image criblée de failles, et le prouver par un second scan
-8. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/): Signer une image, et prouver la signature en faisant refuser une autre
-9. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/): Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
-10. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/): Retirer cluster-admin à un compte de service, sans le priver de son travail
-11. [`cks-api-server-hardening`](labs/cks-api-server-hardening/): Fermer le profileur de l'API server, sans fermer l'API
-12. [`cks-audit-log-policy`](labs/cks-audit-log-policy/): Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
-13. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/): Tout interdire, puis rouvrir le strict nécessaire, DNS compris
-14. [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/): Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
-15. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/): Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+5. [`cks-security-context-immutable`](labs/cks-security-context-immutable/): Rendre un conteneur immuable sans le faire tomber
+6. [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/): Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
+7. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/): Épingler une image par son digest, et prouver que le tag ne suffit pas
+8. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/): Remplacer une image criblée de failles, et le prouver par un second scan
+9. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/): Signer une image, et prouver la signature en faisant refuser une autre
+10. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/): Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
+11. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/): Retirer cluster-admin à un compte de service, sans le priver de son travail
+12. [`cks-api-server-hardening`](labs/cks-api-server-hardening/): Fermer le profileur de l'API server, sans fermer l'API
+13. [`cks-audit-log-policy`](labs/cks-audit-log-policy/): Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
+14. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/): Tout interdire, puis rouvrir le strict nécessaire, DNS compris
+15. [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/): Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
+16. [`cks-ingress-tls`](labs/cks-ingress-tls/): Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur
+17. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/): Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+18. [`cks-capstone-enclave`](labs/cks-capstone-enclave/): Capstone: open an enclave for a team you do not trust · **capstone**
 
 ### Blueprint coverage
 
@@ -185,17 +188,19 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 
 #### CKS, Certified Kubernetes Security Specialist
 
-15 lab(s).
+18 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
 | [`cks-api-server-hardening`](labs/cks-api-server-hardening/) | Fermer le profileur de l'API server, sans fermer l'API | cluster-hardening | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/) | Retirer cluster-admin à un compte de service, sans le priver de son travail | cluster-hardening | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Faire baisser le compte d'un audit CIS, et le prouver par un second audit | cluster-setup | 30m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
+| [`cks-ingress-tls`](labs/cks-ingress-tls/) | Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur | cluster-setup | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/) | Tout interdire, puis rouvrir le strict nécessaire, DNS compris | cluster-setup | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`cks-pod-security-admission`](labs/cks-pod-security-admission/) | Refuser un Pod privilégié à l'admission, avec Pod Security Admission | minimize-vulnerabilities | 15m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 | [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/) | Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version | minimize-vulnerabilities | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
 | [`cks-secure-existing-pod`](labs/cks-secure-existing-pod/) | Reprendre un Pod privilégié en production, sans le priver de son travail | minimize-vulnerabilities | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| [`cks-security-context-immutable`](labs/cks-security-context-immutable/) | Rendre un conteneur immuable sans le faire tomber | minimize-vulnerabilities | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 | [`cks-audit-log-policy`](labs/cks-audit-log-policy/) | Enregistrer qui lit les Secrets, et seulement les métadonnées du reste | monitoring-logging | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
 | [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/) | Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors | monitoring-logging | 30m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
 | [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/) | Signer une image, et prouver la signature en faisant refuser une autre | supply-chain-security | 30m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
@@ -204,8 +209,9 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/) | Remplacer une image criblée de failles, et le prouver par un second scan | supply-chain-security | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confine a Pod with an AppArmor profile | system-hardening | 25m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 | [`cks-seccomp-profile`](labs/cks-seccomp-profile/) | Interdire un appel système à un conteneur, et le prouver de l'intérieur | system-hardening | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
+| [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 
-Total: **53 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **56 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

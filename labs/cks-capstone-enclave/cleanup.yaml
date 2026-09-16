@@ -1,0 +1,27 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Les objets de CLUSTER ne sont pas oubliés : un capstone qui laisse un
+# ClusterRole ou un ClusterRoleBinding derrière lui fausse le lab suivant, et
+# la photographie du validateur le voit.
+- name: Nettoyer le capstone cks-capstone-enclave
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces du capstone
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace enclave dehors
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les objets de cluster qu'un candidat aurait pu poser
+      ansible.builtin.shell: |
+        set -eu
+        kubectl get clusterrole,clusterrolebinding -o name \
+          | grep -E 'enclave|coffre' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
