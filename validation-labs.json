@@ -223,6 +223,38 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-kubeadm-upgrade": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 655,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-kubeadm-upgrade.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "cka-kubectl-debug": {
   "apres": {
    "passed": 4,
@@ -415,6 +447,38 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-resourcequota-limitrange": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 185,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-resourcequota-limitrange.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "cka-static-pod": {
   "apres": {
    "passed": 4,
@@ -444,6 +508,38 @@
    "passed": 0,
    "score": 0,
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-storageclass-provisionnement-dynamique": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 395,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-storageclass-provisionnement-dynamique.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  },
@@ -1183,6 +1279,38 @@
   },
   "verdict": "VALIDE"
  },
+ "ckad-secret-injection-protection": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 156,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-secret-injection-protection.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "ckad-security-context-hardened": {
   "apres": {
    "passed": 4,
@@ -1276,6 +1404,38 @@
    "passed": 0,
    "score": 0,
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-volumes-partage-entre-conteneurs": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 191,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-volumes-partage-entre-conteneurs.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
   },
   "verdict": "VALIDE"
  },
@@ -1846,6 +2006,38 @@
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-security-context-immutable.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-validating-admission-policy": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
+  "avant": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-09-17",
+  "duree_s": 337,
+  "ecarts": [],
+  "etapes": [
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-validating-admission-policy.log",
   "kubernetes": "v1.37.0",
   "raisons": [],
   "rejeu": {

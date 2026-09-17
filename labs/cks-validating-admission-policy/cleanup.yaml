@@ -1,0 +1,32 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# La politique et sa liaison sont des objets de CLUSTER : elles survivraient au
+# namespace, et la photographie du validateur les verrait apparaître. Pire, une
+# politique laissée en place refuserait des Pods dans les labs suivants.
+- name: Nettoyer le lab cks-validating-admission-policy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace production
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les politiques d'admission et leurs liaisons
+      # La liaison d'abord : une politique sans liaison n'agit sur rien, tandis
+      # qu'une liaison qui désigne une politique absente est une erreur bruyante.
+      ansible.builtin.shell: |
+        set -eu
+        kubectl get validatingadmissionpolicybinding -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+        kubectl get validatingadmissionpolicy -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false

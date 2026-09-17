@@ -1,0 +1,6 @@
+title: "Faire refuser une image non épinglée par le cluster lui-même, sans webhook"
+description: |
+  Un namespace accepte n'importe quelle image, tag compris. Faites refuser par
+  l'API server celles qui ne sont pas épinglées par leur digest, avec une
+  politique qu'il évalue lui-même : pas de webhook, pas de contrôleur, rien à
+  maintenir en vie.

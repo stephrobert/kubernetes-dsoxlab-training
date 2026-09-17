@@ -1,0 +1,12 @@
+---
+# Joué par `dsoxlab clean`.
+- name: Nettoyer le lab cka-resourcequota-limitrange
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le ou les namespaces du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace equipe-produit
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false

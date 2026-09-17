@@ -1,0 +1,35 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Le provisionneur pose une StorageClass et un namespace, qui sont des objets
+# de CLUSTER ou qui survivraient au namespace du lab : la photographie du
+# validateur les verrait apparaître.
+- name: Nettoyer le lab cka-storageclass-provisionnement-dynamique
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab, revendications comprises
+      # Les PersistentVolume provisionnés dynamiquement suivent leur
+      # revendication : c'est la reclaimPolicy Delete de la classe qui s'en
+      # charge, et c'est justement ce que le lab fait constater.
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace archives
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le provisionneur de stockage
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf delete -f
+          https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.33/deploy/local-path-storage.yaml
+          --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Effacer ce que le provisionneur a écrit sur le disque du nœud
+      # Les volumes vivent sous /opt/local-path-provisioner : les laisser
+      # remplirait le disque du nœud au fil des labs.
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent

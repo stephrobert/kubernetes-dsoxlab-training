@@ -1,0 +1,6 @@
+title: "Plafonner un namespace sans bloquer ceux qui oublient de se déclarer"
+description: |
+  Un namespace sans plafond ni valeurs par défaut : une équipe peut prendre tout
+  le cluster, et un Pod sans `requests` est placé à l'aveugle. Posez les deux, et
+  prouvez chacun : un Pod qui demande trop est refusé, un Pod qui ne demande rien
+  est accepté et complété.

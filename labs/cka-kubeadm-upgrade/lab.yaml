@@ -1,0 +1,42 @@
+id: cka-kubeadm-upgrade
+title: "Monter un cluster d'une version mineure, sans interrompre ce qui tourne"
+level: cluster-architecture
+section: cka
+difficulty: advanced
+description: |
+  A cluster one minor version behind, an application that must keep serving,
+  and the upgrade to run: the control plane first, then the node, each with its
+  own command. The tests read the versions and check nothing was left drained.
+skills:
+  - kubeadm
+  - upgrade
+  - drain
+  - cluster-architecture
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+lab_type: lab
+estimated_time: 40m
+
+# Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
+# Configuration (25 %) : « Perform a version upgrade on a Kubernetes cluster
+# using kubeadm ». C'était le dernier trou du CKA, et le plus net : la
+# formation l'enseigne, et aucun lab ne la faisait jouer.
+#
+# CE LAB EST LE SEUL DU CATALOGUE QUI RECONSTRUIT LE CLUSTER. Son setup le
+# ramène en 1.36.4 et son cleanup le remonte en 1.37.0, sans quoi le lab
+# suivant hériterait d'un cluster dégradé. Voir les commentaires de ces deux
+# fichiers, qui portent les mesures.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
