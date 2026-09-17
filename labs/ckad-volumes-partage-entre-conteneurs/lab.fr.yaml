@@ -1,0 +1,6 @@
+title: "Faire lire à un conteneur ce qu'un autre écrit, et pas le reste"
+description: |
+  Deux conteneurs dans un Pod, l'un qui écrit et l'autre qui lit, et rien de
+  partagé entre eux. Donnez-leur un volume dont la durée de vie est celle du
+  Pod, et prouvez-le dans les deux sens : ce qui est écrit dans le volume passe,
+  ce qui est écrit à côté ne passe pas.

@@ -1,0 +1,205 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# CE CLEANUP REND LE CLUSTER À SA VERSION, et c'est sa raison d'être. Le setup
+# l'a reconstruit en 1.36 ; le laisser ainsi ferait deux dégâts : la
+# photographie du validateur verrait une version différente de celle de départ,
+# et surtout le lab SUIVANT hériterait d'un cluster dégradé.
+#
+# Il MONTE le cluster, il ne le reconstruit pas. C'est la même procédure que
+# celle demandée au candidat, et elle est bien moins risquée qu'un second
+# `kubeadm reset` : un reset raté laisserait le cluster mort pour tout le
+# catalogue.
+#
+# La garde de version le rend idempotent : sur un cluster déjà en 1.37, il ne
+# touche à rien.
+- name: Nettoyer le lab cka-kubeadm-upgrade
+  hosts: lab_target
+  become: true
+  vars:
+    version_cible: "1.37.0-1.1"
+    kube_cible: "v1.37.0"
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace supervision
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Recenser les workers déclarés par meta.yml
+      ansible.builtin.set_fact:
+        workers: >-
+          {{ hostvars | dict2items
+                      | selectattr('value.role', 'defined')
+                      | selectattr('value.role', 'equalto', 'worker')
+                      | map(attribute='key') | list }}
+
+    - name: Lire la version de CHAQUE nœud
+      # `.items[0]` ne suffit pas, et cela a coûté un cycle le 2026-09-17 : la
+      # solution du formateur avait monté le plan de contrôle puis échoué avant
+      # le worker. La garde, qui ne lisait que le premier nœud, a vu 1.37 et
+      # n'a rien fait. Le cluster est resté avec un worker en 1.36 et
+      # inordonnançable, ce qui est exactement la trace que ce cleanup existe
+      # pour éviter.
+      #
+      # Le jsonpath ne porte AUCUN `\n`, et ce n'est pas un détail : le module
+      # `command` ne passe pas par un shell, et un `{"\n"}` lui parvient tel
+      # quel. Mesuré le 2026-09-17 : kubectl rend alors « unrecognized
+      # character in action: U+005C », la commande échoue, et la garde qui
+      # s'appuyait dessus sautait tout le bloc. La forme `.items[*]` sépare les
+      # valeurs par une espace, sans échappement.
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+          -o jsonpath={.items[*].status.nodeInfo.kubeletVersion}
+      register: versions_en_place
+      changed_when: false
+      failed_when: false
+
+    - name: Remonter le cluster à la version du catalogue
+      # La garde remonte DÈS QU'ELLE DOUTE : une lecture vide ou en échec
+      # déclenche la montée, plutôt que de sauter le bloc. Une garde qui saute
+      # quand elle ne sait pas laisse passer exactement ce qu'elle surveille,
+      # et c'est ce qui est arrivé ici.
+      when: >-
+        versions_en_place.rc | default(1) != 0
+        or (versions_en_place.stdout | default('') | trim) == ''
+        or versions_en_place.stdout.split() | reject('equalto', kube_cible) | list | length > 0
+      block:
+        - name: Défiger les paquets Kubernetes
+          ansible.builtin.dpkg_selections:
+            name: "{{ item.1 }}"
+            selection: install
+          delegate_to: "{{ item.0 }}"
+          loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+        - name: Poser kubeadm à la version cible sur le plan de contrôle
+          ansible.builtin.apt:
+            name: "kubeadm={{ version_cible }}"
+            state: present
+            update_cache: true
+
+        - name: Monter le plan de contrôle
+          ansible.builtin.command:
+            cmd: "kubeadm upgrade apply {{ kube_cible }} --yes"
+          changed_when: true
+
+        - name: Poser kubelet et kubectl à la version cible sur le plan de contrôle
+          ansible.builtin.apt:
+            name:
+              - "kubelet={{ version_cible }}"
+              - "kubectl={{ version_cible }}"
+            state: present
+
+        - name: Redémarrer le kubelet du plan de contrôle
+          ansible.builtin.systemd_service:
+            name: kubelet
+            state: restarted
+            daemon_reload: true
+
+        - name: Poser kubeadm à la version cible sur chaque worker
+          ansible.builtin.apt:
+            name: "kubeadm={{ version_cible }}"
+            state: present
+            update_cache: true
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+
+        - name: Monter la configuration de chaque worker
+          # `upgrade node` et non `upgrade apply` : seul le plan de contrôle
+          # applique une version au cluster, un worker se contente de suivre.
+          ansible.builtin.command:
+            cmd: kubeadm upgrade node
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+          changed_when: true
+
+        - name: Poser kubelet et kubectl à la version cible sur chaque worker
+          ansible.builtin.apt:
+            name:
+              - "kubelet={{ version_cible }}"
+              - "kubectl={{ version_cible }}"
+            state: present
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+
+        - name: Redémarrer le kubelet de chaque worker
+          ansible.builtin.systemd_service:
+            name: kubelet
+            state: restarted
+            daemon_reload: true
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+
+        - name: Refiger les paquets
+          ansible.builtin.dpkg_selections:
+            name: "{{ item.1 }}"
+            selection: hold
+          delegate_to: "{{ item.0 }}"
+          loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+        - name: Rendre les nœuds ordonnançables
+          # Le candidat a pu en boucler un pendant la montée : le laisser
+          # cordonné priverait le lab suivant d'un nœud, sans que rien ne le
+          # dise.
+          #
+          # Les parenthèses ne sont pas décoratives : sans elles, Jinja
+          # applique `join` à `workers` AVANT la concaténation, et la commande
+          # reçoit une liste Python au lieu de noms de nœuds.
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig /etc/kubernetes/admin.conf uncordon
+              {{ ([inventory_hostname] + workers) | join(' ') }}
+          changed_when: true
+          failed_when: false
+
+        - name: Attendre que tous les nœuds soient Ready
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+              nodes --all --timeout=600s
+          changed_when: false
+
+        - name: Attendre le retour des Pods statiques du plan de contrôle
+          # Un nœud Ready ne dit PAS que le plan de contrôle est revenu :
+          # `upgrade apply` remplace les manifestes statiques, et le kubelet
+          # recrée ces Pods l'un après l'autre. Mesuré le 2026-09-17, la
+          # photographie du validateur a vu
+          # `kube-controller-manager` et `kube-scheduler` en Pending là où
+          # elle les avait pris Running, et a rendu ROUGE pour un état
+          # simplement transitoire.
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system wait
+              --for=condition=Ready pod
+              -l tier=control-plane --timeout=600s
+          changed_when: false
+          # Les Pods statiques sont recréés sous un nouveau nom : entre la
+          # disparition de l'ancien et l'apparition du nouveau, `wait` peut ne
+          # trouver aucun Pod et rendre une erreur. On réessaie plutôt que
+          # d'échouer sur cette fenêtre.
+          register: attente_plan_de_controle
+          retries: 10
+          delay: 15
+          until: attente_plan_de_controle.rc == 0
+
+    - name: Retirer le dépôt de la version de départ
+      # Laissé en place, il ferait remonter une 1.36 au prochain `apt upgrade`
+      # d'un lab qui défigerait les paquets.
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/kubernetes-v1.36.list
+        state: absent
+      delegate_to: "{{ noeud }}"
+      loop: "{{ [inventory_hostname] + workers }}"
+      loop_control:
+        loop_var: noeud
+      failed_when: false

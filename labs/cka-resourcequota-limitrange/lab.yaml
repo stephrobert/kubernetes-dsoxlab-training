@@ -1,0 +1,42 @@
+id: cka-resourcequota-limitrange
+title: "Plafonner un namespace sans bloquer ceux qui oublient de se déclarer"
+level: workloads-scheduling
+section: cka
+difficulty: intermediate
+description: |
+  A namespace with no ceiling and no defaults: one team can take the whole
+  cluster, and a Pod with no requests is scheduled blind. Set both, and prove
+  each: a Pod asking too much is refused, a Pod asking nothing is accepted and
+  completed.
+skills:
+  - resourcequota
+  - limitrange
+  - requests-limits
+  - scheduling
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKA, domaine Workloads and Scheduling (15 %) :
+# « Configure workload autoscaling » et la maîtrise des ressources, ainsi que
+# du domaine CKAD Application Environment.
+#
+# Les deux objets vont ENSEMBLE, et c'est le sujet du lab : un quota seul
+# transforme l'oubli d'un développeur en refus incompréhensible, puisqu'un Pod
+# sans requests devient invalide dès qu'un quota porte sur les requests.
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

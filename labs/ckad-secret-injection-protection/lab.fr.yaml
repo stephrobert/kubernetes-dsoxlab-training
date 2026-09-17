@@ -1,0 +1,6 @@
+title: "Sortir un mot de passe d'un manifeste, sans que l'application s'en aperçoive"
+description: |
+  Un mot de passe est écrit en clair dans un manifeste de Deployment, que
+  quiconque peut lire le lit aussi. Déplacez-le dans un Secret, injectez-le à la
+  fois en variable d'environnement et en fichier monté, et laissez l'application
+  tourner.

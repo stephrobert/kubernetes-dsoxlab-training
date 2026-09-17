@@ -1,0 +1,39 @@
+id: cka-storageclass-provisionnement-dynamique
+title: "Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient"
+level: storage
+section: cka
+difficulty: intermediate
+description: |
+  A claim stuck in Pending because nobody prepared a volume by hand. Let the
+  cluster provision it on demand, then observe what the class decides when the
+  claim disappears: the volume goes with it.
+skills:
+  - storageclass
+  - persistentvolumeclaim
+  - provisionnement-dynamique
+  - reclaimpolicy
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+lab_type: lab
+estimated_time: 25m
+
+# Compétence du blueprint CKA, domaine Storage (10 %) : « Understand storage
+# classes, persistent volumes » et « Understand dynamic volume provisioning ».
+#
+# Le voisin `cka-pv-pvc-storageclass` porte sur le provisionnement STATIQUE,
+# où un administrateur crée le PersistentVolume à la main. Celui-ci porte sur
+# le pendant dynamique, et sur ce qu'il change à la suppression.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
