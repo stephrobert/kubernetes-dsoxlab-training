@@ -16,7 +16,7 @@ lesquels. Corriger le premier trouvé ne fait rien répondre.
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 45 minutes |
 | Seuil de réussite | 66 %, celui de l'examen CKA |
-| Leçon jumelée | [Dépanner un cluster](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Leçon jumelée | [Exercices CKA](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 ```bash
 dsoxlab run    cka-capstone-portail

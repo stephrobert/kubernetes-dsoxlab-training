@@ -36,7 +36,7 @@ donner les chemins.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Pod Security Standards](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| Leçon jumelée | [Security Context](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/) |
 
 ```bash
 dsoxlab run   cks-security-context-immutable

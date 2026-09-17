@@ -12,7 +12,7 @@ doivent toutes répondre `green`.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Les Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
+| Leçon jumelée | [Rolling Updates et Rollbacks](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/) |
 
 ```bash
 dsoxlab run   ckad-blue-green-deployment

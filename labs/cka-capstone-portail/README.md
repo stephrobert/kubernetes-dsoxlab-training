@@ -16,7 +16,7 @@ which. Fixing the first one you find makes nothing answer.
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 45 minutes |
 | Pass mark | 66 %, the CKA exam threshold |
-| Companion lesson | [Cluster troubleshooting](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Companion lesson | [CKA exercises](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 ```bash
 dsoxlab run    cka-capstone-portail

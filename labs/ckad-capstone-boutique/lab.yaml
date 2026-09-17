@@ -19,7 +19,7 @@ skills:
   - networkpolicy
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
 lab_type: capstone
 estimated_time: 45m
 

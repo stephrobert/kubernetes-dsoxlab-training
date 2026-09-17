@@ -12,7 +12,7 @@ is the one `kubeadm` wrote. Wave 1 of the backlog asked for it under the name
 |---|---|
 | Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
 | Duration | about 15 minutes |
-| Companion lesson | [Diagnosing a cluster failure](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Companion lesson | [Worker nodes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-kubelet
