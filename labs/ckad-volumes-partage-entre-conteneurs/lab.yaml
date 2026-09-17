@@ -1,0 +1,40 @@
+id: ckad-volumes-partage-entre-conteneurs
+title: "Faire lire à un conteneur ce qu'un autre écrit, et pas le reste"
+level: application-design
+section: ckad
+difficulty: intermediate
+description: |
+  Two containers in one Pod, one writing and one reading, and nothing shared
+  between them. Give them a volume whose lifetime is the Pod's, and prove it
+  both ways: what is written inside the volume crosses, what is written beside
+  it does not.
+skills:
+  - volumes
+  - emptydir
+  - multi-container
+  - sidecar
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# « Understand multi-container Pod design patterns » et l'usage des volumes.
+#
+# Le voisin `ckad-multi-container-sidecar` porte sur le MOTIF, deux conteneurs
+# dans un Pod. Celui-ci porte sur ce qui les relie, et sur ce qu'un système de
+# fichiers de conteneur ne partage justement pas.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false

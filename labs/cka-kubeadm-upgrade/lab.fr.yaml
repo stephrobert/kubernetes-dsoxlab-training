@@ -1,0 +1,6 @@
+title: "Monter un cluster d'une version mineure, sans interrompre ce qui tourne"
+description: |
+  Un cluster en retard d'une version mineure, une application qui doit continuer
+  à servir, et la montée à conduire : le plan de contrôle d'abord, le nœud
+  ensuite, chacun avec sa propre commande. Les tests lisent les versions et
+  vérifient que rien n'a été laissé vidé.

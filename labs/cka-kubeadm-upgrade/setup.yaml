@@ -1,0 +1,218 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+#
+# CE SETUP EST LE SEUL DU CATALOGUE QUI TOUCHE AU CLUSTER LUI-MÊME, et non à
+# son contenu. Il le RECONSTRUIT une version mineure en arrière, parce qu'une
+# montée de version ne se joue pas autrement.
+#
+# Pourquoi 1.36 vers 1.37, et pas une montée de patch. Mesuré le 2026-09-17 :
+# le dépôt `pkgs.k8s.io/core:/stable:/v1.37` ne publie qu'une seule version,
+# 1.36.4-1.1 mise à part il n'y a rien à monter en 1.37. Le dépôt v1.36, lui,
+# en publie cinq. Le cluster doit donc PARTIR en 1.36 pour qu'il y ait quoi que
+# ce soit à monter, et c'est la montée MINEURE que l'examen demande.
+#
+#     v1.37 : 1.37.0-1.1
+#     v1.36 : 1.36.0-1.1, 1.36.1-1.1, 1.36.2-2.1, 1.36.3-1.1, 1.36.4-1.1
+#
+# Le socle standard est inclus D'ABORD : il garantit un cluster sain avant
+# qu'on n'y touche, et répare celui qu'un passage interrompu aurait laissé à
+# moitié. La dégradation vient ensuite, gardée par une vérification de version
+# pour ne pas se rejouer sur un cluster déjà en 1.36.
+- name: Préparer le lab cka-kubeadm-upgrade
+  hosts: lab_target
+  become: true
+  vars:
+    version_depart: "1.36.4-1.1"
+    mineure_depart: "v1.36"
+    kube_depart: "v1.36.4"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Recenser les workers déclarés par meta.yml
+      # Même recensement que le socle : un lab n'a pas à connaître la
+      # topologie, il la lit.
+      ansible.builtin.set_fact:
+        workers: >-
+          {{ hostvars | dict2items
+                      | selectattr('value.role', 'defined')
+                      | selectattr('value.role', 'equalto', 'worker')
+                      | map(attribute='key') | list }}
+
+    - name: Lire la version du plan de contrôle
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+          -o jsonpath={.items[0].status.nodeInfo.kubeletVersion}
+      register: version_en_place
+      changed_when: false
+      failed_when: false
+
+    # ------------------------------------------------------------------
+    # La dégradation, seulement si le cluster n'est pas déjà au départ.
+    # ------------------------------------------------------------------
+    - name: Reconstruire le cluster une version mineure en arrière
+      when: version_en_place.stdout | default('') is not match('^' ~ kube_depart)
+      block:
+        - name: Déclarer aussi le dépôt de la version de départ
+          # Les DEUX dépôts restent déclarés : le candidat doit pouvoir
+          # installer la version cible sans avoir à gérer des sources APT, ce
+          # qui n'est pas la compétence mesurée ici.
+          ansible.builtin.apt_repository:
+            repo: >-
+              deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+              https://pkgs.k8s.io/core:/stable:/{{ mineure_depart }}/deb/ /
+            filename: "kubernetes-{{ mineure_depart }}"
+            state: present
+          delegate_to: "{{ noeud }}"
+          loop: "{{ [inventory_hostname] + workers }}"
+          loop_control:
+            loop_var: noeud
+
+        - name: Défiger les paquets Kubernetes
+          ansible.builtin.dpkg_selections:
+            name: "{{ item.1 }}"
+            selection: install
+          delegate_to: "{{ item.0 }}"
+          loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+        - name: Défaire le cluster sur chaque worker
+          # `kubeadm reset` ne suffit pas à lui seul : il laisse la
+          # configuration du kubelet, que le join suivant refuserait de
+          # réécrire.
+          ansible.builtin.command:
+            cmd: kubeadm reset -f
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+          changed_when: true
+          failed_when: false
+
+        - name: Mettre les certificats du cluster de côté
+          # SANS CELA, LE LAB NE PEUT PAS ÊTRE VALIDÉ, et c'est le validateur
+          # qui l'a montré le 2026-09-17 : `kubeadm init` génère une nouvelle
+          # autorité de certification, ce qui change le contenu de
+          # `kube-system/kube-root-ca.crt` et de
+          # `kube-system/extension-apiserver-authentication`. La photographie
+          # voyait donc deux ConfigMaps modifiées, et rendait ROUGE.
+          #
+          # kubeadm RÉUTILISE les certificats déjà présents dans
+          # /etc/kubernetes/pki plutôt que d'en fabriquer : les remettre avant
+          # l'init suffit à conserver l'identité du cluster. C'est d'ailleurs
+          # ce qu'on fait dans la vraie vie quand on reconstruit un plan de
+          # contrôle sans vouloir redistribuer une CA à tous ses clients.
+          #
+          # On copie le CONTENU vers une destination remise à neuf : `cp -a
+          # source destination` copie DANS la destination quand elle existe
+          # déjà, ce qui produirait un /root/pki-du-cluster/pki au second
+          # passage, et une restauration vide.
+          ansible.builtin.shell: |
+            set -eu
+            test -d /etc/kubernetes/pki || exit 0
+            rm -rf /root/pki-du-cluster
+            mkdir -p /root/pki-du-cluster
+            cp -a /etc/kubernetes/pki/. /root/pki-du-cluster/
+          changed_when: true
+
+        - name: Défaire le plan de contrôle
+          ansible.builtin.command:
+            cmd: kubeadm reset -f
+          changed_when: true
+          failed_when: false
+
+        - name: Remettre les certificats avant de réinitialiser
+          # `cp -a` du CONTENU, le répertoire ayant été supprimé par le reset.
+          ansible.builtin.shell: |
+            set -eu
+            mkdir -p /etc/kubernetes/pki
+            cp -a /root/pki-du-cluster/. /etc/kubernetes/pki/
+          changed_when: true
+
+        - name: Poser la version de départ sur tous les nœuds
+          ansible.builtin.apt:
+            name:
+              - "kubelet={{ version_depart }}"
+              - "kubeadm={{ version_depart }}"
+              - "kubectl={{ version_depart }}"
+            state: present
+            allow_downgrade: true
+            update_cache: true
+          delegate_to: "{{ noeud }}"
+          loop: "{{ [inventory_hostname] + workers }}"
+          loop_control:
+            loop_var: noeud
+
+        - name: Refiger les paquets à la version de départ
+          ansible.builtin.dpkg_selections:
+            name: "{{ item.1 }}"
+            selection: hold
+          delegate_to: "{{ item.0 }}"
+          loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+        - name: Initialiser le plan de contrôle à la version de départ
+          # Le même CIDR que le socle : Calico est configuré pour lui, et un
+          # autre laisserait les Pods sans réseau.
+          ansible.builtin.command:
+            cmd: kubeadm init --pod-network-cidr=10.244.0.0/16
+            creates: /etc/kubernetes/admin.conf
+
+        - name: Reposer le kubeconfig de root
+          ansible.builtin.file:
+            src: /etc/kubernetes/admin.conf
+            dest: /root/.kube/config
+            state: link
+            force: true
+
+        - name: Reposer le kubeconfig de l'utilisateur du lab
+          ansible.builtin.copy:
+            src: /etc/kubernetes/admin.conf
+            dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
+            remote_src: true
+            owner: "{{ ansible_user | default('ubuntu') }}"
+            mode: "0600"
+
+        - name: Réinstaller le CNI
+          # Le manifeste a été téléchargé par le socle : on le réapplique tel
+          # quel, sans ressortir sur le réseau.
+          ansible.builtin.command:
+            cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /root/calico.yaml
+          changed_when: true
+
+        - name: Retirer le taint du plan de contrôle
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig /etc/kubernetes/admin.conf taint nodes --all
+              node-role.kubernetes.io/control-plane- --overwrite
+          changed_when: true
+          failed_when: false
+
+        - name: Fabriquer une commande de jointure
+          ansible.builtin.command: kubeadm token create --print-join-command --ttl 30m
+          register: jointure
+          changed_when: false
+          when: workers | length > 0
+
+        - name: Rejoindre chaque worker
+          ansible.builtin.command:
+            cmd: "{{ jointure.stdout }}"
+          delegate_to: "{{ noeud }}"
+          loop: "{{ workers }}"
+          loop_control:
+            loop_var: noeud
+          changed_when: true
+          when: workers | length > 0
+
+        - name: Attendre que tous les nœuds soient Ready
+          ansible.builtin.command:
+            cmd: >-
+              kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+              nodes --all --timeout=600s
+          changed_when: false
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

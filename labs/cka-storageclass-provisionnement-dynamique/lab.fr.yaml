@@ -1,0 +1,5 @@
+title: "Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient"
+description: |
+  Une revendication bloquée en attente parce que personne n'a préparé de volume
+  à la main. Laissez le cluster le provisionner à la demande, puis observez ce
+  que la classe décide quand la revendication disparaît : le volume la suit.

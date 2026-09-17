@@ -107,6 +107,17 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Une accolade doublée dans un jsonpath ne se voit pas à la relecture, et
+      # kubectl ne proteste pas : il rend une chaîne VIDE. Le test du lab
+      # accuse alors l'application d'être tombée, et le diagnostic part dans la
+      # mauvaise direction. Deux cycles de validation perdus le 2026-09-17.
+      - id: accolades-doublees
+        name: aucun jsonpath ne part vers kubectl avec une accolade doublée
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_accolades_doublees.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Les vérificateurs tournent en CI sur le contenu d'une pull request,
       # donc sur du YAML écrit par quelqu'un d'autre. Un guillemet non fermé
       # faisait remonter une yaml.scanner.ScannerError jusqu'au terminal : le

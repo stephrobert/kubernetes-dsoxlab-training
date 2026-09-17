@@ -12,6 +12,13 @@ repo:
   category: kubernetes
   title: "Kubernetes DevSecOps Training : CKA, CKAD et CKS"
   blog_url: "https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/"
+  # Où `dsoxlab support --issue` dépose le rapport d'un apprenant.
+  #
+  # Sans ce champ, dsoxlab retombe sur `git remote get-url origin`, ce qui
+  # marche ici mais suppose deux choses : un remote nommé `origin`, et un
+  # hébergeur dont les issues vivent sous `<dépôt>/issues`. Le déclarer lève
+  # la supposition.
+  issues_url: "https://github.com/stephrobert/kubernetes-dsoxlab-training/issues"
   description: |
     Labs vérifiables pour la formation Kubernetes du blog Stéphane Robert.
     Chaque lab est jumelé à une leçon du site et valide une compétence
@@ -103,9 +110,11 @@ sections:
       - cka-ingress-path-routing
       - cka-gateway-api-httproute
       - cka-pv-pvc-storageclass
+      - cka-storageclass-provisionnement-dynamique
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
       - cka-hpa-autoscaling
+      - cka-resourcequota-limitrange
       - cka-troubleshoot-imagepullbackoff
       - cka-troubleshoot-crashloopbackoff
       - cka-kubectl-debug
@@ -115,6 +124,11 @@ sections:
       - cka-troubleshoot-kubelet
       - cka-troubleshoot-apiserver
       - cka-etcd-backup-restore
+      # La montée de version vient juste après la sauvegarde d'etcd, et dans
+      # cet ordre : on n'opère pas sur un plan de contrôle dont on ne sait pas
+      # restaurer l'état. C'est aussi le seul lab du catalogue qui reconstruit
+      # le cluster, d'où sa place tardive.
+      - cka-kubeadm-upgrade
       # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
       # puisqu'il ne dit plus quel est le sujet de la panne.
       - cka-capstone-portail
@@ -127,9 +141,11 @@ sections:
     labs:
       - ckad-pod-resources-labels
       - ckad-configmap-secret-injection
+      - ckad-secret-injection-protection
       - ckad-probes-all-types
       - ckad-init-container
       - ckad-multi-container-sidecar
+      - ckad-volumes-partage-entre-conteneurs
       - ckad-expose-service
       - ckad-security-context-hardened
       - ckad-rbac-role-rolebinding
@@ -165,6 +181,7 @@ sections:
       - cks-security-context-immutable
       - cks-runtime-sandbox-gvisor
       - cks-image-pinned-digest
+      - cks-validating-admission-policy
       - cks-image-scanning-trivy
       - cks-cosign-verify-image
       - cks-dockerfile-static-analysis

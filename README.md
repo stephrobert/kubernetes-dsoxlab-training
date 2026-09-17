@@ -76,40 +76,45 @@ This is the order in which the labs are meant to be played, as declared in `meta
 7. [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/): Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne
 8. [`cka-gateway-api-httproute`](labs/cka-gateway-api-httproute/): Router avec la Gateway API, et voir la Gateway se déclarer programmée
 9. [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/): A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes
-10. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/): Roll back a stuck rollout, then ship the right version
-11. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/): Drain a worker for maintenance, without cutting the service
-12. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/): Scale out automatically with a HorizontalPodAutoscaler
-13. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/): Get a Pod out of ImagePullBackOff
-14. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/): Get a Deployment out of CrashLoopBackOff
-15. [`cka-kubectl-debug`](labs/cka-kubectl-debug/): Get inside a container with no shell using kubectl debug
-16. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/): Restore the cluster's DNS resolution
-17. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/): Restore traffic to a Service
-18. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/): Bring a NotReady node back into the cluster
-19. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/): Repair a kubelet that refuses to start
-20. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/): Bring the API server back into service
-21. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/): Back up etcd, then restore the cluster from a snapshot
-22. [`cka-capstone-portail`](labs/cka-capstone-portail/): Capstone: bring the portal back, with nobody left to ask · **capstone**
+10. [`cka-storageclass-provisionnement-dynamique`](labs/cka-storageclass-provisionnement-dynamique/): Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient
+11. [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/): Roll back a stuck rollout, then ship the right version
+12. [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/): Drain a worker for maintenance, without cutting the service
+13. [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/): Scale out automatically with a HorizontalPodAutoscaler
+14. [`cka-resourcequota-limitrange`](labs/cka-resourcequota-limitrange/): Plafonner un namespace sans bloquer ceux qui oublient de se déclarer
+15. [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/): Get a Pod out of ImagePullBackOff
+16. [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/): Get a Deployment out of CrashLoopBackOff
+17. [`cka-kubectl-debug`](labs/cka-kubectl-debug/): Get inside a container with no shell using kubectl debug
+18. [`cka-troubleshoot-dns`](labs/cka-troubleshoot-dns/): Restore the cluster's DNS resolution
+19. [`cka-troubleshoot-networking`](labs/cka-troubleshoot-networking/): Restore traffic to a Service
+20. [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/): Bring a NotReady node back into the cluster
+21. [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/): Repair a kubelet that refuses to start
+22. [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/): Bring the API server back into service
+23. [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/): Back up etcd, then restore the cluster from a snapshot
+24. [`cka-kubeadm-upgrade`](labs/cka-kubeadm-upgrade/): Monter un cluster d'une version mineure, sans interrompre ce qui tourne
+25. [`cka-capstone-portail`](labs/cka-capstone-portail/): Capstone: bring the portal back, with nobody left to ask · **capstone**
 
 **CKAD, Certified Kubernetes Application Developer**
 
 1. [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/): A two-container Pod, with budgets, labels and an annotation
 2. [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/): Inject configuration and secrets into a Pod
-3. [`ckad-probes-all-types`](labs/ckad-probes-all-types/): Three probes on one Pod: startup, liveness, readiness
-4. [`ckad-init-container`](labs/ckad-init-container/): Wait for a dependency with an init container
-5. [`ckad-multi-container-sidecar`](labs/ckad-multi-container-sidecar/): A native sidecar that tails the application logs
-6. [`ckad-expose-service`](labs/ckad-expose-service/): Expose a Deployment through a ClusterIP Service
-7. [`ckad-security-context-hardened`](labs/ckad-security-context-hardened/): Harden a Pod with a securityContext
-8. [`ckad-rbac-role-rolebinding`](labs/ckad-rbac-role-rolebinding/): Grant read-only access to Pods with RBAC
-9. [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/): Partition three tiers with ingress and egress NetworkPolicy
-10. [`ckad-rolling-update-strategy`](labs/ckad-rolling-update-strategy/): Tune a rolling update: maxSurge and maxUnavailable
-11. [`ckad-blue-green-deployment`](labs/ckad-blue-green-deployment/): Switch traffic from one version to the other: blue-green
-12. [`ckad-kustomize-overlays`](labs/ckad-kustomize-overlays/): One Kustomize base and two overlays, dev and prod
-13. [`ckad-helm-install-upgrade`](labs/ckad-helm-install-upgrade/): Install, upgrade and roll back with Helm 4
-14. [`ckad-job-cronjob`](labs/ckad-job-cronjob/): A Job with parallel completions, and a CronJob
-15. [`ckad-in-place-pod-vertical-scaling`](labs/ckad-in-place-pod-vertical-scaling/): Resize a Pod in place, without restarting it
-16. [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/): A Pod blocked by a ConfigMap that does not exist
-17. [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/): Three Pods in CrashLoopBackOff, three causes
-18. [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/): Capstone: ship the shop, from the specification alone · **capstone**
+3. [`ckad-secret-injection-protection`](labs/ckad-secret-injection-protection/): Sortir un mot de passe d'un manifeste, sans que l'application s'en aperçoive
+4. [`ckad-probes-all-types`](labs/ckad-probes-all-types/): Three probes on one Pod: startup, liveness, readiness
+5. [`ckad-init-container`](labs/ckad-init-container/): Wait for a dependency with an init container
+6. [`ckad-multi-container-sidecar`](labs/ckad-multi-container-sidecar/): A native sidecar that tails the application logs
+7. [`ckad-volumes-partage-entre-conteneurs`](labs/ckad-volumes-partage-entre-conteneurs/): Faire lire à un conteneur ce qu'un autre écrit, et pas le reste
+8. [`ckad-expose-service`](labs/ckad-expose-service/): Expose a Deployment through a ClusterIP Service
+9. [`ckad-security-context-hardened`](labs/ckad-security-context-hardened/): Harden a Pod with a securityContext
+10. [`ckad-rbac-role-rolebinding`](labs/ckad-rbac-role-rolebinding/): Grant read-only access to Pods with RBAC
+11. [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/): Partition three tiers with ingress and egress NetworkPolicy
+12. [`ckad-rolling-update-strategy`](labs/ckad-rolling-update-strategy/): Tune a rolling update: maxSurge and maxUnavailable
+13. [`ckad-blue-green-deployment`](labs/ckad-blue-green-deployment/): Switch traffic from one version to the other: blue-green
+14. [`ckad-kustomize-overlays`](labs/ckad-kustomize-overlays/): One Kustomize base and two overlays, dev and prod
+15. [`ckad-helm-install-upgrade`](labs/ckad-helm-install-upgrade/): Install, upgrade and roll back with Helm 4
+16. [`ckad-job-cronjob`](labs/ckad-job-cronjob/): A Job with parallel completions, and a CronJob
+17. [`ckad-in-place-pod-vertical-scaling`](labs/ckad-in-place-pod-vertical-scaling/): Resize a Pod in place, without restarting it
+18. [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/): A Pod blocked by a ConfigMap that does not exist
+19. [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/): Three Pods in CrashLoopBackOff, three causes
+20. [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/): Capstone: ship the shop, from the specification alone · **capstone**
 
 **CKS, Certified Kubernetes Security Specialist**
 
@@ -120,17 +125,18 @@ This is the order in which the labs are meant to be played, as declared in `meta
 5. [`cks-security-context-immutable`](labs/cks-security-context-immutable/): Rendre un conteneur immuable sans le faire tomber
 6. [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/): Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
 7. [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/): Épingler une image par son digest, et prouver que le tag ne suffit pas
-8. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/): Remplacer une image criblée de failles, et le prouver par un second scan
-9. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/): Signer une image, et prouver la signature en faisant refuser une autre
-10. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/): Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
-11. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/): Retirer cluster-admin à un compte de service, sans le priver de son travail
-12. [`cks-api-server-hardening`](labs/cks-api-server-hardening/): Fermer le profileur de l'API server, sans fermer l'API
-13. [`cks-audit-log-policy`](labs/cks-audit-log-policy/): Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
-14. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/): Tout interdire, puis rouvrir le strict nécessaire, DNS compris
-15. [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/): Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
-16. [`cks-ingress-tls`](labs/cks-ingress-tls/): Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur
-17. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/): Faire baisser le compte d'un audit CIS, et le prouver par un second audit
-18. [`cks-capstone-enclave`](labs/cks-capstone-enclave/): Capstone: open an enclave for a team you do not trust · **capstone**
+8. [`cks-validating-admission-policy`](labs/cks-validating-admission-policy/): Faire refuser une image non épinglée par le cluster lui-même, sans webhook
+9. [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/): Remplacer une image criblée de failles, et le prouver par un second scan
+10. [`cks-cosign-verify-image`](labs/cks-cosign-verify-image/): Signer une image, et prouver la signature en faisant refuser une autre
+11. [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/): Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application
+12. [`cks-rbac-least-privilege`](labs/cks-rbac-least-privilege/): Retirer cluster-admin à un compte de service, sans le priver de son travail
+13. [`cks-api-server-hardening`](labs/cks-api-server-hardening/): Fermer le profileur de l'API server, sans fermer l'API
+14. [`cks-audit-log-policy`](labs/cks-audit-log-policy/): Enregistrer qui lit les Secrets, et seulement les métadonnées du reste
+15. [`cks-networkpolicy-default-deny`](labs/cks-networkpolicy-default-deny/): Tout interdire, puis rouvrir le strict nécessaire, DNS compris
+16. [`cks-istio-mtls-lockdown`](labs/cks-istio-mtls-lockdown/): Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
+17. [`cks-ingress-tls`](labs/cks-ingress-tls/): Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur
+18. [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/): Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+19. [`cks-capstone-enclave`](labs/cks-capstone-enclave/): Capstone: open an enclave for a team you do not trust · **capstone**
 
 ### Blueprint coverage
 
@@ -138,10 +144,11 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 
 #### CKA, Certified Kubernetes Administrator
 
-22 lab(s).
+25 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
+| [`cka-kubeadm-upgrade`](labs/cka-kubeadm-upgrade/) | Monter un cluster d'une version mineure, sans interrompre ce qui tourne | cluster-architecture | 40m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
 | [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) | Back up etcd, then restore the cluster from a snapshot | cluster-architecture-installation-configuration | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
 | [`cka-node-drain-cordon`](labs/cka-node-drain-cordon/) | Drain a worker for maintenance, without cutting the service | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 | [`cka-rbac-serviceaccount`](labs/cka-rbac-serviceaccount/) | Give an application an identity: ServiceAccount, Role, RoleBinding | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
@@ -150,6 +157,7 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cka-ingress-path-routing`](labs/cka-ingress-path-routing/) | Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne | services-networking | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | [`cka-networkpolicy-isolate-db`](labs/cka-networkpolicy-isolate-db/) | Isolate the database: only the backend gets in | services-networking | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 | [`cka-pv-pvc-storageclass`](labs/cka-pv-pvc-storageclass/) | A persistent volume: PersistentVolume, PersistentVolumeClaim and a Pod that writes | storage | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
+| [`cka-storageclass-provisionnement-dynamique`](labs/cka-storageclass-provisionnement-dynamique/) | Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient | storage | 25m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/) |
 | [`cka-kubectl-debug`](labs/cka-kubectl-debug/) | Get inside a container with no shell using kubectl debug | troubleshooting | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 | [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/) | Bring the API server back into service | troubleshooting | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/) |
 | [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/) | Get a Deployment out of CrashLoopBackOff | troubleshooting | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
@@ -162,12 +170,13 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cka-deployment-rollout-rollback`](labs/cka-deployment-rollout-rollback/) | Roll back a stuck rollout, then ship the right version | workloads-scheduling | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 | [`cka-hpa-autoscaling`](labs/cka-hpa-autoscaling/) | Scale out automatically with a HorizontalPodAutoscaler | workloads-scheduling | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
 | [`cka-node-affinity`](labs/cka-node-affinity/) | Placing with nodeAffinity: required constraint and preference | workloads-scheduling | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| [`cka-resourcequota-limitrange`](labs/cka-resourcequota-limitrange/) | Plafonner un namespace sans bloquer ceux qui oublient de se déclarer | workloads-scheduling | 25m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
 | [`cka-taints-tolerations-placement`](labs/cka-taints-tolerations-placement/) | Reserve a node: taint, toleration and nodeSelector | workloads-scheduling | 10m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 #### CKAD, Certified Kubernetes Application Developer
 
-18 lab(s).
+21 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
@@ -179,20 +188,23 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`ckad-job-cronjob`](labs/ckad-job-cronjob/) | A Job with parallel completions, and a CronJob | application-design | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/) |
 | [`ckad-multi-container-sidecar`](labs/ckad-multi-container-sidecar/) | A native sidecar that tails the application logs | application-design | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
 | [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/) | A two-container Pod, with budgets, labels and an annotation | application-design | 10m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| [`ckad-volumes-partage-entre-conteneurs`](labs/ckad-volumes-partage-entre-conteneurs/) | Faire lire à un conteneur ce qu'un autre écrit, et pas le reste | application-design | 20m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/) |
 | [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/) | Inject configuration and secrets into a Pod | application-environment | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
 | [`ckad-in-place-pod-vertical-scaling`](labs/ckad-in-place-pod-vertical-scaling/) | Resize a Pod in place, without restarting it | application-environment | 10m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
 | [`ckad-rbac-role-rolebinding`](labs/ckad-rbac-role-rolebinding/) | Grant read-only access to Pods with RBAC | application-environment | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
+| [`ckad-secret-injection-protection`](labs/ckad-secret-injection-protection/) | Sortir un mot de passe d'un manifeste, sans que l'application s'en aperçoive | application-environment | 20m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/) |
 | [`ckad-security-context-hardened`](labs/ckad-security-context-hardened/) | Harden a Pod with a securityContext | application-environment | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/) |
 | [`ckad-probes-all-types`](labs/ckad-probes-all-types/) | Three probes on one Pod: startup, liveness, readiness | application-observability | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
 | [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) | Three Pods in CrashLoopBackOff, three causes | application-observability | 15m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | A Pod blocked by a ConfigMap that does not exist | application-observability | 10m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 | [`ckad-expose-service`](labs/ckad-expose-service/) | Expose a Deployment through a ClusterIP Service | services-networking | 10m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 | [`ckad-networkpolicy-ingress-egress`](labs/ckad-networkpolicy-ingress-egress/) | Partition three tiers with ingress and egress NetworkPolicy | services-networking | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| [`cka-resourcequota-limitrange`](labs/cka-resourcequota-limitrange/) | Plafonner un namespace sans bloquer ceux qui oublient de se déclarer | workloads-scheduling | 25m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone: ship the shop, from the specification alone | capstone, several domains | 45m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 
 #### CKS, Certified Kubernetes Security Specialist
 
-18 lab(s).
+19 lab(s).
 
 | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|
@@ -211,11 +223,12 @@ The same labs, grouped by the domain the exam names. This is the view that answe
 | [`cks-dockerfile-static-analysis`](labs/cks-dockerfile-static-analysis/) | Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application | supply-chain-security | 20m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-image-pinned-digest`](labs/cks-image-pinned-digest/) | Épingler une image par son digest, et prouver que le tag ne suffit pas | supply-chain-security | 15m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 | [`cks-image-scanning-trivy`](labs/cks-image-scanning-trivy/) | Remplacer une image criblée de failles, et le prouver par un second scan | supply-chain-security | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
+| [`cks-validating-admission-policy`](labs/cks-validating-admission-policy/) | Faire refuser une image non épinglée par le cluster lui-même, sans webhook | supply-chain-security | 30m | 2026-09-17 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/) |
 | [`cks-apparmor-confiner-un-pod`](labs/cks-apparmor-confiner-un-pod/) | Confine a Pod with an AppArmor profile | system-hardening | 25m | 2026-09-15 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 | [`cks-seccomp-profile`](labs/cks-seccomp-profile/) | Interdire un appel système à un conteneur, et le prouver de l'intérieur | system-hardening | 25m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/) |
 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-09-16 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **58 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **64 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

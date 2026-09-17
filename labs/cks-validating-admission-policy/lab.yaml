@@ -1,0 +1,43 @@
+id: cks-validating-admission-policy
+title: "Faire refuser une image non épinglée par le cluster lui-même, sans webhook"
+level: supply-chain-security
+section: cks
+difficulty: advanced
+description: |
+  A namespace accepts any image, tag and all. Make the API server refuse the
+  ones that are not pinned by digest, with a policy it evaluates itself: no
+  webhook, no controller, nothing to keep running.
+skills:
+  - validatingadmissionpolicy
+  - cel
+  - admission
+  - supply-chain
+distros:
+  - ubuntu24
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+lab_type: lab
+estimated_time: 30m
+
+# Compétence du blueprint CKS, domaine Supply Chain Security (20 %) :
+# « Use static analysis of user workloads » et le contrôle d'admission.
+#
+# Le voisin `cks-image-pinned-digest` fait ÉPINGLER une image. Celui-ci fait
+# REFUSER celles qui ne le sont pas, ce qui est le geste d'un exploitant et non
+# d'un développeur : il n'exige plus la discipline de chacun.
+#
+# ValidatingAdmissionPolicy est NATIF depuis la 1.30 et stable depuis la 1.32 :
+# aucun composant à installer, contrairement aux solutions par webhook, dont la
+# panne bloque le cluster entier quand `failurePolicy` vaut Fail.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
