@@ -16,7 +16,7 @@ skills:
   - securitycontext
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
 lab_type: capstone
 estimated_time: 45m
 

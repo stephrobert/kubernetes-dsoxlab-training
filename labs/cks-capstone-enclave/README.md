@@ -41,7 +41,7 @@ could recreate it identically.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 45 minutes |
-| Companion lesson | [Pod Security Standards](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| Companion lesson | [CKS exercises](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
 ```bash
 dsoxlab run   cks-capstone-enclave

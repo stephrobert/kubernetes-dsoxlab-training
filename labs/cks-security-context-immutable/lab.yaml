@@ -15,7 +15,7 @@ skills:
   - emptydir
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
 lab_type: lab
 estimated_time: 20m
 

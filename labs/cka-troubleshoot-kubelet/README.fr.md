@@ -12,7 +12,7 @@ réclamait sous le nom `cka-reparer-un-kubelet`.
 |---|---|
 | Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer une panne du cluster](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Leçon jumelée | [Worker Nodes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-kubelet

@@ -10,7 +10,7 @@ celle des Deployments, et le trou est remonté au backlog du blog.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Les Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Leçon jumelée | [Kustomize](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/) |
 
 ```bash
 dsoxlab run   ckad-kustomize-overlays

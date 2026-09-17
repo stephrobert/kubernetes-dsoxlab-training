@@ -17,7 +17,7 @@ does.
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 45 minutes |
 | Pass mark | 66 %, the CKAD exam threshold |
-| Companion lesson | [Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Companion lesson | [CKAD exercises](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 
 ```bash
 dsoxlab run    ckad-capstone-boutique

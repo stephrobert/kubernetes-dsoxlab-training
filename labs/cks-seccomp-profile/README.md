@@ -20,7 +20,7 @@ as with AppArmor.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [AppArmor and Seccomp](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
+| Companion lesson | [Seccomp](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/) |
 
 ```bash
 dsoxlab run   cks-seccomp-profile

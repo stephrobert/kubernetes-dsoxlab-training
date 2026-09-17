@@ -16,7 +16,7 @@ namespace vide, et laisse le candidat choisir ses outils, comme l'épreuve.
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 45 minutes |
 | Seuil de réussite | 66 %, celui de l'examen CKAD |
-| Leçon jumelée | [Deployments](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Leçon jumelée | [Exercices CKAD](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 
 ```bash
 dsoxlab run    ckad-capstone-boutique

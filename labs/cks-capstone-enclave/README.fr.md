@@ -42,7 +42,7 @@ niveau `restricted`, pour qu'un candidat qui le supprimerait puisse le recréer
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 45 minutes |
-| Leçon jumelée | [Pod Security Standards](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| Leçon jumelée | [Exercices CKS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
 ```bash
 dsoxlab run   cks-capstone-enclave

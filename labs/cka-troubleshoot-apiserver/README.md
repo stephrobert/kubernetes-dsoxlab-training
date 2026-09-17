@@ -12,7 +12,7 @@ know how to do without `kubectl`.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Diagnosing a cluster failure](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Companion lesson | [Kubernetes control plane](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-apiserver

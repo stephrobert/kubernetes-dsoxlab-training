@@ -16,7 +16,7 @@ skills:
   - nodeport
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
 lab_type: capstone
 estimated_time: 45m
 

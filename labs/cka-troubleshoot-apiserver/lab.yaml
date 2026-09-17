@@ -16,7 +16,7 @@ skills:
   - control-plane
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
 lab_type: lab
 estimated_time: 15m
 

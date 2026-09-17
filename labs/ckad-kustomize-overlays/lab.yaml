@@ -15,7 +15,7 @@ skills:
   - namespaces
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
 lab_type: lab
 estimated_time: 20m
 

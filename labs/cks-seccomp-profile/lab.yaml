@@ -15,7 +15,7 @@ skills:
   - kubelet
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
 lab_type: lab
 estimated_time: 25m
 
