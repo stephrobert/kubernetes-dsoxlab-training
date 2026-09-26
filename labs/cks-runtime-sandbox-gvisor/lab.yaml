@@ -1,5 +1,5 @@
 id: cks-runtime-sandbox-gvisor
-title: "Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version"
+title: "Isolate a Pod from the host kernel, and prove it by reading its version"
 level: minimize-vulnerabilities
 section: cks
 difficulty: advanced

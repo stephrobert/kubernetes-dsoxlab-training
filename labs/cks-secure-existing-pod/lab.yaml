@@ -1,5 +1,5 @@
 id: cks-secure-existing-pod
-title: "Reprendre un Pod privilégié en production, sans le priver de son travail"
+title: "Take over a privileged Pod in production, without stopping its work"
 level: minimize-vulnerabilities
 section: cks
 difficulty: intermediate

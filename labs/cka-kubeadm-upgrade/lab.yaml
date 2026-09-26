@@ -1,5 +1,5 @@
 id: cka-kubeadm-upgrade
-title: "Monter un cluster d'une version mineure, sans interrompre ce qui tourne"
+title: "Upgrade a cluster one minor version, without interrupting what runs on it"
 level: cluster-architecture
 section: cka
 difficulty: advanced

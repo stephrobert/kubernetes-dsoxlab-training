@@ -1,5 +1,5 @@
 id: cka-resourcequota-limitrange
-title: "Plafonner un namespace sans bloquer ceux qui oublient de se déclarer"
+title: "Cap a namespace without blocking those who forget to declare themselves"
 level: workloads-scheduling
 section: cka
 difficulty: intermediate

@@ -1,5 +1,5 @@
 id: cks-cis-benchmark-remediate
-title: "Faire baisser le compte d'un audit CIS, et le prouver par un second audit"
+title: "Bring down a CIS audit count, and prove it with a second audit"
 level: cluster-setup
 section: cks
 difficulty: advanced

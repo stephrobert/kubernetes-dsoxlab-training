@@ -1,5 +1,5 @@
 id: cka-ingress-path-routing
-title: "Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne"
+title: "Route two applications on a single host, and prove each gets its own"
 level: services-networking
 section: cka
 difficulty: intermediate

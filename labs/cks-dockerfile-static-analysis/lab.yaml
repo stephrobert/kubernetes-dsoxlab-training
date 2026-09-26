@@ -1,5 +1,5 @@
 id: cks-dockerfile-static-analysis
-title: "Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application"
+title: "Fix a Dockerfile static analysis refuses, without changing the application"
 level: supply-chain-security
 section: cks
 difficulty: intermediate

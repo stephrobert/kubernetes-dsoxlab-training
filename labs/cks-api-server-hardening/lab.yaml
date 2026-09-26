@@ -1,5 +1,5 @@
 id: cks-api-server-hardening
-title: "Fermer le profileur de l'API server, sans fermer l'API"
+title: "Close the API server profiler, without closing the API"
 level: cluster-hardening
 section: cks
 difficulty: advanced

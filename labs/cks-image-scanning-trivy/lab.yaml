@@ -1,5 +1,5 @@
 id: cks-image-scanning-trivy
-title: "Remplacer une image criblée de failles, et le prouver par un second scan"
+title: "Replace an image riddled with flaws, and prove it with a second scan"
 level: supply-chain-security
 section: cks
 difficulty: intermediate

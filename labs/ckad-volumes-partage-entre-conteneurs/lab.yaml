@@ -1,5 +1,5 @@
 id: ckad-volumes-partage-entre-conteneurs
-title: "Faire lire à un conteneur ce qu'un autre écrit, et pas le reste"
+title: "Let one container read what another writes, and nothing else"
 level: application-design
 section: ckad
 difficulty: intermediate

@@ -1,5 +1,5 @@
 id: cks-rbac-least-privilege
-title: "Retirer cluster-admin à un compte de service, sans le priver de son travail"
+title: "Take cluster-admin away from a service account, without stopping its work"
 level: cluster-hardening
 section: cks
 difficulty: intermediate
