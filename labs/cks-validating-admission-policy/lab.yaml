@@ -1,5 +1,5 @@
 id: cks-validating-admission-policy
-title: "Faire refuser une image non épinglée par le cluster lui-même, sans webhook"
+title: "Have the cluster itself reject an unpinned image, with no webhook"
 level: supply-chain-security
 section: cks
 difficulty: advanced

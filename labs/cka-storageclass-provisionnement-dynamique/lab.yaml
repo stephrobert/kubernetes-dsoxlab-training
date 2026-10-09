@@ -1,5 +1,5 @@
 id: cka-storageclass-provisionnement-dynamique
-title: "Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient"
+title: "Get a volume no administrator created, and follow what becomes of it"
 level: storage
 section: cka
 difficulty: intermediate

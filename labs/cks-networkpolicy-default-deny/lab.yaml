@@ -1,5 +1,5 @@
 id: cks-networkpolicy-default-deny
-title: "Tout interdire, puis rouvrir le strict nécessaire, DNS compris"
+title: "Deny everything, then reopen the strict minimum, DNS included"
 level: cluster-setup
 section: cks
 difficulty: intermediate

@@ -1,5 +1,5 @@
 id: cka-gateway-api-httproute
-title: "Router avec la Gateway API, et voir la Gateway se déclarer programmée"
+title: "Route with the Gateway API, and watch the Gateway report itself programmed"
 level: services-networking
 section: cka
 difficulty: advanced

@@ -6,7 +6,7 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/), and the project
 follows [semantic versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.0] - 2026-10-09
 
 ### Changed, the catalogue speaks two languages
 
@@ -132,3 +132,6 @@ the sibling Linux catalogue proved out, adapted to Kubernetes.
   then every worker declared in `meta.yml`, prepared and joined by delegation.
   Calico replaces Flannel, which does not enforce NetworkPolicies and left four
   labs unverifiable.
+
+[Unreleased]: https://github.com/stephrobert/kubernetes-dsoxlab-training/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/stephrobert/kubernetes-dsoxlab-training/releases/tag/v0.1.0

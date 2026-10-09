@@ -1,5 +1,5 @@
 id: ckad-secret-injection-protection
-title: "Sortir un mot de passe d'un manifeste, sans que l'application s'en aperçoive"
+title: "Take a password out of a manifest, without the application noticing"
 level: application-environment
 section: ckad
 difficulty: intermediate

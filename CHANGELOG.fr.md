@@ -6,7 +6,7 @@ Tous les changements notables de ce projet sont consignés dans ce fichier. Le
 format s'appuie sur [Keep a Changelog](https://keepachangelog.com/), et le
 projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
-## [Non publié]
+## [0.1.0] - 2026-10-09
 
 ### Changé, la provenance passe au niveau SLSA 3
 
@@ -115,3 +115,6 @@ catalogue Linux jumeau a éprouvé, adapté à Kubernetes et au français.
   puis chaque worker déclaré dans `meta.yml`, préparé et joint par délégation.
   Calico remplace Flannel, qui n'applique pas les NetworkPolicy et rendait
   invérifiables quatre labs.
+
+[Non publié]: https://github.com/stephrobert/kubernetes-dsoxlab-training/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/stephrobert/kubernetes-dsoxlab-training/releases/tag/v0.1.0

@@ -1,5 +1,5 @@
 id: cks-image-pinned-digest
-title: "Épingler une image par son digest, et prouver que le tag ne suffit pas"
+title: "Pin an image by digest, and prove the tag is not enough"
 level: supply-chain-security
 section: cks
 difficulty: intermediate

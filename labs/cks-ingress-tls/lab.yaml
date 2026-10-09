@@ -1,5 +1,5 @@
 id: cks-ingress-tls
-title: "Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur"
+title: "Serve a site over HTTPS with its own certificate, not the controller's"
 level: cluster-setup
 section: cks
 difficulty: intermediate

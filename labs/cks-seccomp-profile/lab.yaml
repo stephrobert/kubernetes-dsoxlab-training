@@ -1,5 +1,5 @@
 id: cks-seccomp-profile
-title: "Interdire un appel système à un conteneur, et le prouver de l'intérieur"
+title: "Deny a system call to a container, and prove it from the inside"
 level: system-hardening
 section: cks
 difficulty: advanced
