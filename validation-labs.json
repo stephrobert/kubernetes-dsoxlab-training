@@ -11,18 +11,18 @@
    "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 230,
+  "date": "2026-10-12",
+  "duree_s": 434,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/8",
    "après la solution : 8/8",
    "après clean et run : 0/8",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-capstone-portail.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -139,18 +139,18 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 536,
+  "date": "2026-10-12",
+  "duree_s": 543,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-gateway-api-httproute.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -203,18 +203,18 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 272,
+  "date": "2026-10-12",
+  "duree_s": 278,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-ingress-path-routing.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -235,25 +235,32 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 655,
-  "ecarts": [],
+  "date": "2026-10-12",
+  "duree_s": 776,
+  "ecarts": [
+   "nœud k8s-cp.lab : version 'v1.37.1' devenu 'v1.37.0'",
+   "nœud k8s-w1.lab : version 'v1.37.1' devenu 'v1.37.0'",
+   "kube-system configmap/kubeadm-config : '9c3dd6d6fdac' devenu '61de972c605a'",
+   "kube-system configmap/kubelet-config : '73c27a184216' devenu '5075bf858537'"
+  ],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
-   "cluster rendu intact"
+   "4 écart(s) après clean"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-kubeadm-upgrade.log",
-  "kubernetes": "v1.37.0",
-  "raisons": [],
+  "kubernetes": "v1.37.1",
+  "raisons": [
+   "le cluster n'est pas rendu intact"
+  ],
   "rejeu": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
-  "verdict": "VALIDE"
+  "verdict": "ROUGE"
  },
  "cka-kubectl-debug": {
   "apres": {
@@ -459,8 +466,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 185,
+  "date": "2026-10-12",
+  "duree_s": 187,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -523,8 +530,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 395,
+  "date": "2026-10-12",
+  "duree_s": 402,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -587,8 +594,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 235,
+  "date": "2026-10-12",
+  "duree_s": 146,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -715,8 +722,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 561,
+  "date": "2026-10-12",
+  "duree_s": 575,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -811,8 +818,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 198,
+  "date": "2026-10-12",
+  "duree_s": 203,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -843,8 +850,8 @@
    "total": 10
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 226,
+  "date": "2026-10-12",
+  "duree_s": 230,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1067,8 +1074,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 78,
+  "date": "2026-10-12",
+  "duree_s": 83,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1291,8 +1298,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 156,
+  "date": "2026-10-12",
+  "duree_s": 157,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1387,8 +1394,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 310,
+  "date": "2026-10-12",
+  "duree_s": 316,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1419,8 +1426,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 191,
+  "date": "2026-10-12",
+  "duree_s": 196,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1451,8 +1458,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 177,
+  "date": "2026-10-12",
+  "duree_s": 154,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1483,18 +1490,18 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 110,
+  "date": "2026-10-12",
+  "duree_s": 113,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-apparmor-confiner-un-pod.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -1515,8 +1522,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 248,
+  "date": "2026-10-12",
+  "duree_s": 223,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1547,11 +1554,11 @@
    "total": 5
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 341,
+  "date": "2026-10-12",
+  "duree_s": 309,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/5",
    "après la solution : 5/5",
    "après clean et run : 0/5",
@@ -1579,8 +1586,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 256,
+  "date": "2026-10-12",
+  "duree_s": 223,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 12 objets hors kube-system",
@@ -1611,11 +1618,11 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 123,
+  "date": "2026-10-12",
+  "duree_s": 142,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -1643,11 +1650,11 @@
    "total": 1
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 70,
+  "date": "2026-10-12",
+  "duree_s": 87,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/1",
    "après la solution : 1/1",
    "après clean et run : 0/1",
@@ -1675,18 +1682,18 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 87,
+  "date": "2026-10-12",
+  "duree_s": 84,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-image-pinned-digest.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -1707,11 +1714,11 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 93,
+  "date": "2026-10-12",
+  "duree_s": 200,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
@@ -1739,11 +1746,11 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 268,
+  "date": "2026-10-12",
+  "duree_s": 278,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
@@ -1771,25 +1778,30 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 348,
-  "ecarts": [],
+  "date": "2026-10-12",
+  "duree_s": 370,
+  "ecarts": [
+   "kube-system configmap/istio-ca-crl : None devenu '5cca5016d357'",
+   "objet laissé : default/configmaps/istio-ca-crl"
+  ],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
-   "cluster rendu intact"
+   "2 écart(s) après clean"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-istio-mtls-lockdown.log",
   "kubernetes": "v1.37.0",
-  "raisons": [],
+  "raisons": [
+   "le cluster n'est pas rendu intact"
+  ],
   "rejeu": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
-  "verdict": "VALIDE"
+  "verdict": "ROUGE"
  },
  "cks-networkpolicy-default-deny": {
   "apres": {
@@ -1803,11 +1815,11 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 215,
+  "date": "2026-10-12",
+  "duree_s": 223,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -1835,18 +1847,18 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-15",
-  "duree_s": 140,
+  "date": "2026-10-12",
+  "duree_s": 142,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-pod-security-admission.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -1867,18 +1879,18 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 93,
+  "date": "2026-10-12",
+  "duree_s": 89,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-rbac-least-privilege.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.1",
   "raisons": [],
   "rejeu": {
    "passed": 0,
@@ -1888,36 +1900,23 @@
   "verdict": "VALIDE"
  },
  "cks-runtime-sandbox-gvisor": {
-  "apres": {
-   "passed": 2,
-   "score": 100,
-   "total": 2
-  },
   "avant": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 189,
-  "ecarts": [],
+  "date": "2026-10-12",
+  "duree_s": 255,
+  "erreur": "la solution du formateur a échoué (rc=1) : runtimeclass.node.k8s.io/gvisor created\npod/confine created\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nerror: timed out waiting for the condition on pods/confine",
   "etapes": [
-   "cluster photographié, v1.37.0, 14 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
-   "cluster rendu intact"
+   "ÉCHEC : la solution du formateur a échoué (rc=1) : runtimeclass.node.k8s.io/gvisor created\npod/confine created\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nerror: timed out waiting for the condition on pods/confine"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-runtime-sandbox-gvisor.log",
   "kubernetes": "v1.37.0",
-  "raisons": [],
-  "rejeu": {
-   "passed": 0,
-   "score": 0,
-   "total": 2
-  },
-  "verdict": "VALIDE"
+  "verdict": "ROUGE"
  },
  "cks-seccomp-profile": {
   "apres": {
@@ -1931,11 +1930,11 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 153,
+  "date": "2026-10-12",
+  "duree_s": 206,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -1963,11 +1962,11 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 142,
+  "date": "2026-10-12",
+  "duree_s": 147,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -1995,8 +1994,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 211,
+  "date": "2026-10-12",
+  "duree_s": 157,
   "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.0, 13 objets hors kube-system",
@@ -2027,11 +2026,11 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-17",
-  "duree_s": 337,
+  "date": "2026-10-12",
+  "duree_s": 339,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 13 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
