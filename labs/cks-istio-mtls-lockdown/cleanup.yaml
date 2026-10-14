@@ -39,13 +39,31 @@
       failed_when: false
 
     # `kubectl delete` n'accepte pas `--all-namespaces` : il faut énumérer.
-    - name: Retirer le ConfigMap du CA racine de tous les namespaces restants
-      ansible.builtin.shell: |
-        set -eu
-        kubectl get namespace -o name | sed 's|namespace/||' | while read -r ns; do
-          kubectl delete configmap istio-ca-root-cert -n "$ns" --ignore-not-found >/dev/null
-        done
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
+    - name: Retirer les ConfigMaps qu'istiod distribue dans tous les namespaces
+      # istiod pousse ses propres ConfigMaps dans CHAQUE namespace, kube-system
+      # compris, et `istioctl uninstall --purge` ne les retire pas.
+      #
+      # Ce retrait visait `istio-ca-root-cert` par son nom. Le relevé du
+      # 2026-10-12 en a trouvé un SECOND, `istio-ca-crl` — la liste de
+      # révocation du CA, qu'une version plus récente d'Istio distribue de la
+      # même manière — et le lab est passé ROUGE pour un objet dont personne ne
+      # connaissait l'existence ici.
+      #
+      # On retire donc par PRÉFIXE `istio-ca-`, pour que le prochain ConfigMap
+      # qu'Istio ajoutera ne rouvre pas la même issue. Nommer les objets un par
+      # un était la vraie cause : la liste ne pouvait que prendre du retard sur
+      # Istio.
+      #
+      # `kubectl delete` n'accepte pas `--all-namespaces` : il faut énumérer.
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+          kubectl get namespace -o name | sed 's|namespace/||' | while read -r ns; do
+            kubectl get configmap -n "$ns" -o name 2>/dev/null \
+              | grep -E '^configmap/istio-ca-' \
+              | xargs -r kubectl delete -n "$ns" --ignore-not-found >/dev/null
+          done
+        executable: /bin/bash
       changed_when: true
       failed_when: false
