@@ -57,7 +57,7 @@
       #
       # Mesuré le 2026-10-14 : le cleanup visait « 1.37.0-1.1 » en dur alors que
       # le dépôt publiait la 1.37.1 depuis, et rétrogradait donc le cluster d'un
-      # patch à chaque passage. Le validateur l'a dit en quatre écarts — les
+      # patch à chaque passage. Le validateur l'a dit en quatre écarts : les
       # deux nœuds « v1.37.1 devenu v1.37.0 », et les ConfigMaps kubeadm-config
       # et kubelet-config que `kubeadm upgrade apply` réécrit au passage.
       #
