@@ -15,7 +15,7 @@
 # catalogue, il ne touche à rien.
 #
 # LA CIBLE N'EST PAS ÉCRITE ICI, et c'est le correctif du 2026-10-14. Elle
-# l'était — « 1.37.0-1.1 » — pendant que le socle installait la 1.37.1 que le
+# l'était : « 1.37.0-1.1 » : pendant que le socle installait la 1.37.1 que le
 # dépôt a publiée depuis : ce cleanup RÉTROGRADAIT donc le cluster d'un patch à
 # chaque passage, et le validateur le disait en quatre écarts. `pkgs.k8s.io` est
 # versionné par mineure et rien n'y fige le patch ; toute valeur recopiée dans ce
@@ -47,8 +47,8 @@
       #
       #   1. le relevé que le setup a écrit AVANT de dégrader le cluster. C'est
       #      la seule source exacte : c'est la version que ce cluster portait.
-      #   2. à défaut — relevé effacé, ou cluster monté par un setup antérieur
-      #      à ce correctif — la plus récente de la mineure que le dépôt publie,
+      #   2. à défaut : relevé effacé, ou cluster monté par un setup antérieur
+      #      à ce correctif : la plus récente de la mineure que le dépôt publie,
       #      c'est-à-dire ce que le socle installerait aujourd'hui.
       #
       # Le numéro APT ne se déduit PAS du numéro kubelet : le suffixe varie

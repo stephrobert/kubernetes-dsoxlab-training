@@ -44,9 +44,9 @@
       # compris, et `istioctl uninstall --purge` ne les retire pas.
       #
       # Ce retrait visait `istio-ca-root-cert` par son nom. Le relevé du
-      # 2026-10-12 en a trouvé un SECOND, `istio-ca-crl` — la liste de
+      # 2026-10-12 en a trouvé un SECOND, `istio-ca-crl` : la liste de
       # révocation du CA, qu'une version plus récente d'Istio distribue de la
-      # même manière — et le lab est passé ROUGE pour un objet dont personne ne
+      # même manière : et le lab est passé ROUGE pour un objet dont personne ne
       # connaissait l'existence ici.
       #
       # On retire donc par PRÉFIXE `istio-ca-`, pour que le prochain ConfigMap
