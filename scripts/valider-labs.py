@@ -220,6 +220,30 @@ def attendre_stabilite(hote: str, journal, delai: int = 300) -> dict:
 #: « 1.37.0-1.1 » en dur rétrogradait un cluster monté en 1.37.1.
 VERSION_PEUT_MONTER = frozenset({"cka-kubeadm-upgrade"})
 
+#: Les ConfigMaps de `kube-system` que `kubeadm upgrade apply` régénère, et les
+#: labs qui ont le droit de les laisser différents.
+#:
+#: Même raison que `VERSION_PEUT_MONTER`, et même portée nominative :
+#: `cka-kubeadm-upgrade` est le seul lab dont le cleanup remonte le cluster par
+#: `kubeadm upgrade apply` au lieu de `kubeadm init`. Les ConfigMaps que kubeadm
+#: y écrit ne sont donc pas ceux que le socle écrit, et cela n'a rien à voir
+#: avec ce que le lab laisse derrière lui.
+#:
+#: Mesuré le 2026-10-15 en capturant le CONTENU des deux versions, et non leurs
+#: seules empreintes : la différence tient en une ligne,
+#: `resolvConf: /run/systemd/resolve/resolv.conf`, que `kubeadm upgrade apply`
+#: ajoute en détectant systemd-resolved et que `kubeadm init` n'écrit pas.
+#:
+#: Ce desserrement est plus large que celui de la version : la photographie ne
+#: porte que des empreintes, donc n'importe quelle différence sur ces deux
+#: ConfigMaps passe. Le supprimer plutôt que l'accepter demanderait de faire
+#: écrire `resolvConf` par le socle dès l'init, ce qui touche la façon dont les
+#: soixante-quatre labs montent leur cluster.
+CONFIGMAPS_REGENERES_PAR_UPGRADE = frozenset({
+    "configmap/kubeadm-config",
+    "configmap/kubelet-config",
+})
+
 
 def _version_en_tuple(brut: str) -> tuple[int, ...] | None:
     """« v1.37.10 » devient (1, 37, 10). None si ce n'est pas lisible.
@@ -269,8 +293,15 @@ def ecarts(avant: dict, apres: dict, ident: str = "") -> list[str]:
             out.append(f"{kind} disparu : {nom}")
     for cle in sorted(set(avant["kube-system"]) | set(apres["kube-system"])):
         a, b = avant["kube-system"].get(cle), apres["kube-system"].get(cle)
-        if a != b:
-            out.append(f"kube-system {cle} : {a!r} devenu {b!r}")
+        if a == b:
+            continue
+        # Le lab d'upgrade remonte le cluster par `kubeadm upgrade apply`, qui
+        # régénère ces ConfigMaps autrement que `kubeadm init` du socle. La
+        # tolérance ne porte QUE sur eux, et QUE pour lui : l'apparition ou la
+        # disparition d'un autre objet de kube-system reste un écart.
+        if monte_permis and cle in CONFIGMAPS_REGENERES_PAR_UPGRADE:
+            continue
+        out.append(f"kube-system {cle} : {a!r} devenu {b!r}")
     for nom in sorted(set(apres["objets"]) - set(avant["objets"])):
         out.append(f"objet laissé : {nom}")
     for nom in sorted(set(avant["objets"]) - set(apres["objets"])):

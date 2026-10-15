@@ -174,3 +174,57 @@ def test_un_objet_laisse_reste_signale_pour_le_lab_tolere() -> None:
     apres["objets"] = ["bac-a-sable/configmaps/traine"]
     trouves = valider_labs.ecarts(photo("v1.37.1"), apres, LAB_TOLERE)
     assert any("objet laissé" in t for t in trouves)
+
+# ── Les ConfigMaps que `kubeadm upgrade apply` régénère ──────────────────────
+#
+# Mesuré le 2026-10-15 : la seule différence de contenu est l'ajout de
+# `resolvConf: /run/systemd/resolve/resolv.conf`, que `kubeadm upgrade apply`
+# pose en détectant systemd-resolved et que `kubeadm init` du socle n'écrit pas.
+# La photographie ne porte que des empreintes, donc la tolérance accepte toute
+# différence sur ces deux ConfigMaps : c'est un desserrement assumé, et ces
+# tests en bornent la portée.
+
+def photo_ks(kube_system: dict, version: str = "v1.37.1") -> dict:
+    p = photo(version)
+    p["kube-system"] = kube_system
+    return p
+
+
+@pytest.mark.parametrize("cle", ["configmap/kubelet-config", "configmap/kubeadm-config"])
+def test_les_configmaps_de_kubeadm_sont_toleres_pour_le_lab_d_upgrade(cle: str) -> None:
+    avant = photo_ks({cle: "73c27a184216"})
+    apres = photo_ks({cle: "5075bf858537"})
+    assert valider_labs.ecarts(avant, apres, LAB_TOLERE) == []
+
+
+@pytest.mark.parametrize("cle", ["configmap/kubelet-config", "configmap/kubeadm-config"])
+def test_aucun_autre_lab_ne_peut_les_laisser_differents(cle: str) -> None:
+    avant = photo_ks({cle: "73c27a184216"})
+    apres = photo_ks({cle: "5075bf858537"})
+    trouves = valider_labs.ecarts(avant, apres, LAB_ORDINAIRE)
+    assert trouves, f"{cle} ne doit être toléré que pour le lab d'upgrade"
+
+
+@pytest.mark.parametrize("cle", [
+    "configmap/coredns",
+    "configmap/kube-proxy",
+    "secret/bootstrap-token",
+    "deployment/coredns",
+])
+def test_les_autres_objets_de_kube_system_restent_compares(cle: str) -> None:
+    """La tolérance porte sur DEUX ConfigMaps nommés, pas sur kube-system.
+
+    Un lab qui modifierait coredns ou kube-proxy toucherait au socle commun des
+    soixante-quatre labs, et c'est exactement ce qu'il faut voir.
+    """
+    avant = photo_ks({cle: "avant"})
+    apres = photo_ks({cle: "apres"})
+    trouves = valider_labs.ecarts(avant, apres, LAB_TOLERE)
+    assert trouves, f"{cle} doit rester comparé, même pour le lab d'upgrade"
+
+
+def test_un_objet_de_kube_system_qui_apparait_reste_un_ecart() -> None:
+    avant = photo_ks({})
+    apres = photo_ks({"configmap/pose-par-le-lab": "abcdef"})
+    trouves = valider_labs.ecarts(avant, apres, LAB_TOLERE)
+    assert trouves, "un objet nouveau dans kube-system doit se voir"
