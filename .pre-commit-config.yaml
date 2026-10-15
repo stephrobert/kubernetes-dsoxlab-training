@@ -185,6 +185,17 @@ repos:
 
       # Garde-fou d'outillage : un test présent mais débranché ne protège plus
       # rien, et personne ne s'en aperçoit.
+      # La tolérance de version du validateur ne doit aller que vers le HAUT.
+      # Une tolérance élargie ne crierait plus jamais, et le défaut qu'elle
+      # laisserait revenir est celui du 2026-10-12 : un cleanup qui ramène le
+      # cluster plus bas que l'état dans lequel il l'a trouvé.
+      - id: tolerance-de-version
+        name: un lab ne peut laisser le cluster que PLUS HAUT, jamais plus bas
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_tolerance_de_version.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: outillage-coherent
         name: les vérificateurs de catalogue sont présents et câblés
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_outillage_coherent.py -q
