@@ -202,16 +202,56 @@ def attendre_stabilite(hote: str, journal, delai: int = 300) -> dict:
     return photo
 
 
-def ecarts(avant: dict, apres: dict) -> list[str]:
+#: Les labs dont le cleanup a le droit de laisser le cluster à une version PLUS
+#: HAUTE que celle de la photographie initiale.
+#:
+#: Un seul y figure, et il n'y a pas de raison d'en ajouter sans en discuter :
+#: `cka-kubeadm-upgrade` est le seul lab du catalogue qui touche à la version du
+#: cluster. Son setup le rétrograde pour qu'il y ait quelque chose à monter, et
+#: son cleanup le ramène à la version que le dépôt APT publie.
+#:
+#: La fenêtre que cela couvre : `pkgs.k8s.io/v1.37` n'est versionné que par
+#: MINEURE, rien n'y fige le patch. Si une 1.37.2 paraît entre le provision et le
+#: clean, la version relevée par le setup et celle que le cleanup trouve
+#: diffèrent, sans que le lab y soit pour rien.
+#:
+#: La tolérance ne va QUE vers le haut. Une version qui redescend reste un écart,
+#: et c'était exactement le défaut du 2026-10-12 : un cleanup qui visait
+#: « 1.37.0-1.1 » en dur rétrogradait un cluster monté en 1.37.1.
+VERSION_PEUT_MONTER = frozenset({"cka-kubeadm-upgrade"})
+
+
+def _version_en_tuple(brut: str) -> tuple[int, ...] | None:
+    """« v1.37.10 » devient (1, 37, 10). None si ce n'est pas lisible.
+
+    La comparaison de chaînes ne convient pas : « v1.37.9 » est supérieur à
+    « v1.37.10 » en lexicographique, et ce genre d'inversion se paie un jour.
+    """
+    morceaux = brut.strip().lstrip("vV").split("+")[0].split("-")[0].split(".")
+    try:
+        return tuple(int(m) for m in morceaux)
+    except ValueError:
+        return None
+
+
+def ecarts(avant: dict, apres: dict, ident: str = "") -> list[str]:
     out: list[str] = []
+    monte_permis = ident in VERSION_PEUT_MONTER
     for nom, a in avant["noeuds"].items():
         b = apres["noeuds"].get(nom)
         if b is None:
             out.append(f"nœud {nom} : disparu")
             continue
         for cle in ("ready", "unschedulable", "taints", "labels", "version"):
-            if a[cle] != b[cle]:
-                out.append(f"nœud {nom} : {cle} {a[cle]!r} devenu {b[cle]!r}")
+            if a[cle] == b[cle]:
+                continue
+            if cle == "version" and monte_permis:
+                va, vb = _version_en_tuple(str(a[cle])), _version_en_tuple(str(b[cle]))
+                # Illisible d'un côté ou de l'autre : on ne conclut pas au vert.
+                # « Je n'ai pas pu comparer » n'est pas « c'est bon ».
+                if va is not None and vb is not None and vb >= va:
+                    continue
+            out.append(f"nœud {nom} : {cle} {a[cle]!r} devenu {b[cle]!r}")
     for nom in apres["noeuds"]:
         if nom not in avant["noeuds"]:
             out.append(f"nœud {nom} : apparu")
@@ -284,7 +324,7 @@ def valider(lab: Path, rejeu: bool) -> dict:
             if res.returncode != 0:
                 raise Echec(f"dsoxlab clean a échoué (rc={res.returncode})")
             apres_photo = attendre_stabilite(hote, journal)
-            resultat["ecarts"] = ecarts(avant_photo, apres_photo)
+            resultat["ecarts"] = ecarts(avant_photo, apres_photo, ident)
             dire("cluster rendu intact" if not resultat["ecarts"] else f"{len(resultat['ecarts'])} écart(s) après clean")
         except Echec as e:
             resultat["erreur"] = str(e)
