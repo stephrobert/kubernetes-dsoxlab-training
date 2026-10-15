@@ -126,7 +126,35 @@ if ! crictl info 2>/dev/null | grep -q runsc; then
 fi
 
 echo "Sonde 2/2 : un Pod peut-il reellement demarrer dans runsc ?"
+
+# LA SONDE NE TOUCHE PAS A CE QUI APPARTIENT AU LAB.
+#
+# Elle emprunta d'abord `bac-a-sable`, le namespace du lab, et elle etait placee
+# AVANT le bloc qui attend la fin d'une suppression en cours. Mesure le
+# 2026-10-15 : « pods "sonde-runsc" is forbidden: unable to create new content
+# in namespace bac-a-sable because it is being terminated ». La sonde est sortie
+# en 1 avant son propre nettoyage, a laisse sa RuntimeClass derriere elle, et le
+# lab suivant a rendu ROUGE pour un objet qu'il n'avait jamais cree.
+#
+# Namespace jetable, donc, et rendu par un trap : qu'elle reussisse, echoue ou
+# soit interrompue, elle ne laisse rien. Une sonde qui salit le cluster qu'elle
+# controle n'est plus une sonde.
+NS_SONDE=dsoxlab-sonde-runsc
+
+retirer_la_sonde() {
+  kubectl delete namespace "$NS_SONDE" --ignore-not-found --wait=false >/dev/null 2>&1 || true
+  kubectl delete runtimeclass sonde-runsc --ignore-not-found --wait=false >/dev/null 2>&1 || true
+}
+trap retirer_la_sonde EXIT
+
+# Un passage precedent a pu laisser le namespace en Terminating : on l'attend
+# plutot que de creer dedans, ce qui est exactement l'erreur qu'on corrige.
+if [[ "$(kubectl get namespace "$NS_SONDE" -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
+  kubectl wait --for=delete "namespace/$NS_SONDE" --timeout=180s || true
+fi
 kubectl delete runtimeclass sonde-runsc --ignore-not-found --wait=true
+kubectl create namespace "$NS_SONDE" >/dev/null
+
 kubectl apply -f - <<'YAML'
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
@@ -134,14 +162,12 @@ metadata:
   name: sonde-runsc
 handler: runsc
 YAML
-kubectl -n bac-a-sable delete pod sonde-runsc --ignore-not-found --wait=true 2>/dev/null || true
-kubectl get namespace bac-a-sable >/dev/null 2>&1 || kubectl create namespace bac-a-sable
-kubectl apply -f - <<'YAML'
+kubectl apply -f - <<YAML
 apiVersion: v1
 kind: Pod
 metadata:
   name: sonde-runsc
-  namespace: bac-a-sable
+  namespace: $NS_SONDE
 spec:
   runtimeClassName: sonde-runsc
   nodeName: k8s-cp.lab
@@ -151,21 +177,21 @@ spec:
       image: busybox:1.37
       command: ["sh", "-c", "sleep 300"]
 YAML
-if ! kubectl -n bac-a-sable wait --for=condition=ready pod/sonde-runsc --timeout=180s; then
+if ! kubectl -n "$NS_SONDE" wait --for=condition=ready pod/sonde-runsc --timeout=180s; then
   echo "AUCUN Pod ne demarre dans runsc. Ce que Kubernetes en dit :" >&2
-  kubectl -n bac-a-sable describe pod sonde-runsc >&2 || true
+  kubectl -n "$NS_SONDE" describe pod sonde-runsc >&2 || true
   echo "--- journal de containerd ---" >&2
   journalctl -u containerd -n 60 --no-pager >&2 || true
-  kubectl -n bac-a-sable delete pod sonde-runsc --ignore-not-found --wait=false
-  kubectl delete runtimeclass sonde-runsc --ignore-not-found --wait=false
-  exit 1
+  exit 1   # le trap retire la sonde
 fi
 echo "gVisor fonctionne : la sonde a demarre."
 
-# La sonde disparait : ce que le candidat doit produire, c'est SA RuntimeClass
-# et SON Pod. En laisser une toute prete donnerait la reponse.
-kubectl -n bac-a-sable delete pod sonde-runsc --ignore-not-found --wait=true
+# Retrait immediat et ATTENDU, pour que la photographie du validateur ne voie
+# pas un namespace en cours de suppression. Le trap reste armé au cas où.
+kubectl -n "$NS_SONDE" delete pod sonde-runsc --ignore-not-found --wait=true
 kubectl delete runtimeclass sonde-runsc --ignore-not-found --wait=true
+kubectl delete namespace "$NS_SONDE" --ignore-not-found --wait=true
+trap - EXIT
 
 # Ce que le candidat doit produire est retire s'il traine d'un passage
 # precedent : la RuntimeClass est un objet de CLUSTER et survivrait au
