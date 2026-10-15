@@ -1,6 +1,6 @@
 [project]
 name = "kubernetes-dsoxlab-training"
-version = "0.1.0"
+version = "0.1.1"
 description = "Catalogue de micro-labs vérifiables CKA, CKAD et CKS — fournisseur de contenu pour la CLI dsoxlab"
 requires-python = ">=3.11"
 dependencies = []
