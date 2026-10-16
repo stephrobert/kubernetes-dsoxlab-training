@@ -18,7 +18,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "equipe-produit"
 DEPLOYMENT = "catalogue"
@@ -85,19 +85,29 @@ def test_le_namespace_refuse_un_pod_qui_demande_trop(host):
     if rc == 0:
         _supprimer(host, "sonde-trop")
 
-    assert rc != 0, (
-        f"Le namespace {NAMESPACE} a ACCEPTÉ un Pod demandant {CPU_EXCESSIF} "
+    assert rc != 0, message(
+        en=f"Namespace {NAMESPACE} ACCEPTED a Pod requesting {CPU_EXCESSIF} "
+        "CPU. Without a ceiling, the API accepts and the Pod waits forever for "
+        "room that does not exist: nobody refused it, and the team's quota "
+        "does not exist. The refusal must come from the namespace, at "
+        "creation time.",
+        fr=f"Le namespace {NAMESPACE} a ACCEPTÉ un Pod demandant {CPU_EXCESSIF} "
         "CPU. Sans plafond, l'API accepte et le Pod attend indéfiniment une "
         "place qui n'existe pas : personne ne l'a refusé, et le quota de "
         "l'équipe n'existe pas. Le refus doit venir du namespace, à la "
-        "création."
+        "création.",
     )
-    assert "exceeded quota" in (diagnostic + sortie).lower(), (
-        "Le Pod a bien été refusé, mais pas par le plafond du namespace. "
+    assert "exceeded quota" in (diagnostic + sortie).lower(), message(
+        en="The Pod was indeed refused, but not by the namespace's ceiling. "
+        "Measured on 2026-09-17: a ceiling that is reached returns \"exceeded "
+        "quota: <name>, requested: …, limited: …\", whereas a refusal coming "
+        "from default values returns \"must be less than or equal to cpu limit\". "
+        f"The message was: {diagnostic or sortie}",
+        fr="Le Pod a bien été refusé, mais pas par le plafond du namespace. "
         "Mesuré le 2026-09-17 : un plafond atteint rend « exceeded quota: "
         "<nom>, requested: …, limited: … », tandis qu'un refus venu des "
         "valeurs par défaut rend « must be less than or equal to cpu limit ». "
-        f"Le message était : {diagnostic or sortie}"
+        f"Le message était : {diagnostic or sortie}",
     )
 
 
@@ -123,34 +133,50 @@ def test_un_pod_sans_requests_est_accepte_et_complete(host):
         f"-n {NAMESPACE} run sonde-sans --image=busybox:1.37 --restart=Never "
         "--command -- sh -c 'sleep 60'",
     )
-    assert rc == 0, (
-        "Un Pod qui ne déclare aucune ressource a été REFUSÉ par le namespace "
+    assert rc == 0, message(
+        en="A Pod declaring no resources was REFUSED by namespace "
+        f"{NAMESPACE}: {diagnostic or sortie}. That is the effect of a ceiling "
+        "set on its own: as soon as a quota covers requests, a Pod declaring "
+        "none becomes invalid, since the API cannot count what is not "
+        "declared. What is missing is something to complete those Pods on arrival.",
+        fr="Un Pod qui ne déclare aucune ressource a été REFUSÉ par le namespace "
         f"{NAMESPACE} : {diagnostic or sortie}. C'est l'effet d'un plafond "
         "posé seul : dès qu'un quota porte sur les requests, un Pod qui n'en "
         "déclare pas devient invalide, l'API ne pouvant décompter ce qui n'est "
-        "pas déclaré. Il manque de quoi compléter ces Pods à leur arrivée."
+        "pas déclaré. Il manque de quoi compléter ces Pods à leur arrivée.",
     )
 
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get pod sonde-sans -o json"
     )
-    assert rc == 0 and sortie, f"Le Pod sonde-sans a disparu. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Pod sonde-sans is gone. {diagnostic}",
+        fr=f"Le Pod sonde-sans a disparu. {diagnostic}",
+    )
     ressources = json.loads(sortie)["spec"]["containers"][0].get("resources", {})
     _supprimer(host, "sonde-sans")
 
     requests = ressources.get("requests", {})
     limits = ressources.get("limits", {})
-    assert requests.get("cpu") and requests.get("memory"), (
-        f"Le Pod a été accepté mais repart sans requests : {ressources}. Il "
+    assert requests.get("cpu") and requests.get("memory"), message(
+        en=f"The Pod was accepted but comes back with no requests: {ressources}. It "
+        "will therefore be placed blindly, and will count for nothing against "
+        "the ceiling. What is missing is not the quota but whatever completes a "
+        "container that declares nothing, as it arrives in the namespace.",
+        fr=f"Le Pod a été accepté mais repart sans requests : {ressources}. Il "
         "sera donc placé à l'aveugle, et ne comptera pour rien dans le "
         "plafond. Ce qui manque n'est pas le quota mais ce qui complète un "
-        "conteneur qui ne déclare rien, à son arrivée dans le namespace."
+        "conteneur qui ne déclare rien, à son arrivée dans le namespace.",
     )
-    assert limits.get("cpu") and limits.get("memory"), (
-        f"Le Pod repart avec des requests mais sans limits : {ressources}. "
+    assert limits.get("cpu") and limits.get("memory"), message(
+        en=f"The Pod comes back with requests but no limits: {ressources}. "
+        "Both are set in the same place, through two distinct fields: one "
+        "feeds what the container REQUESTS, the other what it will not be "
+        "allowed to EXCEED.",
+        fr=f"Le Pod repart avec des requests mais sans limits : {ressources}. "
         "Les deux se règlent au même endroit, par deux champs distincts : l'un "
         "alimente ce que le conteneur DEMANDE, l'autre ce qu'il ne pourra pas "
-        "DÉPASSER."
+        "DÉPASSER.",
     )
 
     rc, pretes, _ = _kubectl(
@@ -158,9 +184,13 @@ def test_un_pod_sans_requests_est_accepte_et_complete(host):
         f"-n {NAMESPACE} get deployment {DEPLOYMENT} "
         "-o jsonpath='{.status.readyReplicas}'",
     )
-    assert rc == 0 and pretes == "1", (
-        f"L'application {DEPLOYMENT} n'a plus d'exemplaire prêt "
+    assert rc == 0 and pretes == "1", message(
+        en=f"Application {DEPLOYMENT} no longer has a ready replica "
+        f"(\"{pretes or 'none'}\"). A ceiling set too low stops it from being "
+        "rescheduled when it restarts: that is an outage, not resource "
+        "control. It asks for 50m of CPU and 32Mi of memory.",
+        fr=f"L'application {DEPLOYMENT} n'a plus d'exemplaire prêt "
         f"(« {pretes or 'aucun'} »). Un plafond trop bas l'empêche de se "
         "replacer quand elle redémarre : c'est une panne, pas une maîtrise des "
-        "ressources. Elle demande 50m de CPU et 32Mi de mémoire."
+        "ressources. Elle demande 50m de CPU et 32Mi de mémoire.",
     )

@@ -19,7 +19,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "bac-a-sable"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -44,8 +44,9 @@ def _noyau(host, pod: str) -> str:
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} exec {pod} --request-timeout=30s -- cat /proc/version"
     )
-    assert rc == 0 and sortie, (
-        f"Impossible de lire le noyau depuis le Pod {pod}. Sortie : {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Cannot read the kernel from Pod {pod}. Output: {diagnostic}",
+        fr=f"Impossible de lire le noyau depuis le Pod {pod}. Sortie : {diagnostic}",
     )
     return sortie
 
@@ -58,16 +59,22 @@ def test_la_runtimeclass_designe_le_runtime_du_noeud(host):
     désigner un runtime que containerd ne connaît pas, auquel cas les Pods
     restent bloqués. Il est là pour que l'échec soit diagnosticable."""
     rc, sortie, diagnostic = _kubectl(host, f"get runtimeclass {RUNTIME_CLASS} -o json")
-    assert rc == 0 and sortie, (
-        f"Aucune RuntimeClass nommée {RUNTIME_CLASS}. C'est un objet de CLUSTER, "
+    assert rc == 0 and sortie, message(
+        en=f"No RuntimeClass named {RUNTIME_CLASS}. It is a CLUSTER object, "
+        "with no namespace: it bridges a name the Pods use and "
+        f"a runtime containerd knows. Output: {diagnostic}",
+        fr=f"Aucune RuntimeClass nommée {RUNTIME_CLASS}. C'est un objet de CLUSTER, "
         "sans namespace : il fait le pont entre un nom que les Pods emploient et "
-        f"un runtime que containerd connaît. Sortie : {diagnostic}"
+        f"un runtime que containerd connaît. Sortie : {diagnostic}",
     )
     handler = json.loads(sortie).get("handler")
-    assert handler == HANDLER, (
-        f"La RuntimeClass désigne le handler « {handler} ». containerd connaît "
+    assert handler == HANDLER, message(
+        en=f"The RuntimeClass names handler \"{handler}\". containerd knows "
+        f"that runtime under the name \"{HANDLER}\", and the name must match "
+        "exactly: otherwise the Pod stays pending, with no clear message.",
+        fr=f"La RuntimeClass désigne le handler « {handler} ». containerd connaît "
         f"ce runtime sous le nom « {HANDLER} », et le nom doit correspondre "
-        "exactement : sinon le Pod reste en attente, sans message clair."
+        "exactement : sinon le Pod reste en attente, sans message clair.",
     )
 
 
@@ -88,22 +95,29 @@ def test_le_pod_confine_ne_voit_pas_le_noyau_de_l_hote(host):
     rc, phase, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get pod {CONFINE} -o jsonpath='{{.status.phase}}'"
     )
-    assert rc == 0 and phase, (
-        f"Aucun Pod {CONFINE} dans {NAMESPACE}. {diagnostic}"
+    assert rc == 0 and phase, message(
+        en=f"No Pod {CONFINE} in {NAMESPACE}. {diagnostic}",
+        fr=f"Aucun Pod {CONFINE} dans {NAMESPACE}. {diagnostic}",
     )
-    assert phase == "Running", (
-        f"Le Pod {CONFINE} est en {phase}. Un runtimeClassName qui désigne un "
+    assert phase == "Running", message(
+        en=f"Pod {CONFINE} is {phase}. A runtimeClassName naming a "
+        "runtime unknown to containerd leaves the Pod pending: "
+        "`kubectl describe pod` says so in its events.",
+        fr=f"Le Pod {CONFINE} est en {phase}. Un runtimeClassName qui désigne un "
         "runtime inconnu de containerd laisse le Pod en attente : "
-        "`kubectl describe pod` le dit dans ses events."
+        "`kubectl describe pod` le dit dans ses events.",
     )
 
     rc, declare, _ = _kubectl(
         host, f"-n {NAMESPACE} get pod {CONFINE} -o jsonpath='{{.spec.runtimeClassName}}'"
     )
-    assert rc == 0 and declare == RUNTIME_CLASS, (
-        f"Le Pod {CONFINE} déclare runtimeClassName « {declare or 'rien'} ». "
+    assert rc == 0 and declare == RUNTIME_CLASS, message(
+        en=f"Pod {CONFINE} declares runtimeClassName \"{declare or 'nothing'}\". "
+        f"It must use class {RUNTIME_CLASS} to be placed in the "
+        "sandbox.",
+        fr=f"Le Pod {CONFINE} déclare runtimeClassName « {declare or 'rien'} ». "
         f"Il doit employer la classe {RUNTIME_CLASS} pour être placé dans le "
-        "bac à sable."
+        "bac à sable.",
     )
 
     noyau_confine = _noyau(host, CONFINE)
@@ -111,20 +125,31 @@ def test_le_pod_confine_ne_voit_pas_le_noyau_de_l_hote(host):
     res = host.run("uname -r")
     noyau_machine = res.stdout.strip()
 
-    assert noyau_machine and noyau_machine in noyau_temoin, (
-        f"Le Pod témoin ne lit pas le noyau de la machine ({noyau_machine}), "
+    assert noyau_machine and noyau_machine in noyau_temoin, message(
+        en=f"The witness Pod does not read the machine's kernel ({noyau_machine}), "
+        f"but \"{noyau_temoin}\". Setup had nevertheless started it with the "
+        "default runtime: without that point of comparison, the measurement that follows "
+        "means nothing.",
+        fr=f"Le Pod témoin ne lit pas le noyau de la machine ({noyau_machine}), "
         f"mais « {noyau_temoin} ». Le setup l'avait pourtant lancé avec le "
         "runtime par défaut : sans ce point de comparaison, la mesure qui suit "
-        "ne veut rien dire."
+        "ne veut rien dire.",
     )
-    assert noyau_machine not in noyau_confine, (
-        f"Le Pod {CONFINE} lit le noyau de la machine : « {noyau_confine} ». Il "
+    assert noyau_machine not in noyau_confine, message(
+        en=f"Pod {CONFINE} reads the machine's kernel: \"{noyau_confine}\". It "
+        "is therefore not in the sandbox, it shares the host's kernel "
+        "like any other container. Check that its runtimeClassName is "
+        "indeed taken into account, and that the Pod was RECREATED afterwards: that field "
+        "cannot be modified on an existing Pod.",
+        fr=f"Le Pod {CONFINE} lit le noyau de la machine : « {noyau_confine} ». Il "
         "n'est donc pas dans le bac à sable, il partage le noyau de l'hôte "
         "comme n'importe quel conteneur. Vérifiez que son runtimeClassName est "
         "bien pris en compte, et que le Pod a été RECRÉÉ après : ce champ ne se "
-        "modifie pas sur un Pod existant."
+        "modifie pas sur un Pod existant.",
     )
-    assert noyau_confine != noyau_temoin, (
-        "Les deux Pods lisent exactement le même noyau : aucun des deux n'est "
-        "isolé."
+    assert noyau_confine != noyau_temoin, message(
+        en="Both Pods read exactly the same kernel: neither of them is "
+        "isolated.",
+        fr="Les deux Pods lisent exactement le même noyau : aucun des deux n'est "
+        "isolé.",
     )

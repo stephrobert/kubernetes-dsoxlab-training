@@ -19,7 +19,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "chaine"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -47,10 +47,13 @@ def _deploiement(host) -> dict:
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT} -o json"
     )
-    assert rc == 0 and sortie, (
-        f"Le Deployment {DEPLOIEMENT} n'existe plus dans {NAMESPACE}. Le setup "
+    assert rc == 0 and sortie, message(
+        en=f"Deployment {DEPLOIEMENT} no longer exists in {NAMESPACE}. Setup "
+        "had placed it there: it had to be pinned, not replaced. Output: "
+        f"{diagnostic}",
+        fr=f"Le Deployment {DEPLOIEMENT} n'existe plus dans {NAMESPACE}. Le setup "
         "l'avait posé : il fallait l'épingler, pas le remplacer. Sortie : "
-        f"{diagnostic}"
+        f"{diagnostic}",
     )
     return json.loads(sortie)
 
@@ -78,15 +81,21 @@ def _digest(reference: str) -> str:
 def test_l_image_n_est_plus_referencee_par_un_tag(host):
     d = _deploiement(host)
     image = d["spec"]["template"]["spec"]["containers"][0]["image"]
-    assert "@sha256:" in image, (
-        f"Le Deployment référence encore son image par un nom mutable : « {image} ». "
+    assert "@sha256:" in image, message(
+        en=f"The Deployment still references its image by a mutable name: \"{image}\". "
+        "A tag can be repointed at another image without any manifest "
+        "changing. The expected form is repository@sha256:<hexadecimal>.",
+        fr=f"Le Deployment référence encore son image par un nom mutable : « {image} ». "
         "Un tag peut être repointé sur une autre image sans qu'aucun manifeste "
-        "ne change. La forme attendue est dépôt@sha256:<hexadécimal>."
+        "ne change. La forme attendue est dépôt@sha256:<hexadécimal>.",
     )
-    assert ":1.27-alpine@" not in image, (
-        f"La référence « {image} » garde le tag à côté du digest. Kubernetes "
+    assert ":1.27-alpine@" not in image, message(
+        en=f"The reference \"{image}\" keeps the tag next to the digest. Kubernetes "
+        "accepts that form and ignores the tag, but it suggests that the "
+        "tag still counts: keep only the digest.",
+        fr=f"La référence « {image} » garde le tag à côté du digest. Kubernetes "
         "accepte cette forme et ignore le tag, mais elle laisse croire que le "
-        "tag compte encore : ne gardez que le digest."
+        "tag compte encore : ne gardez que le digest.",
     )
 
 
@@ -103,25 +112,32 @@ def test_c_est_toujours_l_image_demandee(host):
     d = _deploiement(host)
     image = d["spec"]["template"]["spec"]["containers"][0]["image"]
     depot = image.split("@")[0]
-    assert depot.split("/")[-1].split(":")[0] == "nginx", (
-        f"La référence pointe « {depot} », et le cahier des charges demande "
-        "d'épingler nginx, pas d'en changer."
+    assert depot.split("/")[-1].split(":")[0] == "nginx", message(
+        en=f"The reference points at \"{depot}\", and the specification asks "
+        "for nginx to be pinned, not swapped.",
+        fr=f"La référence pointe « {depot} », et le cahier des charges demande "
+        "d'épingler nginx, pas d'en changer.",
     )
 
     res = host.run("sudo crictl inspecti -o json nginx:1.27-alpine")
     rc, sortie, diagnostic = res.rc, res.stdout.strip(), res.stderr.strip()
-    assert rc == 0 and sortie, (
-        "Le runtime du nœud ne connaît pas nginx:1.27-alpine : impossible de "
-        f"vérifier que le digest est le bon. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en="The node's runtime does not know nginx:1.27-alpine: there is no way to "
+        f"check that the digest is the right one. {diagnostic}",
+        fr="Le runtime du nœud ne connaît pas nginx:1.27-alpine : impossible de "
+        f"vérifier que le digest est le bon. {diagnostic}",
     )
     connus = {
         _digest(reference)
         for reference in (json.loads(sortie).get("status") or {}).get("repoDigests", [])
     }
-    assert _digest(image) in connus, (
-        f"Le digest déclaré n'est pas celui de nginx:1.27-alpine sur ce nœud. "
+    assert _digest(image) in connus, message(
+        en=f"The declared digest is not the one of nginx:1.27-alpine on this node. "
+        f"Declared: {_digest(image)}. Known to the runtime: "
+        f"{', '.join(sorted(connus)) or 'none'}.",
+        fr=f"Le digest déclaré n'est pas celui de nginx:1.27-alpine sur ce nœud. "
         f"Déclaré : {_digest(image)}. Connu(s) du runtime : "
-        f"{', '.join(sorted(connus)) or 'aucun'}."
+        f"{', '.join(sorted(connus)) or 'aucun'}.",
     )
 
 
@@ -144,16 +160,21 @@ def test_le_digest_declare_est_celui_que_le_noeud_execute(host):
     """
     d = _deploiement(host)
     declare = _digest(d["spec"]["template"]["spec"]["containers"][0]["image"])
-    assert declare, (
-        "Le Deployment ne déclare aucun digest : il référence encore son image "
-        "par un tag, et il n'y a rien à comparer."
+    assert declare, message(
+        en="The Deployment declares no digest: it still references its image "
+        "by a tag, and there is nothing to compare.",
+        fr="Le Deployment ne déclare aucun digest : il référence encore son image "
+        "par un tag, et il n'y a rien à comparer.",
     )
 
     prets = d.get("status", {}).get("readyReplicas", 0)
-    assert prets == 2, (
-        f"{prets} exemplaire(s) sur 2 sont prêts après l'épinglage. Si le digest "
+    assert prets == 2, message(
+        en=f"{prets} replica(s) out of 2 are ready after the pinning. If the digest "
+        "is malformed or matches no image in the registry, the Pod stays "
+        "in ImagePullBackOff: look at its events.",
+        fr=f"{prets} exemplaire(s) sur 2 sont prêts après l'épinglage. Si le digest "
         "est mal formé ou ne correspond à aucune image du registre, le Pod reste "
-        "en ImagePullBackOff : regardez ses events."
+        "en ImagePullBackOff : regardez ses events.",
     )
 
     rc, sortie, diagnostic = _kubectl(
@@ -161,18 +182,28 @@ def test_le_digest_declare_est_celui_que_le_noeud_execute(host):
         f"-n {NAMESPACE} get pods -l {SELECTEUR} "
         "-o jsonpath='{range .items[*]}{.status.containerStatuses[0].imageID}{\"\\n\"}{end}'",
     )
-    assert rc == 0 and sortie, f"Aucun Pod de {DEPLOIEMENT} n'a d'état lisible. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"No Pod of {DEPLOIEMENT} has a readable state. {diagnostic}",
+        fr=f"Aucun Pod de {DEPLOIEMENT} n'a d'état lisible. {diagnostic}",
+    )
 
     resolus = [ligne.strip() for ligne in sortie.splitlines() if ligne.strip()]
-    assert len(resolus) == 2, (
-        f"{len(resolus)} exemplaire(s) rendent leur imageID, on en attend deux."
+    assert len(resolus) == 2, message(
+        en=f"{len(resolus)} replica(s) return their imageID; two are expected.",
+        fr=f"{len(resolus)} exemplaire(s) rendent leur imageID, on en attend deux.",
     )
     ecarts = [r for r in resolus if _digest(r) != declare]
-    assert not ecarts, (
-        f"Le Deployment déclare le digest {declare}, mais un exemplaire au "
+    assert not ecarts, message(
+        en=f"The Deployment declares digest {declare}, but at least one replica "
+        f"runs something else: {', '.join(ecarts)}.\n\n"
+        "A reference that has the shape of a digest is not a pinning: "
+        "that is what this test proves, and it is all that separates a chain "
+        "copied from somewhere from a real guarantee of immutability. If the gap persists "
+        "while the digest is correct, the rollout is not finished.",
+        fr=f"Le Deployment déclare le digest {declare}, mais un exemplaire au "
         f"moins exécute autre chose : {', '.join(ecarts)}.\n\n"
         "Une référence qui a la forme d'un digest n'est pas un épinglage : "
         "c'est ce que prouve ce test, et c'est tout ce qui sépare une chaîne "
         "recopiée d'une vraie garantie d'immuabilité. Si l'écart persiste "
-        "alors que le digest est juste, le déploiement n'est pas terminé."
+        "alors que le digest est juste, le déploiement n'est pas terminé.",
     )

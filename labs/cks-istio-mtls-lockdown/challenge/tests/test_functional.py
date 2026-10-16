@@ -21,7 +21,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "maillage"
 NAMESPACE_NU = "dehors"
@@ -68,16 +68,22 @@ def test_le_namespace_exige_le_tls_mutuel(host):
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get peerauthentication -o json"
     )
-    assert rc == 0, (
-        "Impossible de lire les PeerAuthentication du namespace "
-        f"{NAMESPACE}. Le maillage est-il toujours installé ? {diagnostic}"
+    assert rc == 0, message(
+        en="Cannot read the PeerAuthentications of namespace "
+        f"{NAMESPACE}. Is the mesh still installed? {diagnostic}",
+        fr="Impossible de lire les PeerAuthentication du namespace "
+        f"{NAMESPACE}. Le maillage est-il toujours installé ? {diagnostic}",
     )
     objets = json.loads(sortie).get("items", [])
-    assert objets, (
-        f"Aucune PeerAuthentication dans le namespace {NAMESPACE}. C'est "
+    assert objets, message(
+        en=f"No PeerAuthentication in namespace {NAMESPACE}. That is "
+        "the object through which an Istio mesh requires mutual TLS. Without it, "
+        "the mode in force is PERMISSIVE: both encrypted AND clear traffic are "
+        "accepted, which protects nothing.",
+        fr=f"Aucune PeerAuthentication dans le namespace {NAMESPACE}. C'est "
         "l'objet par lequel un maillage Istio exige le TLS mutuel. Sans lui, "
         "le mode en vigueur est PERMISSIVE : le chiffré ET le clair sont "
-        "acceptés, ce qui ne protège de rien."
+        "acceptés, ce qui ne protège de rien.",
     )
 
     modes = {
@@ -90,12 +96,17 @@ def test_le_namespace_exige_le_tls_mutuel(host):
         if not o.get("spec", {}).get("selector")
         and o.get("spec", {}).get("mtls", {}).get("mode") == "STRICT"
     ]
-    assert pour_tout_le_namespace, (
-        f"Les PeerAuthentication de {NAMESPACE} sont {modes}, et aucune "
+    assert pour_tout_le_namespace, message(
+        en=f"The PeerAuthentications of {NAMESPACE} are {modes}, and none "
+        "imposes STRICT on the whole namespace. PERMISSIVE accepts both "
+        "kinds of traffic: that is the migration mode, not a production one. "
+        "A PeerAuthentication carrying a selector only applies to the Pods "
+        "it designates; without a selector, it applies to the whole namespace.",
+        fr=f"Les PeerAuthentication de {NAMESPACE} sont {modes}, et aucune "
         "n'impose STRICT à tout le namespace. PERMISSIVE accepte les deux "
         "trafics : c'est le mode de migration, pas celui d'une production. "
         "Une PeerAuthentication portant un selector ne vaut que pour les Pods "
-        "qu'il désigne ; sans selector, elle vaut pour le namespace entier."
+        "qu'il désigne ; sans selector, elle vaut pour le namespace entier.",
     )
 
 
@@ -121,11 +132,15 @@ def test_le_client_sans_sidecar_est_bloque_et_le_client_maille_passe(host):
         rc, phase, diagnostic = _kubectl(
             host, f"-n {ns} get pod {pod} -o jsonpath='{{.status.phase}}'"
         )
-        assert rc == 0 and phase == "Running", (
-            f"Le Pod {pod} du namespace {ns} n'est pas Running mais "
+        assert rc == 0 and phase == "Running", message(
+            en=f"Pod {pod} of namespace {ns} is not Running but "
+            f"\"{phase or 'absent'}\". Setup had placed all "
+            "three: without them, the measurement that follows means nothing. "
+            f"{diagnostic}",
+            fr=f"Le Pod {pod} du namespace {ns} n'est pas Running mais "
             f"« {phase or 'absent'} ». Le setup les avait posés tous les "
             "trois : sans eux, la mesure qui suit ne veut rien dire. "
-            f"{diagnostic}"
+            f"{diagnostic}",
         )
 
     # L'effet réseau se mesure quand il est arrivé, pas quand l'objet est
@@ -140,22 +155,35 @@ def test_le_client_sans_sidecar_est_bloque_et_le_client_maille_passe(host):
             break
         time.sleep(PAS_S)
 
-    assert not nu_passe, (
-        f"Après {BUDGET_PROPAGATION_S} secondes d'attente, le Pod client-nu "
+    assert not nu_passe, message(
+        en=f"After {BUDGET_PROPAGATION_S} seconds of waiting, Pod client-nu "
+        f"of namespace {NAMESPACE_NU} still reaches {CIBLE} in clear text. It has "
+        "no sidecar, therefore no workload certificate: a "
+        "namespace that truly requires mutual TLS must refuse its "
+        "connection. Check that your PeerAuthentication is indeed in "
+        f"namespace {NAMESPACE}, the one of the SERVICE being called, and that it is in "
+        "STRICT mode.",
+        fr=f"Après {BUDGET_PROPAGATION_S} secondes d'attente, le Pod client-nu "
         f"du namespace {NAMESPACE_NU} joint toujours {CIBLE} en clair. Il n'a "
         "pas de sidecar, donc pas de certificat de charge de travail : un "
         "namespace qui exige vraiment le TLS mutuel doit refuser sa "
         "connexion. Vérifiez que votre PeerAuthentication est bien dans le "
         f"namespace {NAMESPACE}, celui du SERVICE appelé, et qu'elle est en "
-        "mode STRICT."
+        "mode STRICT.",
     )
 
     maille_passe = _joint_le_service(host, NAMESPACE, "client-maille")
-    assert maille_passe, (
-        f"Le Pod client-maille ne joint plus {CIBLE}, alors qu'il porte un "
+    assert maille_passe, message(
+        en=f"Pod client-maille no longer reaches {CIBLE}, although it carries a "
+        "sidecar and did reach it before your change. Requiring mutual TLS "
+        "must not cut off the mesh: it must cut off what is "
+        "OUTSIDE the mesh. Check whether you placed the requirement on "
+        "the whole mesh, in Istio's namespace, or added an "
+        "AuthorizationPolicy refusing more than was asked.",
+        fr=f"Le Pod client-maille ne joint plus {CIBLE}, alors qu'il porte un "
         "sidecar et qu'il y arrivait avant votre intervention. Exiger le TLS "
         "mutuel ne doit pas couper le maillage : il doit couper ce qui est "
         "HORS du maillage. Regardez si vous n'avez pas posé l'exigence sur "
         "tout le mesh, dans le namespace d'Istio, ou ajouté une "
-        "AuthorizationPolicy qui refuse au-delà de ce qui était demandé."
+        "AuthorizationPolicy qui refuse au-delà de ce qui était demandé.",
     )

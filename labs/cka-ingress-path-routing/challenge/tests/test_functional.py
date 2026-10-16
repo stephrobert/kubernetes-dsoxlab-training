@@ -18,7 +18,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 HOTE = "app.local"
@@ -61,13 +61,19 @@ def test_une_regle_de_routage_existe_pour_l_hote(host):
     l'échec du test suivant soit diagnosticable. Un Ingress peut exister, être
     parfaitement valide, et n'être servi par aucun contrôleur faute de classe."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get ingress -o json")
-    assert rc == 0, f"Impossible de lire les Ingress de {NAMESPACE}. {diagnostic}"
+    assert rc == 0, message(
+        en=f"Cannot read the Ingresses of {NAMESPACE}. {diagnostic}",
+        fr=f"Impossible de lire les Ingress de {NAMESPACE}. {diagnostic}",
+    )
 
     objets = json.loads(sortie).get("items", [])
-    assert objets, (
-        f"Aucun Ingress dans le namespace {NAMESPACE}. Les deux applications "
+    assert objets, message(
+        en=f"No Ingress in namespace {NAMESPACE}. Both applications "
+        "are already exposed, each by its own Service: what is missing is the "
+        "rule saying which one serves which path.",
+        fr=f"Aucun Ingress dans le namespace {NAMESPACE}. Les deux applications "
         "sont déjà exposées chacune par son Service : ce qui manque est la "
-        "règle qui dit lequel sert quel chemin."
+        "règle qui dit lequel sert quel chemin.",
     )
 
     pour_l_hote = [
@@ -78,10 +84,13 @@ def test_une_regle_de_routage_existe_pour_l_hote(host):
         r.get("host") or "(aucun)"
         for o in objets for r in o.get("spec", {}).get("rules", [])
     })
-    assert pour_l_hote, (
-        f"Aucune règle ne vise l'hôte {HOTE}. Les hôtes déclarés sont {hotes}. "
+    assert pour_l_hote, message(
+        en=f"No rule targets host {HOTE}. The declared hosts are {hotes}. "
+        "Without a host name, the rule applies to every request, which is not "
+        "what you were asked for.",
+        fr=f"Aucune règle ne vise l'hôte {HOTE}. Les hôtes déclarés sont {hotes}. "
         "Sans nom d'hôte, la règle vaut pour toute requête, ce qui n'est pas "
-        "ce qui vous était demandé."
+        "ce qui vous était demandé.",
     )
 
     sans_classe = [
@@ -89,10 +98,13 @@ def test_une_regle_de_routage_existe_pour_l_hote(host):
         if not o.get("spec", {}).get("ingressClassName")
         and "kubernetes.io/ingress.class" not in o["metadata"].get("annotations", {})
     ]
-    assert not sans_classe, (
-        f"L'Ingress {sans_classe} ne désigne aucune classe. Un Ingress sans "
+    assert not sans_classe, message(
+        en=f"Ingress {sans_classe} names no class. An Ingress without a "
+        "class is served by no controller, unless a default class exists: "
+        "`kubectl get ingressclass` tells you the cluster's.",
+        fr=f"L'Ingress {sans_classe} ne désigne aucune classe. Un Ingress sans "
         "classe n'est servi par aucun contrôleur, sauf si une classe par "
-        "défaut existe : `kubectl get ingressclass` dit celle du cluster."
+        "défaut existe : `kubectl get ingressclass` dit celle du cluster.",
     )
 
 
@@ -120,27 +132,41 @@ def test_chaque_chemin_atteint_son_application(host):
             break
         time.sleep(PAS_S)
 
-    assert corps_api == "api", (
-        f"Le chemin /api répond « {corps_api or 'rien'} » (HTTP "
+    assert corps_api == "api", message(
+        en=f"Path /api answers \"{corps_api or 'nothing'}\" (HTTP "
+        f"{code_api or 'none'}) after {BUDGET_S} seconds, instead of \"api\". "
+        "The application meant to serve it answers with its own name: if you "
+        "read \"web\", the two services are swapped; if you read a 404, no rule "
+        "takes that path.",
+        fr=f"Le chemin /api répond « {corps_api or 'rien'} » (HTTP "
         f"{code_api or 'aucun'}) après {BUDGET_S} secondes, au lieu de « api ». "
         "L'application qui doit le servir répond son propre nom : si vous "
         "lisez « web », les deux services sont intervertis ; si vous lisez un "
-        "404, aucune règle ne prend ce chemin."
+        "404, aucune règle ne prend ce chemin.",
     )
 
     corps_web, code_web = _demander(host, "/web")
-    assert corps_web == "web", (
-        f"Le chemin /web répond « {corps_web or 'rien'} » (HTTP "
+    assert corps_web == "web", message(
+        en=f"Path /web answers \"{corps_web or 'nothing'}\" (HTTP "
+        f"{code_web or 'none'}) instead of \"web\", while /api is already "
+        "correct. Only one of the two rules was written, or both point at the "
+        "same service.",
+        fr=f"Le chemin /web répond « {corps_web or 'rien'} » (HTTP "
         f"{code_web or 'aucun'}) au lieu de « web », alors que /api est déjà "
         "correct. Une seule des deux règles a été posée, ou les deux visent le "
-        "même service."
+        "même service.",
     )
 
     corps_autre, code_autre = _demander(host, "/autre")
-    assert corps_autre not in ("api", "web"), (
-        f"Un chemin que vous n'avez pas déclaré, /autre, est servi par "
+    assert corps_autre not in ("api", "web"), message(
+        en=f"A path you never declared, /autre, is served by "
+        f"\"{corps_autre}\". So the routing sends everything to one application, "
+        "and the two previous measurements proved nothing: they would have "
+        "been green with a rule that routes nothing. Check that your paths "
+        f"are each declared separately. Code received: {code_autre}.",
+        fr=f"Un chemin que vous n'avez pas déclaré, /autre, est servi par "
         f"« {corps_autre} ». Le routage envoie donc tout vers une application, "
         "et les deux mesures précédentes ne prouvaient rien : elles auraient "
         "été vertes avec une règle qui ne route pas. Vérifiez que vos chemins "
-        f"sont bien déclarés séparément. Code obtenu : {code_autre}."
+        f"sont bien déclarés séparément. Code obtenu : {code_autre}.",
     )

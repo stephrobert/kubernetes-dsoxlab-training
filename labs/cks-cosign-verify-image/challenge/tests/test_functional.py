@@ -19,7 +19,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "chaine-signature"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -66,20 +66,27 @@ def test_la_cle_publique_est_publiee_dans_le_cluster(host):
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get configmap {CONFIGMAP} -o json"
     )
-    assert rc == 0 and sortie, (
-        f"Aucun ConfigMap {CONFIGMAP} dans {NAMESPACE}. Sortie : {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"No ConfigMap {CONFIGMAP} in {NAMESPACE}. Output: {diagnostic}",
+        fr=f"Aucun ConfigMap {CONFIGMAP} dans {NAMESPACE}. Sortie : {diagnostic}",
     )
     donnees = json.loads(sortie).get("data") or {}
     contenu = "\n".join(str(v) for v in donnees.values())
-    assert "BEGIN PUBLIC KEY" in contenu, (
-        f"Le ConfigMap {CONFIGMAP} ne contient pas de clé publique lisible. Il "
+    assert "BEGIN PUBLIC KEY" in contenu, message(
+        en=f"ConfigMap {CONFIGMAP} contains no readable public key. It "
+        f"carries {sorted(donnees)}. The expected file is the one cosign "
+        "writes under the name cosign.pub.",
+        fr=f"Le ConfigMap {CONFIGMAP} ne contient pas de clé publique lisible. Il "
         f"porte {sorted(donnees)}. Le fichier attendu est celui que cosign "
-        "écrit sous le nom cosign.pub."
+        "écrit sous le nom cosign.pub.",
     )
-    assert "PRIVATE KEY" not in contenu, (
-        "Le ConfigMap contient une clé PRIVÉE. C'est exactement ce que la "
+    assert "PRIVATE KEY" not in contenu, message(
+        en="The ConfigMap contains a PRIVATE key. That is exactly what the "
+        "supply chain is trying to avoid: whoever reads it can sign "
+        "any image in your name. Only the public key is published.",
+        fr="Le ConfigMap contient une clé PRIVÉE. C'est exactement ce que la "
         "chaîne d'approvisionnement cherche à éviter : qui la lit peut signer "
-        "n'importe quelle image en votre nom. Seule la clé publique se publie."
+        "n'importe quelle image en votre nom. Seule la clé publique se publie.",
     )
 
 
@@ -100,17 +107,23 @@ def test_la_signature_est_poussee_dans_le_registre(host):
     On reconnaît donc la signature à son PRÉFIXE, qui n'a pas changé.
     """
     res = host.run("sudo crane ls localhost:5000/appli/web 2>/dev/null")
-    assert res.rc == 0, (
-        "Le registre local ne répond pas. Le setup le monte en hostNetwork sur "
-        f"le port 5000 du nœud. Sortie : {res.stderr.strip()[:200]}"
+    assert res.rc == 0, message(
+        en="The local registry does not answer. Setup brings it up with hostNetwork on "
+        f"port 5000 of the node. Output: {res.stderr.strip()[:200]}",
+        fr="Le registre local ne répond pas. Le setup le monte en hostNetwork sur "
+        f"le port 5000 du nœud. Sortie : {res.stderr.strip()[:200]}",
     )
     tags = res.stdout.split()
     signatures = [t for t in tags if t.startswith("sha256-")]
-    assert signatures, (
-        f"Le dépôt appli/web ne porte que {tags}. Aucune signature n'y a été "
+    assert signatures, message(
+        en=f"Repository appli/web only carries {tags}. No signature has been "
+        "pushed to it: cosign puts its own in the same repository as the image, under "
+        "a tag derived from its digest, and that is why a registry "
+        "writable over the network is indispensable.",
+        fr=f"Le dépôt appli/web ne porte que {tags}. Aucune signature n'y a été "
         "poussée : cosign range la sienne dans le même dépôt que l'image, sous "
         "un tag dérivé de son digest, et c'est pour cela qu'un registre "
-        "accessible en écriture est indispensable."
+        "accessible en écriture est indispensable.",
     )
 
 
@@ -125,15 +138,23 @@ def test_la_cle_accepte_l_image_signee_et_refuse_l_autre(host):
     erreur avant d'avoir regardé, une clé lue comme vide, une commande mal
     formée, tous ces cas se ressemblent vus du dehors.
     """
-    assert _verifie(host, IMAGE_SIGNEE), (
-        f"La clé publiée ne valide pas {IMAGE_SIGNEE}, que vous venez pourtant "
+    assert _verifie(host, IMAGE_SIGNEE), message(
+        en=f"The published key does not validate {IMAGE_SIGNEE}, which you have just "
+        "signed. Check that the ConfigMap's key is indeed the one "
+        "matching the private key used to sign: a pair regenerated "
+        "after the signature will never validate anything.",
+        fr=f"La clé publiée ne valide pas {IMAGE_SIGNEE}, que vous venez pourtant "
         "de signer. Vérifiez que la clé du ConfigMap est bien celle qui "
         "correspond à la clé privée employée pour signer : une paire régénérée "
-        "après la signature ne validera jamais rien."
+        "après la signature ne validera jamais rien.",
     )
-    assert not _verifie(host, IMAGE_NUE), (
-        f"La clé publiée valide aussi {IMAGE_NUE}, que personne n'a signée. "
+    assert not _verifie(host, IMAGE_NUE), message(
+        en=f"The published key also validates {IMAGE_NUE}, which nobody has signed. "
+        "The verification therefore measures nothing: that is the most dangerous case, "
+        "because a chain that accepts everything looks like a chain that "
+        "works.",
+        fr=f"La clé publiée valide aussi {IMAGE_NUE}, que personne n'a signée. "
         "La vérification ne mesure donc rien : c'est le cas le plus dangereux, "
         "parce qu'une chaîne qui accepte tout ressemble à une chaîne qui "
-        "fonctionne."
+        "fonctionne.",
     )

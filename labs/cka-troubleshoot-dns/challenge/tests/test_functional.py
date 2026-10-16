@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 KUBECTL = "sudo -E kubectl --kubeconfig /etc/kubernetes/admin.conf"
 NAMESPACE = "app"
@@ -78,11 +78,17 @@ def test_coredns_tourne(host):
         "--field-selector=status.phase=Running "
         "-o jsonpath='{.items[*].metadata.name}'",
     )
-    assert rc == 0, f"kubectl a échoué sur le control plane : {diagnostic}"
-    assert pods, (
-        "Aucun Pod CoreDNS ne tourne dans kube-system. Sans lui, aucun nom de "
+    assert rc == 0, message(
+        en=f"kubectl failed on the control plane: {diagnostic}",
+        fr=f"kubectl a échoué sur le control plane : {diagnostic}",
+    )
+    assert pods, message(
+        en="No CoreDNS Pod is running in kube-system. Without it, no service name "
+        "resolves in the cluster. Look at the coredns Deployment, its "
+        "desired and ready replica counts, and the namespace's events.",
+        fr="Aucun Pod CoreDNS ne tourne dans kube-system. Sans lui, aucun nom de "
         "service ne se résout dans le cluster. Regardez le Deployment coredns, "
-        "son nombre de replicas souhaités et prêts, et les events du namespace."
+        "son nombre de replicas souhaités et prêts, et les events du namespace.",
     )
 
 
@@ -97,11 +103,15 @@ def test_le_client_resout_le_service(host):
     main dans le Pod ne ferait pas passer ce test.
     """
     rc, _, diagnostic = _dans_le_client(host, f"nslookup {NOM}")
-    assert rc == 0, (
-        f"Le Pod {CLIENT} ne résout pas {NOM}. Le Service kube-dns existe "
+    assert rc == 0, message(
+        en=f"Pod {CLIENT} does not resolve {NOM}. The kube-dns Service still "
+        "exists and its address is in the Pod's resolv.conf, but a "
+        "Service with no endpoint answers nobody: check what stands "
+        f"behind it, and wait for its Pods to be ready. Output: {diagnostic}",
+        fr=f"Le Pod {CLIENT} ne résout pas {NOM}. Le Service kube-dns existe "
         "toujours et son adresse est dans le resolv.conf du Pod, mais un "
         "Service sans endpoint ne répond à personne : vérifiez ce qui se tient "
-        f"derrière lui, et attendez que ses Pods soient prêts. Sortie : {diagnostic}"
+        f"derrière lui, et attendez que ses Pods soient prêts. Sortie : {diagnostic}",
     )
 
 
@@ -121,13 +131,19 @@ def test_le_client_joint_le_service_en_http(host):
     )
     if rc != 0:
         dns_rc, _, _ = _dans_le_client(host, f"nslookup {NOM}")
-        assert dns_rc == 0, (
-            f"La requête HTTP vers {NOM} échoue, et le nom ne se résout pas "
+        assert dns_rc == 0, message(
+            en=f"The HTTP request to {NOM} fails, and the name does not resolve "
+            "either: it is the cluster's DNS that must be fixed first, "
+            f"and the previous test says where to look. Output: {diagnostic}",
+            fr=f"La requête HTTP vers {NOM} échoue, et le nom ne se résout pas "
             "non plus : c'est le DNS du cluster qu'il faut réparer d'abord, "
-            f"le test précédent dit où regarder. Sortie : {diagnostic}"
+            f"le test précédent dit où regarder. Sortie : {diagnostic}",
         )
-    assert rc == 0, (
-        f"Le nom {NOM} se résout, mais la requête HTTP échoue. Le DNS n'est "
+    assert rc == 0, message(
+        en=f"Name {NOM} resolves, but the HTTP request fails. DNS is therefore "
+        "no longer at fault: look at the web-svc Service, its selector, its "
+        f"endpoints, and the state of the web Pod. Output: {diagnostic}",
+        fr=f"Le nom {NOM} se résout, mais la requête HTTP échoue. Le DNS n'est "
         "donc plus en cause : regardez le Service web-svc, son selector, ses "
-        f"endpoints, et l'état du Pod web. Sortie : {diagnostic}"
+        f"endpoints, et l'état du Pod web. Sortie : {diagnostic}",
     )

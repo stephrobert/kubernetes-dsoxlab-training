@@ -17,7 +17,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "paiement"
 DEPLOYMENT = "passerelle"
@@ -44,12 +44,17 @@ def _un_pod(host) -> str:
         "--field-selector=status.phase=Running "
         "-o jsonpath='{.items[0].metadata.name}'",
     )
-    assert rc == 0 and sortie, (
-        f"Aucun Pod de {DEPLOYMENT} ne tourne dans {NAMESPACE}. Un Pod qui "
+    assert rc == 0 and sortie, message(
+        en=f"No Pod of {DEPLOYMENT} is running in {NAMESPACE}. A Pod that "
+        "references a missing Secret, or a key that does not exist in that "
+        "Secret, does not start: it stays in CreateContainerConfigError, and "
+        "`kubectl describe pod` names the missing key in its events. "
+        f"{diagnostic}",
+        fr=f"Aucun Pod de {DEPLOYMENT} ne tourne dans {NAMESPACE}. Un Pod qui "
         "référence un Secret absent, ou une clé qui n'existe pas dans ce "
         "Secret, ne démarre pas : il reste en CreateContainerConfigError, et "
         "`kubectl describe pod` nomme la clé manquante dans ses events. "
-        f"{diagnostic}"
+        f"{diagnostic}",
     )
     return sortie
 
@@ -62,28 +67,39 @@ def test_un_secret_porte_la_valeur_et_le_deployment_le_reference(host):
     l'échec du test suivant soit diagnosticable, et pour nommer celui des deux
     chemins d'injection qui manque."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get secret -o json")
-    assert rc == 0, f"Impossible de lire les Secrets de {NAMESPACE}. {diagnostic}"
+    assert rc == 0, message(
+        en=f"Cannot read the Secrets of {NAMESPACE}. {diagnostic}",
+        fr=f"Impossible de lire les Secrets de {NAMESPACE}. {diagnostic}",
+    )
 
     secrets = [
         s for s in json.loads(sortie).get("items", [])
         if s.get("type") == "Opaque"
     ]
-    assert secrets, (
-        f"Aucun Secret applicatif dans {NAMESPACE}. C'est l'objet dans lequel "
+    assert secrets, message(
+        en=f"No application Secret in {NAMESPACE}. That is the object in which "
+        "a sensitive value stops living in the middle of the application's "
+        "manifest.",
+        fr=f"Aucun Secret applicatif dans {NAMESPACE}. C'est l'objet dans lequel "
         "une valeur sensible cesse de vivre au milieu du manifeste de "
-        "l'application."
+        "l'application.",
     )
 
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json"
     )
-    assert rc == 0 and sortie, (
-        f"Le Deployment {DEPLOYMENT} est introuvable. Le setup l'avait posé : "
-        f"il doit être MODIFIÉ, pas remplacé. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Deployment {DEPLOYMENT} cannot be found. Setup had placed it there: "
+        f"it must be MODIFIED, not replaced. {diagnostic}",
+        fr=f"Le Deployment {DEPLOYMENT} est introuvable. Le setup l'avait posé : "
+        f"il doit être MODIFIÉ, pas remplacé. {diagnostic}",
     )
     spec = json.loads(sortie)["spec"]["template"]["spec"]
     conteneurs = spec.get("containers", [])
-    assert conteneurs, "Le Deployment ne déclare aucun conteneur."
+    assert conteneurs, message(
+        en="The Deployment declares no container.",
+        fr="Le Deployment ne déclare aucun conteneur.",
+    )
 
     par_variable = any(
         (v.get("valueFrom") or {}).get("secretKeyRef")
@@ -97,11 +113,15 @@ def test_un_secret_porte_la_valeur_et_le_deployment_le_reference(host):
         )
     if not par_volume:
         manques.append("aucun volume ne provient d'un Secret")
-    assert not manques, (
-        "L'injection est incomplète : " + ", et ".join(manques) + ". Les deux "
+    assert not manques, message(
+        en="The injection is incomplete: " + ", and ".join(manques) + ". Both "
+        "paths were asked for, and they are not equivalent: a variable is "
+        "frozen for the life of the process, whereas a mounted file is "
+        "refreshed when the Secret changes.",
+        fr="L'injection est incomplète : " + ", et ".join(manques) + ". Les deux "
         "chemins étaient demandés, et ils ne se valent pas : une variable est "
         "figée pour la vie du processus, tandis qu'un fichier monté est "
-        "rafraîchi quand le Secret change."
+        "rafraîchi quand le Secret change.",
     )
 
 
@@ -117,16 +137,23 @@ def test_la_valeur_a_quitte_le_manifeste_et_arrive_quand_meme(host):
     rc, manifeste, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o yaml"
     )
-    assert rc == 0 and manifeste, (
-        f"Impossible de lire le Deployment {DEPLOYMENT}. {diagnostic}"
+    assert rc == 0 and manifeste, message(
+        en=f"Cannot read Deployment {DEPLOYMENT}. {diagnostic}",
+        fr=f"Impossible de lire le Deployment {DEPLOYMENT}. {diagnostic}",
     )
-    assert VALEUR not in manifeste, (
-        f"Le mot de passe apparaît encore en clair dans le manifeste de "
+    assert VALEUR not in manifeste, message(
+        en=f"The password still appears in clear text in the manifest of "
+        f"{DEPLOYMENT}. That is precisely what had to stop: this "
+        "manifest is versioned, reviewed and copied, and anything that can read it "
+        "can read the value. Moving it into a Secret does not encrypt it, "
+        "but it stops sitting in the middle of the application's "
+        "configuration.",
+        fr=f"Le mot de passe apparaît encore en clair dans le manifeste de "
         f"{DEPLOYMENT}. C'est précisément ce qu'il fallait faire cesser : ce "
         "manifeste est versionné, relu et copié, et tout ce qui peut le lire "
         "peut lire la valeur. La déplacer dans un Secret ne la chiffre pas, "
         "mais elle cesse d'être au milieu de la configuration de "
-        "l'application."
+        "l'application.",
     )
 
     pod = _un_pod(host)
@@ -135,11 +162,15 @@ def test_la_valeur_a_quitte_le_manifeste_et_arrive_quand_meme(host):
         f"-n {NAMESPACE} exec {pod} --request-timeout=30s "
         "-- sh -c 'printf %s \"$DB_PASSWORD\"'",
     )
-    assert rc == 0 and variable == VALEUR, (
-        f"La variable DB_PASSWORD vaut « {variable or 'rien'} » dans le "
+    assert rc == 0 and variable == VALEUR, message(
+        en=f"Variable DB_PASSWORD is \"{variable or 'nothing'}\" in the "
+        f"container, instead of the expected value. Taking the value out of the "
+        "manifest was to change nothing FOR THE APPLICATION: it still expects "
+        "its password under that variable name.",
+        fr=f"La variable DB_PASSWORD vaut « {variable or 'rien'} » dans le "
         f"conteneur, au lieu de la valeur attendue. Sortir la valeur du "
         "manifeste ne devait rien changer POUR L'APPLICATION : elle attend "
-        "toujours son mot de passe sous ce nom de variable."
+        "toujours son mot de passe sous ce nom de variable.",
     )
 
     rc, fichier, diagnostic = _kubectl(
@@ -147,10 +178,15 @@ def test_la_valeur_a_quitte_le_manifeste_et_arrive_quand_meme(host):
         f"-n {NAMESPACE} exec {pod} --request-timeout=30s "
         f"-- sh -c 'cat {CHEMIN_MONTE}/*'",
     )
-    assert rc == 0 and fichier.strip() == VALEUR, (
-        f"Aucun fichier de {CHEMIN_MONTE} ne contient la valeur : « "
+    assert rc == 0 and fichier.strip() == VALEUR, message(
+        en=f"No file in {CHEMIN_MONTE} contains the value: \""
+        f"{fichier or diagnostic or 'nothing'}\". A Secret mounted as a volume "
+        "drops each key as a file NAMED AFTER IT, with no added "
+        "extension. Check the mount point, and that the volume does name "
+        "the Secret.",
+        fr=f"Aucun fichier de {CHEMIN_MONTE} ne contient la valeur : « "
         f"{fichier or diagnostic or 'rien'} ». Un Secret monté en volume "
         "dépose chaque clé comme un fichier PORTANT SON NOM, sans extension "
         "ajoutée. Vérifiez le point de montage, et que le volume désigne bien "
-        "le Secret."
+        "le Secret.",
     )

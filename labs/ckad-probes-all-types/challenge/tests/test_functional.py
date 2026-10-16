@@ -15,7 +15,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 POD = "probed-app"
@@ -34,7 +34,10 @@ def _kubectl(host, args: str):
 
 def _pod(host) -> dict:
     res = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert res.rc == 0, f"Aucun Pod {POD} dans {NAMESPACE}."
+    assert res.rc == 0, message(
+        en=f"No Pod {POD} in {NAMESPACE}.",
+        fr=f"Aucun Pod {POD} dans {NAMESPACE}.",
+    )
     return json.loads(res.stdout)
 
 
@@ -44,9 +47,13 @@ def _conteneur(host) -> dict:
 
 def _http_sur_le_port(sonde: dict, nom: str) -> None:
     http = sonde.get("httpGet")
-    assert http, f"La sonde {nom} n'est pas de type httpGet : {list(sonde) or 'vide'}. Un serveur web se sonde en HTTP."
-    assert str(http.get("port")) in (str(PORT), "http"), (
-        f"La sonde {nom} vise le port {http.get('port')!r} : nginx écoute sur {PORT}."
+    assert http, message(
+        en=f"Probe {nom} is not of type httpGet: {list(sonde) or 'empty'}. A web server is probed over HTTP.",
+        fr=f"La sonde {nom} n'est pas de type httpGet : {list(sonde) or 'vide'}. Un serveur web se sonde en HTTP.",
+    )
+    assert str(http.get("port")) in (str(PORT), "http"), message(
+        en=f"Probe {nom} targets port {http.get('port')!r}: nginx listens on {PORT}.",
+        fr=f"La sonde {nom} vise le port {http.get('port')!r} : nginx écoute sur {PORT}.",
     )
 
 
@@ -56,11 +63,16 @@ def _http_sur_le_port(sonde: dict, nom: str) -> None:
 def test_les_trois_sondes_sont_declarees(host):
     c = _conteneur(host)
     ports = [p.get("containerPort") for p in c.get("ports") or []]
-    assert PORT in ports, f"Le conteneur ne déclare pas le port {PORT} : ports {ports}."
+    assert PORT in ports, message(
+        en=f"The container does not declare port {PORT}: ports {ports}.",
+        fr=f"Le conteneur ne déclare pas le port {PORT} : ports {ports}.",
+    )
     for nom in ("startupProbe", "livenessProbe", "readinessProbe"):
-        assert c.get(nom), (
-            f"Aucune sonde {nom} sur le conteneur. Les trois se déclarent au niveau "
-            "du conteneur, chacune avec son propre bloc."
+        assert c.get(nom), message(
+            en=f"No {nom} probe on the container. All three are declared at the "
+            "container level, each with its own block.",
+            fr=f"Aucune sonde {nom} sur le conteneur. Les trois se déclarent au niveau "
+            "du conteneur, chacune avec son propre bloc.",
         )
         _http_sur_le_port(c[nom], nom)
 
@@ -73,11 +85,15 @@ def test_la_sonde_de_demarrage_tolere_un_demarrage_lent(host):
     periode = sonde.get("periodSeconds", 10)
     echecs = sonde.get("failureThreshold", 3)
     tolerance = periode * echecs
-    assert tolerance >= 60, (
-        f"La sonde de démarrage abandonne après {echecs} échecs à {periode} s, soit "
+    assert tolerance >= 60, message(
+        en=f"The startup probe gives up after {echecs} failures at {periode} s, that is "
+        f"{tolerance} s: an application taking a minute to start would be killed "
+        "before it could answer. The tolerance is failureThreshold "
+        "multiplied by periodSeconds.",
+        fr=f"La sonde de démarrage abandonne après {echecs} échecs à {periode} s, soit "
         f"{tolerance} s : une application qui met une minute à démarrer serait tuée "
         "avant d'avoir répondu. La tolérance est le produit failureThreshold "
-        "multiplié par periodSeconds."
+        "multiplié par periodSeconds.",
     )
 
 
@@ -95,13 +111,21 @@ def test_le_pod_est_ready_sans_redemarrage(host):
         if pret == "True":
             break
         time.sleep(5)
-    assert pod["status"].get("phase") == "Running", f"Le Pod est en phase {pod['status'].get('phase')!r}."
-    assert pret == "True", (
-        f"Le Pod est Running mais Ready = {pret} après 90 s : la sonde de disponibilité, "
-        "ou celle de démarrage, échoue. Un mauvais chemin, un mauvais port : "
-        "kubectl describe pod raconte chaque échec dans ses events."
+    assert pod["status"].get("phase") == "Running", message(
+        en=f"The Pod is in phase {pod['status'].get('phase')!r}.",
+        fr=f"Le Pod est en phase {pod['status'].get('phase')!r}.",
     )
-    assert redemarrages == 0, (
-        f"Le conteneur a redémarré {redemarrages} fois : la sonde de vivacité le tue. "
-        "Elle vise un chemin ou un port où nginx ne répond pas."
+    assert pret == "True", message(
+        en=f"The Pod is Running but Ready = {pret} after 90 s: the readiness probe, "
+        "or the startup one, is failing. A wrong path, a wrong port: "
+        "kubectl describe pod narrates every failure in its events.",
+        fr=f"Le Pod est Running mais Ready = {pret} après 90 s : la sonde de disponibilité, "
+        "ou celle de démarrage, échoue. Un mauvais chemin, un mauvais port : "
+        "kubectl describe pod raconte chaque échec dans ses events.",
+    )
+    assert redemarrages == 0, message(
+        en=f"The container restarted {redemarrages} times: the liveness probe is killing it. "
+        "It targets a path or a port where nginx does not answer.",
+        fr=f"Le conteneur a redémarré {redemarrages} fois : la sonde de vivacité le tue. "
+        "Elle vise un chemin ou un port où nginx ne répond pas.",
     )

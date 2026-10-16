@@ -16,7 +16,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "journalisation"
 POD = "collecteur"
@@ -61,21 +61,28 @@ def test_un_volume_est_monte_dans_les_deux_conteneurs(host):
     l'échec du test suivant soit diagnosticable. Deux conteneurs peuvent monter
     DEUX volumes différents du même Pod et ne rien partager du tout."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert rc == 0 and sortie, (
-        f"Le Pod {POD} est introuvable dans {NAMESPACE}. Le setup l'avait "
-        f"posé : il doit être recréé sous le même nom. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Pod {POD} cannot be found in {NAMESPACE}. Setup had placed "
+        f"it there: it must be recreated under the same name. {diagnostic}",
+        fr=f"Le Pod {POD} est introuvable dans {NAMESPACE}. Le setup l'avait "
+        f"posé : il doit être recréé sous le même nom. {diagnostic}",
     )
     spec = json.loads(sortie)["spec"]
     volumes = {
         v["name"] for v in spec.get("volumes", [])
         if not v["name"].startswith(VOLUME_AUTOMATIQUE)
     }
-    assert volumes, (
-        f"Le Pod {POD} ne déclare aucun volume, en dehors de celui que "
+    assert volumes, message(
+        en=f"Pod {POD} declares no volume, apart from the one "
+        "Kubernetes projects by itself for the ServiceAccount token. Two "
+        "containers of the same Pod "
+        "share the network and can share volumes, but NEVER their "
+        "filesystem: each keeps the one from its image.",
+        fr=f"Le Pod {POD} ne déclare aucun volume, en dehors de celui que "
         "Kubernetes projette lui-même pour le jeton du ServiceAccount. Deux "
         "conteneurs d'un même Pod "
         "partagent le réseau et peuvent partager des volumes, mais JAMAIS leur "
-        "système de fichiers : chacun garde celui de son image."
+        "système de fichiers : chacun garde celui de son image.",
     )
 
     montes = {}
@@ -85,11 +92,15 @@ def test_un_volume_est_monte_dans_les_deux_conteneurs(host):
             if m["name"] in volumes
         }
     communs = set.intersection(*montes.values()) if montes else set()
-    assert communs, (
-        "Les deux conteneurs ne montent aucun volume EN COMMUN : "
+    assert communs, message(
+        en="The two containers mount no volume IN COMMON: "
+        f"{ {k: sorted(v) for k, v in montes.items()} }. Mounting two different "
+        "volumes, one per container, shares nothing: it is the same volume "
+        "name that must appear on both sides.",
+        fr="Les deux conteneurs ne montent aucun volume EN COMMUN : "
         f"{ {k: sorted(v) for k, v in montes.items()} }. Monter deux volumes "
         "différents, un par conteneur, ne partage rien : c'est le même nom de "
-        "volume qui doit apparaître des deux côtés."
+        "volume qui doit apparaître des deux côtés.",
     )
 
 
@@ -106,26 +117,38 @@ def test_le_volume_fait_passer_et_le_reste_ne_passe_pas(host):
     rc, phase, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get pod {POD} -o jsonpath='{{.status.phase}}'"
     )
-    assert rc == 0 and phase == "Running", (
-        f"Le Pod {POD} est en « {phase or 'absent'} ». Les deux conteneurs "
-        f"doivent tourner pour que la mesure ait un sens. {diagnostic}"
+    assert rc == 0 and phase == "Running", message(
+        en=f"Pod {POD} is \"{phase or 'absent'}\". Both containers "
+        f"must be running for the measurement to mean anything. {diagnostic}",
+        fr=f"Le Pod {POD} est en « {phase or 'absent'} ». Les deux conteneurs "
+        f"doivent tourner pour que la mesure ait un sens. {diagnostic}",
     )
 
     rc, _, diagnostic = _dans(host, "lecteur", f"test -s {CHEMIN}")
-    assert rc == 0, (
-        f"Le conteneur « lecteur » ne trouve pas {CHEMIN}, ou le trouve vide, "
+    assert rc == 0, message(
+        en=f"The \"reader\" container does not find {CHEMIN}, or finds it empty, "
+        "although the producer writes into it every five seconds. Check "
+        "that both containers mount the SAME volume, and at the same path: "
+        "a volume mounted elsewhere on the reader's side will show it nothing. "
+        f"{diagnostic}",
+        fr=f"Le conteneur « lecteur » ne trouve pas {CHEMIN}, ou le trouve vide, "
         "alors que le producteur y écrit toutes les cinq secondes. Vérifiez "
         "que les deux conteneurs montent le MÊME volume, et au même chemin : "
         "un volume monté ailleurs chez le lecteur ne lui montrera rien. "
-        f"{diagnostic}"
+        f"{diagnostic}",
     )
 
     _dans(host, "producteur", f"echo prive > {HORS_VOLUME}")
     rc, _, _ = _dans(host, "lecteur", f"test -f {HORS_VOLUME}")
-    assert rc != 0, (
-        f"Un fichier écrit par le producteur HORS du volume, dans "
+    assert rc != 0, message(
+        en=f"A file written by the producer OUTSIDE the volume, in "
+        f"{HORS_VOLUME}, is visible to the reader. The two containers "
+        "therefore share far more than the requested directory: that is the "
+        "signature of a volume mounted too high, on the root or on /var. A "
+        "shared volume must be shared on the one directory that needs it.",
+        fr=f"Un fichier écrit par le producteur HORS du volume, dans "
         f"{HORS_VOLUME}, est visible par le lecteur. Les deux conteneurs "
         "partagent donc bien plus que le répertoire demandé : c'est la "
         "signature d'un volume monté trop haut, sur la racine ou sur /var. Un "
-        "volume partagé doit l'être sur le seul répertoire qui en a besoin."
+        "volume partagé doit l'être sur le seul répertoire qui en a besoin.",
     )

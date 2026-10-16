@@ -21,7 +21,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "equipe-dev"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -56,9 +56,11 @@ def _peut(host, question: str, namespace: str | None = NAMESPACE) -> bool:
     """
     portee = f"-n {namespace}" if namespace else "--all-namespaces"
     _, verdict, _ = _kubectl(host, f"auth can-i {question} {portee} --as={SUJET}")
-    assert verdict in ("yes", "no"), (
-        f"Réponse inattendue de l'API server pour « can-i {question} » : "
-        f"« {verdict} ». Ni yes ni no : la question est mal formée."
+    assert verdict in ("yes", "no"), message(
+        en=f"Unexpected answer from the API server for \"can-i {question}\": "
+        f"\"{verdict}\". Neither yes nor no: the question is malformed.",
+        fr=f"Réponse inattendue de l'API server pour « can-i {question} » : "
+        f"« {verdict} ». Ni yes ni no : la question est mal formée.",
     )
     return verdict == "yes"
 
@@ -74,15 +76,21 @@ def test_le_compte_n_est_plus_administrateur_du_cluster(host):
     interroge donc l'API server, qui tient compte de TOUS les bindings.
     """
     rc, _, _ = _kubectl(host, f"get clusterrolebinding {RACCOURCI}")
-    assert rc != 0, (
-        f"Le ClusterRoleBinding {RACCOURCI} existe encore : il lie dev-sa à "
-        "cluster-admin, c'est-à-dire à tout, partout."
+    assert rc != 0, message(
+        en=f"ClusterRoleBinding {RACCOURCI} still exists: it binds dev-sa to "
+        "cluster-admin, that is to everything, everywhere.",
+        fr=f"Le ClusterRoleBinding {RACCOURCI} existe encore : il lie dev-sa à "
+        "cluster-admin, c'est-à-dire à tout, partout.",
     )
-    assert not _peut(host, "'*' '*'", namespace=None), (
-        "L'API server répond encore « yes » à « peut-il tout faire, partout ? » "
+    assert not _peut(host, "'*' '*'", namespace=None), message(
+        en="The API server still answers \"yes\" to \"can it do everything, everywhere?\" "
+        f"on behalf of {COMPTE}. Another binding gives that power back: look for "
+        "every ClusterRoleBinding having it as a subject, not only the one "
+        "the scenario names.",
+        fr="L'API server répond encore « yes » à « peut-il tout faire, partout ? » "
         f"au nom de {COMPTE}. Un autre binding lui rend ce pouvoir : cherchez "
         "tous les ClusterRoleBindings dont il est le sujet, pas seulement celui "
-        "que le scénario nomme."
+        "que le scénario nomme.",
     )
 
 
@@ -104,12 +112,17 @@ def test_le_compte_a_ce_qu_il_lui_faut_et_rien_de_plus(host):
         "list services": _peut(host, "list services"),
     }
     manquants = [q for q, ok in permis.items() if not ok]
-    assert not manquants, (
-        f"Le compte {COMPTE} ne peut plus : {', '.join(manquants)}. "
+    assert not manquants, message(
+        en=f"Account {COMPTE} can no longer: {', '.join(manquants)}. "
+        "The portail-dev application needs it: taking cluster-admin back does "
+        "not mean removing everything. Deployments are in the \"apps\" API "
+        "group, Pods and Services in the core group, which is written as "
+        "an empty string.",
+        fr=f"Le compte {COMPTE} ne peut plus : {', '.join(manquants)}. "
         "L'application portail-dev en a besoin : reprendre cluster-admin ne "
         "veut pas dire tout retirer. Les Deployments sont dans le groupe d'API "
         "« apps », les Pods et Services dans le groupe core, qui s'écrit comme "
-        "une chaîne vide."
+        "une chaîne vide.",
     )
 
     refuses = {
@@ -117,10 +130,13 @@ def test_le_compte_a_ce_qu_il_lui_faut_et_rien_de_plus(host):
         "get secret/jeton-de-paiement": _peut(host, "get secret/jeton-de-paiement"),
     }
     accordes = [q for q, ok in refuses.items() if ok]
-    assert not accordes, (
-        f"Le compte {COMPTE} peut encore : {', '.join(accordes)}. Les Secrets "
+    assert not accordes, message(
+        en=f"Account {COMPTE} can still: {', '.join(accordes)}. Secrets "
+        "are not part of what the application needs, and an account that "
+        "reads them can read everything the namespace protects.",
+        fr=f"Le compte {COMPTE} peut encore : {', '.join(accordes)}. Les Secrets "
         "ne font pas partie de ce dont l'application a besoin, et un compte qui "
-        "les lit peut lire tout ce que le namespace protège."
+        "les lit peut lire tout ce que le namespace protège.",
     )
 
 
@@ -137,11 +153,15 @@ def test_le_droit_s_arrete_au_namespace(host):
         "list nodes (ressource de cluster)": _peut(host, "list nodes", namespace=None),
     }
     debordements = [q for q, ok in ailleurs.items() if ok]
-    assert not debordements, (
-        f"Le compte {COMPTE} peut encore : {', '.join(debordements)}. Le droit "
+    assert not debordements, message(
+        en=f"Account {COMPTE} can still: {', '.join(debordements)}. The right "
+        "granted spills out of its namespace. A Role applies where it is created; a "
+        "ClusterRole bound by a ClusterRoleBinding applies everywhere, even if its "
+        "name suggests a team.",
+        fr=f"Le compte {COMPTE} peut encore : {', '.join(debordements)}. Le droit "
         "accordé déborde de son namespace. Un Role vaut là où il est créé ; un "
         "ClusterRole lié par un ClusterRoleBinding vaut partout, même si son "
-        "nom évoque une équipe."
+        "nom évoque une équipe.",
     )
 
 
@@ -159,7 +179,10 @@ def test_le_droit_est_porte_par_le_namespace(host):
     personne ne le verrait en lisant le namespace.
     """
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get rolebinding -o json")
-    assert rc == 0 and sortie, f"Impossible de lire les RoleBindings. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Cannot read the RoleBindings. {diagnostic}",
+        fr=f"Impossible de lire les RoleBindings. {diagnostic}",
+    )
 
     lie = [
         rb["metadata"]["name"]
@@ -169,8 +192,11 @@ def test_le_droit_est_porte_par_le_namespace(host):
             for sujet in (rb.get("subjects") or [])
         )
     ]
-    assert lie, (
-        f"Aucun RoleBinding de {NAMESPACE} ne prend {COMPTE} pour sujet. Ses "
+    assert lie, message(
+        en=f"No RoleBinding of {NAMESPACE} takes {COMPTE} as a subject. Its "
+        "rights therefore come from elsewhere, and nothing in this namespace says so: "
+        "that is exactly the kind of right an audit never finds.",
+        fr=f"Aucun RoleBinding de {NAMESPACE} ne prend {COMPTE} pour sujet. Ses "
         "droits viennent donc d'ailleurs, et rien dans ce namespace ne le dit : "
-        "c'est exactement le genre de droit qu'un audit ne retrouve pas."
+        "c'est exactement le genre de droit qu'un audit ne retrouve pas.",
     )

@@ -21,7 +21,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "production"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -50,10 +50,13 @@ def _kubectl(host, args: str):
 
 def _json(host, args: str, quoi: str) -> dict:
     rc, sortie, diagnostic = _kubectl(host, f"{args} -o json")
-    assert rc == 0 and sortie, (
-        f"{quoi} n'existe plus dans le namespace {NAMESPACE}. Il faisait partie "
+    assert rc == 0 and sortie, message(
+        en=f"{quoi} no longer exists in namespace {NAMESPACE}. It was part of the "
+        "delivery: deleting it is not a fix, and recreating it under another "
+        f"name is not one either. Output: {diagnostic}",
+        fr=f"{quoi} n'existe plus dans le namespace {NAMESPACE}. Il faisait partie "
         "de la livraison : le supprimer n'est pas une correction, et le "
-        f"recréer sous un autre nom non plus. Sortie : {diagnostic}"
+        f"recréer sous un autre nom non plus. Sortie : {diagnostic}",
     )
     return json.loads(sortie)
 
@@ -64,7 +67,10 @@ def _ips_des_noeuds(host) -> list[str]:
         "get nodes -o jsonpath='{range .items[*]}"
         '{.status.addresses[?(@.type=="InternalIP")].address}{"\\n"}{end}\'',
     )
-    assert rc == 0 and sortie, "Impossible de lire les adresses des nœuds."
+    assert rc == 0 and sortie, message(
+        en="Cannot read the nodes' addresses.",
+        fr="Impossible de lire les adresses des nœuds.",
+    )
     return [ligne.strip() for ligne in sortie.splitlines() if ligne.strip()]
 
 
@@ -77,7 +83,10 @@ def _cpu_allouable_max(host) -> float:
     rc, sortie, _ = _kubectl(
         host, "get nodes -o jsonpath='{range .items[*]}{.status.allocatable.cpu}{\"\\n\"}{end}'"
     )
-    assert rc == 0 and sortie, "Impossible de lire le CPU allouable des nœuds."
+    assert rc == 0 and sortie, message(
+        en="Cannot read the nodes' allocatable CPU.",
+        fr="Impossible de lire le CPU allouable des nœuds.",
+    )
     valeurs = []
     for brut in sortie.split():
         valeurs.append(float(brut[:-1]) / 1000 if brut.endswith("m") else float(brut))
@@ -141,14 +150,18 @@ def test_les_deux_exemplaires_du_portail_sont_prets(host):
     copies dont aucune ne démarre annonce quand même 2 en souhaité, et c'est
     exactement l'état dans lequel le lab commence."""
     d = _json(host, f"-n {NAMESPACE} get deployment {PORTAIL}", f"Le Deployment {PORTAIL}")
-    assert d["spec"].get("replicas") == 2, (
-        f"Le portail demande {d['spec'].get('replicas')} exemplaire(s), on en "
-        "attend deux. Ce n'est pas le nombre d'exemplaires qui était en cause."
+    assert d["spec"].get("replicas") == 2, message(
+        en=f"The portal asks for {d['spec'].get('replicas')} replica(s), two are "
+        "expected. The number of replicas was not what was at fault.",
+        fr=f"Le portail demande {d['spec'].get('replicas')} exemplaire(s), on en "
+        "attend deux. Ce n'est pas le nombre d'exemplaires qui était en cause.",
     )
     prets = d.get("status", {}).get("readyReplicas", 0)
-    assert prets == 2, (
-        f"{prets} exemplaire(s) sur 2 sont prêts. Un Pod qui ne démarre pas dit "
-        "pourquoi : kubectl describe pod, section Events, tout en bas."
+    assert prets == 2, message(
+        en=f"{prets} replica(s) out of 2 are ready. A Pod that does not start says "
+        "why: kubectl describe pod, the Events section, right at the bottom.",
+        fr=f"{prets} exemplaire(s) sur 2 sont prêts. Un Pod qui ne démarre pas dit "
+        "pourquoi : kubectl describe pod, section Events, tout en bas.",
     )
 
 
@@ -166,11 +179,15 @@ def test_la_reserve_du_portail_tient_dans_un_noeud(host):
         if brut is None:
             continue
         demande = float(brut[:-1]) / 1000 if str(brut).endswith("m") else float(brut)
-        assert demande <= plafond, (
-            f"Le conteneur {conteneur['name']} réserve {brut} de CPU, quand le "
+        assert demande <= plafond, message(
+            en=f"Container {conteneur['name']} requests {brut} of CPU, while the "
+            f"largest node in the cluster declares {plafond}. No scheduler can "
+            "place a Pod requesting more than what exists: a request expresses a "
+            "guaranteed need, not a wish.",
+            fr=f"Le conteneur {conteneur['name']} réserve {brut} de CPU, quand le "
             f"plus gros nœud du cluster en déclare {plafond}. Aucun ordonnanceur "
             "ne peut placer un Pod qui réserve plus que ce qui existe : la "
-            "réserve exprime un besoin garanti, pas un souhait."
+            "réserve exprime un besoin garanti, pas un souhait.",
         )
 
 
@@ -187,12 +204,18 @@ def test_le_service_designe_vraiment_les_pods_du_portail(host):
         f"-n {NAMESPACE} get endpointslice -l kubernetes.io/service-name={SERVICE} "
         "-o jsonpath='{range .items[*].endpoints[*]}{.addresses[0]}{\" \"}{end}'",
     )
-    assert rc == 0, f"Aucune EndpointSlice pour le Service {SERVICE}."
+    assert rc == 0, message(
+        en=f"No EndpointSlice for Service {SERVICE}.",
+        fr=f"Aucune EndpointSlice pour le Service {SERVICE}.",
+    )
     adresses = sortie.split()
-    assert len(adresses) == 2, (
-        f"Le Service {SERVICE} a {len(adresses)} endpoint(s), on en attend deux, "
+    assert len(adresses) == 2, message(
+        en=f"Service {SERVICE} has {len(adresses)} endpoint(s), two are expected, "
+        "one per replica. A Service only knows the Pods its selector points at: "
+        "compare it with the labels the Pods actually carry.",
+        fr=f"Le Service {SERVICE} a {len(adresses)} endpoint(s), on en attend deux, "
         "un par exemplaire. Un Service ne connaît que les Pods que son sélecteur "
-        "désigne : comparez-le aux labels que portent réellement les Pods."
+        "désigne : comparez-le aux labels que portent réellement les Pods.",
     )
 
 
@@ -202,14 +225,18 @@ def test_le_portail_repond_dans_le_cluster(host):
     svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Le Service {SERVICE}")
     ip = svc["spec"].get("clusterIP")
     ports = [p.get("port") for p in svc["spec"].get("ports", [])]
-    assert 80 in ports, (
-        f"Le Service présente le(s) port(s) {ports}, on attend le port 80 côté client."
+    assert 80 in ports, message(
+        en=f"The Service exposes port(s) {ports}; port 80 is expected on the client side.",
+        fr=f"Le Service présente le(s) port(s) {ports}, on attend le port 80 côté client.",
     )
     repond, code = _curl(host, f"http://{ip}:80/")
-    assert repond, (
-        f"Le portail ne répond pas sur son adresse de Service {ip}:80 (obtenu : "
+    assert repond, message(
+        en=f"The portal does not answer on its Service address {ip}:80 (got: "
+        f"{code}). If the Service has its two endpoints, look at targetPort: "
+        "that is the container's port, not the client's.",
+        fr=f"Le portail ne répond pas sur son adresse de Service {ip}:80 (obtenu : "
         f"{code}). Si le Service a ses deux endpoints, regardez le targetPort : "
-        "c'est le port du conteneur, pas celui du client."
+        "c'est le port du conteneur, pas celui du client.",
     )
 
 
@@ -220,16 +247,22 @@ def test_le_service_est_expose_sur_le_port_30080(host):
     """Le port est imposé par la supervision : il ne s'improvise pas."""
     svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Le Service {SERVICE}")
     type_svc = svc["spec"].get("type")
-    assert type_svc in ("NodePort", "LoadBalancer"), (
-        f"Le Service {SERVICE} est de type {type_svc} : il n'est donc joignable "
+    assert type_svc in ("NodePort", "LoadBalancer"), message(
+        en=f"Service {SERVICE} is of type {type_svc}: it is therefore only reachable "
+        "from inside the cluster. What is asked for is access from the outside, "
+        "on a port of the nodes.",
+        fr=f"Le Service {SERVICE} est de type {type_svc} : il n'est donc joignable "
         "que depuis l'intérieur du cluster. On demande un accès depuis "
-        "l'extérieur, sur un port des nœuds."
+        "l'extérieur, sur un port des nœuds.",
     )
     ports_noeud = [p.get("nodePort") for p in svc["spec"].get("ports", [])]
-    assert NODE_PORT in ports_noeud, (
-        f"Le Service ouvre le(s) port(s) {ports_noeud} sur les nœuds, la "
+    assert NODE_PORT in ports_noeud, message(
+        en=f"The Service opens port(s) {ports_noeud} on the nodes; monitoring will "
+        f"query {NODE_PORT}. Without an explicit nodePort, Kubernetes assigns "
+        "one at random in the 30000-32767 range.",
+        fr=f"Le Service ouvre le(s) port(s) {ports_noeud} sur les nœuds, la "
         f"supervision interrogera le {NODE_PORT}. Sans nodePort explicite, "
-        "Kubernetes en attribue un au hasard dans la plage 30000-32767."
+        "Kubernetes en attribue un au hasard dans la plage 30000-32767.",
     )
 
 
@@ -242,21 +275,28 @@ def test_le_portail_repond_sur_chaque_noeud(host):
     un cluster dont le réseau entre nœuds est cassé.
     """
     ips = _ips_des_noeuds(host)
-    assert len(ips) >= 2, (
-        f"Le cluster ne déclare que {len(ips)} nœud(s) : le worker manque, et "
-        "l'exigence « sur chaque nœud » ne veut plus rien dire."
+    assert len(ips) >= 2, message(
+        en=f"The cluster declares only {len(ips)} node(s): the worker is missing, and "
+        "the \"on every node\" requirement no longer means anything.",
+        fr=f"Le cluster ne déclare que {len(ips)} nœud(s) : le worker manque, et "
+        "l'exigence « sur chaque nœud » ne veut plus rien dire.",
     )
     echecs = []
     for ip in ips:
         repond, code = _curl(host, f"http://{ip}:{NODE_PORT}/")
         if not repond:
             echecs.append(f"{ip} a rendu {code}")
-    assert not echecs, (
-        f"Le portail ne répond pas sur le port {NODE_PORT} de : "
+    assert not echecs, message(
+        en=f"The portal does not answer on port {NODE_PORT} of: "
+        f"{', '.join(echecs)}. A NodePort opens on EVERY node, even those "
+        "carrying no replica, and the traffic is routed to a ready Pod. If it "
+        "answers on one node and not the other, the Service is not what to "
+        "look at but the cluster's network.",
+        fr=f"Le portail ne répond pas sur le port {NODE_PORT} de : "
         f"{', '.join(echecs)}. Un NodePort s'ouvre sur TOUS les nœuds, même "
         "ceux qui ne portent aucun exemplaire, et le trafic est routé vers un "
         "Pod prêt. S'il répond sur un nœud et pas sur l'autre, ce n'est pas le "
-        "Service qu'il faut regarder mais le réseau du cluster."
+        "Service qu'il faut regarder mais le réseau du cluster.",
     )
 
     # Et depuis l'EXTÉRIEUR, ce que les deux mesures précédentes ne prouvent
@@ -269,11 +309,15 @@ def test_le_portail_repond_sur_chaque_noeud(host):
         repond, code = _curl_hors_du_cluster(f"http://{ip}:{NODE_PORT}/")
         if not repond:
             dehors.append(f"{ip} a rendu {code}")
-    assert not dehors, (
-        f"Le portail répond sur le port {NODE_PORT} quand on l'interroge depuis "
+    assert not dehors, message(
+        en=f"The portal answers on port {NODE_PORT} when queried from a node, but "
+        "not from a machine outside the cluster: "
+        f"{', '.join(dehors)}. The Service is therefore correct and the block "
+        "is elsewhere, on the network path between the outside and the node.",
+        fr=f"Le portail répond sur le port {NODE_PORT} quand on l'interroge depuis "
         "un nœud, mais pas depuis une machine extérieure au cluster : "
         f"{', '.join(dehors)}. Le Service est donc correct et le blocage est "
-        "ailleurs, sur le chemin réseau entre l'extérieur et le nœud."
+        "ailleurs, sur le chemin réseau entre l'extérieur et le nœud.",
     )
 
 
@@ -285,10 +329,13 @@ def test_la_reclamation_de_stockage_est_satisfaite(host):
         host, f"-n {NAMESPACE} get pvc {RECLAMATION}", f"La réclamation {RECLAMATION}"
     )
     phase = pvc.get("status", {}).get("phase")
-    assert phase == "Bound", (
-        f"La réclamation {RECLAMATION} est en {phase}. Elle cherche une classe de "
+    assert phase == "Bound", message(
+        en=f"Claim {RECLAMATION} is {phase}. It is looking for a storage class, a "
+        "size and an access mode: kubectl describe pvc says which ones, and as "
+        "long as no volume meets all three, it waits.",
+        fr=f"La réclamation {RECLAMATION} est en {phase}. Elle cherche une classe de "
         "stockage, une taille et un mode d'accès : kubectl describe pvc dit "
-        "lesquels, et tant qu'aucun volume ne réunit les trois, elle attend."
+        "lesquels, et tant qu'aucun volume ne réunit les trois, elle attend.",
     )
 
 
@@ -303,17 +350,22 @@ def test_les_archives_ecrivent_vraiment_dans_leur_volume(host):
         f"-n {NAMESPACE} get pods -l app={ARCHIVES} --field-selector=status.phase=Running "
         "-o jsonpath='{.items[0].metadata.name}'",
     )
-    assert rc == 0 and pod, (
-        "Aucun Pod archives ne tourne. Un Pod qui monte une réclamation non "
-        "satisfaite reste Pending indéfiniment : le stockage se règle d'abord."
+    assert rc == 0 and pod, message(
+        en="No archives Pod is running. A Pod mounting an unsatisfied claim stays "
+        "Pending forever: storage is settled first.",
+        fr="Aucun Pod archives ne tourne. Un Pod qui monte une réclamation non "
+        "satisfaite reste Pending indéfiniment : le stockage se règle d'abord.",
     )
     rc, sortie, diagnostic = _kubectl(
         host,
         f"-n {NAMESPACE} exec {pod} --request-timeout=30s -- "
         "sh -c 'echo preuve > /data/preuve.txt && cat /data/preuve.txt && rm /data/preuve.txt'",
     )
-    assert rc == 0 and sortie == "preuve", (
-        "Le Pod archives ne peut pas écrire dans /data. Le volume est peut-être "
+    assert rc == 0 and sortie == "preuve", message(
+        en="The archives Pod cannot write into /data. The volume may be mounted "
+        "read-only, or mounted somewhere other than /data. Output: "
+        f"{diagnostic}",
+        fr="Le Pod archives ne peut pas écrire dans /data. Le volume est peut-être "
         "monté en lecture seule, ou monté ailleurs que sur /data. Sortie : "
-        f"{diagnostic}"
+        f"{diagnostic}",
     )

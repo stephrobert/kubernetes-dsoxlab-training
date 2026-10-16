@@ -16,7 +16,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "production"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -41,9 +41,11 @@ def _kubectl(host, args: str):
 
 def _pod(host) -> dict:
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert rc == 0 and sortie, (
-        f"Aucun Pod {POD} dans {NAMESPACE}. Le cahier des charges demande de "
-        f"reconstruire {FAUTIF} sous ce nom. Sortie : {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"No Pod {POD} in {NAMESPACE}. The specification asks for "
+        f"{FAUTIF} to be rebuilt under that name. Output: {diagnostic}",
+        fr=f"Aucun Pod {POD} dans {NAMESPACE}. Le cahier des charges demande de "
+        f"reconstruire {FAUTIF} sous ce nom. Sortie : {diagnostic}",
     )
     return json.loads(sortie)
 
@@ -53,11 +55,15 @@ def _pod(host) -> dict:
 # ----------------------------------------------------------------------
 def test_le_pod_corrige_tourne(host):
     pod = _pod(host)
-    assert pod["status"]["phase"] == "Running", (
-        f"Le Pod {POD} est en {pod['status']['phase']}. Un durcissement qui "
+    assert pod["status"]["phase"] == "Running", message(
+        en=f"Pod {POD} is {pod['status']['phase']}. A hardening that "
+        "stops the container from starting fixes nothing: look at its events "
+        "and its logs. The busybox image runs without difficulty as a non-root "
+        "user, it writes nothing at the root.",
+        fr=f"Le Pod {POD} est en {pod['status']['phase']}. Un durcissement qui "
         "empêche le conteneur de démarrer ne corrige rien : regardez ses events "
         "et ses logs. L'image busybox tourne sans difficulté en utilisateur non "
-        "root, elle n'écrit rien à la racine."
+        "root, elle n'écrit rien à la racine.",
     )
 
 
@@ -92,9 +98,11 @@ def test_les_cinq_defauts_sont_repris(host):
     if image.endswith(":latest") or ":" not in image.rsplit("/", 1)[-1]:
         restants.append(f"l'image « {image} » emploie un tag flottant")
 
-    assert not restants, (
-        "Le Pod reconstruit garde des défauts de l'original :\n  "
-        + "\n  ".join(restants)
+    assert not restants, message(
+        en="The rebuilt Pod keeps some of the original's flaws:\n  "
+        + "\n  ".join(restants),
+        fr="Le Pod reconstruit garde des défauts de l'original :\n  "
+        + "\n  ".join(restants),
     )
 
 
@@ -106,10 +114,13 @@ def test_le_pod_fautif_n_existe_plus(host):
     correctif. C'est le défaut le plus fréquent d'une remédiation faite dans
     l'urgence, et le seul que l'auteur ne voit jamais."""
     rc, _, _ = _kubectl(host, f"-n {NAMESPACE} get pod {FAUTIF}")
-    assert rc != 0, (
-        f"Le Pod {FAUTIF} tourne toujours dans {NAMESPACE}. Le nouveau Pod ne "
+    assert rc != 0, message(
+        en=f"Pod {FAUTIF} is still running in {NAMESPACE}. The new Pod replaces "
+        "nothing as long as the old one is there: it doubles the surface instead "
+        "of reducing it.",
+        fr=f"Le Pod {FAUTIF} tourne toujours dans {NAMESPACE}. Le nouveau Pod ne "
         "remplace rien tant que l'ancien est là : il double la surface au lieu "
-        "de la réduire."
+        "de la réduire.",
     )
 
 
@@ -127,21 +138,28 @@ def test_le_conteneur_ne_voit_plus_les_processus_de_l_hote(host):
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} exec {POD} --request-timeout=30s -- sh -c 'ps -eo pid | wc -l'"
     )
-    assert rc == 0 and sortie.isdigit(), (
-        f"Impossible de compter les processus dans {POD}. Sortie : {diagnostic}"
+    assert rc == 0 and sortie.isdigit(), message(
+        en=f"Cannot count the processes in {POD}. Output: {diagnostic}",
+        fr=f"Impossible de compter les processus dans {POD}. Sortie : {diagnostic}",
     )
     vus = int(sortie)
-    assert vus <= PLAFOND_PROCESSUS, (
-        f"Le conteneur voit {vus} processus. Il voit donc ceux du NŒUD : le "
+    assert vus <= PLAFOND_PROCESSUS, message(
+        en=f"The container sees {vus} processes. It therefore sees the NODE's: the "
+        "kubelet, containerd, and every other container on the machine, "
+        "to which it can send signals. That is what hostPID grants, and "
+        "that is what the remediation had to remove.",
+        fr=f"Le conteneur voit {vus} processus. Il voit donc ceux du NŒUD : le "
         "kubelet, containerd, et tous les autres conteneurs de la machine, "
         "auxquels il peut envoyer des signaux. C'est ce que hostPID accorde, et "
-        "c'est ce que la remédiation devait retirer."
+        "c'est ce que la remédiation devait retirer.",
     )
 
     rc, identite, _ = _kubectl(
         host, f"-n {NAMESPACE} exec {POD} --request-timeout=30s -- id -u"
     )
-    assert rc == 0 and identite != "0", (
-        f"Le processus du conteneur tourne en uid {identite}. Un conteneur root "
-        "qui s'échappe est root sur le nœud."
+    assert rc == 0 and identite != "0", message(
+        en=f"The container's process runs as uid {identite}. A root container "
+        "that escapes is root on the node.",
+        fr=f"Le processus du conteneur tourne en uid {identite}. Un conteneur root "
+        "qui s'échappe est root sur le nœud.",
     )
