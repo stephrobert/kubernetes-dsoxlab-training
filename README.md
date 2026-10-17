@@ -13,6 +13,8 @@ A catalogue of **verifiable labs and capstones** for the
 on Stéphane Robert's blog. Played by the
 [dsoxlab](https://github.com/stephrobert/dsoxlab) CLI.
 
+## What it is
+
 A **micro-lab** exercises one competency named by the blueprint, and says so in
 its title. A **capstone** names none: it hands over a situation, a 66 % pass
 mark like the exam, and leaves you to pick the tools.
@@ -25,27 +27,150 @@ gives the learner the means to **prove** they can do the work.
 Every lab sets an initial state, states a goal, and validates by reading **the
 state of the system**, never the commands typed.
 
-## Getting started
+## Requirements
+
+- **Python 3.11+ and [`uv`](https://docs.astral.sh/uv/)**
+- **`git`**
+- **A hypervisor**, because every lab here is `runtime: vm`: either
+  **libvirt/KVM** (with `terraform` and the `dmacvicar/libvirt` provider) or
+  **Incus**. The provider is declared as a list in [`meta.yml`](meta.yml), and
+  **a list does not resolve on its own**: pick one with
+  `dsoxlab use --provider kvm`.
+- **About 7 GB of free RAM and 45 GB of disk** for the two machines, and the
+  next section says why there are two.
+- **The Ansible collections** of [`requirements.yml`](requirements.yml), whose
+  versions are **bounded on purpose**: the ones that validated the catalogue,
+  not the latest published.
+- **Outbound network access** on first provision, to pull the base image and
+  the Kubernetes packages.
+
+`dsoxlab doctor` says what this repository needs and what it does not, and
+tells apart a check that failed from one it could not measure.
+
+## Install
+
+`dsoxlab` is published on [PyPI](https://pypi.org/project/dsoxlab/). Install it
+as a standalone tool, so it stays out of this repository:
 
 ```bash
-uv tool install dsoxlab        # the CLI, an external tool
+# 1. The dsoxlab CLI (external tool, stays out of this repo)
+uv tool install dsoxlab
 
+# 2. This lab catalogue
 git clone https://github.com/stephrobert/kubernetes-dsoxlab-training.git
 cd kubernetes-dsoxlab-training
+
+# 3. The Ansible collections, at the bounded versions
 ansible-galaxy collection install -r requirements.yml
 
-export LAB_HOME=$PWD
-dsoxlab use --provider kvm
-dsoxlab provision
-
-dsoxlab list-labs
-dsoxlab run   cks-apparmor-confiner-un-pod
-dsoxlab check cks-apparmor-confiner-un-pod
+# 4. Check the contract and the machine
+dsoxlab validate-structure
+dsoxlab doctor
 ```
 
-`dsoxlab destroy` gives the machines back.
+### Your first lab, in five minutes
 
-## The infrastructure: a vanilla kubeadm cluster
+The cluster has to exist first: nothing here runs on your own host.
+
+```bash
+export LAB_HOME=$PWD
+dsoxlab use --provider kvm           # a list of providers does not resolve on its own
+dsoxlab provision                    # creates the two machines and the cluster
+
+dsoxlab list-labs
+dsoxlab run       cks-apparmor-confiner-un-pod
+dsoxlab challenge cks-apparmor-confiner-un-pod
+dsoxlab check     cks-apparmor-confiner-un-pod
+
+dsoxlab destroy                             # gives the machines back
+```
+
+`provision` exits non-zero if a host does not answer, and names the orphan
+domains it left behind rather than claiming success. Running `check` on a lab
+you never started measures nothing, and says so rather than recording a 0.
+
+### Keeping it up to date
+
+```bash
+uv tool upgrade dsoxlab        # the engine, published on PyPI
+git -C <this repo> pull        # the catalogue
+```
+
+The engine and the catalogue move independently: a new `dsoxlab` never requires
+re-cloning the labs, and new labs never require upgrading the tool, as long as
+the contract version matches.
+
+## How it works
+
+### The declarative contract (two levels)
+
+The catalogue is described by data, not code, which is what keeps the `dsoxlab`
+engine domain-agnostic:
+
+- **`meta.yml`** at the root declares the repository identity, the
+  **infrastructure** (provider, network `lab-k8s`, `10.10.50.0/24`, and the two
+  hosts with their roles) and the **order** of the sections shown by
+  `list-labs`;
+- **`lab.yaml`** per lab declares its `skills`, `level`, `runtime` (type and
+  targets), `distros`, `doc_url`, its `certification_tags` and a `validation`
+  block. A `lab.fr.yaml` overrides `title` and `description` in French, and
+  nothing else.
+
+The Terraform and cloud-init templates are **packaged inside dsoxlab**, not
+here: this repository declares only its `infra:` block and its public key in
+`ssh/`.
+
+### The lab lifecycle
+
+```bash
+dsoxlab list-labs              # browse the catalogue
+dsoxlab show      <id>         # metadata and status of one lab
+dsoxlab run       <id>         # set the starting state
+dsoxlab challenge <id>         # read the mission, no step-by-step
+dsoxlab hint      <id>         # reveal a hint (deducted from the score)
+dsoxlab check     <id>         # run the tests, compute and record the score
+dsoxlab clean     <id>         # undo what the lab set up
+dsoxlab progress               # per-section progress, average score
+```
+
+### Runtimes
+
+| Runtime | What the lab asks for |
+|---|---|
+| `vm` | the two machines provisioned by `dsoxlab provision`, with the kubeadm cluster already up. The tests query the API server and enter the nodes. |
+
+Every lab is `vm`, and none declares `runtime.services`: the cluster is the
+subject, so it lives in the machines and not on your host.
+
+### The validation model
+
+Validation **proves the state, it does not trust the learner**. The tests query
+the API server and the nodes for what they actually hold, and a lab is proven
+**in both directions**: the tests must fail before the work and pass after the
+trainer's solution. A test that is green before the work is not a test, it is
+an assumption about the setup.
+
+`scripts/valider-labs.py` plays that whole cycle: it photographs the cluster,
+plays the lab, checks 0 before and 100 after, cleans up, replays, then compares
+the cluster to its photograph. **A forgotten namespace turns the lab RED**, and
+that is deliberate: it is not that lab that would pay the price, it is the next
+one. Every lab's result, with its date and Kubernetes version, is in
+[`validation-labs.json`](validation-labs.json).
+
+### Scoring, hints, progress
+
+`check` records a score (tests passed out of total, minus the cost of any hints
+revealed). Hints are **base64-encoded** in `challenge/hints.yaml`, so that
+opening the file does not give them away, and their cost grows with their
+precision. History lives in a SQLite database **local to this repository**.
+
+A capstone declares a **66 % pass mark**, like the exam, and `submit` turns the
+score into a verdict. A run that measured nothing is neither a pass nor a
+failure: if every collected test skips, `check` records no score and says why.
+A score of 0 would accuse the lab of what is missing from the cluster, which
+here is usually the cluster not being provisioned.
+
+### The infrastructure: a vanilla kubeadm cluster
 
 Two Ubuntu 24.04 VMs, the distribution the published kubeadm guide recommends:
 a control plane, `k8s-cp.lab`, and a worker, `k8s-w1.lab`, reachable over `ssh`
@@ -57,7 +182,7 @@ kind node, the kubelet refuses an AppArmor Pod with
 `Cannot enforce AppArmor: AppArmor is not enabled on the host`. The training
 teaches on kind, this catalogue proves on machines.
 
-## The catalogue
+## Catalog
 
 <!-- LABS:START -->
 
