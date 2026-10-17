@@ -60,7 +60,7 @@ jobs:
       id-token: write          # OIDC pour publier le score à score.getplumber.io
     steps:
       - name: Durcir le runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
 
@@ -70,7 +70,7 @@ jobs:
           persist-credentials: false
 
       - name: Analyse de conformité Plumber
-        uses: getplumber/plumber@64442057996d66f2b8efaeccc74032043edee9b0 # v0.5.18
+        uses: getplumber/plumber@d3536bae4727b9290d9e69ee25c4350ddbcd91cd # v0.6.0
         with:
           version: "v0.4.3"
           verify-attestation: "true"   # provenance SLSA du binaire, avant de le lancer
