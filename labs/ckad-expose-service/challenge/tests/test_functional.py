@@ -15,7 +15,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 DEPLOYMENT = "web"
@@ -45,14 +45,24 @@ def _json(host, args: str, absent: str) -> dict:
 def test_trois_replicas_prets(host):
     d = {}
     for _ in range(12):
-        d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT}", f"Aucun Deployment {DEPLOYMENT} dans {NAMESPACE}.")
+        d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT}", message(
+            en=f"No Deployment {DEPLOYMENT} in {NAMESPACE}.",
+            fr=f"Aucun Deployment {DEPLOYMENT} dans {NAMESPACE}.",
+        ))
         if d["status"].get("availableReplicas", 0) == 3:
             break
         time.sleep(5)
-    assert d["spec"].get("replicas") == 3, f"{DEPLOYMENT} demande {d['spec'].get('replicas')} replica(s), attendu 3."
-    assert d["status"].get("availableReplicas", 0) == 3, f"{d['status'].get('availableReplicas', 0)} replica(s) disponible(s) sur 3."
-    assert (d["spec"]["template"]["metadata"].get("labels") or {}).get("app") == "web", (
-        "Les Pods du Deployment ne portent pas app=web : c'est ce label que le Service doit sélectionner."
+    assert d["spec"].get("replicas") == 3, message(
+        en=f"{DEPLOYMENT} asks for {d['spec'].get('replicas')} replica(s), expected 3.",
+        fr=f"{DEPLOYMENT} demande {d['spec'].get('replicas')} replica(s), attendu 3.",
+    )
+    assert d["status"].get("availableReplicas", 0) == 3, message(
+        en=f"{d['status'].get('availableReplicas', 0)} replica(s) available out of 3.",
+        fr=f"{d['status'].get('availableReplicas', 0)} replica(s) disponible(s) sur 3.",
+    )
+    assert (d["spec"]["template"]["metadata"].get("labels") or {}).get("app") == "web", message(
+        en="The Deployment's Pods do not carry app=web: that is the label the Service must select.",
+        fr="Les Pods du Deployment ne portent pas app=web : c'est ce label que le Service doit sélectionner.",
     )
 
 
@@ -60,22 +70,38 @@ def test_trois_replicas_prets(host):
 # 2. Le Service est un ClusterIP sur 80, vers 8080, et a trois endpoints.
 # ----------------------------------------------------------------------
 def test_le_service_expose_les_trois_pods(host):
-    s = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Aucun Service {SERVICE} dans {NAMESPACE}.")
-    assert s["spec"].get("type", "ClusterIP") == "ClusterIP", f"{SERVICE} est de type {s['spec'].get('type')}, attendu ClusterIP."
-    ports = s["spec"].get("ports") or []
-    assert any(p.get("port") == 80 and str(p.get("targetPort")) == "8080" for p in ports), (
-        f"{SERVICE} doit écouter sur 80 et viser 8080 : ports {ports}."
+    s = _json(host, f"-n {NAMESPACE} get service {SERVICE}", message(
+            en=f"No Service {SERVICE} in {NAMESPACE}.",
+            fr=f"Aucun Service {SERVICE} dans {NAMESPACE}.",
+        ))
+    assert s["spec"].get("type", "ClusterIP") == "ClusterIP", message(
+        en=f"{SERVICE} is of type {s['spec'].get('type')}, expected ClusterIP.",
+        fr=f"{SERVICE} est de type {s['spec'].get('type')}, attendu ClusterIP.",
     )
-    assert (s["spec"].get("selector") or {}).get("app") == "web", f"Le selector de {SERVICE} vaut {s['spec'].get('selector')}, attendu app=web."
+    ports = s["spec"].get("ports") or []
+    assert any(p.get("port") == 80 and str(p.get("targetPort")) == "8080" for p in ports), message(
+        en=f"{SERVICE} must listen on 80 and target 8080: ports {ports}.",
+        fr=f"{SERVICE} doit écouter sur 80 et viser 8080 : ports {ports}.",
+    )
+    assert (s["spec"].get("selector") or {}).get("app") == "web", message(
+        en=f"The selector of {SERVICE} is {s['spec'].get('selector')}, expected app=web.",
+        fr=f"Le selector de {SERVICE} vaut {s['spec'].get('selector')}, attendu app=web.",
+    )
     prets = []
     for _ in range(12):
-        tranches = _json(host, f"-n {NAMESPACE} get endpointslices -l kubernetes.io/service-name={SERVICE}", "Lecture des EndpointSlices impossible.")
+        tranches = _json(host, f"-n {NAMESPACE} get endpointslices -l kubernetes.io/service-name={SERVICE}", message(
+            en="Cannot read the EndpointSlices.",
+            fr="Lecture des EndpointSlices impossible.",
+        ))
         prets = [a for t in tranches["items"] for e in t.get("endpoints") or []
                  for a in e.get("addresses") or [] if (e.get("conditions") or {}).get("ready")]
         if len(prets) == 3:
             break
         time.sleep(5)
-    assert len(prets) == 3, f"{SERVICE} a {len(prets)} endpoint(s) prêt(s), attendu 3."
+    assert len(prets) == 3, message(
+        en=f"{SERVICE} has {len(prets)} ready endpoint(s), expected 3.",
+        fr=f"{SERVICE} a {len(prets)} endpoint(s) prêt(s), attendu 3.",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -85,13 +111,20 @@ def test_le_service_repond_et_repartit(host):
     reponses = []
     for _ in range(10):
         res = _kubectl(host, f"-n {NAMESPACE} exec {CLIENT} -- wget -qO- -T 5 http://{SERVICE}/")
-        assert res.rc == 0, f"http://{SERVICE}/ ne répond pas depuis {CLIENT} : {res.stderr.strip()[:150]}"
+        assert res.rc == 0, message(
+            en=f"http://{SERVICE}/ does not answer from {CLIENT}: {res.stderr.strip()[:150]}",
+            fr=f"http://{SERVICE}/ ne répond pas depuis {CLIENT} : {res.stderr.strip()[:150]}",
+        )
         reponses.append(res.stdout.strip())
-    assert all(r.startswith(f"{DEPLOYMENT}-") for r in reponses), (
-        f"Les réponses ne sont pas des noms de Pods de {DEPLOYMENT} : {sorted(set(reponses))}. "
-        "Chaque Pod doit servir son nom d'hôte."
+    assert all(r.startswith(f"{DEPLOYMENT}-") for r in reponses), message(
+        en=f"The answers are not Pod names of {DEPLOYMENT}: {sorted(set(reponses))}. "
+        "Each Pod must serve its own hostname.",
+        fr=f"Les réponses ne sont pas des noms de Pods de {DEPLOYMENT} : {sorted(set(reponses))}. "
+        "Chaque Pod doit servir son nom d'hôte.",
     )
-    assert len(set(reponses)) >= 2, (
-        f"Dix requêtes, un seul Pod a répondu : {set(reponses)}. Le Service ne répartit "
-        "pas, ou un seul Pod est derrière lui."
+    assert len(set(reponses)) >= 2, message(
+        en=f"Ten requests, a single Pod answered: {set(reponses)}. The Service is not "
+        "load-balancing, or only one Pod stands behind it.",
+        fr=f"Dix requêtes, un seul Pod a répondu : {set(reponses)}. Le Service ne répartit "
+        "pas, ou un seul Pod est derrière lui.",
     )

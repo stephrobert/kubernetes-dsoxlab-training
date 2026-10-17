@@ -18,7 +18,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "app-team"
 DEPLOYMENT = "inventaire"
@@ -52,12 +52,18 @@ def _pod(host) -> dict:
                 return prets[0]
             pod = vivants[0] if vivants else None
         time.sleep(5)
-    assert pod is not None, (
-        f"Aucun Pod de {DEPLOYMENT} dans {NAMESPACE} après deux minutes. Le ReplicaSet ne peut "
+    assert pod is not None, message(
+        en=f"No Pod of {DEPLOYMENT} in {NAMESPACE} after two minutes. The ReplicaSet cannot "
+        f"create any as long as ServiceAccount {SA} does not exist: kubectl get events -n "
+        f"{NAMESPACE} tells you.",
+        fr=f"Aucun Pod de {DEPLOYMENT} dans {NAMESPACE} après deux minutes. Le ReplicaSet ne peut "
         f"pas en créer tant que le ServiceAccount {SA} n'existe pas : kubectl get events -n "
-        f"{NAMESPACE} le dit."
+        f"{NAMESPACE} le dit.",
     )
-    pytest.fail(f"Le Pod de {DEPLOYMENT} existe mais n'est pas prêt : phase {pod['status'].get('phase')!r}.")
+    pytest.fail(message(
+        en=f"The Pod of {DEPLOYMENT} exists but is not ready: phase {pod['status'].get('phase')!r}.",
+        fr=f"Le Pod de {DEPLOYMENT} existe mais n'est pas prêt : phase {pod['status'].get('phase')!r}.",
+    ))
 
 
 def _code_http(host, chemin: str, methode: str = "GET") -> str:
@@ -70,7 +76,10 @@ def _code_http(host, chemin: str, methode: str = "GET") -> str:
         f'-H "Authorization: Bearer $(cat $D/token)" https://kubernetes.default.svc{chemin}'
     )
     res = _kubectl(host, f"-n {NAMESPACE} exec deploy/{DEPLOYMENT} -- sh -c '{commande}'")
-    assert res.rc == 0, f"kubectl exec dans {DEPLOYMENT} échoue : {res.stderr.strip()[:200]}"
+    assert res.rc == 0, message(
+        en=f"kubectl exec into {DEPLOYMENT} failed: {res.stderr.strip()[:200]}",
+        fr=f"kubectl exec dans {DEPLOYMENT} échoue : {res.stderr.strip()[:200]}",
+    )
     return res.stdout.strip()
 
 
@@ -79,11 +88,16 @@ def _code_http(host, chemin: str, methode: str = "GET") -> str:
 # ----------------------------------------------------------------------
 def test_l_application_demarre_sous_son_identite(host):
     res = _kubectl(host, f"-n {NAMESPACE} get serviceaccount {SA} -o json")
-    assert res.rc == 0, f"Aucun ServiceAccount {SA} dans {NAMESPACE} : c'est lui que le Deployment attend."
+    assert res.rc == 0, message(
+        en=f"No ServiceAccount {SA} in {NAMESPACE}: that is what the Deployment is waiting for.",
+        fr=f"Aucun ServiceAccount {SA} dans {NAMESPACE} : c'est lui que le Deployment attend.",
+    )
     pod = _pod(host)
-    assert pod["spec"].get("serviceAccountName") == SA, (
-        f"Le Pod tourne sous {pod['spec'].get('serviceAccountName')!r} au lieu de {SA} : le "
-        "Deployment a été modifié pour contourner le problème, pas résolu."
+    assert pod["spec"].get("serviceAccountName") == SA, message(
+        en=f"The Pod runs as {pod['spec'].get('serviceAccountName')!r} instead of {SA}: the "
+        "Deployment was modified to work around the problem, not fixed.",
+        fr=f"Le Pod tourne sous {pod['spec'].get('serviceAccountName')!r} au lieu de {SA} : le "
+        "Deployment a été modifié pour contourner le problème, pas résolu.",
     )
 
 
@@ -92,7 +106,10 @@ def test_l_application_demarre_sous_son_identite(host):
 # ----------------------------------------------------------------------
 def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
     res = _kubectl(host, f"-n {NAMESPACE} get role {ROLE} -o json")
-    assert res.rc == 0, f"Aucun Role {ROLE} dans {NAMESPACE}."
+    assert res.rc == 0, message(
+        en=f"No Role {ROLE} in {NAMESPACE}.",
+        fr=f"Aucun Role {ROLE} dans {NAMESPACE}.",
+    )
     verbes_pods: set[str] = set()
     autres: list[str] = []
     for regle in json.loads(res.stdout).get("rules") or []:
@@ -101,28 +118,39 @@ def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
         if "pods" in ressources or "*" in ressources:
             verbes_pods |= verbes
         autres += sorted(r for r in ressources if r not in ("pods",))
-    assert verbes_pods >= VERBES_LECTURE, (
-        f"Le Role donne {sorted(verbes_pods)} sur les Pods, il manque {sorted(VERBES_LECTURE - verbes_pods)}."
+    assert verbes_pods >= VERBES_LECTURE, message(
+        en=f"The Role grants {sorted(verbes_pods)} on Pods, {sorted(VERBES_LECTURE - verbes_pods)} missing.",
+        fr=f"Le Role donne {sorted(verbes_pods)} sur les Pods, il manque {sorted(VERBES_LECTURE - verbes_pods)}.",
     )
     en_trop = verbes_pods - VERBES_LECTURE
-    assert not en_trop, (
-        f"Le Role donne aussi {sorted(en_trop)} sur les Pods. Lire, c'est get, list et watch ; "
-        "un verbe de plus est un droit que l'application n'a pas demandé."
+    assert not en_trop, message(
+        en=f"The Role also grants {sorted(en_trop)} on Pods. Reading means get, list and watch; "
+        "one more verb is a right the application never asked for.",
+        fr=f"Le Role donne aussi {sorted(en_trop)} sur les Pods. Lire, c'est get, list et watch ; "
+        "un verbe de plus est un droit que l'application n'a pas demandé.",
     )
-    assert not autres, (
-        f"Le Role touche à d'autres ressources que les Pods : {autres}. Le moindre privilège "
-        "s'arrête à ce dont l'application a besoin."
+    assert not autres, message(
+        en=f"The Role touches resources other than Pods: {autres}. Least privilege "
+        "stops at what the application needs.",
+        fr=f"Le Role touche à d'autres ressources que les Pods : {autres}. Le moindre privilège "
+        "s'arrête à ce dont l'application a besoin.",
     )
     res = _kubectl(host, f"-n {NAMESPACE} get rolebinding {BINDING} -o json")
-    assert res.rc == 0, f"Aucun RoleBinding {BINDING} dans {NAMESPACE}."
+    assert res.rc == 0, message(
+        en=f"No RoleBinding {BINDING} in {NAMESPACE}.",
+        fr=f"Aucun RoleBinding {BINDING} dans {NAMESPACE}.",
+    )
     rb = json.loads(res.stdout)
-    assert rb["roleRef"].get("kind") == "Role" and rb["roleRef"].get("name") == ROLE, (
-        f"Le RoleBinding vise {rb['roleRef'].get('kind')}/{rb['roleRef'].get('name')} au lieu de Role/{ROLE}."
+    assert rb["roleRef"].get("kind") == "Role" and rb["roleRef"].get("name") == ROLE, message(
+        en=f"The RoleBinding points at {rb['roleRef'].get('kind')}/{rb['roleRef'].get('name')} instead of Role/{ROLE}.",
+        fr=f"Le RoleBinding vise {rb['roleRef'].get('kind')}/{rb['roleRef'].get('name')} au lieu de Role/{ROLE}.",
     )
     sujets = [(s.get("kind"), s.get("namespace"), s.get("name")) for s in rb.get("subjects") or []]
-    assert ("ServiceAccount", NAMESPACE, SA) in sujets, (
-        f"Le RoleBinding ne nomme pas le ServiceAccount {NAMESPACE}/{SA} (sujets : {sujets}). Un Pod "
-        "s'identifie par son ServiceAccount, avec kind ServiceAccount et le namespace, pas par un User."
+    assert ("ServiceAccount", NAMESPACE, SA) in sujets, message(
+        en=f"The RoleBinding does not name ServiceAccount {NAMESPACE}/{SA} (subjects: {sujets}). A Pod "
+        "identifies itself through its ServiceAccount, with kind ServiceAccount and the namespace, not as a User.",
+        fr=f"Le RoleBinding ne nomme pas le ServiceAccount {NAMESPACE}/{SA} (sujets : {sujets}). Un Pod "
+        "s'identifie par son ServiceAccount, avec kind ServiceAccount et le namespace, pas par un User.",
     )
 
 
@@ -132,10 +160,13 @@ def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
 def test_depuis_le_pod_lister_les_pods_passe(host):
     _pod(host)
     code = _code_http(host, f"/api/v1/namespaces/{NAMESPACE}/pods")
-    assert code == "200", (
-        f"Depuis le Pod, GET /api/v1/namespaces/{NAMESPACE}/pods répond {code} au lieu de 200. "
+    assert code == "200", message(
+        en=f"From the Pod, GET /api/v1/namespaces/{NAMESPACE}/pods answers {code} instead of 200. "
+        "The projected token identifies the ServiceAccount; if it is refused, the RoleBinding does "
+        "not name it, or the Role does not grant list.",
+        fr=f"Depuis le Pod, GET /api/v1/namespaces/{NAMESPACE}/pods répond {code} au lieu de 200. "
         "Le jeton projeté identifie le ServiceAccount ; s'il est refusé, le RoleBinding ne le "
-        "nomme pas, ou le Role ne donne pas list."
+        "nomme pas, ou le Role ne donne pas list.",
     )
 
 
@@ -144,14 +175,24 @@ def test_depuis_le_pod_lister_les_pods_passe(host):
 # ----------------------------------------------------------------------
 def test_depuis_le_pod_tout_le_reste_est_refuse(host):
     pod = _pod(host)
+    # Ces libellés sont INTERPOLÉS dans le message d'échec : écrits en
+    # français seulement, ils ressortaient en français au milieu d'une phrase
+    # anglaise. Un message bilingue qui cite des valeurs monolingues n'est
+    # bilingue qu'à moitié, et c'est la moitié que l'audit ne voit pas.
     refus = {
-        "supprimer un Pod d'app-team": _code_http(host, f"/api/v1/namespaces/{NAMESPACE}/pods/{pod['metadata']['name']}", "DELETE"),
-        "lire les Secrets d'app-team": _code_http(host, f"/api/v1/namespaces/{NAMESPACE}/secrets"),
-        "lister les Pods de default": _code_http(host, "/api/v1/namespaces/default/pods"),
+        message(en="delete a Pod of app-team", fr="supprimer un Pod d'app-team"):
+            _code_http(host, f"/api/v1/namespaces/{NAMESPACE}/pods/{pod['metadata']['name']}", "DELETE"),
+        message(en="read the Secrets of app-team", fr="lire les Secrets d'app-team"):
+            _code_http(host, f"/api/v1/namespaces/{NAMESPACE}/secrets"),
+        message(en="list the Pods of default", fr="lister les Pods de default"):
+            _code_http(host, "/api/v1/namespaces/default/pods"),
     }
     passes = {k: v for k, v in refus.items() if v != "403"}
-    assert not passes, (
-        f"Ces requêtes devraient répondre 403 et répondent : {passes}. Le ServiceAccount a plus "
+    assert not passes, message(
+        en=f"These requests should answer 403 and they answer: {passes}. The ServiceAccount has more "
+        "rights than the instruction allows: too broad a Role, a ClusterRoleBinding, or an "
+        "existing role reused. The application must only be able to read the Pods of its namespace.",
+        fr=f"Ces requêtes devraient répondre 403 et répondent : {passes}. Le ServiceAccount a plus "
         "de droits que la consigne : un Role trop large, un ClusterRoleBinding, ou un rôle "
-        "existant réutilisé. L'application ne doit pouvoir que lire les Pods de son namespace."
+        "existant réutilisé. L'application ne doit pouvoir que lire les Pods de son namespace.",
     )

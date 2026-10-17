@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "conformite"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -53,24 +53,37 @@ def _audit(host) -> dict:
     """
     _kubectl(host, f"-n {NAMESPACE} delete job kube-bench --ignore-not-found --wait=true")
     rc, _, diagnostic = _kubectl(host, "apply -f /root/kube-bench-job.yaml")
-    assert rc == 0, f"Le Job kube-bench n'a pas pu être créé. {diagnostic}"
+    assert rc == 0, message(
+        en=f"The kube-bench Job could not be created. {diagnostic}",
+        fr=f"Le Job kube-bench n'a pas pu être créé. {diagnostic}",
+    )
 
     rc, _, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} wait --for=condition=complete job/kube-bench --timeout=300s"
     )
-    assert rc == 0, (
-        f"L'audit kube-bench ne s'est pas terminé. {diagnostic}"
+    assert rc == 0, message(
+        en=f"The kube-bench audit did not finish. {diagnostic}",
+        fr=f"L'audit kube-bench ne s'est pas terminé. {diagnostic}",
     )
     rc, pod, _ = _kubectl(
         host, f"-n {NAMESPACE} get pods -l job-name=kube-bench "
         "-o jsonpath='{.items[0].metadata.name}'"
     )
-    assert rc == 0 and pod, "Le Pod de l'audit est introuvable."
+    assert rc == 0 and pod, message(
+        en="The audit's Pod cannot be found.",
+        fr="Le Pod de l'audit est introuvable.",
+    )
     rc, journal, diagnostic = _kubectl(host, f"-n {NAMESPACE} logs {pod}")
-    assert rc == 0 and journal, f"L'audit n'a rien écrit. {diagnostic}"
+    assert rc == 0 and journal, message(
+        en=f"The audit wrote nothing. {diagnostic}",
+        fr=f"L'audit n'a rien écrit. {diagnostic}",
+    )
 
     debut = journal.find("{")
-    assert debut >= 0, "La sortie de kube-bench ne contient pas de JSON."
+    assert debut >= 0, message(
+        en="kube-bench's output contains no JSON.",
+        fr="La sortie de kube-bench ne contient pas de JSON.",
+    )
     return json.loads(journal[debut:])
 
 
@@ -98,10 +111,13 @@ def test_les_trois_composants_portent_la_correction(host):
             manquants.append(f"{composant} (manifeste illisible)")
         elif "--profiling=false" not in res.stdout:
             manquants.append(composant)
-    assert not manquants, (
-        f"Ces composants n'ont pas été corrigés : {', '.join(manquants)}. Le "
+    assert not manquants, message(
+        en=f"These components were not fixed: {', '.join(manquants)}. The "
+        "CIS benchmark holds the same setting against all three, under three "
+        "different numbers.",
+        fr=f"Ces composants n'ont pas été corrigés : {', '.join(manquants)}. Le "
         "référentiel CIS reproche le même réglage aux trois, sous trois "
-        "numéros différents."
+        "numéros différents.",
     )
 
 
@@ -134,27 +150,38 @@ def test_l_audit_rejoue_compte_moins_d_echecs(host):
         if rc == 0 and phases and "Pending" not in phases:
             break
         host.run("sleep 3")
-    assert rc == 0 and phases and "Pending" not in phases, (
-        f"Un Pod du control plane reste en {phases or 'état illisible'} après "
+    assert rc == 0 and phases and "Pending" not in phases, message(
+        en=f"A control plane Pod stays {phases or 'in an unreadable state'} after "
+        "two minutes. The kubelet could not restart it with the "
+        "new settings: `sudo crictl ps -a` then `sudo crictl logs <id>` "
+        "give the reason.",
+        fr=f"Un Pod du control plane reste en {phases or 'état illisible'} après "
         "deux minutes. Le kubelet n'a pas réussi à le redémarrer avec les "
         "nouveaux réglages : `sudo crictl ps -a` puis `sudo crictl logs <id>` "
-        "donnent la raison."
+        "donnent la raison.",
     )
 
     rapport = _audit(host)
     etats = _resultats(rapport)
 
     encore_en_echec = [c for c in CONTROLES_VISES if etats.get(c) != "PASS"]
-    assert not encore_en_echec, (
-        "Ces contrôles CIS échouent toujours après l'audit rejoué : "
+    assert not encore_en_echec, message(
+        en="These CIS controls still fail after the audit was replayed: "
+        + ", ".join(f"{c} ({etats.get(c, 'absent from the report')})" for c in encore_en_echec)
+        + ". The manifest may be fixed without the kubelet having picked up "
+        "the Pod: check that the component restarted.",
+        fr="Ces contrôles CIS échouent toujours après l'audit rejoué : "
         + ", ".join(f"{c} ({etats.get(c, 'absent du rapport')})" for c in encore_en_echec)
         + ". Le manifeste est peut-être corrigé sans que le kubelet ait repris "
-        "le Pod : vérifiez que le composant a redémarré."
+        "le Pod : vérifiez que le composant a redémarré.",
     )
 
     total = sum(int(c.get("total_fail", 0)) for c in rapport.get("Controls", []))
-    assert total < ECHECS_AU_DEPART, (
-        f"L'audit compte encore {total} échec(s), contre {ECHECS_AU_DEPART} au "
+    assert total < ECHECS_AU_DEPART, message(
+        en=f"The audit still counts {total} failure(s), against {ECHECS_AU_DEPART} at "
+        "the start. Fixing one control by breaking another does not bring the "
+        "count down, and that is what this global measurement catches.",
+        fr=f"L'audit compte encore {total} échec(s), contre {ECHECS_AU_DEPART} au "
         "départ. Corriger un contrôle en cassant un autre ne fait pas baisser "
-        "le compte, et c'est ce que cette mesure globale attrape."
+        "le compte, et c'est ce que cette mesure globale attrape.",
     )

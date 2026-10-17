@@ -18,7 +18,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 WORKER = "k8s-w1.lab"
 NAMESPACE = "lab"
@@ -41,7 +41,10 @@ def _kubectl(host, args: str):
 
 def _json(host, args: str) -> dict:
     res = _kubectl(host, args + " -o json")
-    assert res.rc == 0, f"kubectl {args} échoue : {res.stderr.strip()[:200]}"
+    assert res.rc == 0, message(
+        en=f"kubectl {args} failed: {res.stderr.strip()[:200]}",
+        fr=f"kubectl {args} échoue : {res.stderr.strip()[:200]}",
+    )
     return json.loads(res.stdout)
 
 
@@ -55,7 +58,10 @@ def _pods_web(host) -> list[dict]:
 def _heure_de_pose(host) -> str:
     d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT}")
     heure = (d["metadata"].get("annotations") or {}).get(ANNOTATION)
-    assert heure, f"Le Deployment {DEPLOYMENT} n'a plus l'annotation {ANNOTATION} posée par le setup."
+    assert heure, message(
+        en=f"Deployment {DEPLOYMENT} no longer carries the {ANNOTATION} annotation set by setup.",
+        fr=f"Le Deployment {DEPLOYMENT} n'a plus l'annotation {ANNOTATION} posée par le setup.",
+    )
     return heure
 
 
@@ -80,18 +86,27 @@ def _evacuation_a_eu_lieu(host) -> None:
     """
     pose = _heure_de_pose(host)
     pods = _pods_web(host)
-    assert len(pods) == 4, f"{len(pods)} Pod(s) de {DEPLOYMENT} au lieu de 4 : il ne fallait pas toucher aux replicas."
+    assert len(pods) == 4, message(
+        en=f"{len(pods)} Pod(s) of {DEPLOYMENT} instead of 4: the replicas were not to be touched.",
+        fr=f"{len(pods)} Pod(s) de {DEPLOYMENT} au lieu de 4 : il ne fallait pas toucher aux replicas.",
+    )
     recrees = [p["metadata"]["name"] for p in pods if p["metadata"]["creationTimestamp"] > pose]
-    assert recrees, (
-        f"Aucun Pod de {DEPLOYMENT} n'a été recréé depuis le début du lab. Un drain évince "
+    assert recrees, message(
+        en=f"No Pod of {DEPLOYMENT} has been recreated since the lab started. A drain evicts "
+        "every Pod from the drained node, and the controller recreates it elsewhere: without a "
+        "single Pod newer than the marker, no eviction took place.",
+        fr=f"Aucun Pod de {DEPLOYMENT} n'a été recréé depuis le début du lab. Un drain évince "
         "chaque Pod du nœud drainé, et le contrôleur le recrée ailleurs : sans un seul Pod "
-        "plus récent que la pose, aucune éviction n'a eu lieu."
+        "plus récent que la pose, aucune éviction n'a eu lieu.",
     )
     sur_worker = [p["metadata"]["name"] for p in pods if p["spec"].get("nodeName") == WORKER]
-    assert not sur_worker, (
-        f"Des Pods de {DEPLOYMENT} tournent encore sur {WORKER} : {sur_worker}. Le nœud n'a pas "
+    assert not sur_worker, message(
+        en=f"Pods of {DEPLOYMENT} are still running on {WORKER}: {sur_worker}. The node was not "
+        "drained, or it was drained before being removed from scheduling and the scheduler "
+        "put Pods back on it.",
+        fr=f"Des Pods de {DEPLOYMENT} tournent encore sur {WORKER} : {sur_worker}. Le nœud n'a pas "
         "été évacué, ou l'a été avant d'être retiré du scheduling et le scheduler y a "
-        "remis des Pods."
+        "remis des Pods.",
     )
 
 
@@ -100,15 +115,20 @@ def _evacuation_a_eu_lieu(host) -> None:
 # ----------------------------------------------------------------------
 def test_le_budget_protege_l_application(host):
     res = _kubectl(host, f"-n {NAMESPACE} get pdb {PDB} -o json")
-    assert res.rc == 0, (
-        f"Aucun PodDisruptionBudget {PDB} dans {NAMESPACE}. Sans budget, un drain évince "
-        "tous les Pods du nœud d'un coup, et le service tombe le temps qu'ils reviennent."
+    assert res.rc == 0, message(
+        en=f"No PodDisruptionBudget {PDB} in {NAMESPACE}. Without a budget, a drain evicts "
+        "every Pod of the node at once, and the service goes down until they come back.",
+        fr=f"Aucun PodDisruptionBudget {PDB} dans {NAMESPACE}. Sans budget, un drain évince "
+        "tous les Pods du nœud d'un coup, et le service tombe le temps qu'ils reviennent.",
     )
     pdb = json.loads(res.stdout)
-    assert pdb["spec"].get("minAvailable") == 2, (
-        f"minAvailable vaut {pdb['spec'].get('minAvailable')!r} au lieu de 2 "
+    assert pdb["spec"].get("minAvailable") == 2, message(
+        en=f"minAvailable is {pdb['spec'].get('minAvailable')!r} instead of 2 "
+        f"(maxUnavailable: {pdb['spec'].get('maxUnavailable')!r}). The instruction asks for at "
+        "least two Pods available at all times.",
+        fr=f"minAvailable vaut {pdb['spec'].get('minAvailable')!r} au lieu de 2 "
         f"(maxUnavailable : {pdb['spec'].get('maxUnavailable')!r}). La consigne demande au "
-        "moins deux Pods disponibles à tout moment."
+        "moins deux Pods disponibles à tout moment.",
     )
     attendus = 0
     for _ in range(12):
@@ -117,9 +137,11 @@ def test_le_budget_protege_l_application(host):
             break
         time.sleep(5)
         pdb = _json(host, f"-n {NAMESPACE} get pdb {PDB}")
-    assert attendus == 4, (
-        f"Le budget compte {attendus} Pod(s) attendu(s) au lieu de 4 : son selector ne "
-        f"matche pas les Pods de {DEPLOYMENT}. Un budget qui ne vise rien ne protège rien."
+    assert attendus == 4, message(
+        en=f"The budget counts {attendus} expected Pod(s) instead of 4: its selector does not "
+        f"match the Pods of {DEPLOYMENT}. A budget that targets nothing protects nothing.",
+        fr=f"Le budget compte {attendus} Pod(s) attendu(s) au lieu de 4 : son selector ne "
+        f"matche pas les Pods de {DEPLOYMENT}. Un budget qui ne vise rien ne protège rien.",
     )
 
 
@@ -129,17 +151,21 @@ def test_le_budget_protege_l_application(host):
 def test_le_worker_a_ete_evacue(host):
     _evacuation_a_eu_lieu(host)
     res = _kubectl(host, f"-n {NAMESPACE} get pod {ORPHELIN} -o json")
-    assert res.rc != 0 or json.loads(res.stdout)["metadata"].get("deletionTimestamp"), (
-        f"Le Pod {ORPHELIN} est toujours sur le worker. Il n'a aucun contrôleur et le drain "
-        "le refuse par défaut : la consigne dit qu'il peut disparaître, et l'option existe."
+    assert res.rc != 0 or json.loads(res.stdout)["metadata"].get("deletionTimestamp"), message(
+        en=f"Pod {ORPHELIN} is still on the worker. It has no controller and drain refuses it "
+        "by default: the instruction says it may disappear, and the option exists.",
+        fr=f"Le Pod {ORPHELIN} est toujours sur le worker. Il n'a aucun contrôleur et le drain "
+        "le refuse par défaut : la consigne dit qu'il peut disparaître, et l'option existe.",
     )
     calico = [
         p for p in _json(host, "-n kube-system get pods -l k8s-app=calico-node")["items"]
         if p["spec"].get("nodeName") == WORKER and not p["metadata"].get("deletionTimestamp")
     ]
-    assert calico, (
-        f"Aucun Pod calico-node sur {WORKER} : le DaemonSet du réseau a été supprimé. Un "
-        "drain doit ignorer les DaemonSets, pas les faire disparaître."
+    assert calico, message(
+        en=f"No calico-node Pod on {WORKER}: the network DaemonSet was deleted. A "
+        "drain must ignore DaemonSets, not make them disappear.",
+        fr=f"Aucun Pod calico-node sur {WORKER} : le DaemonSet du réseau a été supprimé. Un "
+        "drain doit ignorer les DaemonSets, pas les faire disparaître.",
     )
 
 
@@ -149,12 +175,17 @@ def test_le_worker_a_ete_evacue(host):
 def test_le_worker_est_remis_en_service(host):
     _evacuation_a_eu_lieu(host)
     noeud = _json(host, f"get node {WORKER}")
-    assert not noeud["spec"].get("unschedulable", False), (
-        f"{WORKER} est toujours hors du scheduling (SchedulingDisabled). La maintenance "
-        "est finie : il faut le remettre en service, sinon tout tourne sur un seul nœud."
+    assert not noeud["spec"].get("unschedulable", False), message(
+        en=f"{WORKER} is still out of scheduling (SchedulingDisabled). Maintenance "
+        "is over: it has to be put back in service, otherwise everything runs on a single node.",
+        fr=f"{WORKER} est toujours hors du scheduling (SchedulingDisabled). La maintenance "
+        "est finie : il faut le remettre en service, sinon tout tourne sur un seul nœud.",
     )
     conditions = {c["type"]: c["status"] for c in noeud["status"].get("conditions", [])}
-    assert conditions.get("Ready") == "True", f"{WORKER} n'est pas Ready (Ready = {conditions.get('Ready')})."
+    assert conditions.get("Ready") == "True", message(
+        en=f"{WORKER} is not Ready (Ready = {conditions.get('Ready')}).",
+        fr=f"{WORKER} n'est pas Ready (Ready = {conditions.get('Ready')}).",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -162,9 +193,16 @@ def test_le_worker_est_remis_en_service(host):
 # ----------------------------------------------------------------------
 def test_la_trace_est_ecrite(host):
     res = _kubectl(host, f"-n {NAMESPACE} get configmap {CONFIGMAP} -o json")
-    assert res.rc == 0, f"Aucun ConfigMap {CONFIGMAP} dans {NAMESPACE}."
-    data = json.loads(res.stdout).get("data") or {}
-    assert data.get("drained-node") == WORKER, (
-        f"drained-node vaut {data.get('drained-node')!r}, attendu {WORKER!r}."
+    assert res.rc == 0, message(
+        en=f"No ConfigMap {CONFIGMAP} in {NAMESPACE}.",
+        fr=f"Aucun ConfigMap {CONFIGMAP} dans {NAMESPACE}.",
     )
-    assert data.get("status") == "completed", f"status vaut {data.get('status')!r}, attendu 'completed'."
+    data = json.loads(res.stdout).get("data") or {}
+    assert data.get("drained-node") == WORKER, message(
+        en=f"drained-node is {data.get('drained-node')!r}, expected {WORKER!r}.",
+        fr=f"drained-node vaut {data.get('drained-node')!r}, attendu {WORKER!r}.",
+    )
+    assert data.get("status") == "completed", message(
+        en=f"status is {data.get('status')!r}, expected 'completed'.",
+        fr=f"status vaut {data.get('status')!r}, attendu 'completed'.",
+    )

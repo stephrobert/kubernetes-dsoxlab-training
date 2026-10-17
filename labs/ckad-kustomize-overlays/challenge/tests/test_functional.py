@@ -16,7 +16,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 ENVIRONNEMENTS = {"dev": 1, "prod": 3}
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -48,27 +48,38 @@ def _verifier_environnement(host, env: str, replicas: int) -> dict:
         if d["status"].get("availableReplicas", 0) == replicas:
             break
         time.sleep(5)
-    assert d["spec"].get("replicas") == replicas, (
-        f"{deploiement} demande {d['spec'].get('replicas')} replica(s), attendu {replicas} : "
-        "c'est l'overlay qui change ce nombre, pas la base."
+    assert d["spec"].get("replicas") == replicas, message(
+        en=f"{deploiement} asks for {d['spec'].get('replicas')} replica(s), expected {replicas}: "
+        "it is the overlay that changes that number, not the base.",
+        fr=f"{deploiement} demande {d['spec'].get('replicas')} replica(s), attendu {replicas} : "
+        "c'est l'overlay qui change ce nombre, pas la base.",
     )
-    assert d["status"].get("availableReplicas", 0) == replicas, (
-        f"{deploiement} : {d['status'].get('availableReplicas', 0)} disponible(s) sur {replicas}."
+    assert d["status"].get("availableReplicas", 0) == replicas, message(
+        en=f"{deploiement}: {d['status'].get('availableReplicas', 0)} available out of {replicas}.",
+        fr=f"{deploiement} : {d['status'].get('availableReplicas', 0)} disponible(s) sur {replicas}.",
     )
-    pods = _json(host, f"-n {env} get pods -l app=app", "Lecture des Pods impossible.")["items"]
+    pods = _json(host, f"-n {env} get pods -l app=app", message(
+            en="Cannot read the Pods.",
+            fr="Lecture des Pods impossible.",
+        ))["items"]
     sans_label = [p["metadata"]["name"] for p in pods if (p["metadata"].get("labels") or {}).get("env") != env]
-    assert pods and not sans_label, (
-        f"Des Pods de {deploiement} ne portent pas env={env} : {sans_label or 'aucun Pod'}. Le label "
-        "doit atteindre le template des Pods, pas seulement le Deployment."
+    assert pods and not sans_label, message(
+        en=f"Some Pods of {deploiement} do not carry env={env}: {sans_label or 'no Pod'}. The label "
+        "must reach the Pod template, not only the Deployment.",
+        fr=f"Des Pods de {deploiement} ne portent pas env={env} : {sans_label or 'aucun Pod'}. Le label "
+        "doit atteindre le template des Pods, pas seulement le Deployment.",
     )
     tranches = _json(host, f"-n {env} get endpointslices -l kubernetes.io/service-name={service}",
                      f"Aucun Service {service} dans {env}.")
     prets = [a for t in tranches["items"] for e in t.get("endpoints") or []
              for a in e.get("addresses") or [] if (e.get("conditions") or {}).get("ready")]
-    assert len(prets) == replicas, (
-        f"{service} a {len(prets)} endpoint(s) prêt(s), attendu {replicas}. Si le label "
+    assert len(prets) == replicas, message(
+        en=f"{service} has {len(prets)} ready endpoint(s), expected {replicas}. If the "
+        f"env={env} label is on the Pods but not in the Service's selector, or the other "
+        "way round, the Service no longer finds its Pods.",
+        fr=f"{service} a {len(prets)} endpoint(s) prêt(s), attendu {replicas}. Si le label "
         f"env={env} est sur les Pods mais pas dans le selector du Service, ou l'inverse, "
-        "le Service ne trouve plus ses Pods."
+        "le Service ne trouve plus ses Pods.",
     )
     return d
 
@@ -90,12 +101,21 @@ def test_prod_tourne_avec_trois_replicas(host):
 def test_les_deux_environnements_viennent_de_la_meme_base(host):
     structures = {}
     for env in ENVIRONNEMENTS:
-        d = _json(host, f"-n {env} get deployment {env}-app", f"Aucun Deployment {env}-app.")
+        d = _json(host, f"-n {env} get deployment {env}-app", message(
+            en=f"No Deployment {env}-app.",
+            fr=f"Aucun Deployment {env}-app.",
+        ))
         c = d["spec"]["template"]["spec"]["containers"][0]
         structures[env] = (c.get("image"), tuple(p.get("containerPort") for p in c.get("ports") or []), c.get("name"))
-    assert structures["dev"] == structures["prod"], (
-        f"dev et prod divergent : {structures}. Une même base donne la même image, le "
+    assert structures["dev"] == structures["prod"], message(
+        en=f"dev and prod diverge: {structures}. One and the same base gives the same image, the "
+        "same port and the same container name; only namespace, replicas, prefix and "
+        "label change.",
+        fr=f"dev et prod divergent : {structures}. Une même base donne la même image, le "
         "même port et le même nom de conteneur ; seuls namespace, replicas, préfixe et "
-        "label changent."
+        "label changent.",
     )
-    assert structures["dev"][0] == "nginx:1.27-alpine", f"L'image de la base est {structures['dev'][0]!r}, attendu nginx:1.27-alpine."
+    assert structures["dev"][0] == "nginx:1.27-alpine", message(
+        en=f"The base's image is {structures['dev'][0]!r}, expected nginx:1.27-alpine.",
+        fr=f"L'image de la base est {structures['dev'][0]!r}, attendu nginx:1.27-alpine.",
+    )

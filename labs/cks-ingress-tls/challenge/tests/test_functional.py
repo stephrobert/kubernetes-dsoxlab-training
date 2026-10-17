@@ -21,7 +21,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "vitrine"
 HOTE = "vitrine.lab"
@@ -69,7 +69,10 @@ def test_le_certificat_est_depose_dans_un_secret_du_bon_type(host):
     l'échec du test suivant soit diagnosticable. Un Secret peut être parfait
     et n'être servi à personne, faute d'être déclaré dans l'Ingress."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get secret -o json")
-    assert rc == 0, f"Impossible de lire les Secrets de {NAMESPACE}. {diagnostic}"
+    assert rc == 0, message(
+        en=f"Cannot read the Secrets of {NAMESPACE}. {diagnostic}",
+        fr=f"Impossible de lire les Secrets de {NAMESPACE}. {diagnostic}",
+    )
 
     tls = [
         s for s in json.loads(sortie).get("items", [])
@@ -78,21 +81,28 @@ def test_le_certificat_est_depose_dans_un_secret_du_bon_type(host):
     presents = {
         s["metadata"]["name"]: s.get("type") for s in json.loads(sortie).get("items", [])
     }
-    assert tls, (
-        f"Aucun Secret de type kubernetes.io/tls dans {NAMESPACE}. Les Secrets "
+    assert tls, message(
+        en=f"No Secret of type kubernetes.io/tls in {NAMESPACE}. The Secrets "
+        f"present are {presents or 'none'}. The TYPE matters: a generic "
+        "Secret carrying the same keys would not be read by the Ingress "
+        "controller, which selects on the type.",
+        fr=f"Aucun Secret de type kubernetes.io/tls dans {NAMESPACE}. Les Secrets "
         f"présents sont {presents or 'aucun'}. Le TYPE compte : un Secret "
         "générique portant les mêmes clés ne serait pas lu par le contrôleur "
-        "Ingress, qui sélectionne sur le type."
+        "Ingress, qui sélectionne sur le type.",
     )
 
     manquantes = [
         s["metadata"]["name"] for s in tls
         if not {"tls.crt", "tls.key"} <= set(s.get("data", {}))
     ]
-    assert not manquantes, (
-        f"Le ou les Secrets {manquantes} sont du bon type mais ne portent pas "
+    assert not manquantes, message(
+        en=f"Secret(s) {manquantes} are of the right type but do not carry "
+        "the two expected keys, tls.crt and tls.key. `kubectl create secret "
+        "tls` names them correctly on your behalf.",
+        fr=f"Le ou les Secrets {manquantes} sont du bon type mais ne portent pas "
         "les deux clés attendues, tls.crt et tls.key. `kubectl create secret "
-        "tls` les nomme correctement à votre place."
+        "tls` les nomme correctement à votre place.",
     )
 
 
@@ -120,33 +130,50 @@ def test_le_serveur_presente_le_certificat_de_l_hote_et_le_site_repond(host):
             break
         time.sleep(PAS_S)
 
-    assert sujet, (
-        f"Aucune connexion TLS n'aboutit sur le port {PORT_TLS} du nœud. Le "
+    assert sujet, message(
+        en=f"No TLS connection succeeds on port {PORT_TLS} of the node. Is the "
+        "Ingress controller still answering? "
+        "`kubectl -n traefik get pods` will tell you.",
+        fr=f"Aucune connexion TLS n'aboutit sur le port {PORT_TLS} du nœud. Le "
         "contrôleur Ingress répond-il encore ? "
-        "`kubectl -n traefik get pods` le dira."
+        "`kubectl -n traefik get pods` le dira.",
     )
-    assert CERT_PAR_DEFAUT not in sujet, (
-        f"Après {BUDGET_S} secondes, le serveur présente toujours son "
+    assert CERT_PAR_DEFAUT not in sujet, message(
+        en=f"After {BUDGET_S} seconds, the server still presents its "
+        f"default certificate: \"{sujet}\". The controller makes one at "
+        "startup and serves it for want of anything else, which explains why the "
+        "site answers over HTTPS without anything having been done. Declaring the "
+        "Secret in the Ingress's tls section is what switches the "
+        "controller to yours.",
+        fr=f"Après {BUDGET_S} secondes, le serveur présente toujours son "
         f"certificat par défaut : « {sujet} ». Le contrôleur en fabrique un au "
         "démarrage et le sert à défaut d'autre chose, ce qui explique que le "
         "site réponde en HTTPS sans que rien n'ait été fait. Déclarer le "
         "Secret dans la section tls de l'Ingress est ce qui fait basculer le "
-        "contrôleur sur le vôtre."
+        "contrôleur sur le vôtre.",
     )
-    assert HOTE in sujet, (
-        f"Le certificat servi ne nomme pas {HOTE} : « {sujet} ». Un client qui "
+    assert HOTE in sujet, message(
+        en=f"The certificate served does not name {HOTE}: \"{sujet}\". A client that "
+        "verifies validates ONLY the subjectAltName, the CN having been ignored for "
+        "years: the certificate must carry "
+        f"`subjectAltName=DNS:{HOTE}`.",
+        fr=f"Le certificat servi ne nomme pas {HOTE} : « {sujet} ». Un client qui "
         "vérifie ne valide QUE le subjectAltName, le CN étant ignoré depuis "
         "des années : le certificat doit porter "
-        f"`subjectAltName=DNS:{HOTE}`."
+        f"`subjectAltName=DNS:{HOTE}`.",
     )
 
     res = host.run(
         f"curl -sk -o /dev/null -w '%{{http_code}}' "
         f"--resolve {HOTE}:{PORT_TLS}:127.0.0.1 https://{HOTE}:{PORT_TLS}/ --max-time 10"
     )
-    assert res.stdout.strip() == "200", (
-        f"Le site ne répond plus : code HTTP « {res.stdout.strip() or 'aucun'} ». "
+    assert res.stdout.strip() == "200", message(
+        en=f"The site no longer answers: HTTP code \"{res.stdout.strip() or 'none'}\". "
+        "The certificate is indeed yours, but the route no longer leads to the "
+        "service. Check that the Ingress's host rule and backend "
+        "were not lost while adding the tls section.",
+        fr=f"Le site ne répond plus : code HTTP « {res.stdout.strip() or 'aucun'} ». "
         "Le certificat est bien le vôtre, mais la route ne mène plus au "
         "service. Vérifiez que la règle d'hôte et le backend de l'Ingress "
-        "n'ont pas été perdus en y ajoutant la section tls."
+        "n'ont pas été perdus en y ajoutant la section tls.",
     )

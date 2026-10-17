@@ -16,7 +16,7 @@ import time
 
 import pytest
 
-from conftest import lab_host
+from conftest import lab_host, message
 
 CONTROL_PLANE = "k8s-cp.lab"
 WORKER = "k8s-w1.lab"
@@ -47,16 +47,22 @@ def test_le_noeud_est_ready(cp):
     statut = ""
     for _ in range(18):
         res = _kubectl(cp, f"get node {WORKER} -o json")
-        assert res.rc == 0, f"Le nœud {WORKER} est introuvable : {res.stderr.strip()[:200]}"
+        assert res.rc == 0, message(
+            en=f"Node {WORKER} cannot be found: {res.stderr.strip()[:200]}",
+            fr=f"Le nœud {WORKER} est introuvable : {res.stderr.strip()[:200]}",
+        )
         conditions = {c["type"]: c for c in json.loads(res.stdout)["status"].get("conditions", [])}
         statut = conditions.get("Ready", {}).get("status", "Unknown")
         if statut == "True":
             return
         time.sleep(5)
-    assert statut == "True", (
-        f"Le nœud {WORKER} est toujours NotReady (Ready = {statut}) après 90 s. "
+    assert statut == "True", message(
+        en=f"Node {WORKER} is still NotReady (Ready = {statut}) after 90 s. "
+        "Its agent is not reporting to the control plane: go and look on the "
+        f"node, with ssh {WORKER}, at what systemd says about the kubelet.",
+        fr=f"Le nœud {WORKER} est toujours NotReady (Ready = {statut}) après 90 s. "
         "Son agent ne donne pas de nouvelles au control plane : allez voir sur le "
-        f"nœud, avec ssh {WORKER}, ce que systemd dit du kubelet."
+        f"nœud, avec ssh {WORKER}, ce que systemd dit du kubelet.",
     )
 
 
@@ -65,14 +71,19 @@ def test_le_noeud_est_ready(cp):
 # ----------------------------------------------------------------------
 def test_le_kubelet_tourne_et_survivra_au_redemarrage(worker):
     kubelet = worker.service("kubelet")
-    assert kubelet.is_running, (
-        f"Le service kubelet n'est pas actif sur {WORKER}. Tant qu'il ne tourne "
-        "pas, le nœud reste NotReady : systemctl status kubelet, puis démarrez-le."
+    assert kubelet.is_running, message(
+        en=f"The kubelet service is not active on {WORKER}. As long as it is not "
+        "running, the node stays NotReady: systemctl status kubelet, then start it.",
+        fr=f"Le service kubelet n'est pas actif sur {WORKER}. Tant qu'il ne tourne "
+        "pas, le nœud reste NotReady : systemctl status kubelet, puis démarrez-le.",
     )
-    assert kubelet.is_enabled, (
-        f"Le kubelet tourne sur {WORKER}, mais il est désactivé : au prochain "
+    assert kubelet.is_enabled, message(
+        en=f"The kubelet is running on {WORKER}, but it is disabled: at the machine's "
+        "next reboot it will not come back, and neither will the fix. A service "
+        "is started AND enabled.",
+        fr=f"Le kubelet tourne sur {WORKER}, mais il est désactivé : au prochain "
         "redémarrage de la machine, il ne reviendra pas, et la panne non plus "
-        "ne sera pas réparée. Un service se démarre ET s'active."
+        "ne sera pas réparée. Un service se démarre ET s'active.",
     )
 
 
@@ -83,26 +94,38 @@ def test_l_application_est_revenue_sur_le_noeud(cp):
     disponibles, voulus = 0, 0
     for _ in range(18):
         res = _kubectl(cp, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json")
-        assert res.rc == 0, f"Le Deployment {DEPLOYMENT} est introuvable : {res.stderr.strip()[:200]}"
+        assert res.rc == 0, message(
+            en=f"Deployment {DEPLOYMENT} cannot be found: {res.stderr.strip()[:200]}",
+            fr=f"Le Deployment {DEPLOYMENT} est introuvable : {res.stderr.strip()[:200]}",
+        )
         d = json.loads(res.stdout)
         voulus = d["spec"].get("replicas", 0)
         disponibles = d["status"].get("availableReplicas", 0)
         if voulus == 3 and disponibles == 3:
             break
         time.sleep(5)
-    assert voulus == 3, f"Le Deployment demande {voulus} replica(s) au lieu de 3 : il ne fallait pas y toucher."
-    assert disponibles == 3, (
-        f"{disponibles} replica(s) disponible(s) sur 3 après 90 s. L'application "
+    assert voulus == 3, message(
+        en=f"The Deployment asks for {voulus} replica(s) instead of 3: it was not to be touched.",
+        fr=f"Le Deployment demande {voulus} replica(s) au lieu de 3 : il ne fallait pas y toucher.",
+    )
+    assert disponibles == 3, message(
+        en=f"{disponibles} replica(s) available out of 3 after 90 s. The application "
+        f"is pinned to {WORKER}: as long as that node cannot host it, "
+        "it stays degraded. A Ready node and an active kubelet are enough.",
+        fr=f"{disponibles} replica(s) disponible(s) sur 3 après 90 s. L'application "
         f"est réservée à {WORKER} : tant que ce nœud ne peut pas l'accueillir, "
-        "elle reste dégradée. Un nœud Ready et un kubelet actif y suffisent."
+        "elle reste dégradée. Un nœud Ready et un kubelet actif y suffisent.",
     )
     pods = _kubectl(cp, f"-n {NAMESPACE} get pods -l app={DEPLOYMENT} -o json")
     ailleurs = [
         p["metadata"]["name"] for p in json.loads(pods.stdout)["items"]
         if p["spec"].get("nodeName") != WORKER
     ]
-    assert not ailleurs, (
-        f"Des Pods de {DEPLOYMENT} tournent ailleurs que sur {WORKER} : {ailleurs}. "
+    assert not ailleurs, message(
+        en=f"Pods of {DEPLOYMENT} are running somewhere other than {WORKER}: {ailleurs}. "
+        "The nodeSelector was removed: the application is pinned to that node, "
+        "and moving it is not repairing the node.",
+        fr=f"Des Pods de {DEPLOYMENT} tournent ailleurs que sur {WORKER} : {ailleurs}. "
         "Le nodeSelector a été retiré : l'application est réservée à ce nœud, "
-        "et la déplacer n'est pas réparer le nœud."
+        "et la déplacer n'est pas réparer le nœud.",
     )

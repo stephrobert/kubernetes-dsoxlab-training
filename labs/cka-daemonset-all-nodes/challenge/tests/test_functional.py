@@ -17,7 +17,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "monitoring"
 DAEMONSET = "monitor-agent"
@@ -38,13 +38,19 @@ def _kubectl(host, args: str):
 
 def _json(host, args: str) -> dict:
     res = _kubectl(host, args + " -o json")
-    assert res.rc == 0, f"kubectl {args} échoue : {res.stderr.strip()[:200]}"
+    assert res.rc == 0, message(
+        en=f"kubectl {args} failed: {res.stderr.strip()[:200]}",
+        fr=f"kubectl {args} échoue : {res.stderr.strip()[:200]}",
+    )
     return json.loads(res.stdout)
 
 
 def _daemonset(host) -> dict:
     res = _kubectl(host, f"-n {NAMESPACE} get daemonset {DAEMONSET} -o json")
-    assert res.rc == 0, f"Aucun DaemonSet {DAEMONSET} dans {NAMESPACE}."
+    assert res.rc == 0, message(
+        en=f"No DaemonSet {DAEMONSET} in {NAMESPACE}.",
+        fr=f"Aucun DaemonSet {DAEMONSET} dans {NAMESPACE}.",
+    )
     return json.loads(res.stdout)
 
 
@@ -67,10 +73,16 @@ def _noeuds(host) -> list[str]:
 def test_le_daemonset_est_declare(host):
     ds = _daemonset(host)
     labels = ds["spec"]["template"]["metadata"].get("labels") or {}
-    assert labels.get("app") == "monitor", f"Les Pods portent {labels} ; il faut app: monitor."
+    assert labels.get("app") == "monitor", message(
+        en=f"The Pods carry {labels}; app: monitor is required.",
+        fr=f"Les Pods portent {labels} ; il faut app: monitor.",
+    )
     conteneurs = ds["spec"]["template"]["spec"].get("containers") or []
     images = [c.get("image") for c in conteneurs]
-    assert IMAGE in images, f"Le DaemonSet utilise {images}, attendu {IMAGE}."
+    assert IMAGE in images, message(
+        en=f"The DaemonSet uses {images}, expected {IMAGE}.",
+        fr=f"Le DaemonSet utilise {images}, attendu {IMAGE}.",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -86,9 +98,11 @@ def test_un_pod_pret_sur_chaque_noeud(host):
             return
         time.sleep(5)
     manquants = sorted(set(noeuds) - set(places))
-    assert places == noeuds, (
-        f"Pods prêts sur {places}, nœuds du cluster {noeuds} : il manque {manquants}. "
-        + (f"{CONTROL_PLANE} porte un taint NoSchedule : sans tolérance, le DaemonSet n'y met rien." if CONTROL_PLANE in manquants else "")
+    assert places == noeuds, message(
+        en=f"Pods ready on {places}, cluster nodes {noeuds}: {manquants} missing. "
+        + (f"{CONTROL_PLANE} carries a NoSchedule taint: without a toleration, the DaemonSet puts nothing there." if CONTROL_PLANE in manquants else ""),
+        fr=f"Pods prêts sur {places}, nœuds du cluster {noeuds} : il manque {manquants}. "
+        + (f"{CONTROL_PLANE} porte un taint NoSchedule : sans tolérance, le DaemonSet n'y met rien." if CONTROL_PLANE in manquants else ""),
     )
 
 
@@ -98,10 +112,13 @@ def test_un_pod_pret_sur_chaque_noeud(host):
 def test_le_taint_est_la_et_l_agent_le_tolere(host):
     noeud = _json(host, f"get node {CONTROL_PLANE}")
     taints = [t for t in noeud["spec"].get("taints") or [] if t.get("key") == TAINT and t.get("effect") == "NoSchedule"]
-    assert taints, (
-        f"{CONTROL_PLANE} n'a plus le taint {TAINT}:NoSchedule. Retirer le taint fait tourner "
+    assert taints, message(
+        en=f"{CONTROL_PLANE} no longer has the {TAINT}:NoSchedule taint. Removing the taint does "
+        "make the agent run everywhere, but it opens the control plane to every Pod: the "
+        "instruction asked for a toleration in the DaemonSet, not an unprotected control plane.",
+        fr=f"{CONTROL_PLANE} n'a plus le taint {TAINT}:NoSchedule. Retirer le taint fait tourner "
         "l'agent partout, mais ouvre le control plane à tous les Pods : la consigne demandait "
-        "une tolérance dans le DaemonSet, pas un control plane sans protection."
+        "une tolérance dans le DaemonSet, pas un control plane sans protection.",
     )
     tolerances = _daemonset(host)["spec"]["template"]["spec"].get("tolerations") or []
     bonnes = [
@@ -109,12 +126,17 @@ def test_le_taint_est_la_et_l_agent_le_tolere(host):
         if t.get("key") in (TAINT, None, "") and t.get("effect") in ("NoSchedule", None, "")
         and (t.get("operator") == "Exists" or t.get("value", "") == "")
     ]
-    assert bonnes, (
-        f"Le DaemonSet tolère {tolerances}, pas le taint {TAINT}:NoSchedule. La clé, "
-        "l'opérateur et l'effet se recopient depuis kubectl describe node."
+    assert bonnes, message(
+        en=f"The DaemonSet tolerates {tolerances}, not the {TAINT}:NoSchedule taint. The key, "
+        "the operator and the effect are copied from kubectl describe node.",
+        fr=f"Le DaemonSet tolère {tolerances}, pas le taint {TAINT}:NoSchedule. La clé, "
+        "l'opérateur et l'effet se recopient depuis kubectl describe node.",
     )
     sur_cp = [p["metadata"]["name"] for p in _pods_prets(host) if p["spec"].get("nodeName") == CONTROL_PLANE]
-    assert sur_cp, f"Aucun Pod de {DAEMONSET} prêt sur {CONTROL_PLANE}, alors que le taint est toléré."
+    assert sur_cp, message(
+        en=f"No Pod of {DAEMONSET} ready on {CONTROL_PLANE}, although the taint is tolerated.",
+        fr=f"Aucun Pod de {DAEMONSET} prêt sur {CONTROL_PLANE}, alors que le taint est toléré.",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -122,7 +144,10 @@ def test_le_taint_est_la_et_l_agent_le_tolere(host):
 # ----------------------------------------------------------------------
 def test_chaque_agent_ecrit_heartbeat(host):
     pods = _pods_prets(host)
-    assert pods, f"Aucun Pod prêt de {DAEMONSET} dans {NAMESPACE}."
+    assert pods, message(
+        en=f"No ready Pod of {DAEMONSET} in {NAMESPACE}.",
+        fr=f"Aucun Pod prêt de {DAEMONSET} dans {NAMESPACE}.",
+    )
     muets: list[str] = []
     for _ in range(6):
         muets = []
@@ -133,7 +158,9 @@ def test_chaque_agent_ecrit_heartbeat(host):
         if not muets:
             return
         time.sleep(5)
-    assert not muets, (
-        f"Ces agents n'écrivent pas heartbeat dans leurs logs : {muets}. Le conteneur doit "
-        "l'écrire toutes les soixante secondes, dès le démarrage, et sans s'arrêter."
+    assert not muets, message(
+        en=f"These agents do not write heartbeat in their logs: {muets}. The container must "
+        "write it every sixty seconds, from startup, and without stopping.",
+        fr=f"Ces agents n'écrivent pas heartbeat dans leurs logs : {muets}. Le conteneur doit "
+        "l'écrire toutes les soixante secondes, dès le démarrage, et sans s'arrêter.",
     )
