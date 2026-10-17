@@ -11,14 +11,21 @@
 # `kubeadm reset` : un reset raté laisserait le cluster mort pour tout le
 # catalogue.
 #
-# La garde de version le rend idempotent : sur un cluster déjà en 1.37, il ne
-# touche à rien.
+# La garde de version le rend idempotent : sur un cluster déjà à la version du
+# catalogue, il ne touche à rien.
+#
+# LA CIBLE N'EST PAS ÉCRITE ICI, et c'est le correctif du 2026-10-14. Elle
+# l'était : « 1.37.0-1.1 » : pendant que le socle installait la 1.37.1 que le
+# dépôt a publiée depuis : ce cleanup RÉTROGRADAIT donc le cluster d'un patch à
+# chaque passage, et le validateur le disait en quatre écarts. `pkgs.k8s.io` est
+# versionné par mineure et rien n'y fige le patch ; toute valeur recopiée dans ce
+# fichier recommencera à mentir à la prochaine publication.
 - name: Nettoyer le lab cka-kubeadm-upgrade
   hosts: lab_target
   become: true
   vars:
-    version_cible: "1.37.0-1.1"
-    kube_cible: "v1.37.0"
+    mineure_catalogue: "1.37"
+    releve: /var/lib/dsoxlab/cka-kubeadm-upgrade.version-du-catalogue
   tasks:
     - name: Supprimer le namespace du lab
       ansible.builtin.command: >-
@@ -34,6 +41,69 @@
                       | selectattr('value.role', 'defined')
                       | selectattr('value.role', 'equalto', 'worker')
                       | map(attribute='key') | list }}
+
+    - name: Établir la version à laquelle remonter
+      # Deux sources, dans cet ordre :
+      #
+      #   1. le relevé que le setup a écrit AVANT de dégrader le cluster. C'est
+      #      la seule source exacte : c'est la version que ce cluster portait.
+      #   2. à défaut : relevé effacé, ou cluster monté par un setup antérieur
+      #      à ce correctif : la plus récente de la mineure que le dépôt publie,
+      #      c'est-à-dire ce que le socle installerait aujourd'hui.
+      #
+      # Le numéro APT ne se déduit PAS du numéro kubelet : le suffixe varie
+      # (1.36.2 est empaquetée « 1.36.2-2.1 » quand ses voisines sont en
+      # « -1.1 »). On le demande donc à APT pour le numéro voulu, au lieu de le
+      # reconstruire.
+      #
+      # Et si rien n'aboutit, cette tâche ÉCHOUE. Un cleanup qui ne sait pas où
+      # remonter ne doit pas choisir à l'aveugle : il laisserait un cluster dans
+      # un état que personne n'a décidé, et le lab suivant en hériterait.
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          apt-get update -qq || true
+          voulue=''
+          if [ -s '{{ releve }}' ]; then
+            voulue=$(tr -d 'v \n' < '{{ releve }}')
+          fi
+          disponibles=$(apt-cache madison kubeadm | awk '{print $3}')
+          apt=''
+          origine='depot'
+          if [ -n "$voulue" ]; then
+            apt=$(printf '%s\n' "$disponibles" | grep -E "^${voulue}-" | sort -V -r | head -1)
+            [ -n "$apt" ] && origine='releve-du-setup'
+          fi
+          if [ -z "$apt" ]; then
+            apt=$(printf '%s\n' "$disponibles" \
+                  | grep -E '^{{ mineure_catalogue }}\.' | sort -V -r | head -1)
+            origine='plus-recente-du-depot'
+          fi
+          if [ -z "$apt" ]; then
+            echo "aucune version {{ mineure_catalogue }} de kubeadm dans les depots declares" >&2
+            exit 1
+          fi
+          # Troisieme champ : D'OU vient la valeur. Sans lui, la trace ne
+          # pourrait que le supposer, et une trace qui suppose ne sert a rien
+          # quand il faut expliquer un ecart de patch apres coup.
+          printf '%s v%s %s\n' "$apt" "${apt%%-*}" "$origine"
+        executable: /bin/bash
+      register: cible_lue
+      changed_when: false
+
+    - name: Retenir la version du catalogue
+      ansible.builtin.set_fact:
+        version_cible: "{{ cible_lue.stdout_lines[-1].split()[0] }}"
+        kube_cible: "{{ cible_lue.stdout_lines[-1].split()[1] }}"
+        origine_cible: "{{ cible_lue.stdout_lines[-1].split()[2] }}"
+
+    - name: Dire à quelle version le cluster est rendu, et d'où vient cette cible
+      # Sans cette trace, un écart de patch resterait à expliquer après coup, et
+      # on ne saurait pas si la cible vient du relevé du setup ou d'un repli.
+      ansible.builtin.debug:
+        msg: >-
+          Le cluster est rendu à {{ kube_cible }} (paquet {{ version_cible }}),
+          cible obtenue par {{ origine_cible }}.
 
     - name: Lire la version de CHAQUE nœud
       # `.items[0]` ne suffit pas, et cela a coûté un cycle le 2026-09-17 : la

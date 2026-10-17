@@ -19,7 +19,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 DOCKERFILE = "/root/inventaire/Dockerfile"
 REPERTOIRE = "/root/inventaire"
@@ -47,9 +47,11 @@ def _analyse(host) -> set[str]:
     ne s'édite pas.
     """
     res = host.run(f"sudo trivy config --quiet --format json {REPERTOIRE} 2>/dev/null")
-    assert res.rc == 0 and res.stdout.strip(), (
-        "Trivy n'a pas pu analyser le répertoire de l'application. L'outil est "
-        f"posé par le setup et s'appelle sans préfixe. Sortie : {res.stderr.strip()[:300]}"
+    assert res.rc == 0 and res.stdout.strip(), message(
+        en="Trivy could not analyse the application's directory. The tool is "
+        f"installed by setup and is called without a prefix. Output: {res.stderr.strip()[:300]}",
+        fr="Trivy n'a pas pu analyser le répertoire de l'application. L'outil est "
+        f"posé par le setup et s'appelle sans préfixe. Sortie : {res.stderr.strip()[:300]}",
     )
     rapport = json.loads(res.stdout)
     return {
@@ -76,22 +78,32 @@ def test_les_cinq_constats_ont_disparu(host):
     # tout leur sens : elles interdisent de faire taire l'analyse en
     # supprimant le fichier, ou en changeant d'application.
     res = host.run(f"sudo cat {DOCKERFILE}")
-    assert res.rc == 0 and res.stdout.strip(), (
-        f"Aucun Dockerfile lisible en {DOCKERFILE}. Le cahier des charges "
+    assert res.rc == 0 and res.stdout.strip(), message(
+        en=f"No readable Dockerfile at {DOCKERFILE}. The specification "
+        "asks for it to be fixed, not to be made to disappear: an analysis that "
+        "has nothing to analyse holds nothing against you.",
+        fr=f"Aucun Dockerfile lisible en {DOCKERFILE}. Le cahier des charges "
         "demande de le corriger, pas de le faire disparaître : une analyse qui "
-        "n'a rien à analyser ne reproche rien."
+        "n'a rien à analyser ne reproche rien.",
     )
     contenu = res.stdout
-    assert "node" in contenu.lower() and "server.js" in contenu, (
-        "Le Dockerfile ne part plus d'une image Node ou ne lance plus "
+    assert "node" in contenu.lower() and "server.js" in contenu, message(
+        en="The Dockerfile no longer starts from a Node image or no longer runs "
+        "server.js. The findings had to be fixed, not the "
+        "application changed.",
+        fr="Le Dockerfile ne part plus d'une image Node ou ne lance plus "
         "server.js. Il fallait corriger les constats, pas changer "
-        "l'application."
+        "l'application.",
     )
 
     restants = _analyse(host) & set(CONSTATS_DU_DEPART)
-    assert not restants, (
-        "L'analyse reproche encore :\n  "
+    assert not restants, message(
+        en="The analysis still reports:\n  "
+        + "\n  ".join(f"{i}: {CONSTATS_DU_DEPART[i]}" for i in sorted(restants))
+        + "\n\nEach finding carries a `Resolution` section in the output of "
+        "`trivy config`: it says what to write.",
+        fr="L'analyse reproche encore :\n  "
         + "\n  ".join(f"{i} : {CONSTATS_DU_DEPART[i]}" for i in sorted(restants))
         + "\n\nChaque constat porte une section `Resolution` dans la sortie de "
-        "`trivy config` : elle dit quoi écrire."
+        "`trivy config` : elle dit quoi écrire.",
     )

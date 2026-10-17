@@ -22,7 +22,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "zero-confiance"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -43,9 +43,11 @@ def _ip(host, pod: str) -> str:
     rc, ip, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get pod {pod} -o jsonpath='{{.status.podIP}}'"
     )
-    assert rc == 0 and ip, (
-        f"Le Pod {pod} n'a pas d'adresse : le setup l'avait posé, il ne fallait "
-        f"pas le supprimer. {diagnostic}"
+    assert rc == 0 and ip, message(
+        en=f"Pod {pod} has no address: setup had placed it there, it was not to "
+        f"be deleted. {diagnostic}",
+        fr=f"Le Pod {pod} n'a pas d'adresse : le setup l'avait posé, il ne fallait "
+        f"pas le supprimer. {diagnostic}",
     )
     return ip
 
@@ -76,7 +78,10 @@ def _resout(host, depuis: str) -> bool:
 
 def _politiques(host) -> list[dict]:
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get networkpolicy -o json")
-    assert rc == 0 and sortie, f"Impossible de lire les NetworkPolicy. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Cannot read the NetworkPolicies. {diagnostic}",
+        fr=f"Impossible de lire les NetworkPolicy. {diagnostic}",
+    )
     return json.loads(sortie).get("items", [])
 
 
@@ -103,13 +108,19 @@ def test_le_namespace_est_ferme_par_defaut_dans_les_deux_sens(host):
                 directions.add(direction)
 
     manquantes = {"Ingress", "Egress"} - directions
-    assert not manquantes, (
-        f"Aucune politique par défaut ne ferme : {', '.join(sorted(manquantes))}. "
+    assert not manquantes, message(
+        en=f"No default policy closes: {', '.join(sorted(manquantes))}. "
+        "A default policy carries an EMPTY podSelector, which selects "
+        "every Pod of the namespace, declares the direction under policyTypes, and "
+        "writes NO rule for that direction. Declaring a direction without "
+        "a rule forbids it entirely; not declaring it says "
+        "nothing about it, so everything gets through.",
+        fr=f"Aucune politique par défaut ne ferme : {', '.join(sorted(manquantes))}. "
         "Une politique par défaut porte un podSelector VIDE, qui sélectionne "
         "tous les Pods du namespace, déclare la direction sous policyTypes, et "
         "n'écrit AUCUNE règle pour cette direction. Déclarer une direction sans "
         "règle, c'est l'interdire entièrement ; ne pas la déclarer, c'est ne "
-        "rien dire d'elle, donc tout laisser passer."
+        "rien dire d'elle, donc tout laisser passer.",
     )
 
 
@@ -123,19 +134,29 @@ def test_seul_le_flux_prevu_atteint_la_base(host):
     qu'aucune politique n'existe. Après une coupure générale, `intrus` est
     bloqué : cette moitié seule serait vraie avec une application cassée.
     """
-    assert _joint(host, "web", "db"), (
-        "Le Pod web ne joint plus db sur le port 80. La fermeture par défaut a "
+    assert _joint(host, "web", "db"), message(
+        en="Pod web no longer reaches db on port 80. The default closure did "
+        "take place, but the flow the application needs has not been "
+        "reopened: an ingress policy on the app=db Pods is needed, allowing "
+        "the app=web Pods on that port. Careful, db's ingress and web's "
+        "egress must BOTH be allowed: two default policies "
+        "close both ends of the same flow.",
+        fr="Le Pod web ne joint plus db sur le port 80. La fermeture par défaut a "
         "bien eu lieu, mais le flux dont l'application a besoin n'a pas été "
         "rouvert : il faut une politique d'entrée sur les Pods app=db qui "
         "autorise les Pods app=web sur ce port. Attention, l'entrée de db et la "
         "sortie de web doivent TOUTES DEUX être permises : deux politiques par "
-        "défaut ferment les deux bouts du même flux."
+        "défaut ferment les deux bouts du même flux.",
     )
-    assert not _joint(host, "intrus", "db"), (
-        "Le Pod intrus joint db alors que rien ne l'y autorise. Soit aucune "
+    assert not _joint(host, "intrus", "db"), message(
+        en="Pod intrus reaches db although nothing allows it to. Either no "
+        "policy selects db for ingress, or the open rule is broader "
+        "than asked: check that it names the app=web label and not "
+        "an empty selector, which lets the whole namespace in.",
+        fr="Le Pod intrus joint db alors que rien ne l'y autorise. Soit aucune "
         "politique ne sélectionne db en entrée, soit la règle ouverte est plus "
         "large que demandée : vérifiez qu'elle nomme le label app=web et non "
-        "un sélecteur vide, qui laisse entrer tout le namespace."
+        "un sélecteur vide, qui laisse entrer tout le namespace.",
     )
 
 
@@ -153,18 +174,27 @@ def test_le_dns_repasse_sans_rouvrir_le_reste_de_la_sortie(host):
     sortie trop large redonne au namespace l'accès qu'on venait de lui retirer.
     C'est pourquoi ce test exige aussi qu'intrus ne joigne toujours pas db.
     """
-    assert _resout(host, "web"), (
-        "Le Pod web ne résout plus aucun nom. C'est l'effet direct d'une sortie "
+    assert _resout(host, "web"), message(
+        en="Pod web no longer resolves any name. That is the direct effect of a "
+        "default-closed egress, and it shows in no spec: the cluster's "
+        "resolver lives in kube-system and listens on port 53, over UDP AND TCP. "
+        "Without an egress rule allowing it, nothing resolves in this "
+        "namespace any more.",
+        fr="Le Pod web ne résout plus aucun nom. C'est l'effet direct d'une sortie "
         "fermée par défaut, et il ne se voit dans aucune spec : le résolveur du "
         "cluster vit dans kube-system et écoute le port 53, en UDP ET en TCP. "
         "Sans règle de sortie qui l'autorise, plus rien ne se résout dans ce "
-        "namespace."
+        "namespace.",
     )
-    assert not _joint(host, "intrus", "db"), (
-        "Le DNS est bien rouvert, mais la sortie l'a été trop largement : "
+    assert not _joint(host, "intrus", "db"), message(
+        en="DNS is indeed reopened, but egress was reopened too broadly: "
+        "intrus reaches db again. An egress rule with no `to` "
+        "allows every destination; the DNS one must target the "
+        "resolver, and only it.",
+        fr="Le DNS est bien rouvert, mais la sortie l'a été trop largement : "
         "intrus joint de nouveau db. Une règle egress qui n'indique aucun `to` "
         "autorise toutes les destinations ; celle du DNS doit viser le "
-        "résolveur, et seulement lui."
+        "résolveur, et seulement lui.",
     )
 
 
@@ -179,13 +209,19 @@ def test_la_sortie_reste_fermee_vers_ce_qui_n_a_pas_ete_ouvert(host):
     façon, et un test bâti sur une telle cible serait vrai avant le travail
     sans rien mesurer. Ici, avant le travail, les deux requêtes aboutissent.
     """
-    assert not _joint(host, "db", "annuaire"), (
-        "Le Pod db ouvre une connexion vers annuaire. Sa sortie n'est donc pas "
+    assert not _joint(host, "db", "annuaire"), message(
+        en="Pod db opens a connection towards annuaire. Its egress is therefore not "
+        "closed: a default policy declaring Egress with no rule "
+        "would prevent it, unless another policy gives it back.",
+        fr="Le Pod db ouvre une connexion vers annuaire. Sa sortie n'est donc pas "
         "fermée : une politique par défaut qui déclare Egress sans aucune règle "
-        "l'en empêcherait, sauf si une autre politique la lui rend."
+        "l'en empêcherait, sauf si une autre politique la lui rend.",
     )
-    assert not _joint(host, "web", "annuaire"), (
-        "Le Pod web joint annuaire, alors que seule sa sortie vers db devait "
+    assert not _joint(host, "web", "annuaire"), message(
+        en="Pod web reaches annuaire, although only its egress towards db was to "
+        "be reopened. An egress rule with no `to` allows "
+        "every destination: name the one that is permitted.",
+        fr="Le Pod web joint annuaire, alors que seule sa sortie vers db devait "
         "être rouverte. Une règle egress qui n'indique aucun `to` autorise "
-        "toutes les destinations : nommez celle qui est permise."
+        "toutes les destinations : nommez celle qui est permise.",
     )

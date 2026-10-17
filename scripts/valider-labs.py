@@ -43,6 +43,10 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+# Le module partagé, IDENTIQUE dans les douze catalogues : il lit
+# `dsoxlab check --json` et en tire un verdict à trois issues. `scripts/` est
+# sur `sys.path` parce que c'est le répertoire de ce fichier.
+import verdict_check
 import yaml
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -135,13 +139,17 @@ def dsoxlab(sous_commande: list[str], journal, timeout: int) -> subprocess.Compl
 
 
 def check(lab: str, journal) -> dict:
-    """Rend {"passed", "total", "score"} de dsoxlab check --json."""
+    """Le `check` du lab, lu dans le CONTRAT et non dans l'encadré du terminal.
+
+    `verdict_check.lire` rend `status`, qui est le seul champ à pouvoir servir
+    de verdict : `ok` dit « aucun test n'a échoué », ce qui est vrai d'une suite
+    entièrement skippée, et `score` vaut alors 0 sans que rien ait tourné.
+    """
     res = dsoxlab(["check", lab, "--json"], journal, 600)
     try:
-        d = json.loads(res.stdout)["check"]
-    except (json.JSONDecodeError, KeyError) as e:
-        raise Echec(f"dsoxlab check n'a pas rendu de JSON lisible : {e}") from e
-    return {"passed": d.get("passed", 0), "total": d.get("total", 0), "score": d.get("score", 0)}
+        return verdict_check.lire(res.stdout)
+    except verdict_check.JsonIllisible as erreur:
+        raise Echec(str(erreur)) from erreur
 
 
 def cible(lab: Path) -> str:
@@ -202,16 +210,80 @@ def attendre_stabilite(hote: str, journal, delai: int = 300) -> dict:
     return photo
 
 
-def ecarts(avant: dict, apres: dict) -> list[str]:
+#: Les labs dont le cleanup a le droit de laisser le cluster à une version PLUS
+#: HAUTE que celle de la photographie initiale.
+#:
+#: Un seul y figure, et il n'y a pas de raison d'en ajouter sans en discuter :
+#: `cka-kubeadm-upgrade` est le seul lab du catalogue qui touche à la version du
+#: cluster. Son setup le rétrograde pour qu'il y ait quelque chose à monter, et
+#: son cleanup le ramène à la version que le dépôt APT publie.
+#:
+#: La fenêtre que cela couvre : `pkgs.k8s.io/v1.37` n'est versionné que par
+#: MINEURE, rien n'y fige le patch. Si une 1.37.2 paraît entre le provision et le
+#: clean, la version relevée par le setup et celle que le cleanup trouve
+#: diffèrent, sans que le lab y soit pour rien.
+#:
+#: La tolérance ne va QUE vers le haut. Une version qui redescend reste un écart,
+#: et c'était exactement le défaut du 2026-10-12 : un cleanup qui visait
+#: « 1.37.0-1.1 » en dur rétrogradait un cluster monté en 1.37.1.
+VERSION_PEUT_MONTER = frozenset({"cka-kubeadm-upgrade"})
+
+#: Les ConfigMaps de `kube-system` que `kubeadm upgrade apply` régénère, et les
+#: labs qui ont le droit de les laisser différents.
+#:
+#: Même raison que `VERSION_PEUT_MONTER`, et même portée nominative :
+#: `cka-kubeadm-upgrade` est le seul lab dont le cleanup remonte le cluster par
+#: `kubeadm upgrade apply` au lieu de `kubeadm init`. Les ConfigMaps que kubeadm
+#: y écrit ne sont donc pas ceux que le socle écrit, et cela n'a rien à voir
+#: avec ce que le lab laisse derrière lui.
+#:
+#: Mesuré le 2026-10-15 en capturant le CONTENU des deux versions, et non leurs
+#: seules empreintes : la différence tient en une ligne,
+#: `resolvConf: /run/systemd/resolve/resolv.conf`, que `kubeadm upgrade apply`
+#: ajoute en détectant systemd-resolved et que `kubeadm init` n'écrit pas.
+#:
+#: Ce desserrement est plus large que celui de la version : la photographie ne
+#: porte que des empreintes, donc n'importe quelle différence sur ces deux
+#: ConfigMaps passe. Le supprimer plutôt que l'accepter demanderait de faire
+#: écrire `resolvConf` par le socle dès l'init, ce qui touche la façon dont les
+#: soixante-quatre labs montent leur cluster.
+CONFIGMAPS_REGENERES_PAR_UPGRADE = frozenset({
+    "configmap/kubeadm-config",
+    "configmap/kubelet-config",
+})
+
+
+def _version_en_tuple(brut: str) -> tuple[int, ...] | None:
+    """« v1.37.10 » devient (1, 37, 10). None si ce n'est pas lisible.
+
+    La comparaison de chaînes ne convient pas : « v1.37.9 » est supérieur à
+    « v1.37.10 » en lexicographique, et ce genre d'inversion se paie un jour.
+    """
+    morceaux = brut.strip().lstrip("vV").split("+")[0].split("-")[0].split(".")
+    try:
+        return tuple(int(m) for m in morceaux)
+    except ValueError:
+        return None
+
+
+def ecarts(avant: dict, apres: dict, ident: str = "") -> list[str]:
     out: list[str] = []
+    monte_permis = ident in VERSION_PEUT_MONTER
     for nom, a in avant["noeuds"].items():
         b = apres["noeuds"].get(nom)
         if b is None:
             out.append(f"nœud {nom} : disparu")
             continue
         for cle in ("ready", "unschedulable", "taints", "labels", "version"):
-            if a[cle] != b[cle]:
-                out.append(f"nœud {nom} : {cle} {a[cle]!r} devenu {b[cle]!r}")
+            if a[cle] == b[cle]:
+                continue
+            if cle == "version" and monte_permis:
+                va, vb = _version_en_tuple(str(a[cle])), _version_en_tuple(str(b[cle]))
+                # Illisible d'un côté ou de l'autre : on ne conclut pas au vert.
+                # « Je n'ai pas pu comparer » n'est pas « c'est bon ».
+                if va is not None and vb is not None and vb >= va:
+                    continue
+            out.append(f"nœud {nom} : {cle} {a[cle]!r} devenu {b[cle]!r}")
     for nom in apres["noeuds"]:
         if nom not in avant["noeuds"]:
             out.append(f"nœud {nom} : apparu")
@@ -229,8 +301,15 @@ def ecarts(avant: dict, apres: dict) -> list[str]:
             out.append(f"{kind} disparu : {nom}")
     for cle in sorted(set(avant["kube-system"]) | set(apres["kube-system"])):
         a, b = avant["kube-system"].get(cle), apres["kube-system"].get(cle)
-        if a != b:
-            out.append(f"kube-system {cle} : {a!r} devenu {b!r}")
+        if a == b:
+            continue
+        # Le lab d'upgrade remonte le cluster par `kubeadm upgrade apply`, qui
+        # régénère ces ConfigMaps autrement que `kubeadm init` du socle. La
+        # tolérance ne porte QUE sur eux, et QUE pour lui : l'apparition ou la
+        # disparition d'un autre objet de kube-system reste un écart.
+        if monte_permis and cle in CONFIGMAPS_REGENERES_PAR_UPGRADE:
+            continue
+        out.append(f"kube-system {cle} : {a!r} devenu {b!r}")
     for nom in sorted(set(apres["objets"]) - set(avant["objets"])):
         out.append(f"objet laissé : {nom}")
     for nom in sorted(set(avant["objets"]) - set(apres["objets"])):
@@ -284,7 +363,7 @@ def valider(lab: Path, rejeu: bool) -> dict:
             if res.returncode != 0:
                 raise Echec(f"dsoxlab clean a échoué (rc={res.returncode})")
             apres_photo = attendre_stabilite(hote, journal)
-            resultat["ecarts"] = ecarts(avant_photo, apres_photo)
+            resultat["ecarts"] = ecarts(avant_photo, apres_photo, ident)
             dire("cluster rendu intact" if not resultat["ecarts"] else f"{len(resultat['ecarts'])} écart(s) après clean")
         except Echec as e:
             resultat["erreur"] = str(e)
@@ -302,10 +381,25 @@ def valider(lab: Path, rejeu: bool) -> dict:
 def verdict(r: dict, rejeu: bool) -> str:
     if "erreur" in r:
         return "ROUGE"
+    # Trois issues, pas deux. Une exécution qui n'a RIEN mesuré n'accuse pas le
+    # lab : elle dit que le poste n'était pas prêt (répertoire de travail non
+    # préparé, service arrêté, machine injoignable). La peindre en rouge
+    # enverrait corriger un lab qui n'a jamais tourné ; la peindre en vert
+    # serait pire. Elle reste donc à mesurer.
+    etapes = [("avant le travail", r["avant"]), ("après la solution", r["apres"])]
+    if "rejeu" in r:
+        # Le rejeu entrait dans le jugement par `passed != 0`, qui est FAUX
+        # quand rien n'a tourné : un second `run` dont la suite skippe passait
+        # donc pour un point de départ sain.
+        etapes.append(("après clean et run", r["rejeu"]))
+    for quand, c in etapes:
+        if not verdict_check.a_mesure(c):
+            r["raisons"] = [f"{quand}, {verdict_check.pourquoi_rien_mesure(c)}"]
+            return verdict_check.SKIP
     raisons = []
     if r["avant"]["passed"] != 0:
         raisons.append(f"{r['avant']['passed']} test(s) passent avant le travail")
-    if r["apres"]["passed"] != r["apres"]["total"] or r["apres"]["total"] == 0:
+    if r["apres"]["passed"] != r["apres"]["total"]:
         raisons.append("la solution ne fait pas passer tous les tests")
     if rejeu and r["rejeu"]["passed"] != 0:
         raisons.append(f"{r['rejeu']['passed']} test(s) passent après clean et run")
@@ -336,22 +430,33 @@ def main() -> int:
 
     anciens = json.loads(RESULTATS.read_text(encoding="utf-8")) if RESULTATS.is_file() else {}
     rouges = 0
+    skips = 0
     for lab in labs:
         print(f"\n{lab.name}", flush=True)
         r = valider(lab, rejeu=not args.sans_rejeu)
         anciens[lab.name] = r
         RESULTATS.write_text(json.dumps(anciens, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
                              encoding="utf-8")
-        if r["verdict"] != "VALIDE":
-            rouges += 1
+        if r["verdict"] != verdict_check.VALIDE:
+            # Le SKIP est compté à part : il ne se répare pas, il se remesure.
+            if r["verdict"] == verdict_check.SKIP:
+                skips += 1
+            else:
+                rouges += 1
             for raison in r.get("raisons", []):
                 print(f"    ✘ {raison}")
             for e in r.get("ecarts", [])[:15]:
                 print(f"      {e}")
         print(f"    {r['verdict']} en {r['duree_s']} s")
 
-    print(f"\n{len(labs) - rouges} valide(s), {rouges} rouge(s) sur {len(labs)} lab(s). Détail : {RESULTATS}")
-    return 1 if rouges else 0
+    print(f"\n{len(labs) - rouges - skips} valide(s), {rouges} rouge(s), "
+          f"{skips} à remesurer sur {len(labs)} lab(s). Détail : {RESULTATS}")
+    if rouges:
+        return verdict_check.RC_UN_ROUGE
+    # Un catalogue sans rouge n'est pas prouvé pour autant : le code est
+    # distinct pour qu'une construction automatisée ne confonde pas « rien à
+    # réparer » avec « tout est mesuré ».
+    return verdict_check.RC_UN_SKIP if skips else verdict_check.RC_TOUT_VALIDE
 
 
 if __name__ == "__main__":

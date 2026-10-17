@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "supervision"
 DEPLOYMENT = "sonde"
@@ -42,10 +42,13 @@ def _kubectl(host, args: str):
 
 def _noeuds(host) -> list[dict]:
     rc, sortie, diagnostic = _kubectl(host, "get nodes -o json")
-    assert rc == 0 and sortie, (
-        f"Le cluster ne répond pas. Une montée de version interrompue laisse "
+    assert rc == 0 and sortie, message(
+        en=f"The cluster does not answer. An interrupted upgrade leaves "
+        "a silent control plane: `sudo systemctl status kubelet` and "
+        f"`sudo crictl ps -a` on the node say where it stopped. {diagnostic}",
+        fr=f"Le cluster ne répond pas. Une montée de version interrompue laisse "
         "un plan de contrôle muet : `sudo systemctl status kubelet` et "
-        f"`sudo crictl ps -a` sur le nœud disent où elle s'est arrêtée. {diagnostic}"
+        f"`sudo crictl ps -a` sur le nœud disent où elle s'est arrêtée. {diagnostic}",
     )
     return json.loads(sortie)["items"]
 
@@ -61,14 +64,22 @@ def test_le_plan_de_controle_est_monte(host):
     rc, sortie, diagnostic = _kubectl(
         host, "version -o json --request-timeout=30s"
     )
-    assert rc == 0 and sortie, f"Impossible de lire la version. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Cannot read the version. {diagnostic}",
+        fr=f"Impossible de lire la version. {diagnostic}",
+    )
     serveur = json.loads(sortie).get("serverVersion", {}).get("gitVersion", "")
-    assert serveur.startswith(VERSION_CIBLE), (
-        f"L'API server annonce « {serveur or 'rien'} » et non {VERSION_CIBLE}. "
+    assert serveur.startswith(VERSION_CIBLE), message(
+        en=f"The API server reports \"{serveur or 'nothing'}\" and not {VERSION_CIBLE}. "
+        f"The cluster started from {VERSION_DEPART}: it is `kubeadm upgrade "
+        "apply` on the control plane that applies a version to the cluster, and "
+        "kubeadm itself must already be at that version to know what it "
+        "expects.",
+        fr=f"L'API server annonce « {serveur or 'rien'} » et non {VERSION_CIBLE}. "
         f"Le cluster est parti de {VERSION_DEPART} : c'est `kubeadm upgrade "
         "apply` sur le plan de contrôle qui applique une version au cluster, et "
         "il faut que kubeadm lui-même soit déjà à cette version pour savoir ce "
-        "qu'elle attend."
+        "qu'elle attend.",
     )
 
 
@@ -85,30 +96,43 @@ def test_tous_les_noeuds_sont_montes_et_le_service_tient(host):
     casse, ce qui est précisément le piège de cette tâche.
     """
     noeuds = _noeuds(host)
-    assert noeuds, "Le cluster ne déclare aucun nœud."
+    assert noeuds, message(
+        en="The cluster declares no node.",
+        fr="Le cluster ne déclare aucun nœud.",
+    )
 
     en_retard = {
         n["metadata"]["name"]: n["status"]["nodeInfo"]["kubeletVersion"]
         for n in noeuds
         if not n["status"]["nodeInfo"]["kubeletVersion"].startswith(VERSION_CIBLE)
     }
-    assert not en_retard, (
-        f"Ces nœuds annoncent encore une autre version : {en_retard}. "
+    assert not en_retard, message(
+        en=f"These nodes still report another version: {en_retard}. "
+        "`kubeadm upgrade apply` does not upgrade the kubelet: the package is "
+        "replaced node by node and the service restarted. On a worker the "
+        "command is not even the same as on the control plane: only the latter "
+        "applies a version to the cluster.",
+        fr=f"Ces nœuds annoncent encore une autre version : {en_retard}. "
         "`kubeadm upgrade apply` ne monte pas le kubelet : le paquet se "
         "remplace nœud par nœud et le service se redémarre. Sur un worker, la "
         "commande n'est d'ailleurs pas la même que sur le plan de contrôle : "
-        "seul celui-ci applique une version au cluster."
+        "seul celui-ci applique une version au cluster.",
     )
 
     vides = [
         n["metadata"]["name"] for n in noeuds if n["spec"].get("unschedulable")
     ]
-    assert not vides, (
-        f"Ces nœuds sont restés inordonnançables : {vides}. Vider un nœud "
+    assert not vides, message(
+        en=f"These nodes were left unschedulable: {vides}. Draining a node "
+        "before upgrading it is the right thing to do, but it has to be given "
+        "back afterwards: otherwise the cluster runs one node short, and "
+        "nothing says so. `kubectl get nodes` then shows "
+        "SchedulingDisabled.",
+        fr=f"Ces nœuds sont restés inordonnançables : {vides}. Vider un nœud "
         "avant de le monter est la bonne façon de faire, mais il faut le "
         "rendre ensuite : le cluster tourne sinon avec un nœud en moins, et "
         "rien ne le signale. `kubectl get nodes` affiche alors "
-        "SchedulingDisabled."
+        "SchedulingDisabled.",
     )
 
     pas_prets = [
@@ -118,11 +142,15 @@ def test_tous_les_noeuds_sont_montes_et_le_service_tient(host):
             for c in n["status"].get("conditions", [])
         )
     ]
-    assert not pas_prets, (
-        f"Ces nœuds ne sont pas Ready : {pas_prets}. Un kubelet monté qui ne "
+    assert not pas_prets, message(
+        en=f"These nodes are not Ready: {pas_prets}. An upgraded kubelet that "
+        "does not restart, or restarts with a configuration it does not "
+        "understand, leaves the node in that state: `sudo journalctl -u "
+        "kubelet -n 50` tells you.",
+        fr=f"Ces nœuds ne sont pas Ready : {pas_prets}. Un kubelet monté qui ne "
         "redémarre pas, ou qui redémarre avec une configuration qu'il ne "
         "comprend pas, laisse le nœud dans cet état : `sudo journalctl -u "
-        "kubelet -n 50` le dit."
+        "kubelet -n 50` le dit.",
     )
 
     rc, pretes, diagnostic = _kubectl(
@@ -130,9 +158,13 @@ def test_tous_les_noeuds_sont_montes_et_le_service_tient(host):
         f"-n {NAMESPACE} get deployment {DEPLOYMENT} "
         "-o jsonpath='{.status.readyReplicas}'",
     )
-    assert rc == 0 and pretes == "2", (
-        f"L'application {DEPLOYMENT} n'a que « {pretes or 'aucun'} » "
+    assert rc == 0 and pretes == "2", message(
+        en=f"Application {DEPLOYMENT} has only \"{pretes or 'none'}\" "
+        "replica(s) ready out of two. An upgrade must not take down what is "
+        "running: draining a node moves its Pods, it does not delete them. "
+        f"{diagnostic}",
+        fr=f"L'application {DEPLOYMENT} n'a que « {pretes or 'aucun'} » "
         "exemplaire(s) prêt(s) sur deux. Une montée de version ne doit pas "
         "emporter ce qui tourne : vider un nœud déplace ses Pods, elle ne les "
-        f"supprime pas. {diagnostic}"
+        f"supprime pas. {diagnostic}",
     )

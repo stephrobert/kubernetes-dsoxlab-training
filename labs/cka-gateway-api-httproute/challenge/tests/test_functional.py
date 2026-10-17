@@ -20,7 +20,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 HOTE = "app.local"
@@ -84,10 +84,13 @@ def test_la_gateway_est_programmee(host):
                 break
         time.sleep(PAS_S)
 
-    assert gw, (
-        f"Aucune Gateway dans le namespace {NAMESPACE}. Les CRD et la "
+    assert gw, message(
+        en=f"No Gateway in namespace {NAMESPACE}. The CRDs and the "
+        "GatewayClass are already installed by the cluster: `kubectl get "
+        "gatewayclass` gives you the name of the class to use.",
+        fr=f"Aucune Gateway dans le namespace {NAMESPACE}. Les CRD et la "
         "GatewayClass sont déjà posées par le cluster : `kubectl get "
-        "gatewayclass` vous donne le nom de la classe à employer."
+        "gatewayclass` vous donne le nom de la classe à employer.",
     )
 
     statut, raison = _condition(gw, "Programmed")
@@ -96,12 +99,17 @@ def test_la_gateway_est_programmee(host):
         f"Programmed={statut or 'absent'} ({raison or 'sans raison'}), "
         f"Accepted={accepte or 'absent'} ({raison_acc or 'sans raison'})"
     )
-    assert statut == "True", (
-        f"La Gateway {gw['metadata']['name']} existe mais n'est pas "
+    assert statut == "True", message(
+        en=f"Gateway {gw['metadata']['name']} exists but is not "
+        f"programmed: {etat}. An unprogrammed Gateway is a perfectly valid "
+        "object that routes nothing. Check the class name, and the listener's "
+        "PORT: it must match an entry point of the controller, otherwise "
+        "nothing is listening.",
+        fr=f"La Gateway {gw['metadata']['name']} existe mais n'est pas "
         f"programmée : {etat}. Une Gateway non programmée est un objet "
         "parfaitement valide qui ne route rien. Vérifiez le nom de la classe, "
         "et le PORT du listener : il doit correspondre à un point d'entrée du "
-        "contrôleur, sans quoi rien ne l'écoute."
+        "contrôleur, sans quoi rien ne l'écoute.",
     )
 
 
@@ -126,28 +134,43 @@ def test_chaque_chemin_atteint_son_application(host):
             break
         time.sleep(PAS_S)
 
-    assert corps_api == "api", (
-        f"Le chemin /api répond « {corps_api or 'rien'} » (HTTP "
+    assert corps_api == "api", message(
+        en=f"Path /api answers \"{corps_api or 'nothing'}\" (HTTP "
+        f"{code_api or 'none'}) after {BUDGET_S} seconds, instead of \"api\". "
+        "If the Gateway is indeed programmed, look at the route: `kubectl -n "
+        "lab get httproute -o yaml` shows in its status whether it was "
+        "ACCEPTED by the Gateway. A route whose parent is misnamed, or whose "
+        "namespace is not allowed to attach, stays refused.",
+        fr=f"Le chemin /api répond « {corps_api or 'rien'} » (HTTP "
         f"{code_api or 'aucun'}) après {BUDGET_S} secondes, au lieu de « api ». "
         "Si la Gateway est bien programmée, regardez la route : `kubectl -n "
         "lab get httproute -o yaml` montre dans son status si elle a été "
         "ACCEPTÉE par la Gateway. Une route dont le parent est mal nommé, ou "
-        "dont le namespace n'est pas autorisé à s'attacher, reste refusée."
+        "dont le namespace n'est pas autorisé à s'attacher, reste refusée.",
     )
 
     corps_web, code_web = _demander(host, "/web")
-    assert corps_web == "web", (
-        f"Le chemin /web répond « {corps_web or 'rien'} » (HTTP "
+    assert corps_web == "web", message(
+        en=f"Path /web answers \"{corps_web or 'nothing'}\" (HTTP "
+        f"{code_web or 'none'}) instead of \"web\", while /api is already "
+        "correct. Only one of the two rules was written, or both point at the "
+        "same service.",
+        fr=f"Le chemin /web répond « {corps_web or 'rien'} » (HTTP "
         f"{code_web or 'aucun'}) au lieu de « web », alors que /api est déjà "
         "correct. Une seule des deux règles a été posée, ou les deux visent le "
-        "même service."
+        "même service.",
     )
 
     corps_autre, code_autre = _demander(host, "/autre")
-    assert corps_autre not in ("api", "web"), (
-        f"Un chemin que vous n'avez pas déclaré, /autre, est servi par "
+    assert corps_autre not in ("api", "web"), message(
+        en=f"A path you never declared, /autre, is served by "
+        f"\"{corps_autre}\". So the routing sends everything to one application, "
+        "and the two previous measurements proved nothing. A rule without "
+        "`matches` accepts EVERYTHING arriving on the Gateway: each path "
+        f"must carry its own. Code received: {code_autre}.",
+        fr=f"Un chemin que vous n'avez pas déclaré, /autre, est servi par "
         f"« {corps_autre} ». Le routage envoie donc tout vers une application, "
         "et les deux mesures précédentes ne prouvaient rien. Une règle sans "
         "`matches` accepte TOUT ce qui arrive sur la Gateway : chaque chemin "
-        f"doit porter le sien. Code obtenu : {code_autre}."
+        f"doit porter le sien. Code obtenu : {code_autre}.",
     )

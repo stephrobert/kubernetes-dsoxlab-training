@@ -48,6 +48,40 @@
       changed_when: false
       failed_when: false
 
+    - name: Garder trace de la version du catalogue, avant de la dégrader
+      # Le cleanup doit remonter le cluster à la version que CE setup a
+      # trouvée, et il ne peut pas la deviner : `pkgs.k8s.io` est versionné par
+      # MINEURE, rien n'y fige le patch, et le socle installe donc « la 1.37.x
+      # du jour ». Une cible écrite à la main vieillit à la première
+      # publication de patch.
+      #
+      # Mesuré le 2026-10-14 : le cleanup visait « 1.37.0-1.1 » en dur alors que
+      # le dépôt publiait la 1.37.1 depuis, et rétrogradait donc le cluster d'un
+      # patch à chaque passage. Le validateur l'a dit en quatre écarts : les
+      # deux nœuds « v1.37.1 devenu v1.37.0 », et les ConfigMaps kubeadm-config
+      # et kubelet-config que `kubeadm upgrade apply` réécrit au passage.
+      #
+      # On n'écrit QUE si la lecture a abouti et ne porte pas déjà la version de
+      # départ : sur un cluster laissé en 1.36 par un passage interrompu, ce
+      # qu'on lit n'est pas la version du catalogue, et l'écrire figerait
+      # l'erreur.
+      when:
+        - version_en_place.rc | default(1) == 0
+        - (version_en_place.stdout | default('') | trim) != ''
+        - version_en_place.stdout | default('') is not match('^' ~ kube_depart)
+      block:
+        - name: Créer le répertoire des relevés
+          ansible.builtin.file:
+            path: /var/lib/dsoxlab
+            state: directory
+            mode: "0755"
+
+        - name: Écrire la version du catalogue
+          ansible.builtin.copy:
+            content: "{{ version_en_place.stdout | trim }}\n"
+            dest: /var/lib/dsoxlab/cka-kubeadm-upgrade.version-du-catalogue
+            mode: "0644"
+
     # ------------------------------------------------------------------
     # La dégradation, seulement si le cluster n'est pas déjà au départ.
     # ------------------------------------------------------------------

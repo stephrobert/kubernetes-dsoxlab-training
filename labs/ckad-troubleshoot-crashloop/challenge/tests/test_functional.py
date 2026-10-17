@@ -16,7 +16,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -29,7 +29,10 @@ def host():
 
 def _pod(host, nom: str) -> dict:
     res = host.run(f"sudo {KUBECTL} -n {NAMESPACE} get pod {nom} -o json")
-    assert res.rc == 0, f"Aucun Pod {nom} dans {NAMESPACE} : il se recrée avec le même nom."
+    assert res.rc == 0, message(
+        en=f"No Pod {nom} in {NAMESPACE}: it is recreated under the same name.",
+        fr=f"Aucun Pod {nom} dans {NAMESPACE} : il se recrée avec le même nom.",
+    )
     return json.loads(res.stdout)
 
 
@@ -43,16 +46,20 @@ def _stable(host, nom: str, cause: str) -> dict:
         time.sleep(5)
     raison = ((statut.get("state") or {}).get("waiting") or {}).get("reason")
     derniere = (statut.get("lastState") or {}).get("terminated") or {}
-    assert pod["status"].get("phase") == "Running" and statut.get("ready"), (
-        f"{nom} est en phase {pod['status'].get('phase')!r}, raison {raison}, dernière "
-        f"mort : {derniere.get('reason')} code {derniere.get('exitCode')}. {cause}"
+    assert pod["status"].get("phase") == "Running" and statut.get("ready"), message(
+        en=f"{nom} is in phase {pod['status'].get('phase')!r}, reason {raison}, last "
+        f"death: {derniere.get('reason')} code {derniere.get('exitCode')}. {cause}",
+        fr=f"{nom} est en phase {pod['status'].get('phase')!r}, raison {raison}, dernière "
+        f"mort : {derniere.get('reason')} code {derniere.get('exitCode')}. {cause}",
     )
     avant = statut.get("restartCount", 0)
     time.sleep(15)
     apres = (_pod(host, nom)["status"].get("containerStatuses") or [{}])[0].get("restartCount", 0)
-    assert apres == avant, (
-        f"{nom} a redémarré pendant l'observation, {avant} puis {apres} : il tourne "
-        f"quelques secondes et meurt à nouveau. {cause}"
+    assert apres == avant, message(
+        en=f"{nom} restarted during the observation, {avant} then {apres}: it runs "
+        f"for a few seconds and dies again. {cause}",
+        fr=f"{nom} a redémarré pendant l'observation, {avant} puis {apres} : il tourne "
+        f"quelques secondes et meurt à nouveau. {cause}",
     )
     return pod
 
@@ -75,9 +82,11 @@ def test_missing_env_tourne(host):
                   "Le conteneur exige une variable et sort si elle manque : ses logs, avec "
                   "--previous, disent laquelle. Elle se déclare sous env dans le Pod.")
     variables = {e.get("name") for e in pod["spec"]["containers"][0].get("env") or []}
-    assert "APP_MODE" in variables, (
-        f"missing-env tourne, mais sans APP_MODE dans son env : {sorted(variables) or 'aucune'}. "
-        "Il ne fallait pas retirer le contrôle, mais fournir la variable."
+    assert "APP_MODE" in variables, message(
+        en=f"missing-env runs, but without APP_MODE in its env: {sorted(variables) or 'none'}. "
+        "The check was not to be removed, the variable was to be provided.",
+        fr=f"missing-env tourne, mais sans APP_MODE dans son env : {sorted(variables) or 'aucune'}. "
+        "Il ne fallait pas retirer le contrôle, mais fournir la variable.",
     )
 
 
@@ -97,7 +106,9 @@ def test_oom_killed_tourne_avec_une_limite_suffisante(host):
         octets = int(memoire[:-2]) * 1024 * 1024 * 1024
     elif memoire.isdigit():
         octets = int(memoire)
-    assert octets >= 64 * 1024 * 1024, (
-        f"La limite de mémoire de oom-killed vaut {memoire!r}, attendu au moins 64Mi. "
-        "Retirer la limite fait tourner le Pod, mais la consigne est de la relever."
+    assert octets >= 64 * 1024 * 1024, message(
+        en=f"The memory limit of oom-killed is {memoire!r}, expected at least 64Mi. "
+        "Removing the limit does make the Pod run, but the instruction is to raise it.",
+        fr=f"La limite de mémoire de oom-killed vaut {memoire!r}, attendu au moins 64Mi. "
+        "Retirer la limite fait tourner le Pod, mais la consigne est de la relever.",
     )

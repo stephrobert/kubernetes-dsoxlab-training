@@ -235,32 +235,25 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 776,
-  "ecarts": [
-   "nœud k8s-cp.lab : version 'v1.37.1' devenu 'v1.37.0'",
-   "nœud k8s-w1.lab : version 'v1.37.1' devenu 'v1.37.0'",
-   "kube-system configmap/kubeadm-config : '9c3dd6d6fdac' devenu '61de972c605a'",
-   "kube-system configmap/kubelet-config : '73c27a184216' devenu '5075bf858537'"
-  ],
+  "date": "2026-10-15",
+  "duree_s": 874,
+  "ecarts": [],
   "etapes": [
    "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
-   "4 écart(s) après clean"
+   "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-kubeadm-upgrade.log",
   "kubernetes": "v1.37.1",
-  "raisons": [
-   "le cluster n'est pas rendu intact"
-  ],
+  "raisons": [],
   "rejeu": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
-  "verdict": "ROUGE"
+  "verdict": "VALIDE"
  },
  "cka-kubectl-debug": {
   "apres": {
@@ -1778,30 +1771,25 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 370,
-  "ecarts": [
-   "kube-system configmap/istio-ca-crl : None devenu '5cca5016d357'",
-   "objet laissé : default/configmaps/istio-ca-crl"
-  ],
+  "date": "2026-10-15",
+  "duree_s": 409,
+  "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.1, 14 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
-   "2 écart(s) après clean"
+   "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-istio-mtls-lockdown.log",
-  "kubernetes": "v1.37.0",
-  "raisons": [
-   "le cluster n'est pas rendu intact"
-  ],
+  "kubernetes": "v1.37.1",
+  "raisons": [],
   "rejeu": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
-  "verdict": "ROUGE"
+  "verdict": "VALIDE"
  },
  "cks-networkpolicy-default-deny": {
   "apres": {
@@ -1900,23 +1888,36 @@
   "verdict": "VALIDE"
  },
  "cks-runtime-sandbox-gvisor": {
+  "apres": {
+   "passed": 2,
+   "score": 100,
+   "total": 2
+  },
   "avant": {
    "passed": 0,
    "score": 0,
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 255,
-  "erreur": "la solution du formateur a échoué (rc=1) : runtimeclass.node.k8s.io/gvisor created\npod/confine created\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nerror: timed out waiting for the condition on pods/confine",
+  "date": "2026-10-15",
+  "duree_s": 231,
+  "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "cluster photographié, v1.37.1, 12 objets hors kube-system",
    "avant le travail : 0/2",
-   "ÉCHEC : la solution du formateur a échoué (rc=1) : runtimeclass.node.k8s.io/gvisor created\npod/confine created\nWarning: Permanently added '10.10.50.11' (ED25519) to the list of known hosts.\nerror: timed out waiting for the condition on pods/confine"
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-runtime-sandbox-gvisor.log",
-  "kubernetes": "v1.37.0",
-  "verdict": "ROUGE"
+  "kubernetes": "v1.37.1",
+  "raisons": [],
+  "rejeu": {
+   "passed": 0,
+   "score": 0,
+   "total": 2
+  },
+  "verdict": "VALIDE"
  },
  "cks-seccomp-profile": {
   "apres": {

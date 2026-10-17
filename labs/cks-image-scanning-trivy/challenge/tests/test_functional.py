@@ -25,7 +25,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "chaine-appro"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -48,9 +48,11 @@ def _deploiement(host) -> dict:
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT} -o json"
     )
-    assert rc == 0 and sortie, (
-        f"Le Deployment {DEPLOIEMENT} n'existe plus dans {NAMESPACE}. Il fallait "
-        f"changer son image, pas le remplacer. Sortie : {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Deployment {DEPLOIEMENT} no longer exists in {NAMESPACE}. Its image "
+        f"had to be changed, not the Deployment replaced. Output: {diagnostic}",
+        fr=f"Le Deployment {DEPLOIEMENT} n'existe plus dans {NAMESPACE}. Il fallait "
+        f"changer son image, pas le remplacer. Sortie : {diagnostic}",
     )
     return json.loads(sortie)
 
@@ -66,9 +68,11 @@ def _critiques(host, image: str) -> int:
         f"sudo trivy image --quiet --scanners vuln --severity CRITICAL "
         f"--format json {image} 2>/dev/null"
     )
-    assert res.rc == 0 and res.stdout.strip(), (
-        f"Trivy n'a pas pu analyser {image} sur le nœud. L'outil est posé par "
-        f"le setup et s'appelle sans préfixe. Sortie : {res.stderr.strip()[:300]}"
+    assert res.rc == 0 and res.stdout.strip(), message(
+        en=f"Trivy could not analyse {image} on the node. The tool is installed by "
+        f"setup and is called without a prefix. Output: {res.stderr.strip()[:300]}",
+        fr=f"Trivy n'a pas pu analyser {image} sur le nœud. L'outil est posé par "
+        f"le setup et s'appelle sans préfixe. Sortie : {res.stderr.strip()[:300]}",
     )
     rapport = json.loads(res.stdout)
     return sum(len(r.get("Vulnerabilities") or []) for r in rapport.get("Results") or [])
@@ -79,14 +83,19 @@ def _critiques(host, image: str) -> int:
 # ----------------------------------------------------------------------
 def test_l_image_de_production_n_est_plus_celle_d_origine(host):
     image = _deploiement(host)["spec"]["template"]["spec"]["containers"][0]["image"]
-    assert image != IMAGE_ORIGINE, (
-        f"Le Deployment tourne toujours sur {IMAGE_ORIGINE}. Analyser une image "
+    assert image != IMAGE_ORIGINE, message(
+        en=f"The Deployment still runs on {IMAGE_ORIGINE}. Analysing an image "
+        "without replacing it reduces no attack surface: the analysis "
+        "report is not the work, it justifies it.",
+        fr=f"Le Deployment tourne toujours sur {IMAGE_ORIGINE}. Analyser une image "
         "sans la remplacer ne réduit aucune surface d'attaque : le rapport "
-        "d'analyse n'est pas le travail, il le justifie."
+        "d'analyse n'est pas le travail, il le justifie.",
     )
-    assert image.split(":")[0].split("/")[-1] == "nginx", (
-        f"L'image est devenue « {image} ». Le cahier des charges demande de "
-        "mettre à jour nginx, pas de changer d'application."
+    assert image.split(":")[0].split("/")[-1] == "nginx", message(
+        en=f"The image has become \"{image}\". The specification asks for "
+        "nginx to be updated, not for the application to be changed.",
+        fr=f"L'image est devenue « {image} ». Le cahier des charges demande de "
+        "mettre à jour nginx, pas de changer d'application.",
     )
 
 
@@ -110,26 +119,39 @@ def test_la_nouvelle_image_porte_moins_de_failles_critiques(host):
     # même assertion a du sens, parce qu'elle ne peut être atteinte qu'après
     # un remplacement d'image qui n'a rien cassé.
     prets = deploiement.get("status", {}).get("readyReplicas", 0)
-    assert prets == 2, (
-        f"{prets} exemplaire(s) sur 2 sont prêts après le changement d'image. "
+    assert prets == 2, message(
+        en=f"{prets} replica(s) out of 2 are ready after the image change. "
+        "A newer image may change its listening port or its default "
+        "user: look at the Pod's events and logs.",
+        fr=f"{prets} exemplaire(s) sur 2 sont prêts après le changement d'image. "
         "Une image plus récente peut changer de port d'écoute ou d'utilisateur "
-        "par défaut : regardez les events et les logs du Pod."
+        "par défaut : regardez les events et les logs du Pod.",
     )
 
     avant = _critiques(host, IMAGE_ORIGINE)
     apres = _critiques(host, image)
 
-    assert avant > 0, (
-        f"Trivy ne trouve aucune faille critique dans {IMAGE_ORIGINE}, ce qui "
+    assert avant > 0, message(
+        en=f"Trivy finds no critical vulnerability in {IMAGE_ORIGINE}, which "
+        "is unexpected for a 2021 image. The vulnerability database may be "
+        "absent or truncated: setup downloads it, check that it "
+        "actually ran.",
+        fr=f"Trivy ne trouve aucune faille critique dans {IMAGE_ORIGINE}, ce qui "
         "est inattendu pour une image de 2021. La base de vulnérabilités est "
         "peut-être absente ou tronquée : le setup la télécharge, vérifiez qu'il "
-        "a bien tourné."
+        "a bien tourné.",
     )
-    assert apres < avant, (
-        f"L'image choisie, {image}, porte {apres} faille(s) critique(s), contre "
+    assert apres < avant, message(
+        en=f"The chosen image, {image}, carries {apres} critical vulnerability(ies), against "
+        f"{avant} for {IMAGE_ORIGINE}. The replacement therefore does not reduce "
+        "the exposure. Scan several candidates BEFORE deploying: a "
+        "recent image is not always the one carrying the fewest, and the "
+        "alpine variants generally carry far fewer than the "
+        "Debian-based ones.",
+        fr=f"L'image choisie, {image}, porte {apres} faille(s) critique(s), contre "
         f"{avant} pour {IMAGE_ORIGINE}. Le remplacement ne réduit donc pas "
         "l'exposition. Scannez plusieurs candidates AVANT de déployer : une "
         "image récente n'est pas toujours celle qui porte le moins, et les "
         "variantes alpine en portent en général beaucoup moins que les "
-        "variantes basées sur Debian."
+        "variantes basées sur Debian.",
     )

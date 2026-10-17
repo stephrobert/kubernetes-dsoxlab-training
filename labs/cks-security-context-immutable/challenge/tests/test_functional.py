@@ -28,7 +28,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "catalogue"
 DEPLOYMENT = "vitrine"
@@ -57,12 +57,17 @@ def _un_pod_du_deployment(host) -> str:
         "--field-selector=status.phase=Running "
         "-o jsonpath='{.items[0].metadata.name}'",
     )
-    assert rc == 0 and sortie, (
-        f"Aucun Pod du Deployment {DEPLOYMENT} ne tourne dans {NAMESPACE}. "
+    assert rc == 0 and sortie, message(
+        en=f"No Pod of Deployment {DEPLOYMENT} is running in {NAMESPACE}. "
+        "A hardening that stops the application from starting is not a "
+        "hardening: `kubectl -n catalogue get pods` and `kubectl -n "
+        "catalogue logs <pod>` will say what nginx stopped on. "
+        f"{diagnostic}",
+        fr=f"Aucun Pod du Deployment {DEPLOYMENT} ne tourne dans {NAMESPACE}. "
         "Un durcissement qui empêche l'application de démarrer n'est pas un "
         "durcissement : `kubectl -n catalogue get pods` et `kubectl -n "
         "catalogue logs <pod>` diront sur quoi nginx s'est arrêté. "
-        f"{diagnostic}"
+        f"{diagnostic}",
     )
     return sortie
 
@@ -77,15 +82,21 @@ def test_les_quatre_exigences_sont_declarees(host):
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json"
     )
-    assert rc == 0 and sortie, (
-        f"Le Deployment {DEPLOYMENT} est introuvable dans {NAMESPACE}. "
+    assert rc == 0 and sortie, message(
+        en=f"Deployment {DEPLOYMENT} cannot be found in {NAMESPACE}. "
+        "Setup had placed it there: it must be MODIFIED, not replaced by an "
+        f"object under another name. {diagnostic}",
+        fr=f"Le Deployment {DEPLOYMENT} est introuvable dans {NAMESPACE}. "
         "Le setup l'avait posé : il doit être MODIFIÉ, pas remplacé par un "
-        f"objet d'un autre nom. {diagnostic}"
+        f"objet d'un autre nom. {diagnostic}",
     )
     spec = json.loads(sortie)["spec"]["template"]["spec"]
     pod_sc = spec.get("securityContext", {})
     conteneurs = spec.get("containers", [])
-    assert conteneurs, "Le Deployment ne déclare aucun conteneur."
+    assert conteneurs, message(
+        en="The Deployment declares no container.",
+        fr="Le Deployment ne déclare aucun conteneur.",
+    )
 
     manques = []
     for c in conteneurs:
@@ -102,13 +113,19 @@ def test_les_quatre_exigences_sont_declarees(host):
     ):
         manques.append("runAsNonRoot n'est déclaré ni au niveau du Pod ni des conteneurs")
 
-    assert not manques, (
-        "Il manque des exigences dans le securityContext :\n  - "
+    assert not manques, message(
+        en="Some requirements are missing from the securityContext:\n  - "
+        + "\n  - ".join(manques)
+        + "\n\nMind the LEVEL: what concerns the process's identity "
+        "is declared at the Pod level as well as the container level, whereas "
+        "escalation, capabilities and the filesystem are only accepted "
+        "at the CONTAINER level.",
+        fr="Il manque des exigences dans le securityContext :\n  - "
         + "\n  - ".join(manques)
         + "\n\nAttention au NIVEAU : ce qui concerne l'identité du processus "
         "se déclare au niveau du Pod comme du conteneur, tandis que "
         "l'escalade, les capacités et le système de fichiers ne s'acceptent "
-        "qu'au niveau du CONTENEUR."
+        "qu'au niveau du CONTENEUR.",
     )
 
 
@@ -134,13 +151,19 @@ def test_l_interieur_ne_s_ecrit_plus_et_le_site_sert_toujours(host):
         f"-n {NAMESPACE} exec {pod} --request-timeout=30s "
         f"-- sh -c 'touch {CHEMIN_PREUVE}/preuve'",
     )
-    assert rc != 0, (
-        f"Le conteneur accepte encore d'écrire dans {CHEMIN_PREUVE}. Ce chemin "
+    assert rc != 0, message(
+        en=f"The container still accepts writes into {CHEMIN_PREUVE}. That path "
+        "is writable by the image's UID as long as the root is not "
+        "closed: that is precisely why it serves as proof here, where the "
+        "root itself was already refused by POSIX permissions before any "
+        "hardening. Only readOnlyRootFilesystem closes it, and it "
+        "applies only to Pods RECREATED since it was declared.",
+        fr=f"Le conteneur accepte encore d'écrire dans {CHEMIN_PREUVE}. Ce chemin "
         "est inscriptible par l'UID de l'image tant que la racine n'est pas "
         "fermée : c'est justement pourquoi il sert de preuve ici, là où la "
         "racine elle-même était déjà refusée par les droits POSIX avant tout "
         "durcissement. Seul readOnlyRootFilesystem le ferme, et il ne "
-        "s'applique qu'aux Pods RECRÉÉS depuis sa déclaration."
+        "s'applique qu'aux Pods RECRÉÉS depuis sa déclaration.",
     )
 
     rc, _, diagnostic = _kubectl(
@@ -148,11 +171,17 @@ def test_l_interieur_ne_s_ecrit_plus_et_le_site_sert_toujours(host):
         f"-n {NAMESPACE} exec client --request-timeout=30s "
         f"-- wget -qO- -T 5 {CIBLE}",
     )
-    assert rc == 0, (
-        f"Le site ne répond plus sur {CIBLE}. Fermer le système de fichiers "
+    assert rc == 0, message(
+        en=f"The site no longer answers on {CIBLE}. Closing the filesystem "
+        "breaks nginx if it cannot find the few paths it writes to "
+        "during startup: the Pod's log names the first one that is "
+        "missing, `kubectl -n catalogue logs <pod>`. Those paths are reopened one "
+        "by one with ephemeral volumes, whose contents are lost on "
+        f"restart, which suits a cache and temporary files. {diagnostic}",
+        fr=f"Le site ne répond plus sur {CIBLE}. Fermer le système de fichiers "
         "casse nginx s'il ne retrouve pas les quelques chemins où il écrit "
         "pendant son démarrage : le journal du Pod nomme le premier qui "
         "manque, `kubectl -n catalogue logs <pod>`. Ces chemins se rouvrent un "
         "à un avec des volumes éphémères, dont le contenu est perdu au "
-        f"redémarrage, ce qui convient au cache et au temporaire. {diagnostic}"
+        f"redémarrage, ce qui convient au cache et au temporaire. {diagnostic}",
     )

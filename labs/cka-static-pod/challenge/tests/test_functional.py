@@ -20,7 +20,7 @@ import time
 import pytest
 import yaml
 
-from conftest import lab_host
+from conftest import lab_host, message
 
 CONTROL_PLANE = "k8s-cp.lab"
 WORKER = "k8s-w1.lab"
@@ -48,11 +48,16 @@ def _kubectl(host, args: str):
 
 def _repertoire_statique(worker) -> str:
     res = worker.run(f"sudo cat {CONFIG_KUBELET}")
-    assert res.rc == 0, f"Impossible de lire {CONFIG_KUBELET} sur {WORKER} : {res.stderr.strip()}"
+    assert res.rc == 0, message(
+        en=f"Cannot read {CONFIG_KUBELET} on {WORKER}: {res.stderr.strip()}",
+        fr=f"Impossible de lire {CONFIG_KUBELET} sur {WORKER} : {res.stderr.strip()}",
+    )
     chemin = (yaml.safe_load(res.stdout) or {}).get("staticPodPath")
-    assert chemin, (
-        f"{CONFIG_KUBELET} n'a plus de staticPodPath : sans ce champ, le kubelet ne "
-        "lit aucun manifeste. Il ne fallait pas le retirer."
+    assert chemin, message(
+        en=f"{CONFIG_KUBELET} no longer has staticPodPath: without that field, the kubelet "
+        "reads no manifest. It was not to be removed.",
+        fr=f"{CONFIG_KUBELET} n'a plus de staticPodPath : sans ce champ, le kubelet ne "
+        "lit aucun manifeste. Il ne fallait pas le retirer.",
     )
     return chemin
 
@@ -70,9 +75,14 @@ def _manifeste(worker) -> dict:
         if doc.get("kind") == "Pod" and (doc.get("metadata") or {}).get("name") == POD:
             return doc
     pytest.fail(
-        f"Aucun manifeste de Pod nommé {POD} dans {repertoire} sur {WORKER} (fichiers vus : "
+        message(
+        en=f"No Pod manifest named {POD} in {repertoire} on {WORKER} (files seen: "
+        f"{fichiers or 'none'}). That directory is the one the worker's kubelet watches: "
+        "a manifest placed elsewhere, or on the control plane, is not read.",
+        fr=f"Aucun manifeste de Pod nommé {POD} dans {repertoire} sur {WORKER} (fichiers vus : "
         f"{fichiers or 'aucun'}). C'est ce répertoire que le kubelet du worker surveille : "
-        "un manifeste posé ailleurs, ou sur le control plane, n'est pas lu."
+        "un manifeste posé ailleurs, ou sur le control plane, n'est pas lu.",
+    )
     )
 
 
@@ -81,15 +91,25 @@ def _manifeste(worker) -> dict:
 # ----------------------------------------------------------------------
 def test_le_manifeste_est_dans_le_repertoire_du_kubelet(worker):
     doc = _manifeste(worker)
-    assert (doc["metadata"].get("labels") or {}).get("role") == "static", (
-        "Le manifeste ne porte pas le label role=static demandé."
+    assert (doc["metadata"].get("labels") or {}).get("role") == "static", message(
+        en="The manifest does not carry the required role=static label.",
+        fr="Le manifeste ne porte pas le label role=static demandé.",
     )
     conteneurs = (doc.get("spec") or {}).get("containers") or []
     web = next((c for c in conteneurs if c.get("name") == "web"), None)
-    assert web, f"Le manifeste n'a pas de conteneur nommé web (vus : {[c.get('name') for c in conteneurs]})."
-    assert web.get("image") == IMAGE, f"Le conteneur web utilise {web.get('image')!r}, attendu {IMAGE!r}."
+    assert web, message(
+        en=f"The manifest has no container named web (seen: {[c.get('name') for c in conteneurs]}).",
+        fr=f"Le manifeste n'a pas de conteneur nommé web (vus : {[c.get('name') for c in conteneurs]}).",
+    )
+    assert web.get("image") == IMAGE, message(
+        en=f"Container web uses {web.get('image')!r}, expected {IMAGE!r}.",
+        fr=f"Le conteneur web utilise {web.get('image')!r}, attendu {IMAGE!r}.",
+    )
     ports = [p.get("containerPort") for p in web.get("ports") or []]
-    assert 80 in ports, f"Le conteneur web n'expose pas le port 80 (ports déclarés : {ports})."
+    assert 80 in ports, message(
+        en=f"Container web does not expose port 80 (declared ports: {ports}).",
+        fr=f"Le conteneur web n'expose pas le port 80 (ports déclarés : {ports}).",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -102,26 +122,36 @@ def test_le_pod_miroir_vient_d_un_fichier(cp):
         if res.rc == 0:
             break
         time.sleep(3)
-    assert res is not None and res.rc == 0, (
-        f"Aucun Pod {MIROIR} dans {NAMESPACE} après 60 s. Un Pod statique apparaît dans "
+    assert res is not None and res.rc == 0, message(
+        en=f"No Pod {MIROIR} in {NAMESPACE} after 60 s. A static Pod appears in the "
+        "API under the Pod's name suffixed with the node's name. If it does not appear, the "
+        f"worker's kubelet did not accept the manifest: journalctl -u kubelet on {WORKER} says why.",
+        fr=f"Aucun Pod {MIROIR} dans {NAMESPACE} après 60 s. Un Pod statique apparaît dans "
         "l'API sous le nom du Pod suffixé du nom du nœud. S'il n'apparaît pas, le kubelet "
-        f"du worker n'a pas accepté le manifeste : journalctl -u kubelet sur {WORKER} dit pourquoi."
+        f"du worker n'a pas accepté le manifeste : journalctl -u kubelet sur {WORKER} dit pourquoi.",
     )
     pod = json.loads(res.stdout)
     annotations = pod["metadata"].get("annotations") or {}
-    assert annotations.get("kubernetes.io/config.source") == "file", (
-        f"Le Pod {MIROIR} existe, mais son annotation kubernetes.io/config.source vaut "
+    assert annotations.get("kubernetes.io/config.source") == "file", message(
+        en=f"Pod {MIROIR} exists, but its kubernetes.io/config.source annotation is "
+        f"{annotations.get('kubernetes.io/config.source')!r} instead of 'file': this is not "
+        "a mirror Pod, it is a Pod created through the API. A file had to be placed on the node.",
+        fr=f"Le Pod {MIROIR} existe, mais son annotation kubernetes.io/config.source vaut "
         f"{annotations.get('kubernetes.io/config.source')!r} au lieu de 'file' : ce n'est pas "
-        "un Pod miroir, c'est un Pod créé par l'API. Il fallait déposer un fichier sur le nœud."
+        "un Pod miroir, c'est un Pod créé par l'API. Il fallait déposer un fichier sur le nœud.",
     )
     proprietaires = [(o.get("kind"), o.get("name")) for o in pod["metadata"].get("ownerReferences") or []]
-    assert ("Node", WORKER) in proprietaires, (
-        f"Le Pod {MIROIR} n'a pas le Node {WORKER} pour propriétaire (vus : {proprietaires}). "
-        "Un Pod miroir appartient au nœud dont le kubelet l'a créé."
+    assert ("Node", WORKER) in proprietaires, message(
+        en=f"Pod {MIROIR} does not have Node {WORKER} as its owner (seen: {proprietaires}). "
+        "A mirror Pod belongs to the node whose kubelet created it.",
+        fr=f"Le Pod {MIROIR} n'a pas le Node {WORKER} pour propriétaire (vus : {proprietaires}). "
+        "Un Pod miroir appartient au nœud dont le kubelet l'a créé.",
     )
-    assert pod["spec"].get("nodeName") == WORKER, (
-        f"Le Pod tourne sur {pod['spec'].get('nodeName')!r}, attendu {WORKER} : le manifeste "
-        "a été déposé sur le mauvais nœud."
+    assert pod["spec"].get("nodeName") == WORKER, message(
+        en=f"The Pod runs on {pod['spec'].get('nodeName')!r}, expected {WORKER}: the manifest "
+        "was placed on the wrong node.",
+        fr=f"Le Pod tourne sur {pod['spec'].get('nodeName')!r}, attendu {WORKER} : le manifeste "
+        "a été déposé sur le mauvais nœud.",
     )
 
 
@@ -141,14 +171,22 @@ def test_le_pod_statique_tourne(cp):
             if phase == "Running" and pret:
                 break
         time.sleep(3)
-    assert phase == "Running" and pret, (
-        f"Le Pod {MIROIR} est en phase {phase!r}, prêt = {pret}, après 60 s. Le kubelet a lu "
-        "le manifeste mais le conteneur ne tourne pas : kubectl describe pod dit ce qu'il attend."
+    assert phase == "Running" and pret, message(
+        en=f"Pod {MIROIR} is in phase {phase!r}, ready = {pret}, after 60 s. The kubelet read "
+        "the manifest but the container is not running: kubectl describe pod says what it is waiting for.",
+        fr=f"Le Pod {MIROIR} est en phase {phase!r}, prêt = {pret}, après 60 s. Le kubelet a lu "
+        "le manifeste mais le conteneur ne tourne pas : kubectl describe pod dit ce qu'il attend.",
     )
     images = [c.get("image") for c in pod["spec"]["containers"]]
-    assert any(IMAGE in (i or "") for i in images), f"Le Pod utilise {images}, attendu {IMAGE}."
+    assert any(IMAGE in (i or "") for i in images), message(
+        en=f"The Pod uses {images}, expected {IMAGE}.",
+        fr=f"Le Pod utilise {images}, attendu {IMAGE}.",
+    )
     ports = [p.get("containerPort") for c in pod["spec"]["containers"] for p in c.get("ports") or []]
-    assert 80 in ports, f"Le Pod n'expose pas le port 80 (ports : {ports})."
+    assert 80 in ports, message(
+        en=f"The Pod does not expose port 80 (ports: {ports}).",
+        fr=f"Le Pod n'expose pas le port 80 (ports : {ports}).",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -156,21 +194,28 @@ def test_le_pod_statique_tourne(cp):
 # ----------------------------------------------------------------------
 def test_le_runtime_du_worker_execute_le_conteneur(worker):
     res = worker.run("sudo crictl pods -o json")
-    assert res.rc == 0, f"crictl pods échoue sur {WORKER} : {res.stderr.strip()[:200]}"
+    assert res.rc == 0, message(
+        en=f"crictl pods failed on {WORKER}: {res.stderr.strip()[:200]}",
+        fr=f"crictl pods échoue sur {WORKER} : {res.stderr.strip()[:200]}",
+    )
     sandboxes = [
         p for p in json.loads(res.stdout).get("items") or []
         if p.get("metadata", {}).get("name") == MIROIR and p.get("state") == "SANDBOX_READY"
     ]
-    assert sandboxes, (
-        f"Le runtime de {WORKER} n'a aucun Pod {MIROIR} en SANDBOX_READY. L'API peut afficher "
-        "un Pod que le nœud n'exécute pas ; ici c'est le conteneur réel qui compte."
+    assert sandboxes, message(
+        en=f"The runtime of {WORKER} has no {MIROIR} Pod in SANDBOX_READY. The API can show "
+        "a Pod the node is not running; here it is the real container that counts.",
+        fr=f"Le runtime de {WORKER} n'a aucun Pod {MIROIR} en SANDBOX_READY. L'API peut afficher "
+        "un Pod que le nœud n'exécute pas ; ici c'est le conteneur réel qui compte.",
     )
     res = worker.run(f"sudo crictl ps --pod {sandboxes[0]['id']} -o json")
     conteneurs = json.loads(res.stdout).get("containers") or []
     web = [c for c in conteneurs if c.get("metadata", {}).get("name") == "web" and c.get("state") == "CONTAINER_RUNNING"]
-    assert web, (
-        f"Le Pod {MIROIR} existe sur {WORKER} mais aucun conteneur web n'y est CONTAINER_RUNNING "
-        f"(vus : {[(c.get('metadata', {}).get('name'), c.get('state')) for c in conteneurs]})."
+    assert web, message(
+        en=f"Pod {MIROIR} exists on {WORKER} but no web container there is CONTAINER_RUNNING "
+        f"(seen: {[(c.get('metadata', {}).get('name'), c.get('state')) for c in conteneurs]}).",
+        fr=f"Le Pod {MIROIR} existe sur {WORKER} mais aucun conteneur web n'y est CONTAINER_RUNNING "
+        f"(vus : {[(c.get('metadata', {}).get('name'), c.get('state')) for c in conteneurs]}).",
     )
     # crictl ps ne donne que le digest de l'image ; le nom demandé est dans
     # userSpecifiedImage, ou dans crictl inspect, ou dans les tags du digest.
@@ -185,7 +230,9 @@ def test_le_runtime_du_worker_execute_le_conteneur(worker):
         for i in json.loads(images.stdout).get("images") or []:
             if i.get("id") == digest:
                 noms += i.get("repoTags") or []
-    assert any(IMAGE in n for n in noms if n), (
-        f"Le conteneur web tourne avec l'image {digest!r}, connue sous {[n for n in noms if n]}, "
-        f"attendu {IMAGE}."
+    assert any(IMAGE in n for n in noms if n), message(
+        en=f"Container web runs with image {digest!r}, known as {[n for n in noms if n]}, "
+        f"expected {IMAGE}.",
+        fr=f"Le conteneur web tourne avec l'image {digest!r}, connue sous {[n for n in noms if n]}, "
+        f"attendu {IMAGE}.",
     )

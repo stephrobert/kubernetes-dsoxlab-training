@@ -17,7 +17,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "archives"
 PVC = "donnees"
@@ -52,26 +52,35 @@ def test_la_revendication_designe_une_classe(host):
     l'échec du test suivant soit diagnosticable. Une revendication peut
     désigner une classe qui n'existe pas, et rester en attente pour toujours."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get pvc {PVC} -o json")
-    assert rc == 0 and sortie, (
-        f"La revendication {PVC} est introuvable dans {NAMESPACE}. Le setup "
-        f"l'avait posée : elle doit être recréée sous le même nom. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Claim {PVC} cannot be found in {NAMESPACE}. Setup "
+        f"had placed it there: it must be recreated under the same name. {diagnostic}",
+        fr=f"La revendication {PVC} est introuvable dans {NAMESPACE}. Le setup "
+        f"l'avait posée : elle doit être recréée sous le même nom. {diagnostic}",
     )
     spec = json.loads(sortie)["spec"]
     classe = spec.get("storageClassName")
-    assert classe, (
-        "La revendication ne désigne aucune classe de stockage : "
+    assert classe, message(
+        en="The claim names no storage class: "
+        f"storageClassName is \"{classe}\". An EMPTY string is not an absent "
+        "field: it explicitly disables dynamic provisioning, and the claim "
+        "then waits for a volume created by hand.",
+        fr="La revendication ne désigne aucune classe de stockage : "
         f"storageClassName vaut « {classe} ». Une chaîne VIDE n'est pas un "
         "champ absent : elle désactive explicitement le provisionnement "
-        "dynamique, et la revendication attend alors un volume créé à la main."
+        "dynamique, et la revendication attend alors un volume créé à la main.",
     )
 
     rc, sortie, _ = _kubectl(host, "get storageclass -o json")
     connues = [c["metadata"]["name"] for c in json.loads(sortie or "{}").get("items", [])]
-    assert classe in connues, (
-        f"La revendication demande la classe « {classe} », que le cluster ne "
+    assert classe in connues, message(
+        en=f"The claim asks for class \"{classe}\", which the cluster does not "
+        f"know. The available classes are {connues}. A claim naming a "
+        "non-existent class stays pending forever, with no error.",
+        fr=f"La revendication demande la classe « {classe} », que le cluster ne "
         f"connaît pas. Les classes disponibles sont {connues}. Une "
         "revendication qui désigne une classe inexistante reste en attente "
-        "indéfiniment, sans erreur."
+        "indéfiniment, sans erreur.",
     )
 
 
@@ -102,36 +111,53 @@ def test_le_volume_est_provisionne_a_la_demande_et_ecrit(host):
                 break
         time.sleep(PAS_S)
 
-    assert phase == "Bound", (
-        f"La revendication {PVC} est en « {phase or 'inconnu'} » après "
+    assert phase == "Bound", message(
+        en=f"Claim {PVC} is \"{phase or 'unknown'}\" after "
+        f"{BUDGET_S} seconds. This cluster's class waits for its first "
+        "consumer before provisioning: as long as no Pod uses the claim, it "
+        "stays pending, and that is normal. So one is needed.",
+        fr=f"La revendication {PVC} est en « {phase or 'inconnu'} » après "
         f"{BUDGET_S} secondes. La classe de ce cluster attend son premier "
         "consommateur avant de provisionner : tant qu'aucun Pod n'utilise la "
         "revendication, elle reste en attente, et c'est normal. Il en faut "
-        "donc un."
+        "donc un.",
     )
 
     rc, sortie, diagnostic = _kubectl(host, f"get pv {volume} -o json")
-    assert rc == 0 and sortie, f"Le volume {volume} est introuvable. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Volume {volume} cannot be found. {diagnostic}",
+        fr=f"Le volume {volume} est introuvable. {diagnostic}",
+    )
     pv = json.loads(sortie)
-    assert pv["spec"].get("storageClassName") == CLASSE, (
-        f"Le volume {volume} n'appartient pas à la classe « {CLASSE} » mais à "
+    assert pv["spec"].get("storageClassName") == CLASSE, message(
+        en=f"Volume {volume} does not belong to class \"{CLASSE}\" but to "
+        f"\"{pv['spec'].get('storageClassName') or 'none'}\". A volume created "
+        "by hand also binds a claim, but then nothing was provisioned on "
+        "demand: that is the subject of the neighbouring lab.",
+        fr=f"Le volume {volume} n'appartient pas à la classe « {CLASSE} » mais à "
         f"« {pv['spec'].get('storageClassName') or 'aucune'} ». Un volume créé "
         "à la main lie aussi une revendication, mais rien n'a alors été "
-        "provisionné à la demande : c'est l'objet du lab voisin."
+        "provisionné à la demande : c'est l'objet du lab voisin.",
     )
     reclaim = pv["spec"].get("persistentVolumeReclaimPolicy")
-    assert reclaim == "Delete", (
-        f"Le volume porte la politique « {reclaim} » et non « Delete ». Un "
+    assert reclaim == "Delete", message(
+        en=f"The volume carries the \"{reclaim}\" policy and not \"Delete\". A "
+        "dynamically provisioned volume inherits its class's policy, which "
+        "decides its fate when the claim disappears.",
+        fr=f"Le volume porte la politique « {reclaim} » et non « Delete ». Un "
         "volume provisionné dynamiquement hérite de la politique de sa classe, "
-        "qui décide de son sort quand la revendication disparaît."
+        "qui décide de son sort quand la revendication disparaît.",
     )
 
     rc, contenu, diagnostic = _kubectl(
         host,
         f"-n {NAMESPACE} exec {POD} --request-timeout=30s -- cat {TEMOIN}",
     )
-    assert rc == 0 and contenu, (
-        f"Le Pod {POD} n'a rien écrit dans {TEMOIN}, ou ne tourne pas. Un "
+    assert rc == 0 and contenu, message(
+        en=f"Pod {POD} wrote nothing into {TEMOIN}, or is not running. A "
+        "bound volume that receives nothing proves very little: it has to be "
+        f"used. {diagnostic}",
+        fr=f"Le Pod {POD} n'a rien écrit dans {TEMOIN}, ou ne tourne pas. Un "
         "volume lié qui ne reçoit rien ne prouve pas grand-chose : il faut "
-        f"qu'il serve. {diagnostic}"
+        f"qu'il serve. {diagnostic}",
     )

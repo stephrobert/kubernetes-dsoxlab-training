@@ -16,7 +16,7 @@ import time
 
 import pytest
 
-from conftest import lab_host
+from conftest import lab_host, message
 
 CONTROL_PLANE = "k8s-cp.lab"
 WORKER = "k8s-w1.lab"
@@ -49,16 +49,22 @@ def test_le_noeud_est_ready(cp):
     statut = ""
     for _ in range(18):
         res = _kubectl(cp, f"get node {WORKER} -o json")
-        assert res.rc == 0, f"Le nœud {WORKER} est introuvable : {res.stderr.strip()[:200]}"
+        assert res.rc == 0, message(
+            en=f"Node {WORKER} cannot be found: {res.stderr.strip()[:200]}",
+            fr=f"Le nœud {WORKER} est introuvable : {res.stderr.strip()[:200]}",
+        )
         conditions = {c["type"]: c for c in json.loads(res.stdout)["status"].get("conditions", [])}
         statut = conditions.get("Ready", {}).get("status", "Unknown")
         if statut == "True":
             return
         time.sleep(5)
-    assert statut == "True", (
-        f"Le nœud {WORKER} est toujours NotReady (Ready = {statut}) après 90 s. "
+    assert statut == "True", message(
+        en=f"Node {WORKER} is still NotReady (Ready = {statut}) after 90 s. "
+        f"Its kubelet does not hold: on the node, journalctl -u kubelet says what "
+        "it holds against its configuration.",
+        fr=f"Le nœud {WORKER} est toujours NotReady (Ready = {statut}) après 90 s. "
         f"Son kubelet ne tient pas : sur le nœud, journalctl -u kubelet dit ce "
-        "qu'il reproche à sa configuration."
+        "qu'il reproche à sa configuration.",
     )
 
 
@@ -67,23 +73,35 @@ def test_le_noeud_est_ready(cp):
 # ----------------------------------------------------------------------
 def test_le_kubelet_tourne_avec_une_configuration_saine(worker):
     kubelet = worker.service("kubelet")
-    assert kubelet.is_running, (
-        f"Le service kubelet n'est pas actif sur {WORKER}. S'il s'arrête aussitôt "
-        "lancé, c'est qu'il refuse sa configuration : le journal nomme le champ."
+    assert kubelet.is_running, message(
+        en=f"The kubelet service is not active on {WORKER}. If it stops as soon as "
+        "it is started, it is refusing its configuration: the journal names the field.",
+        fr=f"Le service kubelet n'est pas actif sur {WORKER}. S'il s'arrête aussitôt "
+        "lancé, c'est qu'il refuse sa configuration : le journal nomme le champ.",
     )
     res = worker.run(f"sudo cat {CONFIG}")
-    assert res.rc == 0, f"Impossible de lire {CONFIG} : {res.stderr.strip()}"
+    assert res.rc == 0, message(
+        en=f"Cannot read {CONFIG}: {res.stderr.strip()}",
+        fr=f"Impossible de lire {CONFIG} : {res.stderr.strip()}",
+    )
     config = res.stdout
-    assert "999.999.999.999" not in config, (
-        f"{CONFIG} porte encore 999.999.999.999 dans clusterDNS. Réindenter la "
+    assert "999.999.999.999" not in config, message(
+        en=f"{CONFIG} still carries 999.999.999.999 in clusterDNS. Re-indenting the "
+        "line does start the kubelet, but 999 is not an octet: it is not "
+        "an address, and a resolver that does not exist has no business in "
+        "the list the kubelet hands to the Pods. The added line must go.",
+        fr=f"{CONFIG} porte encore 999.999.999.999 dans clusterDNS. Réindenter la "
         "ligne fait démarrer le kubelet, mais 999 n'est pas un octet : ce n'est "
         "pas une adresse, et un résolveur qui n'existe pas n'a rien à faire dans "
-        "la liste que le kubelet donne aux Pods. La ligne ajoutée doit partir."
+        "la liste que le kubelet donne aux Pods. La ligne ajoutée doit partir.",
     )
-    assert DNS_LEGITIME in config, (
-        f"{CONFIG} ne mentionne plus {DNS_LEGITIME}, l'adresse du Service "
+    assert DNS_LEGITIME in config, message(
+        en=f"{CONFIG} no longer mentions {DNS_LEGITIME}, the address of the "
+        "kube-dns Service. The kubelet starts, but this node's Pods will no "
+        "longer resolve any name: the added line had to go, not the field.",
+        fr=f"{CONFIG} ne mentionne plus {DNS_LEGITIME}, l'adresse du Service "
         "kube-dns. Le kubelet démarre, mais les Pods de ce nœud ne résoudront "
-        "plus aucun nom : il fallait retirer la ligne ajoutée, pas le champ."
+        "plus aucun nom : il fallait retirer la ligne ajoutée, pas le champ.",
     )
 
 
@@ -94,25 +112,36 @@ def test_l_application_est_revenue_sur_le_noeud(cp):
     disponibles, voulus = 0, 0
     for _ in range(18):
         res = _kubectl(cp, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json")
-        assert res.rc == 0, f"Le Deployment {DEPLOYMENT} est introuvable : {res.stderr.strip()[:200]}"
+        assert res.rc == 0, message(
+            en=f"Deployment {DEPLOYMENT} cannot be found: {res.stderr.strip()[:200]}",
+            fr=f"Le Deployment {DEPLOYMENT} est introuvable : {res.stderr.strip()[:200]}",
+        )
         d = json.loads(res.stdout)
         voulus = d["spec"].get("replicas", 0)
         disponibles = d["status"].get("availableReplicas", 0)
         if voulus == 3 and disponibles == 3:
             break
         time.sleep(5)
-    assert voulus == 3, f"Le Deployment demande {voulus} replica(s) au lieu de 3 : il ne fallait pas y toucher."
-    assert disponibles == 3, (
-        f"{disponibles} replica(s) disponible(s) sur 3 après 90 s. L'application "
+    assert voulus == 3, message(
+        en=f"The Deployment asks for {voulus} replica(s) instead of 3: it was not to be touched.",
+        fr=f"Le Deployment demande {voulus} replica(s) au lieu de 3 : il ne fallait pas y toucher.",
+    )
+    assert disponibles == 3, message(
+        en=f"{disponibles} replica(s) available out of 3 after 90 s. The application "
+        f"is pinned to {WORKER}: as long as that node cannot host it, "
+        "it stays degraded.",
+        fr=f"{disponibles} replica(s) disponible(s) sur 3 après 90 s. L'application "
         f"est réservée à {WORKER} : tant que ce nœud ne peut pas l'accueillir, "
-        "elle reste dégradée."
+        "elle reste dégradée.",
     )
     pods = _kubectl(cp, f"-n {NAMESPACE} get pods -l app={DEPLOYMENT} -o json")
     ailleurs = [
         p["metadata"]["name"] for p in json.loads(pods.stdout)["items"]
         if p["spec"].get("nodeName") != WORKER
     ]
-    assert not ailleurs, (
-        f"Des Pods de {DEPLOYMENT} tournent ailleurs que sur {WORKER} : {ailleurs}. "
-        "Le nodeSelector a été retiré : déplacer l'application n'est pas réparer le nœud."
+    assert not ailleurs, message(
+        en=f"Pods of {DEPLOYMENT} are running somewhere other than {WORKER}: {ailleurs}. "
+        "The nodeSelector was removed: moving the application is not repairing the node.",
+        fr=f"Des Pods de {DEPLOYMENT} tournent ailleurs que sur {WORKER} : {ailleurs}. "
+        "Le nodeSelector a été retiré : déplacer l'application n'est pas réparer le nœud.",
     )

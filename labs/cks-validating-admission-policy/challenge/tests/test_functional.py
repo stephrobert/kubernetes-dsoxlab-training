@@ -20,7 +20,7 @@ import time
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "production"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -81,31 +81,44 @@ def test_une_politique_est_liee_en_mode_refus(host):
     l'échec du test suivant soit diagnosticable, et pour nommer laquelle des
     deux moitiés manque."""
     rc, sortie, diagnostic = _kubectl(host, "get validatingadmissionpolicy -o json")
-    assert rc == 0, f"Impossible de lire les politiques d'admission. {diagnostic}"
+    assert rc == 0, message(
+        en=f"Cannot read the admission policies. {diagnostic}",
+        fr=f"Impossible de lire les politiques d'admission. {diagnostic}",
+    )
     politiques = [
         p["metadata"]["name"]
         for p in json.loads(sortie or "{}").get("items", [])
         if not p["metadata"]["name"].startswith("safe-upgrades")
     ]
-    assert politiques, (
-        "Aucune ValidatingAdmissionPolicy dans le cluster. C'est l'objet par "
+    assert politiques, message(
+        en="No ValidatingAdmissionPolicy in the cluster. That is the object through "
+        "which the API server evaluates a rule itself, with no webhook and no "
+        "controller to keep alive.",
+        fr="Aucune ValidatingAdmissionPolicy dans le cluster. C'est l'objet par "
         "lequel l'API server évalue lui-même une règle, sans webhook ni "
-        "contrôleur à maintenir en vie."
+        "contrôleur à maintenir en vie.",
     )
 
     rc, sortie, diagnostic = _kubectl(
         host, "get validatingadmissionpolicybinding -o json"
     )
-    assert rc == 0, f"Impossible de lire les liaisons. {diagnostic}"
+    assert rc == 0, message(
+        en=f"Cannot read the bindings. {diagnostic}",
+        fr=f"Impossible de lire les liaisons. {diagnostic}",
+    )
     liaisons = [
         b for b in json.loads(sortie or "{}").get("items", [])
         if b["spec"].get("policyName") in politiques
     ]
-    assert liaisons, (
-        f"La ou les politiques {politiques} ne sont liées à rien. Une "
+    assert liaisons, message(
+        en=f"Policy or policies {politiques} are bound to nothing. A "
+        "policy WITHOUT a binding is a perfectly valid object that acts "
+        "on no request: it is the binding that says WHERE it applies, and "
+        "what is done with violations.",
+        fr=f"La ou les politiques {politiques} ne sont liées à rien. Une "
         "politique SANS liaison est un objet parfaitement valide qui n'agit "
         "sur aucune requête : c'est la liaison qui dit OÙ elle s'applique, et "
-        "ce qu'on fait des violations."
+        "ce qu'on fait des violations.",
     )
 
     actions = {
@@ -114,10 +127,13 @@ def test_une_politique_est_liee_en_mode_refus(host):
     }
     assert any(
         "Deny" in (b["spec"].get("validationActions") or []) for b in liaisons
-    ), (
-        f"Aucune liaison ne refuse : {actions}. « Warn » prévient celui qui "
+    ), message(
+        en=f"No binding refuses: {actions}. \"Warn\" warns whoever "
+        "applies and \"Audit\" leaves a trace, but both LET IT "
+        "THROUGH. Only \"Deny\" refuses.",
+        fr=f"Aucune liaison ne refuse : {actions}. « Warn » prévient celui qui "
         "applique et « Audit » laisse une trace, mais tous deux LAISSENT "
-        "PASSER. Seul « Deny » refuse."
+        "PASSER. Seul « Deny » refuse.",
     )
 
 
@@ -138,39 +154,56 @@ def test_une_image_par_tag_est_refusee_et_une_image_epinglee_passe(host):
     … ».
     """
     fin = time.monotonic() + BUDGET_S
-    rc_tag, message = 0, ""
+    rc_tag, refus = 0, ""
     while time.monotonic() < fin:
-        rc_tag, message = _tenter(host, "sonde-tag", IMAGE_TAG)
+        rc_tag, refus = _tenter(host, "sonde-tag", IMAGE_TAG)
         if rc_tag != 0:
             break
         time.sleep(PAS_S)
 
-    assert rc_tag != 0, (
-        f"Après {BUDGET_S} secondes, le namespace {NAMESPACE} accepte "
+    assert rc_tag != 0, message(
+        en=f"After {BUDGET_S} seconds, namespace {NAMESPACE} still accepts "
+        f"the image \"{IMAGE_TAG}\", which is not pinned. A tag "
+        "can be redirected to other content without anything changing "
+        "in the manifest: that is exactly what the policy had to "
+        "prevent. Check that the binding does name this namespace.",
+        fr=f"Après {BUDGET_S} secondes, le namespace {NAMESPACE} accepte "
         f"toujours l'image « {IMAGE_TAG} », qui n'est pas épinglée. Un tag "
         "peut être redirigé vers un autre contenu sans que rien ne change "
         "dans le manifeste : c'est exactement ce que la politique devait "
-        "empêcher. Vérifiez que la liaison désigne bien ce namespace."
+        "empêcher. Vérifiez que la liaison désigne bien ce namespace.",
     )
-    assert "denied request" in message.lower() or "validatingadmissionpolicy" in message.lower(), (
-        "Le Pod a bien été refusé, mais pas par une politique d'admission. Le "
-        f"message était : {message}"
+    admise = "denied request" in refus.lower()
+    nommee = "validatingadmissionpolicy" in refus.lower()
+    assert admise or nommee, message(
+        en="The Pod was indeed refused, but not by an admission policy. The "
+        f"message was: {refus}",
+        fr="Le Pod a bien été refusé, mais pas par une politique d'admission. Le "
+        f"message était : {refus}",
     )
 
     rc_digest, message_digest = _tenter(host, "sonde-digest", IMAGE_DIGEST)
-    assert rc_digest == 0, (
-        f"L'image épinglée « {IMAGE_DIGEST} » est refusée elle aussi : "
+    assert rc_digest == 0, message(
+        en=f"The pinned image \"{IMAGE_DIGEST}\" is refused too: "
+        f"{message_digest}. The policy therefore refuses everything, which is not "
+        "what you were asked for: it must distinguish a pinned image "
+        "from an image by tag, not block the namespace.",
+        fr=f"L'image épinglée « {IMAGE_DIGEST} » est refusée elle aussi : "
         f"{message_digest}. La politique refuse donc tout, ce qui n'est pas "
         "ce qu'on vous demandait : elle doit distinguer une image épinglée "
-        "d'une image par tag, et non bloquer le namespace."
+        "d'une image par tag, et non bloquer le namespace.",
     )
 
     rc, phase, _ = _kubectl(
         host, f"-n {NAMESPACE} get pod conforme -o jsonpath='{{.status.phase}}'"
     )
-    assert rc == 0 and phase == "Running", (
-        f"Le Pod conforme, posé par le setup avec une image épinglée, est en "
+    assert rc == 0 and phase == "Running", message(
+        en=f"The conforming Pod, placed by setup with a pinned image, is "
+        f"\"{phase or 'absent'}\". A policy only judges at CREATION time: a "
+        "Pod already there cannot have been refused, so it was deleted or "
+        "never started.",
+        fr=f"Le Pod conforme, posé par le setup avec une image épinglée, est en "
         f"« {phase or 'absent'} ». Une politique ne juge qu'à la CRÉATION : un "
         "Pod déjà là ne peut pas avoir été refusé, il a donc été supprimé ou "
-        "n'a jamais démarré."
+        "n'a jamais démarré.",
     )

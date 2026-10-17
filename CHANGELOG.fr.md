@@ -6,6 +6,121 @@ Tous les changements notables de ce projet sont consignés dans ce fichier. Le
 format s'appuie sur [Keep a Changelog](https://keepachangelog.com/), et le
 projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [0.2.0] - 2026-10-17
+
+### Modifié
+
+- **Le validateur lit le contrat, plus l'encadré du terminal.**
+  `scripts/valider-labs.py` lisait le score dans ce que `dsoxlab check`
+  *affiche*. Cet encadré est de l'interface : il a changé en dsoxlab 0.4.0 et
+  la regex a cessé de trouver quoi que ce soit. Il lit désormais
+  `check --json`, qui porte un `schema`, et cette lecture vit dans
+  `scripts/verdict_check.py`, **identique dans les douze catalogues**.
+
+- **Trois verdicts, pas deux.** Une exécution dont tous les tests collectés ont
+  skippé n'a rien mesuré : elle est **SKIP**, ni verte ni rouge, et reste à
+  mesurer. La peindre en rouge accuserait le lab de ce qui manque au poste.
+  `--check` sort donc en `10` dans ce cas, contre `1` pour un ROUGE, à l'image
+  de `dsoxlab doctor --strict` où 9 se répare et 10 se remesure.
+
+- **Le README prend la structure de référence** commune aux douze catalogues :
+  quatorze sections, dans les deux langues. Sept d'entre elles décrivent
+  dsoxlab et non le sujet, et sont donc identiques partout.
+
+### Exige
+
+- **dsoxlab 0.4.1 ou plus récent**, qui a introduit le champ `status` de
+  `check --json`. Sans lui, le validateur refuse de conclure plutôt que de
+  deviner.
+
+## [0.1.1] - 2026-10-15
+
+Les trois labs que le relevé du 2026-10-12 donnait ROUGE sont verts, et le
+relevé compte soixante-quatre verdicts VALIDE sur soixante-quatre labs.
+
+Aucun des trois n'avait de défaut de pédagogie : ils enseignent ce qu'ils
+annoncent, et deux portaient même, en commentaire, la mesure qui aurait dû les
+protéger. Ce qui avait vieilli dans les trois cas, c'est une valeur écrite à la
+main là où il fallait lire le monde.
+
+### Corrigé
+
+- **`cks-runtime-sandbox-gvisor` : l'archive gVisor porte sept binaires, pas
+  deux.** Elle contient désormais `runsc`, `containerd-shim-runsc-v1` et un
+  répertoire `gvisor-bin/` de cinq binaires, dont `gvisor_sentry` que runsc
+  exige. `fixtures/prepare.sh` n'installait que les deux de la racine, si bien
+  que runsc refusait de créer le moindre bac à sable. Le message ne paraissait
+  que dans le journal de containerd, jamais dans la sortie de kubectl, qui se
+  contentait d'un délai dépassé sur le Pod. La garde regarde maintenant aussi
+  `gvisor-bin/gvisor_sentry`, sans quoi un nœud portant déjà runsc ne
+  réinstallerait jamais le répertoire absent.
+
+  Le setup déclare en outre les options de runsc, `SystemdCgroup = true` : le
+  socle alignait runc sur les cgroups systemd par un `replace` de chaîne, qui
+  n'atteignait pas la section ajoutée ensuite.
+
+- **`cka-kubeadm-upgrade` : la cible du retour était épinglée.** Le cleanup
+  visait `1.37.0-1.1` en dur, alors que `shared/kubeadm-cluster.yml` avertit que
+  « rien ne fige le PATCH » dans `pkgs.k8s.io/v1.37`. La 1.37.1 est sortie
+  depuis, et le cleanup rétrogradait donc le cluster d'un patch à chaque
+  passage. Le setup relève maintenant la version du catalogue avant de la
+  dégrader, le cleanup la relit, et il ne reste aucun numéro de version dans ce
+  fichier. Le numéro de paquet est demandé à APT plutôt que reconstruit, le
+  suffixe variant d'une version à l'autre.
+
+- **`cks-istio-mtls-lockdown` : un ConfigMap de plus qu'Istio distribue.** Le
+  cleanup retirait `istio-ca-root-cert` namespace par namespace, mais istiod en
+  pousse un second, `istio-ca-crl`, qu'une version plus récente a ajouté. Le
+  retrait se fait désormais par préfixe `istio-ca-` : nommer les objets un par
+  un était la vraie cause, la liste ne pouvant que prendre du retard sur Istio.
+
+- Le catalogue des README suivait des titres de labs périmés, le hook qui
+  l'attrape ne jouant qu'au push.
+
+### Ajouté
+
+- **Deux sondes dans le setup de `cks-runtime-sandbox-gvisor`**, et c'est l'une
+  d'elles qui a nommé la cause au premier essai. La seconde est la seule qui
+  prouve quelque chose : elle lance un Pod témoin dans `runsc` et, sur échec,
+  affiche ses Events et le journal de containerd avant de sortir en 1. Elle
+  prend son propre namespace jetable, rendu par un `trap`. Un setup doit échouer
+  chez lui, avec un message, plutôt que laisser la solution du formateur échouer
+  trois minutes plus tard sur un délai dépassé muet.
+
+- **`tests/test_tolerance_de_version.py`**, trente-trois cas. Aucun test ne
+  couvrait `scripts/valider-labs.py` jusqu'ici, alors que c'est lui qui décide
+  si un lab est publiable.
+
+### Changé, deux tolérances nommées dans le validateur
+
+`cka-kubeadm-upgrade` est le seul lab du catalogue qui touche à la version de
+son cluster : son setup le rétrograde pour qu'il y ait quelque chose à monter,
+et son cleanup le remonte par `kubeadm upgrade apply` là où le socle monte par
+`kubeadm init`. Deux tolérances, nominatives, le reconnaissent :
+
+- la version des nœuds peut être **supérieure ou égale** à celle de la
+  photographie initiale, jamais inférieure. Ce n'est pas « on ignore la version
+  pour ce lab », c'est « on accepte qu'il laisse le cluster monté, pas qu'il le
+  laisse tombé ». Une rétrogradation reste un écart, et c'était exactement le
+  défaut corrigé plus haut ;
+- les ConfigMaps `kubeadm-config` et `kubelet-config` peuvent différer, parce
+  que `kubeadm upgrade apply` les régénère autrement que `kubeadm init`. Mesuré
+  en capturant leur contenu : la différence tient en une ligne,
+  `resolvConf: /run/systemd/resolve/resolv.conf`, que l'upgrade pose en
+  détectant systemd-resolved.
+
+Ce second desserrement est plus large que le premier, la photographie ne portant
+que des empreintes. Il reste borné à deux clés nommées et à un identifiant :
+`coredns`, `kube-proxy` et tout autre objet de `kube-system` restent comparés, y
+compris pour ce lab. Le supprimer plutôt que l'accepter demanderait de faire
+écrire `resolvConf` par le socle dès l'`init`, ce qui changerait la façon dont
+les soixante-quatre labs montent leur cluster.
+
+### Durées mesurées
+
+`cks-runtime-sandbox-gvisor` 231 s, `cks-istio-mtls-lockdown` 409 s,
+`cka-kubeadm-upgrade` 874 s.
+
 ## [0.1.0] - 2026-10-09
 
 ### Changé, la provenance passe au niveau SLSA 3
@@ -116,5 +231,6 @@ catalogue Linux jumeau a éprouvé, adapté à Kubernetes et au français.
   Calico remplace Flannel, qui n'applique pas les NetworkPolicy et rendait
   invérifiables quatre labs.
 
-[Non publié]: https://github.com/stephrobert/kubernetes-dsoxlab-training/compare/v0.1.0...HEAD
+[Non publié]: https://github.com/stephrobert/kubernetes-dsoxlab-training/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/stephrobert/kubernetes-dsoxlab-training/releases/tag/v0.1.1
 [0.1.0]: https://github.com/stephrobert/kubernetes-dsoxlab-training/releases/tag/v0.1.0

@@ -20,7 +20,7 @@ import json
 
 import pytest
 
-from conftest import lab_host, lab_target_host
+from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "secure-ns"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -97,10 +97,16 @@ def _soumettre(host, manifeste: str) -> tuple[bool, str]:
     # exécutions simultanées ne se marchent pas dessus, et rien ne peut
     # préparer le chemin à l'avance.
     cree = host.run("mktemp /tmp/dsoxlab-sonde-psa.XXXXXX.yaml")
-    assert cree.rc == 0 and cree.stdout.strip(), "mktemp a échoué sur le nœud."
+    assert cree.rc == 0 and cree.stdout.strip(), message(
+        en="mktemp failed on the node.",
+        fr="mktemp a échoué sur le nœud.",
+    )
     chemin = cree.stdout.strip()
     depose = host.run(f"cat > {chemin} <<'MANIFESTE'\n{manifeste}MANIFESTE")
-    assert depose.rc == 0, "Impossible de déposer le manifeste de sonde sur le nœud."
+    assert depose.rc == 0, message(
+        en="Cannot drop the probe manifest onto the node.",
+        fr="Impossible de déposer le manifeste de sonde sur le nœud.",
+    )
     rc, sortie, diagnostic = _kubectl(host, f"apply --dry-run=server -f {chemin}")
     host.run(f"rm -f {chemin}")
     return rc == 0, diagnostic or sortie
@@ -111,18 +117,23 @@ def _soumettre(host, manifeste: str) -> tuple[bool, str]:
 # ----------------------------------------------------------------------
 def test_le_namespace_declare_le_standard_restricted(host):
     rc, sortie, diagnostic = _kubectl(host, f"get namespace {NAMESPACE} -o json")
-    assert rc == 0 and sortie, (
-        f"Le namespace {NAMESPACE} n'existe plus : le setup l'avait créé. {diagnostic}"
+    assert rc == 0 and sortie, message(
+        en=f"Namespace {NAMESPACE} no longer exists: setup had created it. {diagnostic}",
+        fr=f"Le namespace {NAMESPACE} n'existe plus : le setup l'avait créé. {diagnostic}",
     )
     labels = (json.loads(sortie).get("metadata") or {}).get("labels") or {}
     manquants = [
         mode for mode in MODES if labels.get(f"{PREFIXE}/{mode}") != NIVEAU
     ]
-    assert not manquants, (
-        f"Mode(s) absent(s) ou au mauvais niveau : {', '.join(manquants)}. "
+    assert not manquants, message(
+        en=f"Mode(s) missing or at the wrong level: {', '.join(manquants)}. "
+        f"The standard is enabled through labels on the namespace, one per mode: "
+        f"{PREFIXE}/<mode>={NIVEAU}. All three are independent, and setting "
+        "only one leaves the other two without effect.",
+        fr=f"Mode(s) absent(s) ou au mauvais niveau : {', '.join(manquants)}. "
         f"Le standard s'active par des labels sur le namespace, un par mode : "
         f"{PREFIXE}/<mode>={NIVEAU}. Les trois sont indépendants, et n'en poser "
-        "qu'un laisse les deux autres sans effet."
+        "qu'un laisse les deux autres sans effet.",
     )
 
 
@@ -135,13 +146,17 @@ def test_le_pod_conforme_tourne(host):
     rc, phase, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get pod conforme -o jsonpath='{{.status.phase}}'"
     )
-    assert rc == 0 and phase, (
-        "Aucun Pod « conforme » dans secure-ns. Il doit satisfaire le standard "
-        f"restricted pour être admis. Sortie : {diagnostic}"
+    assert rc == 0 and phase, message(
+        en="No \"conforme\" Pod in secure-ns. It must satisfy the restricted "
+        f"standard to be admitted. Output: {diagnostic}",
+        fr="Aucun Pod « conforme » dans secure-ns. Il doit satisfaire le standard "
+        f"restricted pour être admis. Sortie : {diagnostic}",
     )
-    assert phase == "Running", (
-        f"Le Pod conforme est en {phase}. Il a donc été admis, mais il ne tourne "
-        "pas : regardez ses events et ses logs."
+    assert phase == "Running", message(
+        en=f"The conforming Pod is {phase}. It was therefore admitted, but it is not "
+        "running: look at its events and its logs.",
+        fr=f"Le Pod conforme est en {phase}. Il a donc été admis, mais il ne tourne "
+        "pas : regardez ses events et ses logs.",
     )
 
 
@@ -153,7 +168,10 @@ def test_le_pod_conforme_satisfait_les_quatre_exigences(host):
     n'existent qu'au niveau du conteneur.
     """
     rc, sortie, _ = _kubectl(host, f"-n {NAMESPACE} get pod conforme -o json")
-    assert rc == 0 and sortie, "Le Pod conforme est introuvable."
+    assert rc == 0 and sortie, message(
+        en="The conforming Pod cannot be found.",
+        fr="Le Pod conforme est introuvable.",
+    )
     spec = json.loads(sortie)["spec"]
     pod_ctx = spec.get("securityContext") or {}
     conteneur = spec["containers"][0]
@@ -172,11 +190,15 @@ def test_le_pod_conforme_satisfait_les_quatre_exigences(host):
     if seccomp not in ("RuntimeDefault", "Localhost"):
         ecarts.append("aucun profil seccomp n'est déclaré")
 
-    assert not ecarts, (
-        "Le Pod conforme a été admis, mais il ne satisfait pas ce que le "
+    assert not ecarts, message(
+        en="The conforming Pod was admitted, but it does not satisfy what the "
+        "standard requires:\n  " + "\n  ".join(ecarts) + "\n\nIf admission "
+        "let it through anyway, then the enforce mode does not target "
+        "restricted.",
+        fr="Le Pod conforme a été admis, mais il ne satisfait pas ce que le "
         "standard exige :\n  " + "\n  ".join(ecarts) + "\n\nSi l'admission l'a "
         "laissé passer malgré cela, c'est que le mode enforce ne vise pas "
-        "restricted."
+        "restricted.",
     )
 
 
@@ -194,22 +216,33 @@ def test_l_admission_refuse_l_interdit_et_accepte_le_conforme(host):
     le cluster ressort de ce test exactement comme il y est entré.
     """
     accepte_interdit, reponse_interdit = _soumettre(host, POD_INTERDIT)
-    assert not accepte_interdit, (
-        "L'API server a ACCEPTÉ un Pod qui partage le namespace PID de l'hôte "
+    assert not accepte_interdit, message(
+        en="The API server ACCEPTED a Pod that shares the host's PID namespace "
+        "and runs as root. The standard is therefore not applied: check that "
+        f"the enforce mode of namespace {NAMESPACE} does target restricted, and not "
+        "only the warn and audit modes, which have never blocked anyone.",
+        fr="L'API server a ACCEPTÉ un Pod qui partage le namespace PID de l'hôte "
         "et tourne en root. Le standard n'est donc pas appliqué : vérifiez que "
         f"le mode enforce du namespace {NAMESPACE} vise bien restricted, et non "
-        "seulement les modes warn et audit, qui n'ont jamais bloqué personne."
+        "seulement les modes warn et audit, qui n'ont jamais bloqué personne.",
     )
-    assert "PodSecurity" in reponse_interdit or "violate" in reponse_interdit, (
-        "Le Pod a bien été refusé, mais pas par Pod Security Admission : le "
+    assert "PodSecurity" in reponse_interdit or "violate" in reponse_interdit, message(
+        en="The Pod was indeed refused, but not by Pod Security Admission: the "
+        f"refusal says \"{reponse_interdit}\". Something else is blocking, and the requirement "
+        "is not satisfied for all that.",
+        fr="Le Pod a bien été refusé, mais pas par Pod Security Admission : le "
         f"refus dit « {reponse_interdit} ». Autre chose bloque, et l'exigence "
-        "n'est pas satisfaite pour autant."
+        "n'est pas satisfaite pour autant.",
     )
 
     accepte_conforme, reponse_conforme = _soumettre(host, POD_ACCEPTABLE)
-    assert accepte_conforme, (
-        "Un Pod qui satisfait le standard restricted est refusé lui aussi : "
+    assert accepte_conforme, message(
+        en="A Pod that satisfies the restricted standard is refused too: "
+        f"\"{reponse_conforme}\". An admission that refuses everything is not a "
+        "security policy, it is an outage. Check the level requested, "
+        "and that no pinned version points at a non-existent standard.",
+        fr="Un Pod qui satisfait le standard restricted est refusé lui aussi : "
         f"« {reponse_conforme} ». Une admission qui refuse tout n'est pas une "
         "politique de sécurité, c'est une panne. Vérifiez le niveau demandé, "
-        "et qu'aucune version épinglée ne pointe un standard inexistant."
+        "et qu'aucune version épinglée ne pointe un standard inexistant.",
     )
