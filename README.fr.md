@@ -13,39 +13,163 @@ Catalogue de **labs et de capstones vérifiables** pour la
 du blog de Stéphane Robert. Joué par la CLI
 [dsoxlab](https://github.com/stephrobert/dsoxlab).
 
-Un **micro-lab** éprouve une compétence nommée par le blueprint et le dit dans
-son titre. Un **capstone** n'en nomme aucune : il donne une situation, un seuil
-de réussite à 66 % comme l'examen, et laisse choisir les outils.
+## Ce que c'est
+
+Un **micro-lab** exerce une compétence nommée par le blueprint, et le dit dans
+son titre. Un **capstone** n'en nomme aucune : il remet une situation, un seuil
+de réussite de 66 % comme à l'examen, et laisse choisir les outils.
 
 **Les trois certifications Kubernetes sont entièrement pratiques.** Le candidat
-répare ou construit sur un cluster réel : il ne reconnaît pas une bonne réponse
-parmi quatre. Un quiz prépare au vocabulaire, pas à l'épreuve. Ce catalogue
-donne à l'apprenant de quoi **prouver** qu'il sait faire.
+répare ou construit sur un vrai cluster : il ne choisit pas la bonne réponse
+parmi quatre. Un quiz prépare au vocabulaire, pas à l'examen. Ce catalogue
+donne à l'apprenant les moyens de **prouver** qu'il sait faire.
 
 Chaque lab pose un état initial, énonce un objectif, et valide en lisant
 **l'état du système**, jamais les commandes tapées.
 
-## Démarrer
+## Prérequis
+
+- **Python 3.11+ et [`uv`](https://docs.astral.sh/uv/)**
+- **`git`**
+- **Un hyperviseur**, puisque tous les labs d'ici sont `runtime: vm` : soit
+  **libvirt/KVM** (avec `terraform` et le provider `dmacvicar/libvirt`), soit
+  **Incus**. Le provider est déclaré en liste dans [`meta.yml`](meta.yml), et
+  **une liste ne se résout pas d'elle-même** : choisissez-en un avec
+  `dsoxlab use --provider kvm`.
+- **Environ 7 Go de RAM libre et 45 Go de disque** pour les deux machines, et
+  la section suivante dit pourquoi il y en a deux.
+- **Les collections Ansible** de [`requirements.yml`](requirements.yml), dont
+  les versions sont **bornées à dessein** : celles qui ont validé le catalogue,
+  pas les dernières publiées.
+- **Un accès réseau sortant** au premier provision, pour récupérer l'image de
+  base et les paquets Kubernetes.
+
+`dsoxlab doctor` dit ce dont ce dépôt a besoin et ce dont il n'a pas besoin, et
+distingue un contrôle qui a échoué d'un contrôle qu'il n'a pas pu mesurer.
+
+## Installation
+
+`dsoxlab` est publié sur [PyPI](https://pypi.org/project/dsoxlab/).
+Installez-le en outil autonome, pour qu'il reste hors de ce dépôt :
 
 ```bash
-uv tool install dsoxlab        # la CLI, outil externe
+# 1. La CLI dsoxlab (outil externe, hors de ce dépôt)
+uv tool install dsoxlab
 
+# 2. Ce catalogue de labs
 git clone https://github.com/stephrobert/kubernetes-dsoxlab-training.git
 cd kubernetes-dsoxlab-training
+
+# 3. Les collections Ansible, aux versions bornées
 ansible-galaxy collection install -r requirements.yml
 
-export LAB_HOME=$PWD
-dsoxlab use --provider kvm
-dsoxlab provision
-
-dsoxlab list-labs
-dsoxlab run   cks-apparmor-confiner-un-pod
-dsoxlab check cks-apparmor-confiner-un-pod
+# 4. Vérifier le contrat et la machine
+dsoxlab validate-structure
+dsoxlab doctor
 ```
 
-`dsoxlab destroy` rend les machines.
+### Votre premier lab, en cinq minutes
 
-## L'infrastructure : un cluster kubeadm vanilla
+Le cluster doit exister d'abord : rien ici ne tourne sur votre propre poste.
+
+```bash
+export LAB_HOME=$PWD
+dsoxlab use --provider kvm           # une liste de providers ne se résout pas seule
+dsoxlab provision                    # crée les deux machines et le cluster
+
+dsoxlab list-labs
+dsoxlab run       cks-apparmor-confiner-un-pod
+dsoxlab challenge cks-apparmor-confiner-un-pod
+dsoxlab check     cks-apparmor-confiner-un-pod
+
+dsoxlab destroy                             # rend les machines
+```
+
+`provision` sort en code non nul si un hôte ne répond pas, et nomme les
+domaines orphelins qu'il a laissés plutôt que d'annoncer un succès. Un `check`
+joué sur un lab jamais démarré ne mesure rien, et le dit au lieu d'enregistrer
+un 0.
+
+### Garder à jour
+
+```bash
+uv tool upgrade dsoxlab        # le moteur, publié sur PyPI
+git -C <ce dépôt> pull         # le catalogue
+```
+
+Le moteur et le catalogue avancent indépendamment : un nouveau `dsoxlab` ne
+demande jamais de recloner les labs, et de nouveaux labs ne demandent jamais de
+mettre l'outil à jour, tant que la version du contrat correspond.
+
+## Comment ça marche
+
+### Le contrat déclaratif, à deux niveaux
+
+Le catalogue est décrit par des données, pas par du code, et c'est ce qui garde
+le moteur `dsoxlab` indépendant du domaine :
+
+- **`meta.yml`** à la racine déclare l'identité du dépôt, l'**infrastructure**
+  (provider, réseau `lab-k8s`, `10.10.50.0/24`, et les deux hôtes avec leurs
+  rôles) et l'**ordre** des sections affichées par `list-labs` ;
+- **`lab.yaml`** par lab déclare ses `skills`, son `level`, son `runtime` (type
+  et targets), ses `distros`, son `doc_url`, ses `certification_tags` et un
+  bloc `validation`. Un `lab.fr.yaml` surcharge `title` et `description` en
+  français, et rien d'autre.
+
+Les gabarits Terraform et cloud-init sont **packagés dans dsoxlab**, pas ici :
+ce dépôt ne déclare que son bloc `infra:` et sa clé publique dans `ssh/`.
+
+### Le cycle de vie d'un lab
+
+```bash
+dsoxlab list-labs              # parcourir le catalogue
+dsoxlab show      <id>         # métadonnées et état d'un lab
+dsoxlab run       <id>         # poser l'état de départ
+dsoxlab challenge <id>         # lire la mission, sans pas-à-pas
+dsoxlab hint      <id>         # révéler un indice (déduit du score)
+dsoxlab check     <id>         # lancer les tests, calculer et enregistrer le score
+dsoxlab clean     <id>         # défaire ce que le lab a posé
+dsoxlab progress               # avancement par section, score moyen
+```
+
+### Les runtimes
+
+| Runtime | Ce que le lab demande |
+|---|---|
+| `vm` | les deux machines provisionnées par `dsoxlab provision`, avec le cluster kubeadm déjà debout. Les tests interrogent le serveur d'API et entrent dans les nœuds. |
+
+Tous les labs sont `vm`, et aucun ne déclare `runtime.services` : le cluster
+est le sujet, donc il vit dans les machines et non sur votre poste.
+
+### Le modèle de validation
+
+La validation **prouve l'état, elle ne fait pas confiance à l'apprenant**. Les
+tests demandent au serveur d'API et aux nœuds ce qu'ils contiennent vraiment,
+et un lab est prouvé **dans les deux sens** : les tests doivent échouer avant
+le travail et passer après la solution du formateur. Un test vert avant le
+travail n'est pas un test, c'est une hypothèse sur le setup.
+
+`scripts/valider-labs.py` joue ce cycle entier : il photographie le cluster,
+joue le lab, contrôle 0 avant et 100 après, nettoie, rejoue, puis compare le
+cluster à sa photographie. **Un namespace oublié rend le lab ROUGE**, et c'est
+voulu : ce n'est pas ce lab-là qui en paierait le prix, c'est le suivant. Le
+résultat de chaque lab, avec sa date et sa version de Kubernetes, est dans
+[`validation-labs.json`](validation-labs.json).
+
+### Score, indices, avancement
+
+`check` enregistre un score (tests réussis sur total, moins le coût des indices
+révélés). Les indices sont **en base64** dans `challenge/hints.yaml`, pour qu'on
+n'y accède pas en ouvrant le fichier, et leur coût croît avec leur précision.
+L'historique vit dans une base SQLite **locale à ce dépôt**.
+
+Un capstone déclare un **seuil de 66 %**, comme à l'examen, et `submit` traduit
+la note en verdict. Une exécution qui n'a rien mesuré n'est ni une réussite ni
+un échec : si tous les tests collectés skippent, `check` n'enregistre aucune
+note et dit pourquoi. Un 0 accuserait le lab de ce qui manque au cluster, qui
+est ici le plus souvent le cluster non provisionné.
+
+### L'infrastructure : un cluster kubeadm vanilla
 
 Deux VM Ubuntu 24.04, la distribution que recommande le guide kubeadm publié :
 un control plane, `k8s-cp.lab`, et un worker, `k8s-w1.lab`, joignable par `ssh`
