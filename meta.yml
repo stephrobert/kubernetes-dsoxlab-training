@@ -10,7 +10,7 @@ schema_version: 1
 repo:
   id: kubernetes-dsoxlab-training
   category: kubernetes
-  title: "Kubernetes DevSecOps Training : CKA, CKAD et CKS"
+  title: "Kubernetes DevSecOps Training: CKA, CKAD and CKS"
   blog_url: "https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/"
   # Où `dsoxlab support --issue` dépose le rapport d'un apprenant.
   #
@@ -19,15 +19,12 @@ repo:
   # hébergeur dont les issues vivent sous `<dépôt>/issues`. Le déclarer lève
   # la supposition.
   issues_url: "https://github.com/stephrobert/kubernetes-dsoxlab-training/issues"
-  description: |
-    Labs vérifiables pour la formation Kubernetes du blog Stéphane Robert.
-    Chaque lab est jumelé à une leçon du site et valide une compétence
-    nommée par un blueprint officiel, CKA, CKAD ou CKS.
-
-    Ces trois examens sont entièrement PRATIQUES : le candidat répare ou
-    construit sur un cluster réel, il ne reconnaît pas une bonne réponse
-    parmi quatre. Un quiz ne prépare donc pas à l'épreuve, il prépare au
-    vocabulaire. C'est le trou que ce catalogue comble.
+  description: >-
+    Verifiable labs for the blog's Kubernetes course. Every lab is paired
+    with a lesson on the site and validates a skill named by an exam
+    blueprint. The cluster is a real kubeadm cluster on virtual machines,
+    not a container runtime: that is what makes the kubelet, etcd and the
+    node's own configuration reachable.
 
 # Topologie d'infrastructure.
 #
@@ -92,10 +89,10 @@ infra:
 sections:
   - id: cka
     title: "CKA, Certified Kubernetes Administrator"
-    description: |
-      Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et
-      c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui
-      savent l'exploiter.
+    description: >-
+      Five domains. Troubleshooting weighs 30 %, more than any other, and it
+      is the one that separates those who know Kubernetes from those who can
+      operate it.
     labs:
       - cka-static-pod
       - cka-daemonset-all-nodes
@@ -135,9 +132,9 @@ sections:
 
   - id: ckad
     title: "CKAD, Certified Kubernetes Application Developer"
-    description: |
-      Cinq domaines orientés application. « Application Environment,
-      Configuration and Security » pèse 25 %, le plus lourd des cinq.
+    description: >-
+      Five application-facing domains. « Application Environment,
+      Configuration and Security » weighs 25 %, the heaviest of the five.
     labs:
       - ckad-pod-resources-labels
       - ckad-configmap-secret-injection
@@ -165,10 +162,10 @@ sections:
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"
-    description: |
-      Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux
-      seuls. Plusieurs compétences y sont invérifiables sur un cluster en
-      conteneur, ce qui est la raison d'être des VM de ce catalogue.
+    description: >-
+      Six domains. Three of them weigh 20 % each, so 60 % between them.
+      Several of their skills cannot be checked on a containerised cluster,
+      which is the reason this catalogue uses virtual machines.
     labs:
       - cks-apparmor-confiner-un-pod
       - cks-seccomp-profile

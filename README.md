@@ -190,6 +190,8 @@ One table per exam, in the order `meta.yml` declares. That order is a teaching p
 
 ### CKA, Certified Kubernetes Administrator
 
+Five domains. Troubleshooting weighs 30 %, more than any other, and it is the one that separates those who know Kubernetes from those who can operate it.
+
 25 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
@@ -222,6 +224,8 @@ One table per exam, in the order `meta.yml` declares. That order is a teaching p
 
 ### CKAD, Certified Kubernetes Application Developer
 
+Five application-facing domains. « Application Environment, Configuration and Security » weighs 25 %, the heaviest of the five.
+
 20 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
@@ -248,6 +252,8 @@ One table per exam, in the order `meta.yml` declares. That order is a teaching p
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone: ship the shop, from the specification alone | capstone, several domains | 45m | 2026-10-12 | [lesson](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 
 ### CKS, Certified Kubernetes Security Specialist
+
+Six domains. Three of them weigh 20 % each, so 60 % between them. Several of their skills cannot be checked on a containerised cluster, which is the reason this catalogue uses virtual machines.
 
 19 lab(s).
 

@@ -189,6 +189,8 @@ Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet ordre est une p
 
 ### CKA, Certified Kubernetes Administrator
 
+Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui savent l'exploiter.
+
 25 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
@@ -221,6 +223,8 @@ Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet ordre est une p
 
 ### CKAD, Certified Kubernetes Application Developer
 
+Cinq domaines orientés application. « Application Environment, Configuration and Security » pèse 25 %, le plus lourd des cinq.
+
 20 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
@@ -247,6 +251,8 @@ Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet ordre est une p
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone : livrer la boutique, à partir du seul cahier des charges | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 
 ### CKS, Certified Kubernetes Security Specialist
+
+Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plusieurs compétences y sont invérifiables sur un cluster en conteneur, ce qui est la raison d'être des VM de ce catalogue.
 
 19 lab(s).
 

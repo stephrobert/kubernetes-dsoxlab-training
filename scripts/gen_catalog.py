@@ -60,11 +60,43 @@ DEBUT, FIN = "<!-- LABS:START -->", "<!-- LABS:END -->"
 #: Ordre d'affichage des certifications, et leur titre. Repris de `meta.yml`,
 #: qui les déclare dans cet ordre. Le titre est le même dans les deux langues :
 #: ce sont les noms officiels des certifications.
-CERTIFICATIONS = [
-    ("cka", "CKA, Certified Kubernetes Administrator"),
-    ("ckad", "CKAD, Certified Kubernetes Application Developer"),
-    ("cks", "CKS, Certified Kubernetes Security Specialist"),
-]
+#: Les certifications, LUES DANS `meta.yml` et dans son ordre.
+#
+# Elles y vivaient en double, ici et dans `sections[].title`, et le script
+# ignorait le contrat. Les deux disaient la même chose, ce qui est le cas le
+# plus trompeur : rien ne signale la dérive le jour où l'un bouge.
+
+
+@lru_cache(maxsize=2)
+def _sections_du_contrat(langue: str) -> tuple[tuple[str, str, str], ...]:
+    """[(id, titre, description)] dans l'ordre de `meta.yml`, pour une langue.
+
+    La surcharge `meta.<langue>.yml` est appariée par `id`, jamais par
+    position : une certification insérée au milieu ne décale donc rien. Son
+    absence n'est pas une erreur, c'est le cas de la langue par défaut.
+    """
+    donnees = lire_yaml(META)
+    surcharge: dict[str, dict[str, str]] = {}
+    fichier = META.parent / f"meta.{langue}.yml"
+    if langue != "en" and fichier.exists():
+        try:
+            traduit = lire_yaml(fichier)
+        except YamlIllisible as exc:
+            print(f"  surcharge {langue} ignorée : {exc}", file=sys.stderr)
+            traduit = {}
+        surcharge = {
+            str(s.get("id", "")): s for s in (traduit.get("sections") or [])
+        }
+    rendu = []
+    for section in donnees.get("sections") or []:
+        identifiant = str(section.get("id", ""))
+        traduite = surcharge.get(identifiant, {})
+        rendu.append((
+            identifiant,
+            str(traduite.get("title") or section.get("title", "")),
+            str(traduite.get("description") or section.get("description", "")),
+        ))
+    return tuple(rendu)
 
 #: Le curriculum de référence, et la version de Kubernetes réellement jouée.
 #:
@@ -308,12 +340,18 @@ def _table(langue: str) -> str:
     lignes: list[str] = [str(mots["intro"]), ""]
     rendus: set[str] = set()
 
-    for tag, titre in CERTIFICATIONS:
+    for tag, titre, description in _sections_du_contrat(langue):
         ids = _parcours().get(tag) or []
         if not ids:
             continue
         lignes.append(f"### {titre}")
         lignes.append("")
+        # Ce que `meta.yml` dit de cette certification : les domaines et leur
+        # poids. Le générateur ne le rendait pas, et c'est justement ce qui
+        # aide à choisir par quoi commencer.
+        if description:
+            lignes.append(description)
+            lignes.append("")
         lignes.append(str(mots["compte"]).format(n=len(ids)))
         lignes.append("")
         lignes.append("| " + " | ".join(mots["colonnes"]) + " |")

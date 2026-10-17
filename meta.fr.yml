@@ -1,0 +1,43 @@
+# Surcharge française du catalogue, lue par dsoxlab (0.1.54) et par
+# scripts/gen_catalog.py. Elle ne porte QUE `repo.title`,
+# `repo.description` et les `title` / `description` des sections,
+# appariés par `id` et jamais par position : une certification insérée au
+# milieu ne décale donc rien.
+#
+# La langue par défaut de l'outil est l'anglais : `meta.yml` porte
+# l'anglais, ce fichier le français. Jusqu'au 2026-10-17, ce dépôt n'avait
+# pas de surcharge et son `meta.yml` portait le français : une session
+# anglaise lisait donc les trois titres de sections en français.
+
+repo:
+  title: "Kubernetes DevSecOps Training : CKA, CKAD et CKS"
+  description: |
+    Labs vérifiables pour la formation Kubernetes du blog Stéphane Robert.
+    Chaque lab est jumelé à une leçon du site et valide une compétence
+    nommée par un blueprint officiel, CKA, CKAD ou CKS.
+
+    Ces trois examens sont entièrement PRATIQUES : le candidat répare ou
+    construit sur un cluster réel, il ne reconnaît pas une bonne réponse
+    parmi quatre. Un quiz ne prépare donc pas à l'épreuve, il prépare au
+    vocabulaire. C'est le trou que ce catalogue comble.
+
+sections:
+  - id: cka
+    title: "CKA, Certified Kubernetes Administrator"
+    description: >-
+      Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et
+      c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui
+      savent l'exploiter.
+
+  - id: ckad
+    title: "CKAD, Certified Kubernetes Application Developer"
+    description: >-
+      Cinq domaines orientés application. « Application Environment,
+      Configuration and Security » pèse 25 %, le plus lourd des cinq.
+
+  - id: cks
+    title: "CKS, Certified Kubernetes Security Specialist"
+    description: >-
+      Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux
+      seuls. Plusieurs compétences y sont invérifiables sur un cluster en
+      conteneur, ce qui est la raison d'être des VM de ce catalogue.
