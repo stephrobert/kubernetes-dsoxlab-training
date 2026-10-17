@@ -11,18 +11,25 @@ depuis `lab.fr.yaml`, qui surcharge le titre et la description. Un lab dont le
 verrait : `dsoxlab validate-structure` le refuse d'ailleurs avant, avec
 `content_missing_english`.
 
-Le catalogue rend DEUX vues, parce qu'un lecteur pose deux questions
-différentes et qu'une seule table ne peut pas répondre aux deux.
+Le catalogue rend UNE vue par certification, et elle répond aux deux questions
+que le lecteur pose :
 
-- **Le parcours recommandé**, numéroté, lu dans `meta.yml` : dans quel ordre
-  jouer les labs. C'est une progression pédagogique.
-- **La couverture du blueprint**, groupée par certification puis par domaine
-  (`level`) : quelle compétence de l'examen chaque lab éprouve. C'est la
-  question qui pilote ce dépôt.
+- **dans quel ordre jouer** : les lignes suivent `meta.yml`, et la colonne de
+  rang le dit sans qu'il faille compter ;
+- **quelle compétence de l'examen chaque lab éprouve** : la colonne « domaine
+  du blueprint ».
 
-Les confondre a un coût mesuré : tant que le catalogue n'a rendu que la
-seconde, le lecteur du README tombait sur `cka-etcd-backup-restore` avant
-`cka-static-pod`, alors que `meta.yml` déclare l'inverse.
+Il en a rendu DEUX jusqu'au 2026-10-17, un parcours numéroté puis un tableau
+groupé par domaine. Chacune avait sa raison, et les deux ensemble énuméraient
+les 64 labs 129 fois : mesuré sur les douze catalogues, le facteur de
+répétition valait 2,02 ici contre 1,00 partout ailleurs. Un README de 406
+lignes où le même lab se lit deux fois n'informe pas deux fois mieux.
+
+Ce que la fusion ne perd pas : l'ordre reste celui de `meta.yml`, et non le tri
+par domaine. Tant que le catalogue n'a rendu QUE la vue par domaine, le lecteur
+tombait sur `cka-etcd-backup-restore` avant `cka-static-pod`, alors que
+`meta.yml` déclare l'inverse. C'est ce défaut-là qui avait fait ajouter la
+seconde vue ; il ne revient pas.
 
 La colonne de validation vient de `validation-labs.json`, écrit par
 `scripts/valider-labs.py`. Un lab livrable n'est pas un lab validé, et cette
@@ -91,30 +98,29 @@ def _source_curriculums() -> str:
 LANGUES = {
     "en": {
         "fichier": "README.md",
-        "colonnes": ("Lab", "Title", "Blueprint domain", "Duration", "Validated", "Companion lesson"),
+        "colonnes": ("#", "Lab", "Title", "Blueprint domain", "Duration", "Validated", "Companion lesson"),
         "compte": "{n} lab(s).",
         "lecon": "lesson",
         "aucune": "none",
         "non": "no",
         "rouge": "**RED**",
         "capstone": "capstone, several domains",
-        "titre_parcours": "The recommended path",
-        "intro_parcours": (
-            "This is the order in which the labs are meant to be played, as "
-            "declared in `meta.yml`. It is a teaching progression, not the "
-            "structure of the exam: it goes from what a cluster is made of to "
-            "diagnosing it, and ends with the capstone, which assumes the rest "
-            "has been played. The table further down answers the other "
-            "question, the one about coverage: which blueprint domain does each "
-            "lab exercise."
+        "intro": (
+            "One table per exam, in the order `meta.yml` declares. That order "
+            "is a teaching progression, not the structure of the exam: it goes "
+            "from what a cluster is made of to diagnosing it, and ends with the "
+            "capstone, which assumes the rest has been played. The "
+            "`Blueprint domain` column answers the other question, the one "
+            "about coverage: what each lab lets you prove."
         ),
         "absent": "declared, missing from the catalogue",
         "deux_points": ": ",
-        "titre_couverture": "Blueprint coverage",
-        "intro_couverture": (
-            "The same labs, grouped by the domain the exam names. This is the "
-            "view that answers \"what can I actually prove?\", and it is "
-            "deliberately not the order in which you should play them."
+        "titre_orphelins": "Not yet in any path",
+        "intro_orphelins": (
+            "These labs exist on disk but no section of `meta.yml` declares "
+            "them, so they have no rank in any progression. They are listed "
+            "here rather than left out: a lab that appears nowhere is a lab "
+            "nobody plays."
         ),
         "pied": (
             "Total: **{n} lab(s)**. The validation column carries the date of the "
@@ -130,29 +136,30 @@ LANGUES = {
     },
     "fr": {
         "fichier": "README.fr.md",
-        "colonnes": ("Lab", "Titre", "Domaine du blueprint", "Durée", "Validé", "Leçon jumelée"),
+        "colonnes": ("#", "Lab", "Titre", "Domaine du blueprint", "Durée", "Validé", "Leçon jumelée"),
         "compte": "{n} lab(s).",
         "lecon": "leçon",
         "aucune": "aucune",
         "non": "non",
         "rouge": "**ROUGE**",
         "capstone": "capstone, plusieurs domaines",
-        "titre_parcours": "Le parcours recommandé",
-        "intro_parcours": (
-            "C'est l'ordre dans lequel les labs sont faits pour être joués, tel "
-            "que `meta.yml` le déclare. C'est une progression pédagogique, pas "
-            "la structure de l'examen : elle va de ce dont un cluster est fait "
-            "vers son diagnostic, et se termine par le capstone, qui suppose le "
-            "reste joué. Le tableau plus bas répond à l'autre question, celle "
-            "de la couverture : quel domaine du blueprint chaque lab éprouve."
+        "intro": (
+            "Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet "
+            "ordre est une progression pédagogique, pas la structure de "
+            "l'examen : il va de ce dont un cluster est fait vers son "
+            "diagnostic, et se termine par le capstone, qui suppose le reste "
+            "joué. La colonne « Domaine du blueprint » répond à l'autre "
+            "question, celle de la couverture : ce que chaque lab permet de "
+            "prouver."
         ),
         "absent": "déclaré, absent du catalogue",
         "deux_points": " : ",
-        "titre_couverture": "La couverture du blueprint",
-        "intro_couverture": (
-            "Les mêmes labs, groupés par le domaine que l'examen nomme. C'est "
-            "la vue qui répond à « qu'est-ce que je peux prouver ? », et elle "
-            "n'est délibérément pas l'ordre dans lequel les jouer."
+        "titre_orphelins": "Pas encore dans un parcours",
+        "intro_orphelins": (
+            "Ces labs existent sur le disque, mais aucune section de `meta.yml` "
+            "ne les déclare : ils n'ont donc de rang dans aucune progression. "
+            "Ils sont listés ici plutôt qu'omis, parce qu'un lab qui "
+            "n'apparaît nulle part est un lab que personne ne joue."
         ),
         "pied": (
             "Total : **{n} lab(s)**. La colonne « Validé » porte la date du dernier "
@@ -267,87 +274,76 @@ def _cellule_validation(lab: dict, mesures: dict[str, dict], mots: dict) -> str:
     return str(mesure.get("date", ""))[:10]
 
 
-def _liste_parcours(langue: str) -> list[str]:
-    """La vue « dans quel ordre jouer », numérotée, une section par examen.
+def _ligne(rang: int, lab: dict, langue: str, mesures: dict, mots: dict) -> str:
+    url = str(lab.get("doc_url", ""))
+    # Un capstone ne vise pas UN domaine du blueprint, il en croise plusieurs :
+    # afficher son `level` seul laisserait croire qu'il n'éprouve que celui-là.
+    capstone = lab.get("lab_type") == "capstone"
+    return (
+        "| {rang} | [`{id}`](labs/{rep}/) | {titre} | {niveau} | {duree} "
+        "| {valide} | {lecon} |"
+    ).format(
+        rang=rang,
+        id=lab.get("id", ""),
+        rep=lab["_repertoire"],
+        titre=lab["_titre_fr"] if langue == "fr" else lab["_titre_en"],
+        niveau=mots["capstone"] if capstone else lab.get("level", ""),
+        duree=lab.get("estimated_time", ""),
+        valide=_cellule_validation(lab, mesures, mots),
+        lecon=f"[{mots['lecon']}]({url})" if url else mots["aucune"],
+    )
 
-    Un lab déclaré dans `meta.yml` mais absent du disque n'est pas listé en
-    silence : il est rendu avec une mention, parce qu'un parcours qui saute un
-    numéro sans rien dire est plus trompeur qu'un parcours qui signale son
-    trou. Le contrôle de complétude, lui, refusera le lab.
+
+def _table(langue: str) -> str:
+    """Un tableau par certification, dans l'ordre de `meta.yml`.
+
+    L'ordre des lignes porte la progression pédagogique, la colonne du domaine
+    porte la couverture du blueprint. Jusqu'au 2026-10-17, ces deux réponses
+    demandaient deux énumérations complètes des 64 labs.
     """
     mots = LANGUES[langue]
-    connus = {str(lab.get("id", "")): lab for lab in _labs()}
-    lignes = [f"### {mots['titre_parcours']}", "", str(mots["intro_parcours"]), ""]
+    labs = _labs()
+    mesures = _validations()
+    connus = {str(lab.get("id", "")): lab for lab in labs}
+    lignes: list[str] = [str(mots["intro"]), ""]
+    rendus: set[str] = set()
 
     for tag, titre in CERTIFICATIONS:
         ids = _parcours().get(tag) or []
         if not ids:
             continue
-        lignes.append(f"**{titre}**")
+        lignes.append(f"### {titre}")
         lignes.append("")
-        for rang, identifiant in enumerate(ids, start=1):
-            lab = connus.get(identifiant)
-            if lab is None:
-                lignes.append(f"{rang}. `{identifiant}` ({mots['absent']})")
-                continue
-            nom = lab["_titre_fr"] if langue == "fr" else lab["_titre_en"]
-            marque = " · **capstone**" if lab.get("lab_type") == "capstone" else ""
-            lignes.append(
-                f"{rang}. [`{identifiant}`](labs/{lab['_repertoire']}/)"
-                f"{mots['deux_points']}{nom}{marque}"
-            )
-        lignes.append("")
-    return lignes
-
-
-def _table(langue: str) -> str:
-    mots = LANGUES[langue]
-    labs = _labs()
-    mesures = _validations()
-    lignes: list[str] = _liste_parcours(langue)
-    lignes.append(f"### {mots['titre_couverture']}")
-    lignes.append("")
-    lignes.append(str(mots["intro_couverture"]))
-    lignes.append("")
-
-    for tag, titre in CERTIFICATIONS:
-        # Les capstones passent en dernier, et ce n'est pas cosmétique : ils
-        # supposent les micro-labs de leur certification déjà joués, puisqu'ils
-        # ne disent plus quel objet employer ni où est la panne. Les lire en
-        # tête du tableau enverrait l'apprenant au mur.
-        de_cette_certif = sorted(
-            (lab for lab in labs if tag in (lab.get("certification_tags") or [])),
-            key=lambda lab: (
-                lab.get("lab_type") == "capstone",
-                str(lab.get("level", "")),
-                str(lab.get("id", "")),
-            ),
-        )
-        if not de_cette_certif:
-            continue
-        lignes.append(f"#### {titre}")
-        lignes.append("")
-        lignes.append(str(mots["compte"]).format(n=len(de_cette_certif)))
+        lignes.append(str(mots["compte"]).format(n=len(ids)))
         lignes.append("")
         lignes.append("| " + " | ".join(mots["colonnes"]) + " |")
         lignes.append("|" + "|".join(["---"] * len(mots["colonnes"])) + "|")
-        for lab in de_cette_certif:
-            url = str(lab.get("doc_url", ""))
-            # Un capstone ne vise pas UN domaine du blueprint, il en croise
-            # plusieurs : afficher son `level` seul laisserait croire qu'il
-            # n'éprouve que celui-là, alors qu'il en croise plusieurs.
-            capstone = lab.get("lab_type") == "capstone"
-            lignes.append(
-                "| [`{id}`](labs/{rep}/) | {titre} | {niveau} | {duree} | {valide} | {lecon} |".format(
-                    id=lab.get("id", ""),
-                    rep=lab["_repertoire"],
-                    titre=lab["_titre_fr"] if langue == "fr" else lab["_titre_en"],
-                    niveau=mots["capstone"] if capstone else lab.get("level", ""),
-                    duree=lab.get("estimated_time", ""),
-                    valide=_cellule_validation(lab, mesures, mots),
-                    lecon=f"[{mots['lecon']}]({url})" if url else mots["aucune"],
-                )
-            )
+        for rang, identifiant in enumerate(ids, start=1):
+            lab = connus.get(identifiant)
+            if lab is None:
+                # Un lab déclaré dans `meta.yml` mais absent du disque n'est pas
+                # sauté en silence : un parcours qui saute un rang sans rien
+                # dire est plus trompeur qu'un parcours qui signale son trou.
+                # Le contrôle de complétude, lui, refusera le lab.
+                vides = " | ".join([""] * (len(mots["colonnes"]) - 2))
+                lignes.append(f"| {rang} | `{identifiant}` | {mots['absent']} | {vides} |")
+                continue
+            rendus.add(identifiant)
+            lignes.append(_ligne(rang, lab, langue, mesures, mots))
+        lignes.append("")
+
+    # Un lab présent sur le disque qu'aucune section de `meta.yml` ne déclare
+    # n'apparaîtrait nulle part : il est rendu à part, nommé pour ce qu'il est.
+    orphelins = [lab for lab in labs if str(lab.get("id", "")) not in rendus]
+    if orphelins:
+        lignes.append(f"### {mots['titre_orphelins']}")
+        lignes.append("")
+        lignes.append(str(mots["intro_orphelins"]))
+        lignes.append("")
+        lignes.append("| " + " | ".join(mots["colonnes"]) + " |")
+        lignes.append("|" + "|".join(["---"] * len(mots["colonnes"])) + "|")
+        for rang, lab in enumerate(orphelins, start=1):
+            lignes.append(_ligne(rang, lab, langue, mesures, mots))
         lignes.append("")
 
     lignes.append(
