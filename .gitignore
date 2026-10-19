@@ -17,3 +17,7 @@ __pycache__/
 
 # Réglages Claude Code propres à ce poste : autorisations de commandes.
 .claude/settings.local.json
+
+# Le mot de passe qui déchiffre les solutions du formateur. Jamais commité :
+# le commiter annulerait le chiffrement, puisqu'il voyage avec ce qu'il ouvre.
+.vault-pass
