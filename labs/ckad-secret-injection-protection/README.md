@@ -25,7 +25,7 @@ configuration reads a file rather than a variable.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 20 minutes |
-| Companion lesson | [Secrets](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/) |
+| Companion lesson | [Secrets](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/) |
 
 ```bash
 dsoxlab run   ckad-secret-injection-protection

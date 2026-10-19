@@ -32,7 +32,7 @@ import yaml
 
 SOURCE = Path.home() / "Projets" / "K8sExamLab"
 PARCOURS = Path.home() / "Projets" / "test-astro-5" / "src/data/parcours/kubernetes.yaml"
-BLOG = "https://blog.stephane-robert.info"
+BLOG = "https://www.stephane-robert.info"
 
 # Au-dessous de ce score, la proposition se relit avant d'être retenue.
 SUR = 3

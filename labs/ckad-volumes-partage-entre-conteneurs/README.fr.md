@@ -21,7 +21,7 @@ toutes les cinq secondes, et `ls` dans le lecteur ne trouve rien.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Volumes applicatifs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/) |
+| Leçon jumelée | [Volumes applicatifs](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/) |
 
 ```bash
 dsoxlab run   ckad-volumes-partage-entre-conteneurs

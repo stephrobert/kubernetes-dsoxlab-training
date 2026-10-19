@@ -12,7 +12,7 @@ savoir se passer de `kubectl`.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Control Plane Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/) |
+| Leçon jumelée | [Control Plane Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-apiserver

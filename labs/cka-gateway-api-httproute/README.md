@@ -37,7 +37,7 @@ the chart, which warns it will stop shipping them.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [Gateway API](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
+| Companion lesson | [Gateway API](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
 
 ```bash
 dsoxlab run   cka-gateway-api-httproute

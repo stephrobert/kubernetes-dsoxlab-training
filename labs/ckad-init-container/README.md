@@ -12,7 +12,7 @@ really stays in `Init` as long as nothing answers.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Init Containers and Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
+| Companion lesson | [Init Containers and Sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
 
 ```bash
 dsoxlab run   ckad-init-container

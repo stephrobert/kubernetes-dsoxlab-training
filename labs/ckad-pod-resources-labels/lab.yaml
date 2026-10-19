@@ -15,7 +15,7 @@ skills:
   - multi-container
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
 lab_type: lab
 estimated_time: 10m
 

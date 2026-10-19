@@ -12,7 +12,7 @@ events, not in the status.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Companion lesson | [Diagnosing an ImagePullBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/) |
+| Companion lesson | [Diagnosing an ImagePullBackOff](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-imagepullbackoff

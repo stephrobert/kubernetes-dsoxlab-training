@@ -16,7 +16,7 @@ skills:
   - load-testing
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
 lab_type: lab
 estimated_time: 20m
 

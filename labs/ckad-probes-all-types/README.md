@@ -11,7 +11,7 @@ they are looking for, and a probe aimed at a wrong path would not pass.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Defining Probes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
+| Companion lesson | [Defining Probes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
 
 ```bash
 dsoxlab run   ckad-probes-all-types

@@ -14,7 +14,7 @@ that is where persistence is proven.
 |---|---|
 | Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
 | Duration | about 15 minutes |
-| Companion lesson | [Kubernetes storage: PV, PVC, StorageClass and CSI](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
+| Companion lesson | [Kubernetes storage: PV, PVC, StorageClass and CSI](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
 
 ```bash
 dsoxlab run   cka-pv-pvc-storageclass

@@ -32,7 +32,7 @@ kubeadm cluster with no cloud provider. Measured cost: about 66 MB.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [Ingress](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
+| Companion lesson | [Ingress](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 
 ```bash
 dsoxlab run   cks-ingress-tls

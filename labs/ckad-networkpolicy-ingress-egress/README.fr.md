@@ -11,7 +11,7 @@ bloquée : c'est pour ce lab, entre autres, que le socle est passé à Calico.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Network Policies](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| Leçon jumelée | [Network Policies](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 
 ```bash
 dsoxlab run   ckad-networkpolicy-ingress-egress

@@ -15,7 +15,7 @@ skills:
   - scheduling
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
 lab_type: lab
 estimated_time: 25m
 

@@ -23,7 +23,7 @@ Trivy is installed on the node by **mise**, from `shared/outil-par-mise.yml`.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [Image Scanning](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
+| Companion lesson | [Image Scanning](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
 
 ```bash
 dsoxlab run   cks-image-scanning-trivy

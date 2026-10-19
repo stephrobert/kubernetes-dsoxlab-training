@@ -22,7 +22,7 @@ la calcule à partir des URL de pair et du jeton de cluster.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [etcd : la base clé/valeur du control plane](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
+| Leçon jumelée | [etcd : la base clé/valeur du control plane](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
 
 ```bash
 dsoxlab run   cka-etcd-backup-restore

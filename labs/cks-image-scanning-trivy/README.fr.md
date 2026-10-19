@@ -23,7 +23,7 @@ Trivy est posé sur le nœud par **mise**, depuis `shared/outil-par-mise.yml`.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [Image Scanning](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
+| Leçon jumelée | [Image Scanning](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
 
 ```bash
 dsoxlab run   cks-image-scanning-trivy

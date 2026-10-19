@@ -12,7 +12,7 @@ nœud s'il exécute vraiment le conteneur.
 |---|---|
 | Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [Fonctionnement des Worker Nodes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
+| Leçon jumelée | [Fonctionnement des Worker Nodes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   cka-static-pod

@@ -20,7 +20,7 @@ doit pouvoir faire, et ce qu'il ne doit plus pouvoir faire.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [RBAC](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
+| Leçon jumelée | [RBAC](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 
 ```bash
 dsoxlab run   cks-rbac-least-privilege

@@ -20,7 +20,7 @@ un test bâti sur une telle cible serait vrai avant le travail.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Network Policies](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| Leçon jumelée | [Network Policies](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 
 ```bash
 dsoxlab run   cks-networkpolicy-default-deny

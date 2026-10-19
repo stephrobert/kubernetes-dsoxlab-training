@@ -14,7 +14,7 @@ looking into another namespace answer 403.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [ServiceAccounts for developers](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
+| Companion lesson | [ServiceAccounts for developers](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
 
 ```bash
 dsoxlab run   cka-rbac-serviceaccount

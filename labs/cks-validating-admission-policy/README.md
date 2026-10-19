@@ -33,7 +33,7 @@ objects: left in place, they would refuse Pods in later labs. The Gateway API's
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 30 minutes |
-| Companion lesson | [ValidatingAdmissionPolicy](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/) |
+| Companion lesson | [ValidatingAdmissionPolicy](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/) |
 
 ```bash
 dsoxlab run   cks-validating-admission-policy

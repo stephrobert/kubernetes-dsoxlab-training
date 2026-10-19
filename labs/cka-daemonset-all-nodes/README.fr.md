@@ -13,7 +13,7 @@ parce que le control plane a été ouvert à tous.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [DaemonSets Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/) |
+| Leçon jumelée | [DaemonSets Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/) |
 
 ```bash
 dsoxlab run   cka-daemonset-all-nodes

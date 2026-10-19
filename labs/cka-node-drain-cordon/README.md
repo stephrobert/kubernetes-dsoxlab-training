@@ -13,7 +13,7 @@ every Pod of the application was recreated elsewhere after the lab started.
 |---|---|
 | Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
 | Duration | about 15 minutes |
-| Companion lesson | [Preparing a Kubernetes cluster maintenance](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
+| Companion lesson | [Preparing a Kubernetes cluster maintenance](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-node-drain-cordon

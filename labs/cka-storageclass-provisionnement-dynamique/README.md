@@ -33,7 +33,7 @@ objects and files that would fill the disk over successive labs.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [StorageClass](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/) |
+| Companion lesson | [StorageClass](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/) |
 
 ```bash
 dsoxlab run   cka-storageclass-provisionnement-dynamique

@@ -29,7 +29,7 @@ the sandboxed Pod reads `Linux version 4.19.0-gvisor`, the node runs
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [Runtime Sandboxes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
+| Companion lesson | [Runtime Sandboxes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
 
 ```bash
 dsoxlab run   cks-runtime-sandbox-gvisor

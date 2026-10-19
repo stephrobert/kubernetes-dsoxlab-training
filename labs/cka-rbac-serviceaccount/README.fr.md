@@ -13,7 +13,7 @@ lire les Secrets ou regarder un autre namespace répondent 403.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [ServiceAccounts pour développeurs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
+| Leçon jumelée | [ServiceAccounts pour développeurs](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
 
 ```bash
 dsoxlab run   cka-rbac-serviceaccount

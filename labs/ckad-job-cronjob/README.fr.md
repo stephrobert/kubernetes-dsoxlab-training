@@ -11,7 +11,7 @@ tourné en même temps.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Les Jobs et CronJobs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/) |
+| Leçon jumelée | [Les Jobs et CronJobs](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/) |
 
 ```bash
 dsoxlab run   ckad-job-cronjob

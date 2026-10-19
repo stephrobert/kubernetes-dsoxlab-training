@@ -19,7 +19,7 @@ aussi les deux niveaux : une politique qui enregistrerait tout en
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [Audit Logs](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
+| Leçon jumelée | [Audit Logs](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
 
 ```bash
 dsoxlab run   cks-audit-log-policy

@@ -11,7 +11,7 @@ c'est un composant du cluster qu'il faut retrouver et remettre en service.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [CoreDNS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
+| Leçon jumelée | [CoreDNS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-dns

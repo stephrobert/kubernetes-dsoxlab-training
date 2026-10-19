@@ -27,7 +27,7 @@ would keep it from being scheduled again, and that would be an outage.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [ResourceQuota and LimitRange](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
+| Companion lesson | [ResourceQuota and LimitRange](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
 
 ```bash
 dsoxlab run   cka-resourcequota-limitrange

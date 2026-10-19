@@ -29,7 +29,7 @@ resterait `Pending` sur un cluster kubeadm sans fournisseur de cloud.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Ingress](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
+| Leçon jumelée | [Ingress](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 
 ```bash
 dsoxlab run   cka-ingress-path-routing

@@ -11,7 +11,7 @@ at zero, the new one complete.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Rolling Updates and Rollbacks](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/) |
+| Companion lesson | [Rolling Updates and Rollbacks](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/) |
 
 ```bash
 dsoxlab run   ckad-rolling-update-strategy

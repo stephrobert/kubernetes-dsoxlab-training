@@ -10,7 +10,7 @@ les deux : le confinement agit, et l'application sert.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Security Context](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/) |
+| Leçon jumelée | [Security Context](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/) |
 
 ```bash
 dsoxlab run   ckad-security-context-hardened

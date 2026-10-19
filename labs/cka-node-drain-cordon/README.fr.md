@@ -13,7 +13,7 @@ chaque Pod de l'application a été recréé ailleurs après le début du lab.
 |---|---|
 | Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Préparer une maintenance de cluster Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
+| Leçon jumelée | [Préparer une maintenance de cluster Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-node-drain-cordon

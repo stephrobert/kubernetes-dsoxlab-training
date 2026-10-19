@@ -13,7 +13,7 @@ Calico.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Les Services](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
+| Leçon jumelée | [Les Services](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-networking

@@ -12,7 +12,7 @@ one without breaking the API. It is the first lab in the catalogue to use the
 |---|---|
 | Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
 | Duration | about 15 minutes |
-| Companion lesson | [Diagnosing a cluster failure](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
+| Companion lesson | [Diagnosing a cluster failure](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-node-notready

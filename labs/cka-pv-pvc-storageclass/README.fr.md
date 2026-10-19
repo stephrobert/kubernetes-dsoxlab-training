@@ -14,7 +14,7 @@ prouve.
 |---|---|
 | Cibles | `k8s-cp.lab`, et `k8s-w1.lab` joignable par `ssh` depuis le control plane |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Stockage Kubernetes : PV, PVC, StorageClass et CSI](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
+| Leçon jumelée | [Stockage Kubernetes : PV, PVC, StorageClass et CSI](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/) |
 
 ```bash
 dsoxlab run   cka-pv-pvc-storageclass

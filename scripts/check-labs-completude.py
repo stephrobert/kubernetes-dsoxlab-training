@@ -72,7 +72,7 @@ def defauts(lab: Path) -> list[str]:
     hote = urlparse(url).hostname or ""
     if MARQUEUR in url or hote in GABARITS:
         out.append("doc_url : la leçon du blog n'est pas renseignée")
-    elif not url.startswith("https://blog.stephane-robert.info/"):
+    elif not url.startswith("https://www.stephane-robert.info/"):
         out.append(f"doc_url : hors du blog ({url[:48]})")
 
     if d.get("id") != lab.name:

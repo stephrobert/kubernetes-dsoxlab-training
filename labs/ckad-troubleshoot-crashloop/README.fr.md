@@ -13,7 +13,7 @@ raconte. Chaque test observe le Pod pendant quinze secondes : un Pod
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Diagnostiquer un CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
+| Leçon jumelée | [Diagnostiquer un CrashLoopBackOff](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-crashloop

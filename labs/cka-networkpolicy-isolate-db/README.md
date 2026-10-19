@@ -14,7 +14,7 @@ none of this would be measurable.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Kubernetes NetworkPolicies](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| Companion lesson | [Kubernetes NetworkPolicies](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 
 ```bash
 dsoxlab run   cka-networkpolicy-isolate-db

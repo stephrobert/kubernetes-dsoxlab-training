@@ -28,7 +28,7 @@ plafond trop bas l'empêcherait de se replacer, et ce serait une panne.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [ResourceQuota et LimitRange](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
+| Leçon jumelée | [ResourceQuota et LimitRange](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
 
 ```bash
 dsoxlab run   cka-resourcequota-limitrange

@@ -12,7 +12,7 @@ anywhere.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [ConfigMaps](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
+| Companion lesson | [ConfigMaps](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
 
 ```bash
 dsoxlab run   ckad-configmap-secret-injection
