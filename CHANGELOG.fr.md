@@ -6,6 +6,53 @@ Tous les changements notables de ce projet sont consignés dans ce fichier. Le
 format s'appuie sur [Keep a Changelog](https://keepachangelog.com/), et le
 projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [0.2.2] - 2026-10-19
+
+### Sécurité
+
+- **Les 64 solutions du formateur sont chiffrées par ansible-vault.** Elles
+  étaient commitées en clair dans `labs/<lab>/challenge/solution.sh`, c'est-à-dire
+  dans le répertoire que l'apprenant ouvre, et dans un dépôt public. Le
+  catalogue était pourtant conçu pour des solutions chiffrées : son
+  `conftest.py` sait déchiffrer un script qui commence par `$ANSIBLE_VAULT`,
+  et `CONTRIBUTING.md` décrit la solution comme « rejouable ». Seuls le secret
+  et le chiffrement manquaient.
+
+  Deux lecteurs lisaient ce fichier en clair et devaient donc apprendre à
+  déchiffrer, sans quoi le chiffrement cassait la validation au lieu de
+  protéger le lab : `scripts/valider-labs.py` envoyait le script brut par SSH,
+  et `tests/test_pieges_du_depot.py` analysait ses lignes. Ils passent
+  maintenant par `scripts/lecture_solution.py`, qui déchiffre et qui **lève**
+  quand il ne peut pas, plutôt que de rendre une chaîne vide.
+
+  Ce dernier point est le vrai risque de l'opération, et il méritait un
+  module : un analyseur à qui l'on donne un blob chiffré ne lève pas, il n'y
+  voit aucun `ssh` et conclut au vert. Le garde-fou des `ssh` sans `-n`, qui a
+  coûté un cycle de cluster, serait devenu aveugle en restant au vert. Mesuré
+  après coup : l'analyse voit 2 447 lignes de code et 11 appels `ssh`, et sans
+  le secret elle se déclare non jouée.
+
+  Chaque fichier a été prouvé un par un : la somme SHA256 du clair a été
+  retenue avant chiffrement et comparée à celle du déchiffrement. 64 sur 64
+  rendent l'original à l'octet près.
+
+- **`.gitignore` couvre `.vault-pass`.** Il ne le faisait pas, à la différence
+  des autres catalogues, et le secret apparaissait donc dans `git status`
+  comme un fichier à committer. Le commiter annulerait le chiffrement,
+  puisqu'il voyage avec ce qu'il ouvre.
+
+### Connu, non traité ici
+
+- Le rejeu de la solution officielle **ne se joue sur aucun lab de ce
+  catalogue**. Pour un lab `vm`, `conftest.py` cherche
+  `solution/<chemin>/solution.yaml` à la racine du dépôt, et ce répertoire
+  n'existe pas : la condition est fausse pour les 64 labs, et les tests
+  tournent alors sur l'état courant du cluster sans que la solution ait été
+  appliquée. Les solutions vivent ailleurs, en `.sh` dans `challenge/`, où
+  seul `scripts/valider-labs.py` va les chercher. Déplacer les 64 fichiers
+  touche les tests de structure du dépôt : c'est un chantier à part, et il
+  est consigné ici pour ne pas être redécouvert.
+
 ## [0.2.1] - 2026-10-19
 
 ### Modifié

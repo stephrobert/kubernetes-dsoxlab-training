@@ -6,6 +6,52 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/), and the project
 follows [semantic versioning](https://semver.org/).
 
+## [0.2.2] - 2026-10-19
+
+### Security
+
+- **The 64 trainer solutions are encrypted with ansible-vault.** They were
+  committed in plaintext under `labs/<lab>/challenge/solution.sh`, that is, in
+  the directory the learner opens, and in a public repository. The catalogue
+  was built for encrypted solutions all along: its `conftest.py` knows how to
+  decrypt a script starting with `$ANSIBLE_VAULT`, and `CONTRIBUTING.md`
+  describes the solution as "replayable". Only the secret and the encryption
+  were missing.
+
+  Two readers consumed that file in plaintext and therefore had to learn to
+  decrypt, otherwise encrypting would have broken validation instead of
+  protecting the lab: `scripts/valider-labs.py` piped the raw script over SSH,
+  and `tests/test_pieges_du_depot.py` scanned its lines. Both now go through
+  `scripts/lecture_solution.py`, which decrypts and **raises** when it cannot,
+  rather than returning an empty string.
+
+  That last point is the real risk of the operation, and it deserved a module:
+  a scanner handed an encrypted blob does not raise, it sees no `ssh` in it and
+  concludes green. The guard against `ssh` without `-n`, which cost a full
+  cluster cycle, would have gone blind while staying green. Measured
+  afterwards: the scan sees 2,447 lines of code and 11 `ssh` calls, and without
+  the secret it declares itself not run.
+
+  Every file was proved one by one: the SHA256 of the plaintext was taken
+  before encryption and compared with the decryption afterwards. 64 out of 64
+  return the original byte for byte.
+
+- **`.gitignore` now covers `.vault-pass`.** It did not, unlike the other
+  catalogues, so the secret showed up in `git status` as a file to commit.
+  Committing it would undo the encryption, since it travels with what it
+  opens.
+
+### Known, not addressed here
+
+- The official solution replay **runs on no lab in this catalogue**. For a `vm`
+  lab, `conftest.py` looks for `solution/<path>/solution.yaml` at the
+  repository root, and that directory does not exist: the condition is false
+  for all 64 labs, and the tests then run against the current cluster state
+  without the solution having been applied. The solutions live elsewhere, as
+  `.sh` files under `challenge/`, where only `scripts/valider-labs.py` looks
+  for them. Moving the 64 files touches the repository's structure tests: that
+  is a separate piece of work, recorded here so it is not rediscovered.
+
 ## [0.2.1] - 2026-10-19
 
 ### Changed

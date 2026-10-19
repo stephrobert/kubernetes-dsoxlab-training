@@ -48,6 +48,7 @@ from pathlib import Path
 # sur `sys.path` parce que c'est le répertoire de ce fichier.
 import verdict_check
 import yaml
+from lecture_solution import lire_solution
 
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
@@ -343,7 +344,10 @@ def valider(lab: Path, rejeu: bool) -> dict:
             dire(f"avant le travail : {resultat['avant']['passed']}/{resultat['avant']['total']}")
 
             solution = lab / "challenge" / "solution.sh"
-            res = ssh(hote, solution.read_text(encoding="utf-8"), journal, 600)
+            # lire_solution déchiffre : envoyer le blob vault par SSH ferait
+            # échouer la solution sur une erreur de syntaxe bash, et le message
+            # enverrait chercher le défaut dans le lab.
+            res = ssh(hote, lire_solution(solution), journal, 600)
             if res.returncode != 0:
                 raise Echec(f"la solution du formateur a échoué (rc={res.returncode}) : "
                             f"{(res.stdout + res.stderr).strip()[-400:]}")

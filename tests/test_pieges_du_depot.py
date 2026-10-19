@@ -39,11 +39,19 @@ se voit à la relecture : ils se manifestent tous comme autre chose.
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 import pytest
 
 RACINE = Path(__file__).resolve().parent.parent
+
+# Les solutions sont chiffrées : l'analyse passe par le helper qui déchiffre,
+# comme `scripts/valider-labs.py`. L'idiome de ce dépôt pour atteindre
+# `scripts/` depuis un test.
+sys.path.insert(0, str(RACINE / "scripts"))
+from lecture_solution import SolutionIllisible, lire_solution  # noqa: E402
+
 LABS = RACINE / "labs"
 REPERTOIRES = sorted(p.parent for p in LABS.glob("*/lab.yaml"))
 IDS = [p.name for p in REPERTOIRES]
@@ -60,9 +68,15 @@ SUPPRIME_NAMESPACE = re.compile(r"delete\s+namespace\s+((?:[a-z0-9-]+\s+)*[a-z0-
 
 
 def _lignes_de_code(fichier: Path) -> list[tuple[int, str]]:
-    """Les lignes non commentées, avec leur numéro."""
+    """Les lignes non commentées, avec leur numéro.
+
+    Passe par `lire_solution` parce que les solutions sont chiffrées : un
+    `read_text` rendrait l'en-tête vault et son pavé hexadécimal, où ce
+    module ne trouverait aucun `ssh` et conclurait donc au vert sur les
+    soixante-quatre solutions.
+    """
     lignes = []
-    for numero, ligne in enumerate(fichier.read_text(encoding="utf-8").splitlines(), start=1):
+    for numero, ligne in enumerate(lire_solution(fichier).splitlines(), start=1):
         if ligne.strip().startswith("#"):
             continue
         lignes.append((numero, ligne))
@@ -80,9 +94,16 @@ def test_tout_ssh_d_une_solution_porte_l_option_n(lab: Path) -> None:
     if not solution.is_file():
         pytest.skip("ce lab n'a pas de solution.sh")
 
+    try:
+        lignes = _lignes_de_code(solution)
+    except SolutionIllisible as illisible:
+        # Se déclarer non joué, jamais vert : sans le secret, ce contrôle ne
+        # regarde rien, et c'est le cas en CI où `.vault-pass` n'existe pas.
+        pytest.skip(f"solution non analysable : {illisible}")
+
     fautifs = [
         (numero, ligne.strip())
-        for numero, ligne in _lignes_de_code(solution)
+        for numero, ligne in lignes
         for options in [APPEL_SSH.search(ligne)]
         if options and "-n" not in options.group(1).split()
     ]
