@@ -19,7 +19,7 @@ skills:
   - disaster-recovery
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
 lab_type: lab
 estimated_time: 25m
 

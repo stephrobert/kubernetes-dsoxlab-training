@@ -11,7 +11,7 @@ sans la coller dans son manifeste, et ses secrets sans les écrire nulle part.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Les ConfigMaps](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
+| Leçon jumelée | [Les ConfigMaps](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/) |
 
 ```bash
 dsoxlab run   ckad-configmap-secret-injection

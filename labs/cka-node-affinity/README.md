@@ -13,7 +13,7 @@ there; the `gpu-app` Pod must have waited for its label, which the
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 
 ```bash
 dsoxlab run   cka-node-affinity

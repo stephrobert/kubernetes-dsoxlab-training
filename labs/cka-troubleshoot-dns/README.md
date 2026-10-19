@@ -12,7 +12,7 @@ in service.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Companion lesson | [CoreDNS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
+| Companion lesson | [CoreDNS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-dns

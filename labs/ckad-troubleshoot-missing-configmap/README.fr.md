@@ -11,7 +11,7 @@ doit servir ce qu'il contient.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [Débugger une application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
+| Leçon jumelée | [Débugger une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-missing-configmap

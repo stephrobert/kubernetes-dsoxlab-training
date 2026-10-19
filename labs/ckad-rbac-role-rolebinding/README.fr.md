@@ -12,7 +12,7 @@ vérifie les deux côtés.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [RBAC Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
+| Leçon jumelée | [RBAC Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 
 ```bash
 dsoxlab run   ckad-rbac-role-rolebinding

@@ -13,7 +13,7 @@ between two deaths does not pass.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Diagnosing a CrashLoopBackOff](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
+| Companion lesson | [Diagnosing a CrashLoopBackOff](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-crashloop

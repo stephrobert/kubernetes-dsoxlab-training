@@ -17,7 +17,7 @@ skills:
   - scheduling
 distros:
   - ubuntu24
-doc_url: https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
 lab_type: lab
 estimated_time: 15m
 

@@ -28,7 +28,7 @@ Measured on 2026-09-16, on this setup:
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 30 minutes |
-| Companion lesson | [Encrypting Pod-to-Pod traffic with mTLS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
+| Companion lesson | [Encrypting Pod-to-Pod traffic with mTLS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
 
 ```bash
 dsoxlab run   cks-istio-mtls-lockdown

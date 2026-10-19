@@ -49,7 +49,7 @@ The last test brings three checks together, deliberately:
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 40 minutes |
-| Companion lesson | [Upgrading a Kubernetes cluster](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
+| Companion lesson | [Upgrading a Kubernetes cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
 
 ```bash
 dsoxlab run   cka-kubeadm-upgrade

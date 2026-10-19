@@ -12,7 +12,7 @@ Calico.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 20 minutes |
-| Companion lesson | [Network Policies](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
+| Companion lesson | [Network Policies](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/) |
 
 ```bash
 dsoxlab run   ckad-networkpolicy-ingress-egress

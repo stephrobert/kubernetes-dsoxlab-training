@@ -20,7 +20,7 @@ do, and what it must no longer be able to do.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 20 minutes |
-| Companion lesson | [RBAC](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
+| Companion lesson | [RBAC](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/) |
 
 ```bash
 dsoxlab run   cks-rbac-least-privilege

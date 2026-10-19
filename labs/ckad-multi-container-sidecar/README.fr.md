@@ -11,7 +11,7 @@ second conteneur ordinaire qui la remplaçait avant.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Init Containers et Sidecars](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
+| Leçon jumelée | [Init Containers et Sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
 
 ```bash
 dsoxlab run   ckad-multi-container-sidecar

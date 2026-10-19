@@ -23,7 +23,7 @@ devait protéger.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [CIS Benchmark](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
+| Leçon jumelée | [CIS Benchmark](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 
 ```bash
 dsoxlab run   cks-api-server-hardening

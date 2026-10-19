@@ -17,7 +17,7 @@ and has no docker: the hints point to `crictl`.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Supply Chain Security](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
+| Companion lesson | [Supply Chain Security](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 
 ```bash
 dsoxlab run   cks-image-pinned-digest

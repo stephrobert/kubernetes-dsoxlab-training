@@ -11,7 +11,7 @@ by `helm create`, with an image aligned on the rest of the catalogue.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Installing and managing Helm releases](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/) |
+| Companion lesson | [Installing and managing Helm releases](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/) |
 
 ```bash
 dsoxlab run   ckad-helm-install-upgrade

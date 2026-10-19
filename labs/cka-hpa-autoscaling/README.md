@@ -16,7 +16,7 @@ option that kubeadm requires, and removed by the cleanup.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 20 minutes |
-| Companion lesson | [Horizontal Pod Autoscaler](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
+| Companion lesson | [Horizontal Pod Autoscaler](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/) |
 
 ```bash
 dsoxlab run   cka-hpa-autoscaling

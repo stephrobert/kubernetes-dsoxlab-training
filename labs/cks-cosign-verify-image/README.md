@@ -33,7 +33,7 @@ cosign 3.1.3 and crane 0.22.1 are installed by **mise**, from
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 30 minutes |
-| Companion lesson | [Supply Chain Security](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
+| Companion lesson | [Supply Chain Security](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/) |
 
 ```bash
 dsoxlab run   cks-cosign-verify-image

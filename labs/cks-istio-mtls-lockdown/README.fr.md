@@ -27,7 +27,7 @@ Mesuré le 2026-09-16, sur ce socle :
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 30 minutes |
-| Leçon jumelée | [Chiffrer le trafic entre Pods avec mTLS](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
+| Leçon jumelée | [Chiffrer le trafic entre Pods avec mTLS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/) |
 
 ```bash
 dsoxlab run   cks-istio-mtls-lockdown

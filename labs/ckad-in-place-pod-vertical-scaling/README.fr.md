@@ -11,7 +11,7 @@ noyau applique la nouvelle limite.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [Requests et Limits](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| Leçon jumelée | [Requests et Limits](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
 
 ```bash
 dsoxlab run   ckad-in-place-pod-vertical-scaling

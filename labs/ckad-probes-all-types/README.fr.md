@@ -11,7 +11,7 @@ qu'elles cherchent, et une sonde vers un mauvais chemin ne passerait pas.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Définir les Probes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
+| Leçon jumelée | [Définir les Probes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
 
 ```bash
 dsoxlab run   ckad-probes-all-types

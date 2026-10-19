@@ -12,7 +12,7 @@ que ce catalogue fournit.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [AppArmor et seccomp](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
+| Leçon jumelée | [AppArmor et seccomp](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/) |
 
 ```bash
 dsoxlab run   cks-apparmor-confiner-un-pod

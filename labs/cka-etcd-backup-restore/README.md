@@ -22,7 +22,7 @@ restore, since etcd computes it from the peer URLs and the cluster token.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 25 minutes |
-| Companion lesson | [etcd, the key/value store of the control plane](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
+| Companion lesson | [etcd, the key/value store of the control plane](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
 
 ```bash
 dsoxlab run   cka-etcd-backup-restore

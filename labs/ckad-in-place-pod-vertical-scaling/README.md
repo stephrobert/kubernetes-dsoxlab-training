@@ -11,7 +11,7 @@ the new limit.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Companion lesson | [Requests and Limits](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| Companion lesson | [Requests and Limits](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
 
 ```bash
 dsoxlab run   ckad-in-place-pod-vertical-scaling

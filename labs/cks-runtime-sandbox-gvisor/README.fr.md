@@ -28,7 +28,7 @@ Pod confiné lit `Linux version 4.19.0-gvisor`, le nœud tourne sous
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 25 minutes |
-| Leçon jumelée | [Runtime Sandboxes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
+| Leçon jumelée | [Runtime Sandboxes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
 
 ```bash
 dsoxlab run   cks-runtime-sandbox-gvisor

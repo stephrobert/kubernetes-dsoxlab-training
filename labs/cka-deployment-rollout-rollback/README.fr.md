@@ -14,7 +14,7 @@ arrière a eu lieu, dans quel ordre, et si l'historique a été conservé.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Deployments Kubernetes](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
+| Leçon jumelée | [Deployments Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/) |
 
 ```bash
 dsoxlab run   cka-deployment-rollout-rollback

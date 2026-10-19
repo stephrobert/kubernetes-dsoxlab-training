@@ -12,7 +12,7 @@ skipping the scheduler, and the taint with it, which the test refuses.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
+| Companion lesson | [Advanced scheduling: Affinity, Taints, Tolerations](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/) |
 
 ```bash
 dsoxlab run   cka-taints-tolerations-placement

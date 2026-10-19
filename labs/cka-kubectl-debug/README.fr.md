@@ -12,7 +12,7 @@ nœud sans session SSH.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Débugger une application](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
+| Leçon jumelée | [Débugger une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
 ```bash
 dsoxlab run   cka-kubectl-debug

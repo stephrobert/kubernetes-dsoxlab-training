@@ -25,7 +25,7 @@ application qui recharge sa configuration lit un fichier et non une variable.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 20 minutes |
-| Leçon jumelée | [Secrets](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/) |
+| Leçon jumelée | [Secrets](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/) |
 
 ```bash
 dsoxlab run   ckad-secret-injection-protection

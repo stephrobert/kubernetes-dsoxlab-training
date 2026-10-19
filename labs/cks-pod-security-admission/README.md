@@ -16,7 +16,7 @@ real Pods to the API server, one forbidden and one compliant, as a
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Pod Security Standards](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
+| Companion lesson | [Pod Security Standards](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/) |
 
 ```bash
 dsoxlab run   cks-pod-security-admission

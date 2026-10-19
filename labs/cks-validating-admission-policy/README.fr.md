@@ -36,7 +36,7 @@ elle est présente, est épargnée.
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 30 minutes |
-| Leçon jumelée | [ValidatingAdmissionPolicy](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/) |
+| Leçon jumelée | [ValidatingAdmissionPolicy](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/) |
 
 ```bash
 dsoxlab run   cks-validating-admission-policy

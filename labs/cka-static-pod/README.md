@@ -12,7 +12,7 @@ it is really running the container.
 |---|---|
 | Targets | `k8s-cp.lab`, and `k8s-w1.lab` reachable over `ssh` from the control plane |
 | Duration | about 10 minutes |
-| Companion lesson | [How worker nodes work](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
+| Companion lesson | [How worker nodes work](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   cka-static-pod
