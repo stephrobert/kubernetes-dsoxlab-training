@@ -24,6 +24,37 @@ qui n'en a pas.
 - **Une infrastructure provisionnée** : 64 lab(s) sont en `runtime: vm` sur le réseau `lab-k8s`, et exigent `dsoxlab provision` avant la campagne, `dsoxlab destroy` après. Les hôtes attendus sont `k8s-cp.lab`, `k8s-w1.lab`.
 - De la mémoire libre réelle, et non celle qu'annonce `doctor` : détruire l'infra des autres dépôts AVANT de provisionner celle-ci, sinon les VM se disputent la RAM et les labs échouent par épuisement, ce qui ressemble à un défaut de lab.
 
+### Le cluster n'existe pas avant qu'un lab l'installe
+
+C'est le piège qui a coûté **59 faux ROUGE** le 2026-10-19, et il est écrit
+dans `CLAUDE.md` de ce dépôt depuis longtemps :
+
+> **Aucun point d'accroche après le provisionnement.** Le socle partagé est
+> donc inclus par *chaque* `setup.yaml`. Remonté en amont,
+> `stephrobert/dsoxlab#213`.
+
+`shared/kubeadm-cluster.yml` monte le control plane et joint les workers, et
+chaque `setup.yaml` l'inclut. Donc **des VM fraîchement provisionnées ne
+portent aucun cluster** : `kubectl` n'existe pas encore sur `k8s-cp.lab`.
+
+Or `valider-labs.py` photographie le cluster **avant** de jouer le lab, pour
+comparer l'état avant et après. Sur des VM neuves, cette photographie échoue
+sur `FileNotFoundError: 'kubectl'`, et chaque lab rend ROUGE en deux secondes
+sans avoir été joué.
+
+La séquence est donc :
+
+```bash
+dsoxlab provision
+dsoxlab run cka-kubectl-debug     # n'importe quel lab : son setup monte le socle
+mise exec -- uv run scripts/valider-labs.py
+dsoxlab destroy
+```
+
+Le `run` initial prend plusieurs minutes, le temps que kubeadm installe le
+cluster. Sans lui, la campagne écrit 64 verdicts qui parlent de l'absence de
+cluster et non des labs.
+
 ## La commande
 
 ```bash

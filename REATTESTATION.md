@@ -23,6 +23,36 @@ that has none.
 - **Provisioned infrastructure**: 64 lab(s) are `runtime: vm` on the `lab-k8s` network and require `dsoxlab provision` before the campaign and `dsoxlab destroy` after. Expected hosts: `k8s-cp.lab`, `k8s-w1.lab`.
 - Real free memory, not what `doctor` reports: destroy the other repositories' infrastructure BEFORE provisioning this one, or the VMs compete for RAM and labs fail by exhaustion, which looks like a lab defect.
 
+### The cluster does not exist until a lab installs it
+
+This is the trap that cost **59 false REDs** on 2026-10-19, and it has been
+written in this repository's `CLAUDE.md` all along:
+
+> **No hook after provisioning.** The shared base is therefore included by
+> *every* `setup.yaml`. Raised upstream as `stephrobert/dsoxlab#213`.
+
+`shared/kubeadm-cluster.yml` brings up the control plane and joins the
+workers, and every `setup.yaml` includes it. So **freshly provisioned VMs
+carry no cluster at all**: `kubectl` does not exist yet on `k8s-cp.lab`.
+
+But `valider-labs.py` photographs the cluster **before** running the lab, to
+compare the before and after states. On fresh VMs that photograph fails with
+`FileNotFoundError: 'kubectl'`, and every lab returns RED in two seconds
+without having been played.
+
+The sequence is therefore:
+
+```bash
+dsoxlab provision
+dsoxlab run cka-kubectl-debug     # any lab: its setup brings up the base
+mise exec -- uv run scripts/valider-labs.py
+dsoxlab destroy
+```
+
+That first `run` takes several minutes while kubeadm installs the cluster.
+Without it, the campaign writes 64 verdicts about a missing cluster rather
+than about the labs.
+
 ## The command
 
 ```bash
