@@ -1,7 +1,5 @@
-# OpenSSF Scorecard : mesure la posture de sécurité de la chaîne
-# d'approvisionnement du dépôt (protection de branche, dépendances épinglées,
-# permissions des jetons, revue de code…) et publie le résultat sur le
-# visualiseur public Scorecard, qui alimente le badge du README.
+
+# OpenSSF Scorecard - Supply chain security
 name: OpenSSF Scorecard
 
 on:
@@ -20,20 +18,19 @@ concurrency:
 
 jobs:
   analysis:
-    name: Analyse Scorecard
-    # Scorecard a besoin d'un dépôt public (API du graphe de commits et
-    # publication du résultat). Se saute tant que le dépôt est privé, s'active
-    # tout seul une fois public.
+    name: Scorecard analysis
     if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+
     permissions:
       contents: read
-      security-events: write   # dépôt du SARIF dans Code Scanning
-      id-token: write          # publication du résultat à l'API OpenSSF Scorecard
+      security-events: write
+      id-token: write
+
     steps:
-      - name: Durcir le runner
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+      - name: Harden the runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           egress-policy: audit
 
@@ -42,47 +39,15 @@ jobs:
         with:
           persist-credentials: false
 
-      # Deux tentatives, et ce n'est pas de la superstition.
-      #
-      # L'API GraphQL de GitHub rend par intermittence une erreur interne quand
-      # Scorecard tourne JUSTE APRÈS un push : « ListCommits: error during
-      # graphqlHandler.setup: internal error: githubv4.Query: Something went
-      # wrong while executing your query ». Le commit vient d'arriver, ses
-      # données associées ne sont pas encore propagées côté GitHub.
-      #
-      # Mesuré le 2026-09-15 sur ce dépôt et ses jumeaux : plusieurs runs de
-      # push en échec pendant une rafale de fusions, les MÊMES dépôts analysés
-      # sans erreur quelques minutes plus tard, sans qu'une ligne ait changé.
-      # La requête a été rejouée à la main : elle passe. Ce n'est donc pas une
-      # donnée cassée, c'est un moment.
-      #
-      # Sans second essai, la main reste rouge pour une panne qui n'est pas la
-      # nôtre, et une main rouge qu'on apprend à ignorer ne sert plus à rien.
-      - name: Lancer Scorecard
+      - name: Run OpenSSF Scorecard
         id: scorecard
-        continue-on-error: true
-        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
-        with:
-          results_file: results.sarif
-          results_format: sarif
-          publish_results: true # publie au visualiseur OpenSSF, qui alimente le badge
-
-      - name: Laisser GitHub propager le commit
-        if: steps.scorecard.outcome == 'failure'
-        run: sleep 90
-
-      # Celle-ci ne porte PAS continue-on-error : si le second essai échoue
-      # aussi, le job échoue, et c'est bien ce qu'on veut. Un workflow qui ne
-      # peut plus échouer ne mesure plus rien.
-      - name: Lancer Scorecard (second essai)
-        if: steps.scorecard.outcome == 'failure'
-        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        uses: ossf/scorecard-action@fa7117db83c52d787ae5a89f350999701505d78e # v2.5.0
         with:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
 
-      - name: Déposer le SARIF dans Code Scanning
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+      - name: Upload SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           sarif_file: results.sarif
