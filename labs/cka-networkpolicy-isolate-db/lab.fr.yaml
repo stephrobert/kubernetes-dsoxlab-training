@@ -5,3 +5,21 @@ description: |
   connexions : celle qui doit passer, celle du frontend qui doit être
   bloquée, celle d'un Pod au bon label mais dans un autre namespace, et
   vérifient que la base peut encore sortir.
+
+criteria:
+  - id: la-politique-s-applique-a-la-base
+    label: "La politique db-allow-backend s'applique aux Pods de la base"
+  - id: la-politique-controle-l-entree
+    label: "La politique contrôle le trafic entrant"
+  - id: la-politique-laisse-entrer-le-backend-du-meme-namespace
+    label: "La politique laisse entrer les Pods app=backend du même namespace"
+  - id: la-politique-n-ouvre-que-le-port-5432-en-tcp
+    label: "La politique n'ouvre que le port 5432 en TCP"
+  - id: le-backend-atteint-toujours-la-base
+    label: "backend atteint toujours db sur 5432"
+  - id: le-frontend-est-bloque
+    label: "frontend n'atteint plus db"
+  - id: l-intrus-d-un-autre-namespace-est-bloque
+    label: "intrus, dans un autre namespace, n'atteint plus db malgré son label"
+  - id: la-base-peut-toujours-sortir
+    label: "La base peut toujours sortir"
