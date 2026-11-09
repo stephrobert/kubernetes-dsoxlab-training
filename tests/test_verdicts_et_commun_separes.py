@@ -14,6 +14,7 @@ passer ce qu'il doit arreter.
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -21,6 +22,14 @@ import pytest
 
 RACINE = Path(__file__).resolve().parents[1]
 OUTIL = RACINE / "tests" / "outils" / "verdicts_et_commun_separes.py"
+
+#: L'environnement SANS les variables `GIT_*` de l'appelant. Lancé comme hook
+#: pre-commit, ce test hérite de `GIT_INDEX_FILE` : relatif (`.git/index`) dans
+#: un checkout ordinaire, il se résout dans le dépôt jetable ; ABSOLU dans un
+#: worktree, il désigne l'index du catalogue, et `git -C <jetable> add -A`
+#: écrivait alors les fichiers du dépôt jetable dans l'index réel (848 entrées,
+#: `scripts/valider-labs.py` réduit à « depart », mesuré le 2026-11-09).
+ENV_ISOLE = {cle: valeur for cle, valeur in os.environ.items() if not cle.startswith("GIT_")}
 
 
 def _git(depot: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -30,6 +39,7 @@ def _git(depot: Path, *args: str) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         timeout=30,
+        env=ENV_ISOLE,
     )
 
 
@@ -72,6 +82,7 @@ def _jouer(depot: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         timeout=30,
+        env=ENV_ISOLE,
     )
 
 
