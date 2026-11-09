@@ -5,3 +5,27 @@ description: |
   monter dans un Pod qui y écrit. Les tests lisent le volume, la liaison,
   le montage, le fichier dans le Pod, puis le même fichier sur le disque du
   nœud : c'est là que se prouve la persistance.
+
+criteria:
+  - id: le-volume-a-une-capacite-de-1gi
+    label: "Le PersistentVolume lab-pv a une capacité de 1Gi"
+  - id: le-volume-est-en-readwriteonce
+    label: "Le PersistentVolume lab-pv est en ReadWriteOnce"
+  - id: le-volume-a-la-storageclass-manual
+    label: "Le PersistentVolume lab-pv a la StorageClass manual"
+  - id: le-volume-est-adosse-au-repertoire-du-noeud
+    label: "Le PersistentVolume lab-pv est adossé au répertoire /mnt/lab-data du nœud"
+  - id: la-reclamation-demande-500mi
+    label: "La réclamation lab-pvc demande 500Mi"
+  - id: la-reclamation-demande-readwriteonce
+    label: "La réclamation lab-pvc demande ReadWriteOnce"
+  - id: la-reclamation-demande-la-storageclass-manual
+    label: "La réclamation lab-pvc demande la StorageClass manual"
+  - id: la-reclamation-est-liee-a-lab-pv
+    label: "La réclamation lab-pvc est Bound à lab-pv"
+  - id: le-pod-monte-la-reclamation-sur-data
+    label: "Le Pod data-pod monte la réclamation sur /data"
+  - id: le-pod-a-ecrit-hello-dans-data-test-txt
+    label: "Le Pod a écrit hello dans /data/test.txt"
+  - id: le-fichier-est-sur-le-disque-du-noeud
+    label: "Le fichier est sur le disque du nœud, dans /mnt/lab-data"

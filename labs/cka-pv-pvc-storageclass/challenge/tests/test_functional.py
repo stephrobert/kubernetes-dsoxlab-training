@@ -2,7 +2,7 @@
 
 Ces tests lisent l'état du CLUSTER et du NŒUD, jamais les commandes tapées.
 
-Quatre affirmations. La première lit le PersistentVolume : capacité, mode
+Un test vérifie un seul état demandé par l'énoncé, en quatre temps. Le premier lit le PersistentVolume : capacité, mode
 d'accès, StorageClass, et le répertoire du nœud auquel il est adossé. La
 deuxième lit la réclamation et sa liaison. La troisième lit le Pod, son
 montage, et le fichier vu de l'intérieur. La quatrième lit le même fichier
@@ -81,24 +81,36 @@ def _pod_pret(host) -> dict:
 # ----------------------------------------------------------------------
 # 1. Le PersistentVolume est ce qui est demandé.
 # ----------------------------------------------------------------------
-def test_le_volume_est_declare(host):
+def test_le_volume_a_une_capacite_de_1gi(host):
     pv = _pv(host)
     capacite = (pv["spec"].get("capacity") or {}).get("storage")
     assert capacite == "1Gi", message(
         en=f"{PV} has a capacity of {capacite!r}, expected 1Gi.",
         fr=f"{PV} a une capacité de {capacite!r}, attendu 1Gi.",
     )
+
+
+def test_le_volume_est_en_readwriteonce(host):
+    pv = _pv(host)
     modes = pv["spec"].get("accessModes") or []
     assert "ReadWriteOnce" in modes, message(
         en=f"{PV} has modes {modes}, expected ReadWriteOnce.",
         fr=f"{PV} a les modes {modes}, attendu ReadWriteOnce.",
     )
+
+
+def test_le_volume_a_la_storageclass_manual(host):
+    pv = _pv(host)
     assert pv["spec"].get("storageClassName") == "manual", message(
         en=f"{PV} has StorageClass {pv['spec'].get('storageClassName')!r}, expected manual. A PVC "
         "asking for manual will never bind to a PV that says something else.",
         fr=f"{PV} a la StorageClass {pv['spec'].get('storageClassName')!r}, attendu manual. Un PVC "
         "qui demande manual ne se liera jamais à un PV qui dit autre chose.",
     )
+
+
+def test_le_volume_est_adosse_au_repertoire_du_noeud(host):
+    pv = _pv(host)
     chemin = _chemin_du_pv(pv)
     assert chemin.rstrip("/") == REPERTOIRE, message(
         en=f"{PV} is backed by {chemin!r}, expected {REPERTOIRE}.",
@@ -109,22 +121,43 @@ def test_le_volume_est_declare(host):
 # ----------------------------------------------------------------------
 # 2. La réclamation est liée à ce volume.
 # ----------------------------------------------------------------------
-def test_la_reclamation_est_liee(host):
-    res = _kubectl(host, f"-n {NAMESPACE} get pvc {PVC} -o json")
+def _pvc(host) -> dict:
+    res =_kubectl(host, f"-n {NAMESPACE} get pvc {PVC} -o json")
     assert res.rc == 0, message(
         en=f"No PersistentVolumeClaim {PVC} in {NAMESPACE}.",
         fr=f"Aucun PersistentVolumeClaim {PVC} dans {NAMESPACE}.",
     )
-    pvc = json.loads(res.stdout)
+    return json.loads(res.stdout)
+
+
+def test_la_reclamation_demande_500mi(host):
+    pvc = _pvc(host)
     demande = ((pvc["spec"].get("resources") or {}).get("requests") or {}).get("storage")
     assert demande == "500Mi", message(
         en=f"{PVC} asks for {demande!r}, expected 500Mi.",
         fr=f"{PVC} demande {demande!r}, attendu 500Mi.",
     )
+
+
+def test_la_reclamation_demande_readwriteonce(host):
+    pvc = _pvc(host)
+    modes = pvc["spec"].get("accessModes") or []
+    assert "ReadWriteOnce" in modes, message(
+        en=f"{PVC} asks for access modes {modes}, expected ReadWriteOnce, the same as {PV}.",
+        fr=f"{PVC} demande les modes d'accès {modes}, attendu ReadWriteOnce, comme {PV}.",
+    )
+
+
+def test_la_reclamation_demande_la_storageclass_manual(host):
+    pvc = _pvc(host)
     assert pvc["spec"].get("storageClassName") == "manual", message(
         en=f"{PVC} asks for StorageClass {pvc['spec'].get('storageClassName')!r}, expected manual.",
         fr=f"{PVC} demande la StorageClass {pvc['spec'].get('storageClassName')!r}, attendu manual.",
     )
+
+
+def test_la_reclamation_est_liee_a_lab_pv(host):
+    pvc = _pvc(host)
     phase = pvc["status"].get("phase")
     assert phase == "Bound", message(
         en=f"{PVC} is in phase {phase!r}. A claim stays Pending as long as no PV has the "
@@ -141,7 +174,7 @@ def test_la_reclamation_est_liee(host):
 # ----------------------------------------------------------------------
 # 3. Le Pod monte la réclamation et y a écrit.
 # ----------------------------------------------------------------------
-def test_le_pod_monte_le_volume_et_a_ecrit(host):
+def test_le_pod_monte_la_reclamation_sur_data(host):
     pod = _pod_pret(host)
     volumes = {
         v["name"]: (v.get("persistentVolumeClaim") or {}).get("claimName")
@@ -157,6 +190,10 @@ def test_le_pod_monte_le_volume_et_a_ecrit(host):
         fr=f"{POD} ne monte pas la réclamation {PVC} sur /data (volumes : {volumes}). Le volume du "
         "Pod doit être un persistentVolumeClaim, et le conteneur le monter sur /data.",
     )
+
+
+def test_le_pod_a_ecrit_hello_dans_data_test_txt(host):
+    _pod_pret(host)
     res = _kubectl(host, f"-n {NAMESPACE} exec {POD} -- cat /data/test.txt")
     assert res.rc == 0 and res.stdout.strip() == "hello", message(
         en=f"/data/test.txt in {POD} is {res.stdout.strip()!r} (rc {res.rc}), expected hello.",
