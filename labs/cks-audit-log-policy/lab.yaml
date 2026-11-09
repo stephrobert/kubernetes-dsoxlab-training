@@ -39,3 +39,49 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-politique-enregistre-les-secrets-en-requestresponse
+    label: "The audit policy records Secrets at the RequestResponse level"
+    tests:
+      - test_la_politique_enregistre_les_secrets_en_requestresponse
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: la-politique-enregistre-le-reste-en-metadata
+    label: "The audit policy records everything else at the Metadata level"
+    tests:
+      - test_la_politique_enregistre_le_reste_en_metadata
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: l-api-server-applique-la-politique
+    label: "The API server is started with the audit policy file"
+    tests:
+      - test_l_api_server_applique_la_politique
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: le-journal-est-ecrit-dans-un-fichier-du-noeud
+    label: "The audit log is written to a file on the node"
+    tests:
+      - test_le_journal_est_ecrit_dans_un_fichier_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: l-api-server-repond-apres-la-modification
+    label: "The API server still answers after the change"
+    tests:
+      - test_l_api_server_repond_apres_la_modification
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: le-journal-enregistre-la-lecture-du-secret-en-requestresponse
+    label: "The log holds a Secret read at the RequestResponse level"
+    tests:
+      - test_le_journal_enregistre_la_lecture_du_secret_en_requestresponse
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: le-journal-enregistre-une-lecture-banale-en-metadata-seulement
+    label: "The log holds an ordinary read at the Metadata level only"
+    tests:
+      - test_le_journal_enregistre_une_lecture_banale_en_metadata_seulement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+
+feedback: full
