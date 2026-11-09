@@ -2,7 +2,7 @@
 
 Ces tests lisent l'état du NŒUD et du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première lit la sauvegarde fraîche avec etcdutl et
+Un test vérifie un seul état demandé par l'énoncé. La première lit la sauvegarde fraîche avec etcdutl et
 exige qu'elle photographie l'état d'avant la restauration, par sa révision.
 La deuxième lit, sur le nœud, la date de création du répertoire de données
 que l'etcd en marche utilise : une restauration en crée un neuf, et un etcd
@@ -76,7 +76,7 @@ def _api_saine(host) -> tuple[bool, str]:
 # ----------------------------------------------------------------------
 # 1. La sauvegarde fraîche existe, est lisible, et date d'avant la restauration.
 # ----------------------------------------------------------------------
-def test_la_sauvegarde_fraiche_est_valide_et_anterieure(host, etat):
+def test_la_sauvegarde_fraiche_existe_et_est_lisible(host):
     res = host.run(f"sudo test -f {SAUVEGARDE}")
     assert res.rc == 0, message(
         en=f"No {SAUVEGARDE} file. The instruction starts there: you never restore "
@@ -96,6 +96,15 @@ def test_la_sauvegarde_fraiche_est_valide_et_anterieure(host, etat):
         en=f"The snapshot holds no key: {statut}.",
         fr=f"L'instantané ne contient aucune clé : {statut}.",
     )
+
+
+def test_la_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration(host, etat):
+    res = host.run(f"sudo etcdutl snapshot status {SAUVEGARDE} -w json")
+    assert res.rc == 0, message(
+        en=f"etcdutl cannot read {SAUVEGARDE}: {res.stderr.strip()[:200]}.",
+        fr=f"etcdutl ne lit pas {SAUVEGARDE} : {res.stderr.strip()[:200]}.",
+    )
+    statut = json.loads(res.stdout)
     assert statut.get("revision", 0) >= etat["revision"], message(
         en=f"The snapshot is at revision {statut.get('revision')}, but the cluster was at "
         f"{etat['revision']} when the lab started. A backup taken after the restore, or a "
@@ -109,7 +118,7 @@ def test_la_sauvegarde_fraiche_est_valide_et_anterieure(host, etat):
 # ----------------------------------------------------------------------
 # 2. etcd tourne sur un répertoire restauré, et le cluster est sain.
 # ----------------------------------------------------------------------
-def test_etcd_a_ete_restaure_et_le_cluster_est_sain(host, etat):
+def test_etcd_repond_sur_son_port(host):
     res = host.run(f"sudo {ETCDCTL} endpoint status -w json")
     assert res.rc == 0, message(
         en=f"etcd does not answer on 127.0.0.1:2379: {res.stderr.strip()[:200]}. Is the manifest "
@@ -117,6 +126,9 @@ def test_etcd_a_ete_restaure_et_le_cluster_est_sain(host, etat):
         fr=f"etcd ne répond pas sur 127.0.0.1:2379 : {res.stderr.strip()[:200]}. Le manifeste "
         "est-il de retour dans /etc/kubernetes/manifests, et pointe-t-il un répertoire qui existe ?",
     )
+
+
+def test_etcd_tourne_sur_un_repertoire_de_donnees_neuf(host, etat):
     # Le répertoire que l'etcd EN MARCHE utilise, demandé au runtime : le Pod
     # miroir dans l'API peut être celui d'avant la restauration, mesuré le
     # 2026-09-15, puisque l'API vient d'être restaurée. crictl, lui, dit quel
@@ -164,6 +176,12 @@ def test_etcd_a_ete_restaure_et_le_cluster_est_sain(host, etat):
         "Arrêter le kubelet n'arrête pas etcd ; c'est le manifeste qu'il faut sortir, ou faire "
         "pointer sur le répertoire restauré.",
     )
+
+
+def test_le_cluster_est_sain_apres_la_restauration(host, etat):
+    # Garde : un cluster intact serait sain sans rien avoir restauré. L'état
+    # demandé est « sain APRÈS la restauration », donc la restauration d'abord.
+    test_etcd_tourne_sur_un_repertoire_de_donnees_neuf(host, etat)
     saine, detail = False, ""
     for _ in range(30):
         saine, detail = _api_saine(host)
@@ -181,7 +199,7 @@ def test_etcd_a_ete_restaure_et_le_cluster_est_sain(host, etat):
 # ----------------------------------------------------------------------
 # 3. Les données sont revenues telles qu'elles étaient.
 # ----------------------------------------------------------------------
-def test_les_donnees_sont_revenues_avec_leur_identite(host, etat):
+def test_le_namespace_important_data_est_revenu_a_l_identique(host, etat):
     res = _kubectl(host, f"get namespace {NAMESPACE} -o json")
     assert res.rc == 0, message(
         en=f"Namespace {NAMESPACE} did not come back: {res.stderr.strip()[:200]}",
@@ -194,6 +212,9 @@ def test_les_donnees_sont_revenues_avec_leur_identite(host, etat):
         fr=f"Le namespace {NAMESPACE} existe, mais avec l'UID {ns_uid} au lieu de {etat['ns_uid']} : "
         "il a été recréé, pas restauré. Les données viennent de l'instantané ou ne reviennent pas.",
     )
+
+
+def test_le_configmap_mission_critical_est_revenu_a_l_identique(host, etat):
     res = _kubectl(host, f"-n {NAMESPACE} get configmap {CONFIGMAP} -o json")
     assert res.rc == 0, message(
         en=f"ConfigMap {CONFIGMAP} did not come back in {NAMESPACE}.",
@@ -213,7 +234,7 @@ def test_les_donnees_sont_revenues_avec_leur_identite(host, etat):
 # ----------------------------------------------------------------------
 # 4. La preuve : ce qui a été écrit après la sauvegarde a disparu.
 # ----------------------------------------------------------------------
-def test_ce_qui_a_ete_ecrit_apres_la_sauvegarde_a_disparu(host):
+def test_l_objet_ecrit_apres_la_sauvegarde_a_disparu(host):
     res = _kubectl(host, f"-n default get configmap {BRUIT} -o json")
     assert res.rc != 0, message(
         en=f"ConfigMap default/{BRUIT} still exists. It was written after last night's backup: "
@@ -223,6 +244,9 @@ def test_ce_qui_a_ete_ecrit_apres_la_sauvegarde_a_disparu(host):
         "soir : si le cluster tournait sur les données restaurées, il n'existerait plus. Soit la "
         "restauration n'a pas eu lieu, soit l'API server sert encore son cache d'avant.",
     )
+
+
+def test_l_api_server_ne_sert_plus_son_cache_d_avant_la_restauration(host):
     res = _kubectl(host, "-n default get configmaps -o json")
     assert res.rc == 0, message(
         en=f"Listing the ConfigMaps of default failed: {res.stderr.strip()[:200]}",

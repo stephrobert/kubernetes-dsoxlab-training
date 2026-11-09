@@ -41,3 +41,70 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-sauvegarde-fraiche-existe-et-est-lisible
+    label: "A fresh snapshot exists at /opt/backup/etcd-snapshot.db and is valid"
+    tests:
+      - test_la_sauvegarde_fraiche_existe_et_est_lisible
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: la-sauvegarde-fraiche-photographie-l-etat-d-avant-la-restauration
+    label: "The fresh snapshot captures the state from before the restore"
+    tests:
+      - test_la_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: etcd-repond-sur-son-port
+    label: "etcd is running and answers"
+    tests:
+      - test_etcd_repond_sur_son_port
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: etcd-tourne-sur-un-repertoire-de-donnees-neuf
+    label: "etcd runs on a new data directory produced by the restore"
+    tests:
+      - test_etcd_tourne_sur_un_repertoire_de_donnees_neuf
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: le-cluster-est-sain-apres-la-restauration
+    label: "After the restore, the API answers and both nodes are Ready"
+    tests:
+      - test_le_cluster_est_sain_apres_la_restauration
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: le-namespace-important-data-est-revenu-a-l-identique
+    label: "The namespace important-data is back, with its original identity"
+    tests:
+      - test_le_namespace_important_data_est_revenu_a_l_identique
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: le-configmap-mission-critical-est-revenu-a-l-identique
+    label: "The ConfigMap mission-critical is back, with its original identity and content"
+    tests:
+      - test_le_configmap_mission_critical_est_revenu_a_l_identique
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: l-objet-ecrit-apres-la-sauvegarde-a-disparu
+    label: "The object written after last night's backup no longer exists"
+    tests:
+      - test_l_objet_ecrit_apres_la_sauvegarde_a_disparu
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: l-api-server-ne-sert-plus-son-cache-d-avant-la-restauration
+    label: "The API server no longer serves its cache from before the restore"
+    tests:
+      - test_l_api_server_ne_sert_plus_son_cache_d_avant_la_restauration
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+
+feedback: full
