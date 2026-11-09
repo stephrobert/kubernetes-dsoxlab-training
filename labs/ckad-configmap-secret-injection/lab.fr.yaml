@@ -4,3 +4,33 @@ description: |
   et par un fichier monté, et ses identifiants par un Secret, sans jamais
   écrire un mot de passe dans le manifeste du Pod. Prouver, de l'intérieur du
   conteneur, que tout est arrivé.
+
+criteria:
+  - id: le-configmap-porte-app-mode
+    label: "Le ConfigMap app-settings porte APP_MODE à production"
+  - id: le-configmap-porte-log-level
+    label: "Le ConfigMap app-settings porte LOG_LEVEL à info"
+  - id: le-configmap-porte-le-fichier-config-yaml
+    label: "Le ConfigMap app-settings porte une clé config.yaml qui contient port: 8080"
+  - id: le-secret-porte-db-host
+    label: "Le Secret db-credentials porte DB_HOST à db.internal.svc"
+  - id: le-secret-porte-db-password
+    label: "Le Secret db-credentials porte un DB_PASSWORD non vide"
+  - id: le-pod-tourne-avec-la-bonne-image
+    label: "Le Pod app tourne avec l'image nginx:1.27-alpine"
+  - id: le-pod-recoit-les-cles-du-configmap-en-variables
+    label: "Le Pod reçoit les clés de app-settings en variables d'environnement"
+  - id: le-pod-recoit-db-host-du-secret
+    label: "Le Pod reçoit DB_HOST depuis le Secret, par référence"
+  - id: le-pod-recoit-db-password-du-secret
+    label: "Le Pod reçoit DB_PASSWORD depuis le Secret, par référence"
+  - id: aucun-mot-de-passe-n-est-ecrit-en-clair-dans-le-pod
+    label: "Aucun mot de passe n'est écrit en clair dans le manifeste du Pod"
+  - id: le-configmap-est-monte-sous-etc-app-config
+    label: "Le Pod monte app-settings sous /etc/app-config"
+  - id: dans-le-conteneur-app-mode-vaut-production
+    label: "Dans le conteneur, APP_MODE vaut production"
+  - id: dans-le-conteneur-db-password-est-defini
+    label: "Dans le conteneur, DB_PASSWORD est défini"
+  - id: dans-le-conteneur-le-fichier-config-yaml-contient-le-port
+    label: "Dans le conteneur, /etc/app-config/config.yaml contient port: 8080"
