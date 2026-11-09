@@ -58,7 +58,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: etcd-repond-sur-son-port
-    label: "etcd is running and answers"
+    label: "After the restore, etcd is running and answers"
     tests:
       - test_etcd_repond_sur_son_port
     lessons:

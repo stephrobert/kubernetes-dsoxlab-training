@@ -118,7 +118,10 @@ def test_la_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration(host,
 # ----------------------------------------------------------------------
 # 2. etcd tourne sur un répertoire restauré, et le cluster est sain.
 # ----------------------------------------------------------------------
-def test_etcd_repond_sur_son_port(host):
+def test_etcd_repond_sur_son_port(host, etat):
+    # Garde : etcd répond déjà sur un cluster intact. L'état demandé est
+    # « etcd répond APRÈS la restauration », donc la restauration d'abord.
+    test_etcd_tourne_sur_un_repertoire_de_donnees_neuf(host, etat)
     res = host.run(f"sudo {ETCDCTL} endpoint status -w json")
     assert res.rc == 0, message(
         en=f"etcd does not answer on 127.0.0.1:2379: {res.stderr.strip()[:200]}. Is the manifest "
