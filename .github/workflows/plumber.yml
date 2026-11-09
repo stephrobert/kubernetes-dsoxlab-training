@@ -70,9 +70,10 @@ jobs:
           persist-credentials: false
 
       - name: Analyse de conformité Plumber
-        uses: getplumber/plumber@d3536bae4727b9290d9e69ee25c4350ddbcd91cd # v0.6.0
+        # No `version:` input: the action installs the binary of its own release
+        # (the default in its action.yml), so Dependabot moves both together.
+        uses: getplumber/plumber@ec8cb3a7edd6a324b33e85109b627b2df6023d94 # v0.7.23
         with:
-          version: "v0.4.3"
           verify-attestation: "true"   # provenance SLSA du binaire, avant de le lancer
           # La barrière est le score Plumber lui-même. `threshold` est OBSOLÈTE
           # et sa valeur 100 est explicitement « traitée comme non définie » par
