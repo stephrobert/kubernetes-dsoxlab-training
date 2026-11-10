@@ -38,3 +38,55 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-politique-s-applique-a-la-base
+    label: "The policy db-allow-backend applies to the database Pods"
+    tests:
+      - test_la_politique_s_applique_a_la_base
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: la-politique-controle-l-entree
+    label: "The policy controls inbound traffic"
+    tests:
+      - test_la_politique_controle_l_entree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: la-politique-laisse-entrer-le-backend-du-meme-namespace
+    label: "The policy lets in the app=backend Pods of the same namespace"
+    tests:
+      - test_la_politique_laisse_entrer_le_backend_du_meme_namespace
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: la-politique-n-ouvre-que-le-port-5432-en-tcp
+    label: "The policy opens only TCP port 5432"
+    tests:
+      - test_la_politique_n_ouvre_que_le_port_5432_en_tcp
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: le-backend-atteint-toujours-la-base
+    label: "backend still reaches db on 5432"
+    tests:
+      - test_le_backend_atteint_toujours_la_base
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: le-frontend-est-bloque
+    label: "frontend no longer reaches db"
+    tests:
+      - test_le_frontend_est_bloque
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: l-intrus-d-un-autre-namespace-est-bloque
+    label: "intrus, in another namespace, no longer reaches db despite its label"
+    tests:
+      - test_l_intrus_d_un_autre_namespace_est_bloque
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: la-base-peut-toujours-sortir
+    label: "The database can still make outbound connections"
+    tests:
+      - test_la_base_peut_toujours_sortir
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+
+feedback: full

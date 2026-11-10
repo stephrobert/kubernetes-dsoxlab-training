@@ -4,3 +4,19 @@ description: |
   politique d'audit à deux niveaux, corps complets pour les Secrets et
   métadonnées pour le reste, et prouvez qu'elle agit en relisant le journal
   que le cluster vient d'écrire.
+
+criteria:
+  - id: la-politique-enregistre-les-secrets-en-requestresponse
+    label: "La politique d'audit enregistre les Secrets au niveau RequestResponse"
+  - id: la-politique-enregistre-le-reste-en-metadata
+    label: "La politique d'audit enregistre tout le reste au niveau Metadata"
+  - id: l-api-server-applique-la-politique
+    label: "L'API server est lancé avec le fichier de politique d'audit"
+  - id: le-journal-est-ecrit-dans-un-fichier-du-noeud
+    label: "Le journal d'audit est écrit dans un fichier du nœud"
+  - id: l-api-server-repond-apres-la-modification
+    label: "L'API server répond toujours après la modification"
+  - id: le-journal-enregistre-la-lecture-du-secret-en-requestresponse
+    label: "Le journal contient une lecture de Secret au niveau RequestResponse"
+  - id: le-journal-enregistre-une-lecture-banale-en-metadata-seulement
+    label: "Le journal contient une lecture banale au niveau Metadata seulement"

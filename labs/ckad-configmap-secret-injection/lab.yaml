@@ -36,3 +36,91 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-configmap-porte-app-mode
+    label: "The ConfigMap app-settings sets APP_MODE to production"
+    tests:
+      - test_le_configmap_porte_app_mode
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-configmap-porte-log-level
+    label: "The ConfigMap app-settings sets LOG_LEVEL to info"
+    tests:
+      - test_le_configmap_porte_log_level
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-configmap-porte-le-fichier-config-yaml
+    label: "The ConfigMap app-settings holds a config.yaml key containing port: 8080"
+    tests:
+      - test_le_configmap_porte_le_fichier_config_yaml
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-secret-porte-db-host
+    label: "The Secret db-credentials sets DB_HOST to db.internal.svc"
+    tests:
+      - test_le_secret_porte_db_host
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: le-secret-porte-db-password
+    label: "The Secret db-credentials holds a non-empty DB_PASSWORD"
+    tests:
+      - test_le_secret_porte_db_password
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: le-pod-tourne-avec-la-bonne-image
+    label: "The Pod app runs nginx:1.27-alpine"
+    tests:
+      - test_le_pod_tourne_avec_la_bonne_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-pod-recoit-les-cles-du-configmap-en-variables
+    label: "The Pod receives the keys of app-settings as environment variables"
+    tests:
+      - test_le_pod_recoit_les_cles_du_configmap_en_variables
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-pod-recoit-db-host-du-secret
+    label: "The Pod receives DB_HOST from the Secret by reference"
+    tests:
+      - test_le_pod_recoit_db_host_du_secret
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: le-pod-recoit-db-password-du-secret
+    label: "The Pod receives DB_PASSWORD from the Secret by reference"
+    tests:
+      - test_le_pod_recoit_db_password_du_secret
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: aucun-mot-de-passe-n-est-ecrit-en-clair-dans-le-pod
+    label: "No password is written in clear text in the Pod manifest"
+    tests:
+      - test_aucun_mot_de_passe_n_est_ecrit_en_clair_dans_le_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: le-configmap-est-monte-sous-etc-app-config
+    label: "The Pod mounts app-settings under /etc/app-config"
+    tests:
+      - test_le_configmap_est_monte_sous_etc_app_config
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: dans-le-conteneur-app-mode-vaut-production
+    label: "Inside the container, APP_MODE is production"
+    tests:
+      - test_dans_le_conteneur_app_mode_vaut_production
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: dans-le-conteneur-db-password-est-defini
+    label: "Inside the container, DB_PASSWORD is set"
+    tests:
+      - test_dans_le_conteneur_db_password_est_defini
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: dans-le-conteneur-le-fichier-config-yaml-contient-le-port
+    label: "Inside the container, /etc/app-config/config.yaml contains port: 8080"
+    tests:
+      - test_dans_le_conteneur_le_fichier_config_yaml_contient_le_port
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+
+feedback: full

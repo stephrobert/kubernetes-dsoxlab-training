@@ -3,7 +3,7 @@
 Ces tests lisent l'état du CLUSTER et tentent de vraies connexions, jamais
 les commandes tapées.
 
-Quatre affirmations. La première lit la politique : ce qu'elle sélectionne,
+Un test vérifie un seul état demandé par l'énoncé. Les quatre premiers lit la politique : ce qu'elle sélectionne,
 ce qu'elle contrôle, ce qu'elle laisse entrer. La deuxième tente la
 connexion depuis backend, qui doit passer, et depuis frontend, qui doit
 être bloquée : les deux côtés, sinon elle passerait avant le travail. La
@@ -55,7 +55,7 @@ def _politique(host) -> dict:
 # ----------------------------------------------------------------------
 # 1. La politique vise la base, contrôle l'entrée, cite le backend et le port.
 # ----------------------------------------------------------------------
-def test_la_politique_est_ecrite_comme_il_faut(host):
+def test_la_politique_s_applique_a_la_base(host):
     p = _politique(host)
     assert (p["spec"].get("podSelector") or {}).get("matchLabels", {}).get("app") == "db", message(
         en=f"The policy selects {p['spec'].get('podSelector')} instead of the app=db Pods. "
@@ -63,10 +63,18 @@ def test_la_politique_est_ecrite_comme_il_faut(host):
         fr=f"La politique sélectionne {p['spec'].get('podSelector')} au lieu des Pods app=db. "
         "podSelector désigne les Pods PROTÉGÉS, pas ceux qu'on laisse entrer.",
     )
+
+
+def test_la_politique_controle_l_entree(host):
+    p = _politique(host)
     assert "Ingress" in (p["spec"].get("policyTypes") or []), message(
         en=f"policyTypes is {p['spec'].get('policyTypes')}: without Ingress, nothing is filtered inbound.",
         fr=f"policyTypes vaut {p['spec'].get('policyTypes')} : sans Ingress, rien n'est filtré en entrée.",
     )
+
+
+def test_la_politique_laisse_entrer_le_backend_du_meme_namespace(host):
+    p = _politique(host)
     regles = p["spec"].get("ingress") or []
     assert regles, message(
         en="The policy has no ingress rule: it blocks everything, backend included.",
@@ -78,6 +86,11 @@ def test_la_politique_est_ecrite_comme_il_faut(host):
         en=f"No podSelector app=backend source in the rules (sources: {sources}).",
         fr=f"Aucune source podSelector app=backend dans les règles (sources : {sources}).",
     )
+
+
+def test_la_politique_n_ouvre_que_le_port_5432_en_tcp(host):
+    p = _politique(host)
+    regles = p["spec"].get("ingress") or []
     ports = [(pt.get("protocol", "TCP"), pt.get("port")) for r in regles for pt in r.get("ports") or []]
     assert ("TCP", 5432) in ports, message(
         en=f"The rules open ports {ports}, not TCP 5432. A rule without ports opens every port.",
@@ -88,13 +101,19 @@ def test_la_politique_est_ecrite_comme_il_faut(host):
 # ----------------------------------------------------------------------
 # 2. Le backend passe, le frontend est bloqué.
 # ----------------------------------------------------------------------
-def test_le_backend_passe_et_le_frontend_est_bloque(host):
+def test_le_backend_atteint_toujours_la_base(host):
+    # Garde : sans politique, tout le monde passe, backend compris. L'état
+    # demandé est « atteint TOUJOURS », donc après avoir posé la politique.
+    _politique(host)
     assert _connecte(host, NAMESPACE, "backend", "db"), message(
         en="backend no longer reaches db on 5432. The policy must let it in: podSelector "
         "app=backend under from, and port 5432 under ports.",
         fr="backend n'atteint plus db sur 5432. La politique doit le laisser entrer : podSelector "
         "app=backend dans from, et le port 5432 dans ports.",
     )
+
+
+def test_le_frontend_est_bloque(host):
     assert not _connecte(host, NAMESPACE, "frontend", "db"), message(
         en="frontend still reaches db on 5432. No policy isolates the database, or it does not "
         "select it: as soon as a Pod is selected for Ingress, anything not named is refused.",

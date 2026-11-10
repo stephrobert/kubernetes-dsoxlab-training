@@ -41,3 +41,84 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-volume-a-une-capacite-de-1gi
+    label: "The PersistentVolume lab-pv has a capacity of 1Gi"
+    tests:
+      - test_le_volume_a_une_capacite_de_1gi
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-volume-est-en-readwriteonce
+    label: "The PersistentVolume lab-pv is ReadWriteOnce"
+    tests:
+      - test_le_volume_est_en_readwriteonce
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-volume-a-la-storageclass-manual
+    label: "The PersistentVolume lab-pv has the StorageClass manual"
+    tests:
+      - test_le_volume_a_la_storageclass_manual
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-volume-est-adosse-au-repertoire-du-noeud
+    label: "The PersistentVolume lab-pv is backed by the node directory /mnt/lab-data"
+    tests:
+      - test_le_volume_est_adosse_au_repertoire_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: la-reclamation-demande-500mi
+    label: "The claim lab-pvc requests 500Mi"
+    tests:
+      - test_la_reclamation_demande_500mi
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: la-reclamation-demande-readwriteonce
+    label: "The claim lab-pvc requests ReadWriteOnce"
+    tests:
+      - test_la_reclamation_demande_readwriteonce
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: la-reclamation-demande-la-storageclass-manual
+    label: "The claim lab-pvc requests the StorageClass manual"
+    tests:
+      - test_la_reclamation_demande_la_storageclass_manual
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: la-reclamation-est-liee-a-lab-pv
+    label: "The claim lab-pvc is Bound to lab-pv"
+    tests:
+      - test_la_reclamation_est_liee_a_lab_pv
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-pod-monte-la-reclamation-sur-data
+    label: "The Pod data-pod mounts the claim on /data"
+    tests:
+      - test_le_pod_monte_la_reclamation_sur_data
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-pod-a-ecrit-hello-dans-data-test-txt
+    label: "The Pod wrote hello into /data/test.txt"
+    tests:
+      - test_le_pod_a_ecrit_hello_dans_data_test_txt
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: le-fichier-est-sur-le-disque-du-noeud
+    label: "The file is on the node disk, in /mnt/lab-data"
+    tests:
+      - test_le_fichier_est_sur_le_disque_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+
+feedback: full
