@@ -107,6 +107,19 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Le validateur photographie le cluster AVANT le premier `run`, alors que
+      # le socle n'est posé que par le `setup.yaml` de chaque lab : il n'y a
+      # aucun point d'accroche après le provisionnement (dsoxlab#213). Sans
+      # amorçage, un lab sur un socle absent sort ROUGE sur son propre socle,
+      # avec un cycle par ailleurs parfait. Mesuré le 2026-11-10 : 184 faux
+      # écarts, et un `StopIteration` muet sur un hôte nu.
+      - id: amorcage-du-socle
+        name: le validateur amorce le socle, et un socle absent n'accuse pas le lab
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_amorcage_du_socle.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Une accolade doublée dans un jsonpath ne se voit pas à la relecture, et
       # kubectl ne proteste pas : il rend une chaîne VIDE. Le test du lab
       # accuse alors l'application d'être tombée, et le diagnostic part dans la
