@@ -53,7 +53,34 @@ from lecture_solution import lire_solution
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 RESULTATS = RACINE / "validation-labs.json"
-CACHE = Path.home() / ".cache" / "dsoxlab" / RACINE.name
+
+
+def _identifiant_du_depot() -> str:
+    """Rend le `repo.id` du meta.yml, qui nomme le cache de dsoxlab.
+
+    LE NOM DU DOSSIER NE CONVIENT PAS, et l'écart ne se voit pas depuis un
+    clone ordinaire : là, le dossier s'appelle comme le dépôt et les deux
+    coïncident. Depuis un WORKTREE, non. Mesuré le 2026-11-10 : une campagne
+    lancée depuis `kubernetes-dsoxlab-training-pilote` cherchait son
+    `ssh_config` sous ce nom, alors que dsoxlab l'écrit sous `repo.id`,
+    `kubernetes-dsoxlab-training`. Les cinq labs ont échoué en une seconde,
+    sans rien écrire.
+
+    C'est le pire genre de défaut : il tient tant qu'on travaille là où on a
+    toujours travaillé, et il tombe la première fois qu'on s'en écarte.
+
+    Repli sur le nom du dossier si le meta.yml est illisible : ce script doit
+    pouvoir dire ce qui ne va pas, pas mourir sur sa première ligne.
+    """
+    try:
+        meta = yaml.safe_load((RACINE / "meta.yml").read_text(encoding="utf-8")) or {}
+        identifiant = ((meta.get("repo") or {}).get("id") or "").strip()
+    except (OSError, yaml.YAMLError):
+        identifiant = ""
+    return identifiant or RACINE.name
+
+
+CACHE = Path.home() / ".cache" / "dsoxlab" / _identifiant_du_depot()
 SSH_CONFIG = CACHE / "ssh_config"
 
 # Exécuté SUR le nœud, en root, par ssh : il rend une photographie JSON de ce
@@ -114,6 +141,24 @@ print(json.dumps(photo))
 
 class Echec(Exception):
     pass
+
+
+class SocleAbsent(Echec):
+    """Le nœud n'a pas encore de cluster : rien n'est mesurable, rien n'est faux.
+
+    L'étape 0 photographie le cluster par `kubectl`, et elle passe AVANT le
+    premier `dsoxlab run`. Or c'est le setup du lab qui installe kubeadm, par
+    `shared/kubeadm-cluster.yml`. Sur des VM neuves, la photographie échoue donc
+    sur un `kubectl` introuvable, et le lab était déclaré ROUGE SANS AVOIR ÉTÉ
+    JOUÉ. Mesuré le 2026-11-10 : cinq verdicts faux en une campagne, annulés à
+    la main.
+
+    C'est la faute la plus coûteuse qu'un validateur puisse commettre. Un
+    verdict manquant se remesure ; un faux rouge envoie corriger un lab qui n'a
+    rien. La règle du dépôt le dit déjà pour les contrôles de `doctor`, et elle
+    vaut ici : un contrôle qui n'a pas pu regarder ne conclut jamais, ni au
+    vert, ni au rouge. Il dit qu'il reste à mesurer.
+    """
 
 
 def commande(args: list[str], journal, timeout: int, entree: str | None = None) -> subprocess.CompletedProcess:
@@ -188,7 +233,23 @@ def photographier(hote: str, journal) -> dict:
     res = ssh(hote, PHOTOGRAPHIE, journal, 180, root=True)
     lignes = [ligne for ligne in res.stdout.splitlines() if ligne.startswith("{")]
     if res.returncode != 0 or not lignes:
-        raise Echec(f"photographie du cluster impossible : {res.stderr.strip()[-300:]}")
+        sortie = res.stderr.strip()
+        # `kubectl` introuvable n'est pas un cluster en panne : c'est un nœud sur
+        # lequel le socle n'est pas encore posé. Python rend un
+        # `FileNotFoundError` nommant l'exécutable ; le shell, un « command not
+        # found ». On reconnaît les deux, et on refuse de conclure.
+        if "kubectl" in sortie and (
+            "FileNotFoundError" in sortie
+            or "No such file or directory" in sortie
+            or "command not found" in sortie
+        ):
+            raise SocleAbsent(
+                f"{hote} n'a pas de cluster à photographier : kubectl est absent. "
+                "Le socle s'installe au premier `dsoxlab run` du lab "
+                "(shared/kubeadm-cluster.yml) ; jouez-en un, ou provisionnez, "
+                "avant de valider. Ce lab reste À MESURER, il n'est pas refusé."
+            )
+        raise Echec(f"photographie du cluster impossible : {sortie[-300:]}")
     return json.loads(lignes[-1])
 
 
@@ -369,6 +430,10 @@ def valider(lab: Path, rejeu: bool) -> dict:
             apres_photo = attendre_stabilite(hote, journal)
             resultat["ecarts"] = ecarts(avant_photo, apres_photo, ident)
             dire("cluster rendu intact" if not resultat["ecarts"] else f"{len(resultat['ecarts'])} écart(s) après clean")
+        except SocleAbsent as e:
+            # Marqué à part de `erreur` : `verdict()` rend SKIP et non ROUGE.
+            resultat["non_mesurable"] = str(e)
+            dire(f"NON MESURÉ : {e}")
         except Echec as e:
             resultat["erreur"] = str(e)
             dire(f"ÉCHEC : {e}")
@@ -383,6 +448,12 @@ def valider(lab: Path, rejeu: bool) -> dict:
 
 
 def verdict(r: dict, rejeu: bool) -> str:
+    # Avant tout : rien mesuré n'est pas mesuré faux. Un socle absent laisse le
+    # lab À MESURER, jamais ROUGE. L'ordre compte, ce cas doit passer AVANT le
+    # test de `erreur`.
+    if "non_mesurable" in r:
+        r["raisons"] = [r["non_mesurable"]]
+        return verdict_check.SKIP
     if "erreur" in r:
         return "ROUGE"
     # Trois issues, pas deux. Une exécution qui n'a RIEN mesuré n'accuse pas le
