@@ -78,6 +78,24 @@ def _valeur(releve: dict[str, str], cle: str) -> str:
     return valeur
 
 
+def _forme(texte: str) -> str:
+    """Le texte sans accents ni casse, espaces et soulignés changés en tirets :
+    « Replica Set », « replica_set » et « ReplicaSet » se comparent pareil."""
+    import unicodedata
+    decompose = unicodedata.normalize("NFKD", texte.lower())
+    sans = "".join(c for c in decompose if not unicodedata.combining(c))
+    return "-".join(sans.replace("_", " ").split())
+
+
+#: Qui a créé ou recréé un Pod : le contrôleur exact, le processus qui l'héberge,
+#: ou l'objet qui le porte, comme les leçons le disent (« le ReplicaSet recrée »).
+CREATEURS_DE_POD = ("replicaset-controller", "kube-controller-manager",
+                    "controller-manager", "replicaset", "replica-set")
+#: Qui a recréé un ReplicaSet : le contrôleur exact, son processus, ou le Deployment.
+CREATEURS_DE_REPLICASET = ("deployment-controller", "kube-controller-manager",
+                           "controller-manager", "deployment")
+
+
 # ----------------------------------------------------------------------
 # 1. Un Pod supprimé, recréé par son ReplicaSet.
 # ----------------------------------------------------------------------
@@ -133,8 +151,10 @@ def test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande
 # 3. Le contrôleur qui a recréé le Pod.
 # ----------------------------------------------------------------------
 def test_le_controleur_qui_recree_le_pod_est_consigne(releve):
-    valeur = _valeur(releve, "pod-recree-par").lower()
-    assert "replicaset-controller" in valeur and "deployment-controller" not in valeur, message(
+    valeur = _valeur(releve, "pod-recree-par")
+    forme = _forme(valeur)
+    assert any(nom in forme for nom in CREATEURS_DE_POD) and not any(
+        nom in forme for nom in ("deployment", "scheduler", "kubelet")), message(
         en=f"pod-recree-par is {valeur!r}; it must name the controller that wrote the "
            "SuccessfulCreate event of the new Pod.",
         fr=f"pod-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "
@@ -146,8 +166,10 @@ def test_le_controleur_qui_recree_le_pod_est_consigne(releve):
 # 4. Le contrôleur qui a recréé le ReplicaSet.
 # ----------------------------------------------------------------------
 def test_le_controleur_qui_recree_le_replicaset_est_consigne(releve):
-    valeur = _valeur(releve, "replicaset-recree-par").lower()
-    assert "deployment-controller" in valeur and "replicaset-controller" not in valeur, message(
+    valeur = _valeur(releve, "replicaset-recree-par")
+    forme = _forme(valeur)
+    assert any(nom in forme for nom in CREATEURS_DE_REPLICASET) and not any(
+        nom in forme for nom in ("replicaset", "replica-set", "scheduler", "kubelet")), message(
         en=f"replicaset-recree-par is {valeur!r}; it must name the controller that wrote the "
            "ScalingReplicaSet event of the Deployment.",
         fr=f"replicaset-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "

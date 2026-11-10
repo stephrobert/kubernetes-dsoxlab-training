@@ -32,7 +32,9 @@ ligne.
 
 5. Pour `file-attente`, **`cree-par`** nomme le composant qui a créé ses
    Pods, et **`n-agit-pas`** nomme le seul composant qui n'agit pas sur eux.
-   Diagnostic seul : ne réparez pas le Deployment.
+   Diagnostic seul : ne réparez pas le Deployment. La colonne From de la
+   section Events de `kubectl describe` donne le nom exact du composant qui a
+   agi.
 
 ## Comment vous serez noté
 
