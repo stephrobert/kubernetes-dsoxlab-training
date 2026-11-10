@@ -10,9 +10,9 @@ set -x
 LAB_USER="${LAB_USER:-ansible}"
 LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
 
-if kubectl get namespace suivre-un-pod >/dev/null 2>&1; then
-  kubectl delete namespace suivre-un-pod --wait=true --timeout=180s
-fi
+# --ignore-not-found plutôt qu'un get préalable : un namespace encore en
+# Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
+kubectl delete namespace suivre-un-pod --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace suivre-un-pod
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/suivre-un-pod"

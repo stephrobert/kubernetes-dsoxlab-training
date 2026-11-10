@@ -22,9 +22,9 @@ LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
 IMAGE="nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
 
 # 1. Un namespace neuf.
-if kubectl get namespace architecture >/dev/null 2>&1; then
-  kubectl delete namespace architecture --wait=true --timeout=180s
-fi
+# --ignore-not-found plutôt qu'un get préalable : un namespace encore en
+# Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
+kubectl delete namespace architecture --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace architecture
 
 # 2. Le Pod témoin.
