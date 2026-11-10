@@ -15,7 +15,7 @@
 
     - name: Attendre que l'API server réponde à nouveau
       ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /readyz
       register: sante
       until: sante.rc == 0
       retries: 40

@@ -18,12 +18,12 @@ FAUX='--authorization-modes='
 
 sed -i "s|${FAUX}|${BON}|" "$MANIFESTE"
 for essai in $(seq 1 60); do
-  if kubectl get --raw /healthz >/dev/null 2>&1; then
+  if kubectl get --raw /readyz >/dev/null 2>&1; then
     break
   fi
   sleep 3
 done
-kubectl get --raw /healthz >/dev/null
+kubectl get --raw /readyz >/dev/null
 
 grep -q -- "${BON}Node,RBAC" "$MANIFESTE" || {
   echo "Le manifeste ne porte pas ${BON}Node,RBAC : le socle a changé, le lab ne s'applique plus." >&2
@@ -37,7 +37,7 @@ grep -q -- "${BON}Node,RBAC" "$MANIFESTE" || {
 sed -i "s|${BON}|${FAUX}|" "$MANIFESTE"
 silences=0
 for essai in $(seq 1 60); do
-  if kubectl get --raw /healthz >/dev/null 2>&1; then
+  if kubectl get --raw /readyz >/dev/null 2>&1; then
     silences=0
   else
     silences=$((silences + 1))

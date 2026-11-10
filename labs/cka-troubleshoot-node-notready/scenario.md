@@ -30,8 +30,8 @@ A `NotReady` node is a node whose agent no longer reports to the control plane.
 sign of life. The rest cannot be read from the control plane: you have to go to
 the node, and question systemd there.
 
-A service can be stopped in two ways, and one of the two does not show up in
-`systemctl status`.
+A service can be down in two ways, and the `Active:` line of
+`systemctl status` only shows one of them.
 
 ## How you will know it works
 

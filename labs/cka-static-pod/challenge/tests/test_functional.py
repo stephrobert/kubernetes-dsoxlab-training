@@ -28,6 +28,12 @@ NAMESPACE = "default"
 POD = "static-web"
 MIROIR = f"{POD}-{WORKER}"
 IMAGE = "nginx:1.27-alpine"
+# Le digest de l'index multi-architecture de ce tag, relevé sur Docker Hub le
+# 2026-11-10. Le tag seul et le tag épinglé par digest sont acceptés : le site
+# enseigne d'épingler, un apprenant qui le fait ne doit pas être recalé.
+DIGEST = "sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10"
+IMAGES_ACCEPTEES = {IMAGE, f"{IMAGE}@{DIGEST}", f"docker.io/library/{IMAGE}",
+                    f"docker.io/library/{IMAGE}@{DIGEST}"}
 CONFIG_KUBELET = "/var/lib/kubelet/config.yaml"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
@@ -101,9 +107,9 @@ def test_le_manifeste_est_dans_le_repertoire_du_kubelet(worker):
         en=f"The manifest has no container named web (seen: {[c.get('name') for c in conteneurs]}).",
         fr=f"Le manifeste n'a pas de conteneur nommé web (vus : {[c.get('name') for c in conteneurs]}).",
     )
-    assert web.get("image") == IMAGE, message(
-        en=f"Container web uses {web.get('image')!r}, expected {IMAGE!r}.",
-        fr=f"Le conteneur web utilise {web.get('image')!r}, attendu {IMAGE!r}.",
+    assert web.get("image") in IMAGES_ACCEPTEES, message(
+        en=f"Container web uses {web.get('image')!r}, expected {IMAGE!r} or {IMAGE}@{DIGEST}.",
+        fr=f"Le conteneur web utilise {web.get('image')!r}, attendu {IMAGE!r} ou {IMAGE}@{DIGEST}.",
     )
     ports = [p.get("containerPort") for p in web.get("ports") or []]
     assert 80 in ports, message(
