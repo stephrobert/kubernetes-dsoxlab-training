@@ -87,6 +87,17 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Un lab sans `criteria` ne rend aucun état par exigence : l'apprenant
+      # reçoit un score et rien d'autre. La règle vient du lot pilote, et rien
+      # ne la mesurait avant ce hook : c'est une contre-expertise manuelle qui
+      # a dû la relever, lab par lab.
+      - id: criteria-declares
+        name: chaque lab déclare ses critères, en anglais et en français
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_criteria_declares.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Le style du blog interdit emoji et tiret cadratin dans ce que
       # l'apprenant lit. Une règle de rédaction sans contrôle dérive au premier
       # lab écrit vite, et le tiret cadratin arrive tout seul.

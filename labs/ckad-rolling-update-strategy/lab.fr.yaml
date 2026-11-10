@@ -4,3 +4,23 @@ description: |
   deux en trop ni plus d'un indisponible, puis déclencher une mise à jour
   d'image et prouver qu'elle est allée au bout : ancienne révision à zéro,
   nouvelle au complet.
+
+criteria:
+  - id: la-strategie-est-rollingupdate
+    label: "Le Deployment webapp utilise la stratégie RollingUpdate"
+  - id: maxsurge-vaut-deux
+    label: "maxSurge vaut 2 : au plus deux Pods en trop pendant la bascule"
+  - id: maxunavailable-vaut-un
+    label: "maxUnavailable vaut 1 : au plus un Pod indisponible à la fois"
+  - id: l-image-est-la-nouvelle
+    label: "L'image du Deployment est passée à nginx:1.27-alpine"
+  - id: les-replicas-restent-cinq
+    label: "Le Deployment demande toujours cinq replicas"
+  - id: les-cinq-replicas-sont-prets-et-a-jour
+    label: "Les cinq replicas sont prêts et à jour"
+  - id: deux-revisions-existent
+    label: "Deux révisions de webapp existent, la nouvelle image venant après l'ancienne"
+  - id: le-nouveau-replicaset-porte-cinq-replicas
+    label: "Le ReplicaSet de la nouvelle image porte cinq replicas prêts"
+  - id: les-anciens-replicasets-sont-a-zero
+    label: "Les anciens ReplicaSets sont conservés à zéro"

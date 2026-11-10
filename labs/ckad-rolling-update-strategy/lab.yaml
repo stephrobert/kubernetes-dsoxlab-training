@@ -35,3 +35,62 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-strategie-est-rollingupdate
+    label: "The webapp Deployment uses the RollingUpdate strategy"
+    tests:
+      - test_la_strategie_est_rollingupdate
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: maxsurge-vaut-deux
+    label: "maxSurge is 2: at most two extra Pods during the switch"
+    tests:
+      - test_maxsurge_vaut_deux
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: maxunavailable-vaut-un
+    label: "maxUnavailable is 1: at most one Pod unavailable at a time"
+    tests:
+      - test_maxunavailable_vaut_un
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: l-image-est-la-nouvelle
+    label: "The Deployment's image moved to nginx:1.27-alpine"
+    tests:
+      - test_l_image_est_la_nouvelle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: les-replicas-restent-cinq
+    label: "The Deployment still asks for five replicas"
+    tests:
+      - test_les_replicas_restent_cinq
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: les-cinq-replicas-sont-prets-et-a-jour
+    label: "The five replicas are ready and up to date"
+    tests:
+      - test_les_cinq_replicas_sont_prets_et_a_jour
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: deux-revisions-existent
+    label: "Two revisions of webapp exist, the new image coming after the old one"
+    tests:
+      - test_deux_revisions_existent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: le-nouveau-replicaset-porte-cinq-replicas
+    label: "The ReplicaSet of the new image carries five ready replicas"
+    tests:
+      - test_le_nouveau_replicaset_porte_cinq_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: les-anciens-replicasets-sont-a-zero
+    label: "The old ReplicaSets are kept at zero"
+    tests:
+      - test_les_anciens_replicasets_sont_a_zero
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+
+feedback: full

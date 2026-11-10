@@ -7,8 +7,11 @@ update and rollbacks ».
 Le lab hérité faisait faire une mise à jour qui marche puis un retour
 arrière sans raison, et lisait l'image finale. Ici le déploiement est
 bloqué sur une image qui n'existe pas, comme à l'examen, et les tests
-lisent les numéros de révision des ReplicaSets : ils disent si un retour
-arrière a eu lieu, dans quel ordre, et si l'historique a été conservé.
+lisent les numéros de révision des ReplicaSets qui appartiennent au
+Deployment : ils disent quelle révision sert le trafic, lesquelles sont
+gardées à zéro, et si l'historique a survécu. Ils jugent cet état, pas les
+commandes tapées : `rollout undo` et `set image` vers l'image précédente
+laissent le même historique, donc rien ici ne prétend prouver le geste.
 
 | | |
 |---|---|

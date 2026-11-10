@@ -4,11 +4,11 @@ level: workloads-scheduling
 section: cka
 difficulty: intermediate
 description: |
-  An update went out with a wrong image name and the rollout is stuck. Go
-  back to the revision that worked through the Deployment history, then ship
-  the correct image with a change cause. The tests read the ReplicaSets and
-  their revision numbers: they tell the story of what happened, and a
-  Deployment recreated from scratch tells no story at all.
+  An update went out with a wrong image name and the rollout is stuck. Put the
+  revision that worked back in service, then ship the correct image and carry a
+  change cause on the Deployment. The tests read the ReplicaSets that belong to
+  the Deployment and the exact revision numbers expected: a Deployment deleted
+  and recreated no longer has the history they read.
 skills:
   - deployment
   - rollout
@@ -38,3 +38,61 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-deploiement-demande-la-bonne-image
+    label: "The Deployment webapp asks for the image nginx:1.27-alpine"
+    tests:
+      - test_le_deploiement_demande_la_bonne_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: le-deploiement-demande-trois-replicas
+    label: "The Deployment webapp asks for three replicas"
+    tests:
+      - test_le_deploiement_demande_trois_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: les-trois-replicas-sont-disponibles-et-a-jour
+    label: "The three replicas are available and up to date"
+    tests:
+      - test_les_trois_replicas_sont_disponibles_et_a_jour
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: aucun-pod-n-est-en-erreur-d-image
+    label: "No Pod of webapp is left in image error"
+    tests:
+      - test_aucun_pod_n_est_en_erreur_d_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: l-historique-du-deploiement-est-intact
+    label: "The history keeps a ReplicaSet for the version that worked and for the faulty one"
+    tests:
+      - test_l_historique_du_deploiement_est_intact
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: le-retour-arriere-a-ete-fait-avant-la-livraison
+    label: "The version that worked is back in service as revision 3, before the final delivery"
+    tests:
+      - test_le_retour_arriere_a_ete_fait_avant_la_livraison
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: la-version-fautive-est-conservee-a-zero
+    label: "The faulty revision is kept, scaled down to zero"
+    tests:
+      - test_la_version_fautive_est_conservee_a_zero
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: la-revision-finale-est-celle-de-la-bonne-image
+    label: "The final revision 4 is the one of nginx:1.27-alpine, with three replicas"
+    tests:
+      - test_la_revision_finale_est_celle_de_la_bonne_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: le-deploiement-porte-la-cause-de-changement
+    label: "The Deployment webapp carries the kubernetes.io/change-cause annotation"
+    tests:
+      - test_le_deploiement_porte_la_cause_de_changement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+
+feedback: full

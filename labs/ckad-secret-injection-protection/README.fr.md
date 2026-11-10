@@ -8,13 +8,25 @@ qui porte sur l'injection depuis un ConfigMap. Celui-ci porte sur ce que le
 Secret change vraiment : **la valeur quitte le manifeste**, et l'application ne
 voit pas la différence.
 
-Le test final exerce les deux côtés dans le **même** test, délibérément.
-Séparées, ces deux moitiés ne mesureraient rien de bon :
+**Neuf tests, un par état demandé par l'énoncé**, chacun pesant le même
+neuvième de la note. Deux d'entre eux portent tout le propos du lab :
 
-| moitié isolée | pourquoi elle ne vaut rien seule |
+| test | ce qu'il ferme |
 |---|---|
-| « la valeur n'est plus dans le manifeste » | vert si le candidat supprime la variable et casse l'application |
-| « le conteneur voit la valeur » | déjà vrai AVANT le travail, le manifeste la lui donne en clair |
+| il lit le `.data` du Secret et le décode | le Secret n'est plus une formalité dont personne ne lit le contenu |
+| il balaye les ConfigMaps du namespace à la recherche de la valeur | la valeur déplacée dans un ConfigMap quitte le manifeste et ne protège rien |
+
+Sans ces deux-là, le mot de passe écrit en clair dans un ConfigMap et injecté
+de là rendait la note pleine, soit l'inverse exact de ce que le lab enseigne.
+Sortir une valeur d'un manifeste ne vaut rien en soi : ce qui compte est
+l'objet où elle atterrit.
+
+Aucune des deux moitiés « elle a quitté le manifeste » et « le conteneur la
+voit » ne prouve quoi que ce soit seule, et cela reste vrai : la première est
+verte si le candidat supprime la variable et casse l'application, la seconde est
+déjà vraie AVANT le travail. Les deux sont donc exigées, en tests distincts,
+pour qu'un travail incomplet s'entende dire quel état manque plutôt que le seul
+premier échec.
 
 Le lab demande les **deux** chemins d'injection, parce qu'ils ne se valent pas :
 une variable d'environnement est figée pour la vie du processus, un fichier

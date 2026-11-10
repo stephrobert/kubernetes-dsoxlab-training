@@ -3,9 +3,12 @@
 **CKAD** lab, *Services and Networking* domain (20 % of the exam), competency
 "Provide and troubleshoot access to applications via services".
 
-The inherited lab read six specs without ever making a request. Here each Pod
-answers with its own name, and ten requests from a client must reach at least
-two Pods.
+The inherited lab read six specs without ever making a request. Here eleven
+criteria measure one asked state each: the Deployment and the image of the Pods
+it really runs, the Service with its ports, selector and ready endpoints, then
+ten requests from a client. The answers are compared to the REAL list of Pods,
+and each Pod is queried on its own loopback: a container serving an invented
+identifier is refused.
 
 | | |
 |---|---|

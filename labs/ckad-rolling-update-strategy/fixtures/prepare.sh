@@ -17,6 +17,12 @@ fi
 kubectl get namespace lab >/dev/null 2>&1 || kubectl create namespace lab
 
 kubectl -n lab delete deployment webapp --ignore-not-found --wait=true
+# Les ReplicaSets d'un Deployment partent avec lui, mais un ReplicaSet SANS
+# propriétaire, posé à la main au passage précédent, survit à cette
+# suppression : il porterait le label app=webapp dans un namespace censé
+# repartir d'une seule révision, et les tests le liraient comme un historique.
+# La situation se pose sur un namespace vide de ReplicaSets, pas presque vide.
+kubectl -n lab delete replicasets --all --wait=true
 
 cat <<'EOF' | kubectl apply -f -
 apiVersion: apps/v1
