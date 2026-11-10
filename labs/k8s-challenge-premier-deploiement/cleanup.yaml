@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le challenge a créé, les deux
+# namespaces, les fichiers de la boutique et les deux kubeconfig de
+# l'apprenant. Le cluster kind reste, il fait partie du socle.
+- name: Nettoyer le challenge k8s-challenge-premier-deploiement
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces du challenge
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        vitrine catalogue --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de la boutique et les kubeconfig de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/{{ item }}"
+        state: absent
+      loop:
+        - boutique
+        - .kube/boutique.yaml
+        - .kube/config

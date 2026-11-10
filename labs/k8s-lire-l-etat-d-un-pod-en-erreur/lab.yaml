@@ -1,0 +1,71 @@
+id: k8s-lire-l-etat-d-un-pod-en-erreur
+title: "Read the state of a failing Pod"
+level: application-observability
+section: ckad
+difficulty: beginner
+description: |
+  Two applications will not start in the diagnostic namespace. Find out why,
+  with evidence read from the cluster, without repairing anything: the reason
+  an image will not pull, the error a crashing container wrote before it
+  stopped, its exit code, and which running Pod uses the most memory.
+skills:
+  - kubectl-get
+  - kubectl-describe
+  - kubectl-logs
+  - kubectl-top
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKAD, domaine Application Observability and
+# Maintenance : « Use built-in CLI tools to monitor Kubernetes applications »,
+# « Utilize container logs ». Lab de la leçon « Lire l'état du cluster » du
+# module Fondamentaux de la formation, qui enseigne sur kind : il tourne donc
+# sur un cluster kind, sur l'hôte k8s-kind.lab.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: la-cause-de-api-est-consignee
+    label: "api.txt names why the api container is waiting and the faulty image"
+    tests:
+      - test_la_cause_de_api_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+  - id: l-erreur-de-batch-est-consignee
+    label: "batch.txt quotes the error written by the previous run of batch"
+    tests:
+      - test_l_erreur_de_batch_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+  - id: le-code-de-sortie-de-batch-est-consigne
+    label: "batch.txt gives the exit code of the last terminated batch container"
+    tests:
+      - test_le_code_de_sortie_de_batch_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+  - id: le-pod-le-plus-gourmand-est-consigne
+    label: "top.txt names the Pod of the namespace that uses the most memory"
+    tests:
+      - test_le_pod_le_plus_gourmand_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+  - id: rien-n-a-ete-repare
+    label: "Nothing was repaired: api and batch keep their original image and command"
+    tests:
+      - test_rien_n_a_ete_repare
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/

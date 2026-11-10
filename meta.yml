@@ -83,6 +83,17 @@ infra:
       vcpu: 2
       disk_gb: 20
 
+    # Les labs du module Fondamentaux de la formation tournent sur un cluster
+    # kind, l'outil que la formation enseigne : un seul nœud, dans une VM, avec
+    # Docker et kind posés par shared/kind-cluster.yml. Rôle `kind` et non
+    # `worker` : le socle kubeadm rejoint tout hôte `worker` au cluster.
+    - name: k8s-kind.lab
+      distro: debian13
+      role: kind
+      ram_mb: 8192
+      vcpu: 4
+      disk_gb: 30
+
 # Sections et niveaux reprennent les DOMAINES des blueprints officiels, mot
 # pour mot. C'est ce qui permet de répondre à la seule question qui compte
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
@@ -159,6 +170,10 @@ sections:
       # il ne s'adresse qu'à qui a déjà joué les dix-sept précédents, puisqu'il
       # ne dit plus quel objet employer.
       - ckad-capstone-boutique
+      # Servent le module Fondamentaux de la formation, sur un cluster kind :
+      # le lab de la leçon « Lire l'état du cluster », puis le challenge du module.
+      - k8s-lire-l-etat-d-un-pod-en-erreur
+      - k8s-challenge-premier-deploiement
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

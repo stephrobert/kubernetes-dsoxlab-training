@@ -1,0 +1,175 @@
+---
+# Socle des labs qui tournent sur kind : un hôte Debian 13 (k8s-kind.lab) avec
+# Docker, kind, kubectl, et un cluster kind à un nœud, prêt à recevoir des Pods.
+# C'est l'équivalent de shared/kubeadm-cluster.yml pour les labs du module
+# Fondamentaux, qui enseignent sur kind comme la formation.
+#
+# Inclus par le `setup.yaml` de chaque lab kind, dans un play sur `lab_target`
+# (k8s-kind.lab), avec le nom du cluster en variable :
+#
+#     - name: Installer le socle, un cluster kind
+#       ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+#       vars:
+#         kind_cluster_name: lab
+#
+# Chaque tâche porte sa propre idempotence : la première exécution installe
+# tout, les suivantes constatent que tout est là.
+#
+# Ce que ce fichier pose :
+#   - Docker CE du dépôt officiel de Docker, version épinglée ci-dessous ;
+#   - /usr/local/bin/kind et /usr/local/bin/kubectl, empreintes vérifiées ;
+#   - /etc/sysctl.d/99-kind.conf, les limites inotify ;
+#   - le cluster kind_cluster_name, un seul nœud <nom>-control-plane ;
+#   - /etc/kind/<nom>.kubeconfig, 0600 root, que les tests lisent avec sudo ;
+#   - ~/.kube/config de l'utilisateur du lab, réglé sur ce cluster, sauf si
+#     `kind_donner_kubeconfig: false`.
+#
+# Joué de bout en bout le 2026-11-10 avec le lab k8s-lire-l-etat-d-un-pod-en-erreur
+# (VALIDE), empreintes de kind et de kubectl comprises. containerd.io n'est pas
+# épinglé : c'est le paquet que Docker CE 29.9.3 tire du même dépôt.
+- name: Poser les variables du socle kind
+  ansible.builtin.set_fact:
+    kind_nom: "{{ kind_cluster_name | default('lab') }}"
+    kind_utilisateur: "{{ ansible_user | default('ansible') }}"
+    kind_donner: "{{ kind_donner_kubeconfig | default(true) }}"
+    kind_docker_version: "5:29.9.3-1~debian.13~trixie"
+    kind_version: "v0.33.0"
+    kind_kubectl_version: "v1.37.0"
+    kind_noeud_image: "kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5"
+
+- name: Installer les dépendances du dépôt Docker
+  ansible.builtin.apt:
+    name: [ca-certificates, curl]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Créer le répertoire des clés apt
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Récupérer la clé du dépôt Docker
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: Déclarer le dépôt officiel de Docker
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    uris: https://download.docker.com/linux/debian
+    suites: trixie
+    components: stable
+    architectures: amd64
+    signed_by: /etc/apt/keyrings/docker.asc
+    state: present
+
+# Sans ce rafraîchissement, le cache apt tout juste mis à jour par la tâche des
+# dépendances ignore le dépôt Docker qu'on vient de déclarer.
+- name: Rafraîchir l'index apt après l'ajout du dépôt Docker
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Installer Docker CE, version épinglée
+  ansible.builtin.apt:
+    name:
+      - "docker-ce={{ kind_docker_version }}"
+      - "docker-ce-cli={{ kind_docker_version }}"
+      - containerd.io
+    state: present
+    allow_downgrade: true
+
+- name: Démarrer Docker
+  ansible.builtin.systemd_service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Donner le groupe docker à l'utilisateur du lab
+  ansible.builtin.user:
+    name: "{{ kind_utilisateur }}"
+    groups: docker
+    append: true
+
+# Sans ces limites, le kubelet d'un nœud kind peut échouer sur « too many open
+# files », et le message ne nomme pas la cause.
+- name: Régler les limites inotify, de façon persistante
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-kind.conf
+    mode: "0644"
+    content: |
+      fs.inotify.max_user_watches   = 524288
+      fs.inotify.max_user_instances = 512
+  register: sysctl_kind
+
+- name: Appliquer les limites inotify
+  ansible.builtin.command: sysctl -p /etc/sysctl.d/99-kind.conf
+  when: sysctl_kind is changed
+  changed_when: true
+
+- name: Installer kind
+  ansible.builtin.get_url:
+    url: "https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64"
+    dest: /usr/local/bin/kind
+    checksum: "sha256:https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64.sha256sum"
+    mode: "0755"
+
+- name: Installer kubectl
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kind_kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    checksum: "sha256:https://dl.k8s.io/release/{{ kind_kubectl_version }}/bin/linux/amd64/kubectl.sha256"
+    mode: "0755"
+
+- name: Lister les clusters kind existants
+  ansible.builtin.command: kind get clusters
+  register: kind_existants
+  changed_when: false
+
+- name: Créer le cluster kind
+  ansible.builtin.command: >-
+    kind create cluster --name {{ kind_nom }}
+    --image {{ kind_noeud_image }} --wait 180s
+  when: kind_nom not in kind_existants.stdout_lines
+  changed_when: true
+
+- name: Créer le répertoire des kubeconfig d'administration
+  ansible.builtin.file:
+    path: /etc/kind
+    state: directory
+    mode: "0700"
+
+- name: Exporter le kubeconfig d'administration du cluster
+  ansible.builtin.shell: |
+    set -o pipefail
+    kind get kubeconfig --name {{ kind_nom }} > /etc/kind/{{ kind_nom }}.kubeconfig
+    chmod 0600 /etc/kind/{{ kind_nom }}.kubeconfig
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: Attendre que le nœud du cluster soit Ready
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kind/{{ kind_nom }}.kubeconfig wait
+    --for=condition=Ready node --all --timeout=180s
+  changed_when: false
+
+- name: Créer le répertoire kube de l'utilisateur du lab
+  ansible.builtin.file:
+    path: "/home/{{ kind_utilisateur }}/.kube"
+    state: directory
+    owner: "{{ kind_utilisateur }}"
+    mode: "0700"
+  when: kind_donner | bool
+
+- name: Régler le kubectl de l'utilisateur du lab sur ce cluster
+  ansible.builtin.copy:
+    src: "/etc/kind/{{ kind_nom }}.kubeconfig"
+    dest: "/home/{{ kind_utilisateur }}/.kube/config"
+    remote_src: true
+    owner: "{{ kind_utilisateur }}"
+    mode: "0600"
+  when: kind_donner | bool

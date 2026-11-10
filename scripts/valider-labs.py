@@ -61,53 +61,74 @@ SSH_CONFIG = CACHE / "ssh_config"
 # changent à chaque redémarrage, on y regarde les Deployments, DaemonSets,
 # Pods statiques et ConfigMaps ; ailleurs, chaque objet compte.
 PHOTOGRAPHIE = r'''
-import hashlib, json, subprocess
-K = ["kubectl", "--kubeconfig", "/etc/kubernetes/admin.conf"]
+import glob, hashlib, json, os, subprocess
+# Un nœud kubeadm porte /etc/kubernetes/admin.conf. Un hôte kind (k8s-kind.lab)
+# porte un kubeconfig d'administration par cluster, dans /etc/kind : on les
+# photographie tous, chacun préfixé de son nom, parce que deux labs kind peuvent
+# laisser chacun leur cluster sur le même hôte.
+if os.path.exists("/etc/kubernetes/admin.conf"):
+    CIBLES = [("", "/etc/kubernetes/admin.conf")]
+else:
+    CIBLES = [(os.path.basename(c)[:-len(".kubeconfig")] + ":", c) for c in sorted(glob.glob("/etc/kind/*.kubeconfig"))]
+K = []
 def get(*args):
     out = subprocess.run(K + list(args) + ["-o", "json"], capture_output=True, text=True)
     return json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {"items": []}
-photo = {"noeuds": {}, "cluster": {}, "kube-system": {}}
-for n in get("get", "nodes")["items"]:
-    conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
-    photo["noeuds"][n["metadata"]["name"]] = {
-        "ready": conds.get("Ready"),
-        "unschedulable": bool(n["spec"].get("unschedulable", False)),
-        "taints": sorted(t["key"] + "=" + t.get("value", "") + ":" + t["effect"] for t in n["spec"].get("taints") or []),
-        "labels": n["metadata"].get("labels", {}),
-        "version": n["status"]["nodeInfo"]["kubeletVersion"],
-    }
-ns = get("get", "namespaces")["items"]
-photo["namespaces"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") != "Terminating")
-photo["terminating"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") == "Terminating")
-for kind in ("clusterroles", "clusterrolebindings", "storageclasses", "persistentvolumes", "runtimeclasses",
-             "priorityclasses", "crds", "validatingwebhookconfigurations", "mutatingwebhookconfigurations",
-             "ingressclasses"):
-    photo["cluster"][kind] = sorted(x["metadata"]["name"] for x in get("get", kind)["items"])
-ks = photo["kube-system"]
-for d in get("get", "deployments", "-n", "kube-system")["items"]:
-    ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
-for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
-    ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
-# Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
-# redémarrage, on ne retient que le compte de son DaemonSet.
-for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
-    ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
-for p in get("get", "pods", "-n", "kube-system")["items"]:
-    if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
-        ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
-for c in get("get", "configmaps", "-n", "kube-system")["items"]:
-    empreinte = hashlib.sha256(json.dumps(c.get("data") or {}, sort_keys=True).encode()).hexdigest()[:12]
-    ks["configmap/" + c["metadata"]["name"]] = empreinte
-objets = []
-for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemonsets", "statefulsets", "jobs",
-             "cronjobs", "networkpolicies", "serviceaccounts", "roles", "rolebindings", "persistentvolumeclaims",
-             "ingresses", "resourcequotas", "limitranges"):
-    for x in get("get", kind, "-A")["items"]:
-        nsn = x["metadata"]["namespace"]
-        if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
-            continue
-        objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
-photo["objets"] = sorted(objets)
+def photographier_un(prefixe):
+    photo = {"noeuds": {}, "cluster": {}, "kube-system": {}}
+    for n in get("get", "nodes")["items"]:
+        conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
+        photo["noeuds"][n["metadata"]["name"]] = {
+            "ready": conds.get("Ready"),
+            "unschedulable": bool(n["spec"].get("unschedulable", False)),
+            "taints": sorted(t["key"] + "=" + t.get("value", "") + ":" + t["effect"] for t in n["spec"].get("taints") or []),
+            "labels": n["metadata"].get("labels", {}),
+            "version": n["status"]["nodeInfo"]["kubeletVersion"],
+        }
+    ns = get("get", "namespaces")["items"]
+    photo["namespaces"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") != "Terminating")
+    photo["terminating"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") == "Terminating")
+    for kind in ("clusterroles", "clusterrolebindings", "storageclasses", "persistentvolumes", "runtimeclasses",
+                 "priorityclasses", "crds", "validatingwebhookconfigurations", "mutatingwebhookconfigurations",
+                 "ingressclasses"):
+        photo["cluster"][kind] = sorted(x["metadata"]["name"] for x in get("get", kind)["items"])
+    ks = photo["kube-system"]
+    for d in get("get", "deployments", "-n", "kube-system")["items"]:
+        ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
+    for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
+        ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+    # Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
+    # redémarrage, on ne retient que le compte de son DaemonSet.
+    for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
+        ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+    for p in get("get", "pods", "-n", "kube-system")["items"]:
+        if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
+            ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
+    for c in get("get", "configmaps", "-n", "kube-system")["items"]:
+        empreinte = hashlib.sha256(json.dumps(c.get("data") or {}, sort_keys=True).encode()).hexdigest()[:12]
+        ks["configmap/" + c["metadata"]["name"]] = empreinte
+    objets = []
+    for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemonsets", "statefulsets", "jobs",
+                 "cronjobs", "networkpolicies", "serviceaccounts", "roles", "rolebindings", "persistentvolumeclaims",
+                 "ingresses", "resourcequotas", "limitranges"):
+        for x in get("get", kind, "-A")["items"]:
+            nsn = x["metadata"]["namespace"]
+            if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
+                continue
+            objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
+    photo["objets"] = sorted(objets)
+    return photo
+totale = {"noeuds": {}, "cluster": {}, "kube-system": {}, "namespaces": [], "terminating": [], "objets": []}
+for prefixe, chemin in CIBLES:
+    K[:] = ["kubectl", "--kubeconfig", chemin]
+    une = photographier_un(prefixe)
+    totale["noeuds"].update(une["noeuds"])
+    for kind, noms in une["cluster"].items():
+        totale["cluster"].setdefault(kind, []).extend(prefixe + n for n in noms)
+    totale["kube-system"].update({prefixe + k: v for k, v in une["kube-system"].items()})
+    for cle in ("namespaces", "terminating", "objets"):
+        totale[cle].extend(prefixe + n for n in une[cle])
+photo = totale
 print(json.dumps(photo))
 '''
 
