@@ -22,6 +22,13 @@ repo:
     vocabulaire. C'est le trou que ce catalogue comble.
 
 sections:
+  - id: kcna
+    title: "KCNA, Kubernetes and Cloud Native Associate"
+    description: >-
+      Quatre domaines. Kubernetes Fundamentals pèse 44 %, le plus lourd : de
+      quoi un cluster est fait et quel composant fait quoi, lu sur un cluster
+      multi-nœuds vivant.
+
   - id: cka
     title: "CKA, Certified Kubernetes Administrator"
     description: >-

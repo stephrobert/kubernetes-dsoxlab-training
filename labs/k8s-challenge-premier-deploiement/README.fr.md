@@ -2,8 +2,8 @@
 
 Challenge du module **Fondamentaux** de la formation Kubernetes, sans guidage,
 noté sur l'état final (seuil 70, deux exigences bloquantes). Il mobilise les
-gestes du domaine CKAD *Application Deployment* et le réglage du client
-`kubectl`.
+gestes du domaine KCNA *Kubernetes Fundamentals* (Kubernetes Core Concepts) et
+le réglage du client `kubectl`.
 
 | | |
 |---|---|

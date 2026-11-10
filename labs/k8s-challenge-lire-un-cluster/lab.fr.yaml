@@ -1,0 +1,19 @@
+title: "Lire un cluster : quel composant fait quoi"
+description: |
+  Sur un cluster kind à quatre nœuds, trouver quel Node porte le control plane,
+  nommer les Pods de ses quatre composants avec leur rôle, lire le runtime de
+  conteneurs de chaque worker, prouver où le scheduler a placé un Pod, et
+  trouver quel composant n'agit pas sur un Deployment dont les Pods ne
+  démarrent jamais.
+
+criteria:
+  - id: le-noeud-du-control-plane-est-consigne
+    label: "Le Node qui porte le control plane est consigné"
+  - id: les-composants-du-control-plane-sont-consignes
+    label: "Les Pods des quatre composants du control plane sont consignés avec leur rôle"
+  - id: le-runtime-de-chaque-worker-est-consigne
+    label: "Le runtime de conteneurs de chaque Node worker est consigné"
+  - id: le-placement-du-pod-temoin-est-prouve
+    label: "Le Node qui a reçu le Pod temoin est consigné, avec l'événement Scheduled"
+  - id: le-maillon-qui-n-agit-pas-est-identifie
+    label: "Pour file-attente, le composant qui a agi et celui qui n'agit pas sont consignés"

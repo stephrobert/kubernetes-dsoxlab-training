@@ -1,0 +1,69 @@
+# Lab guidé de la leçon « Les nœuds worker » du module Architecture de la
+# formation. Il fait lire, sur un worker désigné, ce que le Node déclare de
+# lui-même : son runtime, la version de son kubelet, sa capacité et sa
+# condition Ready.
+#
+# Il tourne sur le cluster kind « architecture », partagé par les quatre labs
+# du module. Il ne crée aucun objet dans le cluster : il n'écrit qu'une fiche
+# dans le répertoire de l'apprenant, et ne modifie jamais les Nodes.
+id: k8s-lire-un-node
+title: "Read what a worker Node declares"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  On the multi-node kind cluster, record for the worker architecture-worker2
+  its container runtime, the version of its kubelet, its CPU and memory
+  capacity, and its Ready condition, as the Node declares them.
+skills:
+  - kubectl-get-nodes
+  - kubectl-describe-node
+  - kubelet
+  - container-runtime
+  - node-conditions
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - kcna
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-runtime-du-worker-est-consigne
+    label: "The container runtime of architecture-worker2 and its version are recorded"
+    tests:
+      - test_le_runtime_du_worker_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+  - id: la-version-du-kubelet-est-consignee
+    label: "The kubelet version of architecture-worker2 is recorded"
+    tests:
+      - test_la_version_du_kubelet_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+  - id: la-capacite-du-worker-est-consignee
+    label: "The CPU and memory capacity of architecture-worker2 are recorded"
+    tests:
+      - test_la_capacite_en_cpu_et_en_memoire_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+  - id: la-condition-ready-est-consignee
+    label: "The Ready condition of architecture-worker2 is recorded"
+    tests:
+      - test_la_condition_ready_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/

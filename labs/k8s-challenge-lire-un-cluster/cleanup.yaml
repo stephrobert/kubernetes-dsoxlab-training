@@ -1,0 +1,19 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le challenge a créé, le namespace
+# architecture et le relevé de l'apprenant. Le cluster kind reste : il est le
+# socle partagé des labs du module Architecture, et aucun d'eux ne le détruit.
+- name: Nettoyer le challenge k8s-challenge-lire-un-cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/architecture.kubeconfig delete namespace
+        architecture --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le relevé de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/architecture"
+        state: absent

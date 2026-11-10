@@ -2,8 +2,8 @@
 
 Challenge of the **Fundamentals** module of the Kubernetes course, with no
 guidance, graded on the final state (pass mark 70, two blocking requirements).
-It uses the moves of the CKAD *Application Deployment* domain and the setup of
-the `kubectl` client.
+It uses the moves of the KCNA *Kubernetes Fundamentals* domain (Kubernetes Core
+Concepts) and the setup of the `kubectl` client.
 
 | | |
 |---|---|

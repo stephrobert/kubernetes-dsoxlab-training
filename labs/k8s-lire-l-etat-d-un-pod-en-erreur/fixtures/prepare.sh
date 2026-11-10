@@ -23,9 +23,9 @@ LAB_USER="${LAB_USER:-ansible}"
 LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
 
 # 1. Un namespace neuf.
-if kubectl get namespace "$NS" >/dev/null 2>&1; then
-  kubectl delete namespace "$NS" --wait=true --timeout=180s
-fi
+# --ignore-not-found plutôt qu'un get préalable : un namespace encore en
+# Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
+kubectl delete namespace "$NS" --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace "$NS"
 
 # 2. Les trois Deployments.
