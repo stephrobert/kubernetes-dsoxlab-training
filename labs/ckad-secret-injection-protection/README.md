@@ -23,10 +23,19 @@ counts is the object it lands in.
 
 Neither half of the pair "it left the manifest" and "the container sees it"
 proves anything alone, and that is still true: the first is green if the
-candidate deletes the variable and breaks the application, the second is
-already true BEFORE the work. Both are therefore required, as separate tests,
+candidate deletes the variable and breaks the application, and the second was
+already true BEFORE the work, since the variable already carried the right
+value, taken from the manifest. Both are therefore required, as separate tests,
 so an incomplete piece of work is told which state is missing rather than only
 the first failure.
+
+And since a half that is already true at the start measures nothing, **every
+test now demands the arrival state**. Three of them passed before any work,
+measured on 2026-11-10: the ConfigMap sweep, because an absence is true before
+you begin; "a Pod is running", because the setup already runs one; and
+`DB_PASSWORD` inside the container, for the reason above. The first is now
+conditioned on the value being held by a Secret, the other two read the running
+Pod and demand the Secret projection and the variable's origin there.
 
 The lab asks for **both** injection paths, because they are not equivalent: an
 environment variable is frozen for the life of the process, a mounted file is

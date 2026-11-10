@@ -27,10 +27,12 @@ You are on the control plane, with `kubectl` configured.
    `kubernetes.io/change-cause` on the **Deployment itself**, with text that
    says what was shipped. That is where the tests read it.
 
-4. The history is intact. The ReplicaSet of the version that worked and the one
-   of the faulty image are both still there, and the faulty one, which stays
-   **revision 2**, is scaled down to **zero**: nothing was deleted by hand, and
-   the Deployment was neither deleted nor recreated.
+4. Once the delivery is done, the history is intact. The ReplicaSet of the
+   version that worked and the one of the faulty image are both still there,
+   and the faulty one, which stays **revision 2**, is scaled down to **zero**:
+   nothing was deleted by hand, and the Deployment was neither deleted nor
+   recreated. That state is read on what the rollback and the delivery left
+   behind, so it is judged with the final revision present, never before.
 
 So, at the end, four revisions: 1 the original application, 2 this morning's
 faulty update at zero, 3 the version that worked back in service at zero, 4 the
@@ -54,6 +56,11 @@ The tests read the live cluster: the Deployment, the Pods and the ReplicaSets
 that **belong** to it, with their revision annotations. They judge the state
 reached, not the commands you typed, and they cannot tell a `rollout undo` from
 a `set image` back to the previous image: both leave the same history.
+
+Every one of them judges a state that only the work produces. Keeping the three
+replicas is therefore read **with** the final revision, not as a requirement of
+its own: the situation already asks for three, so a separate check would hand
+out points for the starting state.
 
 ```bash
 dsoxlab check cka-deployment-rollout-rollback

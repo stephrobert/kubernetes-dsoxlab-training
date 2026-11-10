@@ -29,8 +29,24 @@ formateur, rejouable et sans trace.
 
 Réécrit le 2026-11-10 après une contre-expertise indépendante : les trois
 tests précédents rendaient 100 sur un Deployment recréé de zéro et décoré
-d'un ReplicaSet orphelin. Neuf critères désormais, un par état demandé,
-chaque ReplicaSet contrôlé sur son propriétaire et son numéro de révision.
+d'un ReplicaSet orphelin. Neuf critères alors, un par état demandé, chaque
+ReplicaSet contrôlé sur son propriétaire et son numéro de révision.
+
+Corrigé le même jour, après une campagne qui a mesuré **3 tests sur 9 verts
+avant le travail** : un test qui passe sur la situation de départ donne des
+points pour l'état initial. Huit critères désormais.
+
+- La stratégie : `RollingUpdate` étant le défaut de Kubernetes, l'exigence ne
+  pouvait rien refuser. C'est la situation qui a changé, `fixtures/prepare.sh`
+  posant désormais `type: Recreate`. Le sujet y gagne : l'apprenant voit la
+  différence entre les deux stratégies.
+- Les cinq replicas prêts : ils l'étaient au départ, sur l'ancienne image. Le
+  test exige maintenant l'état final complet, l'image de la révision active
+  comprise.
+- Les cinq replicas voulus : exigence de non-régression, vraie avant le
+  travail par construction. Elle n'a plus de critère à elle et vit comme
+  assertion du test précédent.
+
 **Cette réécriture n'a pas encore été rejouée contre un cluster** :
 l'attestation 0 puis 100 ci-dessus porte sur les tests précédents, pas sur
 ceux-ci.

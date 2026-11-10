@@ -28,10 +28,13 @@ Vous êtes sur le control plane, avec `kubectl` configuré.
    `kubernetes.io/change-cause` sur le **Deployment lui-même**, avec un
    texte qui dit ce qui a été livré. C'est là que les tests la lisent.
 
-4. L'historique est intact. Le ReplicaSet de la version qui marchait et
-   celui de l'image fautive sont tous les deux encore là, et le fautif, qui
-   reste en **révision 2**, est réduit à **zéro** : rien n'a été supprimé à
-   la main, et le Deployment n'a été ni supprimé ni recréé.
+4. Une fois la livraison faite, l'historique est intact. Le ReplicaSet de la
+   version qui marchait et celui de l'image fautive sont tous les deux encore
+   là, et le fautif, qui reste en **révision 2**, est réduit à **zéro** : rien
+   n'a été supprimé à la main, et le Deployment n'a été ni supprimé ni recréé.
+   Cet état se lit sur ce que le retour arrière et la livraison ont laissé
+   derrière eux, il se juge donc avec la révision finale présente, jamais
+   avant.
 
 Soit, à la fin, quatre révisions : la 1 de l'application d'origine, la 2 de
 la mise à jour fautive de ce matin à zéro, la 3 de la version qui marchait
@@ -56,6 +59,11 @@ ReplicaSets qui lui **appartiennent**, avec leurs annotations de révision.
 Ils jugent l'état atteint, pas les commandes tapées, et ils ne savent pas
 distinguer un `rollout undo` d'un `set image` vers l'image précédente : les
 deux laissent le même historique.
+
+Chacun d'eux juge un état que seul le travail produit. Conserver les trois
+replicas se lit donc **avec** la révision finale, et non comme une exigence
+à part : la situation en demande déjà trois, un contrôle séparé donnerait
+des points pour l'état de départ.
 
 ```bash
 dsoxlab check cka-deployment-rollout-rollback

@@ -4,10 +4,10 @@ level: application-deployment
 section: ckad
 difficulty: intermediate
 description: |
-  Constrain the way a Deployment replaces its Pods, never more than two
-  extra ones nor more than one unavailable, then trigger an image update and
-  prove it went all the way through: old revision down to zero, new one
-  complete.
+  A Deployment set to Recreate must become a progressive replacement:
+  never more than two extra Pods nor more than one unavailable. Then
+  trigger an image update and prove it went all the way through: old
+  revision down to zero, new one complete.
 skills:
   - rolling-update
   - deployment
@@ -61,18 +61,17 @@ criteria:
       - test_l_image_est_la_nouvelle
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-  - id: les-replicas-restent-cinq
-    label: "The Deployment still asks for five replicas"
+  # Le critère « les replicas restent cinq » a disparu le 2026-11-10 : une
+  # exigence de non-régression est vraie avant le travail, donc son test ne
+  # pouvait pas refuser. Elle est devenue une assertion du critère suivant, qui
+  # lui dépend du travail.
+  - id: les-cinq-replicas-sont-prets-sur-la-nouvelle-image
+    label: "The five replicas are ready, up to date and running the new image"
     tests:
-      - test_les_replicas_restent_cinq
-    lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: les-cinq-replicas-sont-prets-et-a-jour
-    label: "The five replicas are ready and up to date"
-    tests:
-      - test_les_cinq_replicas_sont_prets_et_a_jour
+      - test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: deux-revisions-existent
     label: "Two revisions of webapp exist, the new image coming after the old one"
     tests:

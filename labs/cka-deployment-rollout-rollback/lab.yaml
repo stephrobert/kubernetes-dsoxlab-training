@@ -46,12 +46,6 @@ criteria:
       - test_le_deploiement_demande_la_bonne_image
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: le-deploiement-demande-trois-replicas
-    label: "The Deployment webapp asks for three replicas"
-    tests:
-      - test_le_deploiement_demande_trois_replicas
-    lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles-et-a-jour
     label: "The three replicas are available and up to date"
     tests:
@@ -65,7 +59,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: l-historique-du-deploiement-est-intact
-    label: "The history keeps a ReplicaSet for the version that worked and for the faulty one"
+    label: "Once the delivery is done, the history still keeps the version that worked and the faulty one"
     tests:
       - test_l_historique_du_deploiement_est_intact
     lessons:
@@ -83,7 +77,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-revision-finale-est-celle-de-la-bonne-image
-    label: "The final revision 4 is the one of nginx:1.27-alpine, with three replicas"
+    label: "The final revision 4 is the one of nginx:1.27-alpine, with the three replicas kept"
     tests:
       - test_la_revision_finale_est_celle_de_la_bonne_image
     lessons:

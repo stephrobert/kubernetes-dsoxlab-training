@@ -15,12 +15,12 @@ criteria:
   - id: le-mot-de-passe-a-quitte-le-manifeste
     label: "Le mot de passe n'apparaît plus dans le manifeste du Deployment"
   - id: le-mot-de-passe-n-est-en-clair-nulle-part-ailleurs
-    label: "Le mot de passe n'est en clair nulle part ailleurs dans le namespace, en particulier dans aucun ConfigMap"
+    label: "Le mot de passe est porté par un Secret et n'est en clair nulle part ailleurs dans le namespace, dans aucun ConfigMap en particulier"
   - id: le-deployment-a-ete-modifie-pas-remplace
     label: "Le Deployment a été modifié sur place et sa bascule est allée au bout"
-  - id: un-pod-tourne
-    label: "Un Pod à jour du Deployment tourne et est prêt"
-  - id: dans-le-conteneur-db-password-vaut-la-valeur
-    label: "Dans le conteneur, DB_PASSWORD porte la valeur attendue"
+  - id: un-pod-a-jour-porte-la-projection-du-secret
+    label: "Le Pod qui tourne est celui né du gabarit modifié : il porte la projection du Secret sous /etc/passerelle"
+  - id: dans-le-conteneur-db-password-vient-du-secret-et-vaut-la-valeur
+    label: "Dans le conteneur, DB_PASSWORD porte la valeur attendue, et le Pod qui tourne la tire du Secret par référence"
   - id: dans-le-conteneur-le-fichier-porte-la-valeur
     label: "Dans le conteneur, le fichier de /etc/passerelle porte la valeur attendue"

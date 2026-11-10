@@ -15,6 +15,28 @@ le compare ; le cinquième
 ConfigMaps du namespace et refuse la valeur. Sans eux, un ConfigMap portant le
 mot de passe en clair, injecté par `envFrom`, satisfaisait tout le reste.
 
+CHAQUE TEST EXIGE L'ÉTAT D'ARRIVÉE, JAMAIS UN ÉTAT DÉJÀ VRAI AU DÉPART.
+Mesuré le 2026-11-10 : trois des neuf passaient AVANT le travail, donc
+donnaient des points pour la situation posée par le setup. Un test qui ne sait
+pas refuser ne mesure rien, et les trois se trompaient de la même façon : ils
+regardaient un fait vrai au départ au lieu de l'état que le travail produit.
+
+- le cinquième mesure une ABSENCE, et une absence est vraie avant qu'on
+  commence : aucun ConfigMap du namespace ne porte le mot de passe sur un lab
+  neuf. Il est donc CONDITIONNÉ à l'état qui lui donne son sens : la valeur est
+  dans un Secret, ET elle n'est en clair dans aucun ConfigMap. Déplacer la
+  valeur vers un ConfigMap échoue alors deux fois, et ne rend plus ce point ;
+- le septième voyait « un Pod tourne », ce qui est vrai dès le setup. Il lit
+  maintenant le `spec` du Pod QUI TOURNE et y exige la projection du Secret :
+  seul un Pod né du gabarit modifié la porte ;
+- le huitième voyait `DB_PASSWORD` porter la bonne valeur, ce qui est vrai dès
+  le setup, puisque c'est le défaut même que le lab fait corriger. Il exige
+  maintenant la valeur ET son origine, lue dans le Pod réel.
+
+Le gabarit de Pod et le Pod réel ne se confondent pas : le premier dit ce que
+le Deployment demande, le second dit ce qui tourne. Les tests 2 et 3 lisent le
+gabarit, les tests 7 et 8 lisent le Pod.
+
 Le choix du nom du Secret et de sa clé reste à l'apprenant : les tests
 DÉCOUVRENT l'objet qui porte la valeur, puis exigent que ce soit CELUI-LÀ que
 le Deployment référence et monte. C'est l'énoncé qui demande un objet dédié,
@@ -157,6 +179,37 @@ def _secret_requis(host) -> tuple[str, str]:
     return porteurs[0]
 
 
+def _variables_declarees(spec: dict) -> list[str | None]:
+    """Les noms de toutes les variables d'environnement déclarées, pour le message."""
+    return [
+        v.get("name")
+        for c in spec.get("containers") or []
+        for v in c.get("env") or []
+    ]
+
+
+def _entrees_de_la_variable(spec: dict) -> list[dict]:
+    """Les déclarations de DB_PASSWORD trouvées dans ce `spec`."""
+    return [
+        v
+        for c in spec.get("containers") or []
+        for v in c.get("env") or []
+        if v.get("name") == VARIABLE
+    ]
+
+
+def _secrets_references_par_la_variable(spec: dict) -> list[str | None]:
+    """Le Secret que chaque déclaration de DB_PASSWORD désigne, ou None.
+
+    Un `value:` nu rend None : c'est exactement ce que le setup pose, et ce que
+    le travail doit remplacer.
+    """
+    return [
+        ((v.get("valueFrom") or {}).get("secretKeyRef") or {}).get("name")
+        for v in _entrees_de_la_variable(spec)
+    ]
+
+
 def _volumes_du_secret(spec: dict, nom_secret: str) -> list[str]:
     """Les noms des volumes du gabarit qui proviennent de ce Secret."""
     return [
@@ -250,6 +303,23 @@ def _pod_requis(host) -> str:
     return nom
 
 
+def _spec_du_pod_reel(host, nom: str) -> dict:
+    """Le `spec` du Pod qui tourne, lu sur le Pod lui-même.
+
+    Le gabarit du Deployment dit ce qui est DEMANDÉ ; ce Pod dit ce qui TOURNE.
+    Un Pod tournait déjà avant le travail, posé par le setup : c'est en lisant
+    son propre `spec` qu'on distingue celui-là du Pod né du gabarit modifié.
+    """
+    rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get pod {nom} -o json")
+    assert rc == 0 and sortie, message(
+        en=f"Pod {nom} cannot be read in {NAMESPACE}, so nothing was measured "
+        f"about what it carries. {diagnostic}",
+        fr=f"Le Pod {nom} est illisible dans {NAMESPACE}, donc rien n'a été mesuré "
+        f"sur ce qu'il porte. {diagnostic}",
+    )
+    return json.loads(sortie)["spec"]
+
+
 # ----------------------------------------------------------------------
 # 1. Un objet dédié porte la valeur, et on le LIT.
 # ----------------------------------------------------------------------
@@ -286,17 +356,8 @@ def test_le_secret_porte_le_mot_de_passe(host):
 def test_db_password_vient_du_secret_par_reference(host):
     nom_secret, _ = _secret_requis(host)
     spec = _spec_pod(host)
-    declarees = [
-        v.get("name")
-        for c in spec.get("containers") or []
-        for v in c.get("env") or []
-    ]
-    entrees = [
-        v
-        for c in spec.get("containers") or []
-        for v in c.get("env") or []
-        if v.get("name") == VARIABLE
-    ]
+    declarees = _variables_declarees(spec)
+    entrees = _entrees_de_la_variable(spec)
     assert entrees, message(
         en=f"The container declares no {VARIABLE} environment variable. Variables "
         f"declared: {declarees}. The application still expects its password "
@@ -307,10 +368,7 @@ def test_db_password_vient_du_secret_par_reference(host):
         "mot de passe sous ce nom exact : sortir la valeur du manifeste ne "
         "devait rien changer POUR L'APPLICATION.",
     )
-    references = [
-        ((v.get("valueFrom") or {}).get("secretKeyRef") or {}).get("name")
-        for v in entrees
-    ]
+    references = _secrets_references_par_la_variable(spec)
     assert nom_secret in references, message(
         en=f"{VARIABLE} does not take its value from Secret {nom_secret!r}, the one "
         f"that holds the password. What it references: {references}. A variable "
@@ -390,15 +448,25 @@ def test_le_mot_de_passe_a_quitte_le_manifeste(host):
 
 
 # ----------------------------------------------------------------------
-# 5. Et elle n'est pas allée en clair ailleurs.
+# 5. Elle est dans un Secret, ET elle n'est pas allée en clair ailleurs.
 # ----------------------------------------------------------------------
 def test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs(host):
-    """Le test qui ferme le contournement.
+    """Le test qui ferme le contournement, conditionné à l'état qui lui donne sens.
 
     Déplacer la valeur du manifeste vers un ConfigMap la fait bien disparaître
     du Deployment, et ne protège rien : un ConfigMap se lit comme le reste de
     la configuration, sans la moindre convention de confidentialité.
+
+    Mais l'absence seule ne mesure rien : sur un lab neuf, aucun ConfigMap ne
+    porte le mot de passe, et ce test passait donc AVANT le travail. L'état
+    demandé n'est pas « nulle part », il est « dans le Secret, et nulle part
+    ailleurs » : les deux moitiés se tiennent, et ensemble elles ne sont
+    atteintes que par le travail.
+
+    Le contournement reste refusé des deux façons : sans Secret, la première
+    assertion tombe ; avec un Secret ET un ConfigMap porteurs, la seconde.
     """
+    _secret_requis(host)
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get configmap -o json")
     assert rc == 0 and sortie, message(
         en=f"Cannot read the ConfigMaps of {NAMESPACE}. {diagnostic}",
@@ -469,18 +537,83 @@ def test_le_deployment_a_ete_modifie_pas_remplace(host):
 
 
 # ----------------------------------------------------------------------
-# 7. Un Pod à jour tourne.
+# 7. Le Pod qui tourne est né du gabarit modifié : il porte la projection.
 # ----------------------------------------------------------------------
-def test_un_pod_tourne(host):
-    nom, diagnostic = _un_pod(host)
-    assert nom, _message_sans_pod(diagnostic)
+def test_un_pod_a_jour_porte_la_projection_du_secret(host):
+    """« Un Pod tourne » était vrai dès le setup, qui pose un Deployment à une
+    réplique prête : ce test donnait un neuvième de la note pour la situation
+    de départ. Ce qui prouve quelque chose, c'est QUEL Pod tourne, et on le
+    reconnaît à ce qu'il porte : la projection du Secret dans son propre
+    `spec`, celle que seul le gabarit modifié produit."""
+    nom_secret, _ = _secret_requis(host)
+    nom = _pod_requis(host)
+    spec = _spec_du_pod_reel(host, nom)
+    declares = [v.get("name") for v in spec.get("volumes") or []]
+    noms = _volumes_du_secret(spec, nom_secret)
+    assert noms, message(
+        en=f"Pod {nom} is running, but no volume of ITS OWN spec comes from Secret "
+        f"{nom_secret!r}. Volumes it carries: {declares}. A Pod was already "
+        "running before you started, so a running Pod proves nothing by itself. "
+        "The one asked for is the Pod born FROM the modified template: if you "
+        "changed the Deployment and this Pod still carries nothing, the old Pod "
+        f"is the one that survived. `kubectl -n {NAMESPACE} get pod -o wide` and "
+        "`kubectl describe pod` say which generation it belongs to.",
+        fr=f"Le Pod {nom} tourne, mais aucun volume de SON PROPRE spec ne provient "
+        f"du Secret {nom_secret!r}. Volumes qu'il porte : {declares}. Un Pod "
+        "tournait déjà avant que vous commenciez : un Pod qui tourne ne prouve "
+        "donc rien à lui seul. Celui qui est demandé est le Pod né DU gabarit "
+        "modifié : si vous avez changé le Deployment et que ce Pod ne porte "
+        f"rien, c'est l'ancien qui a survécu. `kubectl -n {NAMESPACE} get pod -o "
+        "wide` et `kubectl describe pod` disent de quelle génération il est.",
+    )
+    chemins = [m.get("mountPath") for m in _montages(spec, noms)]
+    assert CHEMIN_MONTE in chemins, message(
+        en=f"Pod {nom} carries volume {noms} from the Secret, but mounted at "
+        f"{chemins} instead of {CHEMIN_MONTE}. The template may have been fixed "
+        "after this Pod was born: the running Pod is the one that counts, and a "
+        "rollout is what replaces it.",
+        fr=f"Le Pod {nom} porte le volume {noms} issu du Secret, mais monté sur "
+        f"{chemins} au lieu de {CHEMIN_MONTE}. Le gabarit a peut-être été corrigé "
+        "après la naissance de ce Pod : c'est le Pod qui tourne qui compte, et "
+        "c'est une bascule qui le remplace.",
+    )
 
 
 # ----------------------------------------------------------------------
-# 8. Dans le conteneur, la variable porte la valeur.
+# 8. Dans le conteneur, la variable porte la valeur, et elle vient du Secret.
 # ----------------------------------------------------------------------
-def test_dans_le_conteneur_db_password_vaut_la_valeur(host):
+def test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur(host):
+    """La valeur seule ne mesure rien : au départ, `DB_PASSWORD` porte DÉJÀ la
+    bonne valeur dans le conteneur, en clair depuis le manifeste, et c'est
+    précisément le défaut que le lab fait corriger. L'état demandé est donc la
+    valeur ET son origine, lue sur le Pod qui tourne."""
+    nom_secret, _ = _secret_requis(host)
     pod = _pod_requis(host)
+    spec = _spec_du_pod_reel(host, pod)
+    entrees = _entrees_de_la_variable(spec)
+    assert entrees, message(
+        en=f"Running Pod {pod} declares no {VARIABLE} environment variable. "
+        f"Variables declared: {_variables_declarees(spec)}. The application "
+        "still expects its password under that exact name.",
+        fr=f"Le Pod {pod} qui tourne ne déclare aucune variable d'environnement "
+        f"{VARIABLE}. Variables déclarées : {_variables_declarees(spec)}. "
+        "L'application attend toujours son mot de passe sous ce nom exact.",
+    )
+    references = _secrets_references_par_la_variable(spec)
+    assert nom_secret in references, message(
+        en=f"In running Pod {pod}, {VARIABLE} does not take its value from Secret "
+        f"{nom_secret!r}: {references}. Before you started, that variable ALREADY "
+        "carried the right value, written in clear text in the manifest, so its "
+        "value alone proves nothing. What is measured is where it comes from: "
+        "valueFrom.secretKeyRef, read on the Pod that is running and not only on "
+        "the template.",
+        fr=f"Dans le Pod {pod} qui tourne, {VARIABLE} ne tire pas sa valeur du "
+        f"Secret {nom_secret!r} : {references}. Avant que vous commenciez, cette "
+        "variable portait DÉJÀ la bonne valeur, écrite en clair dans le "
+        "manifeste : sa valeur seule ne prouve donc rien. Ce qui est mesuré, "
+        "c'est son origine : valueFrom.secretKeyRef, lu sur le Pod qui tourne et "
+        "pas seulement sur le gabarit.",
+    )
     rc, variable, diagnostic = _kubectl(
         host,
         f"-n {NAMESPACE} exec {pod} --request-timeout=30s "

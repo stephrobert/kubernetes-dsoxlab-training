@@ -8,12 +8,15 @@ image `nginx:1.26-alpine`. The next update must move to
 for more than **two extra Pods** during the switch, and the service
 tolerates no more than **one unavailable Pod** at a time.
 
-The Deployment was created with the default strategy, which respects
-neither of the two.
+The Deployment was created with an explicit **`strategy.type: Recreate`**,
+which respects neither of the two: `Recreate` kills *every* Pod before
+starting a single new one, so the service goes down for the whole switch,
+and it has no `maxSurge` nor `maxUnavailable` to tune.
 
 ## What you must achieve
 
-1. The Deployment `webapp` has a **`RollingUpdate`** strategy.
+1. The Deployment `webapp` has a **`RollingUpdate`** strategy, in place of
+   the `Recreate` it carries today.
 
 2. Its `maxSurge` is **2**.
 
@@ -21,19 +24,23 @@ neither of the two.
 
 4. Its image has moved to **`nginx:1.27-alpine`**.
 
-5. It still asks for **five** replicas: the exercise changes the strategy
-   and the image, not the size of the Deployment.
+5. Its **five** replicas are **ready, up to date, and running the new
+   image**. The exercise changes the strategy and the image, not the size of
+   the Deployment: it still asks for five, and that is checked here too.
 
-6. Those five replicas are **ready and up to date**.
-
-7. **Two revisions of `webapp` exist**, produced by this Deployment, the new
+6. **Two revisions of `webapp` exist**, produced by this Deployment, the new
    image's one coming after the old image's one in the history.
 
-8. The ReplicaSet of `nginx:1.27-alpine` carries **five ready replicas**.
+7. The ReplicaSet of `nginx:1.27-alpine` carries **five ready replicas**.
 
-9. The old ReplicaSets are **kept at zero**.
+8. The old ReplicaSets are **kept at zero**.
 
 ## Useful bearings
+
+`Recreate` and `RollingUpdate` are the two strategies a Deployment can have,
+and only the second one replaces Pods gradually. That is why `maxSurge` and
+`maxUnavailable` live under `spec.strategy.rollingUpdate`: they only mean
+something once the type is `RollingUpdate`.
 
 A Deployment keeps its old ReplicaSets, at zero replicas: that is what makes
 the rollback possible, and it is also what shows a replacement took place.
@@ -54,7 +61,9 @@ is a switch the cluster may not have had room for.
 
 The tests read the Deployment's strategy, its image, its replica count and
 its ready replicas, then the ReplicaSets that belong to it, with their
-revision numbers.
+revision numbers. The replica count is read together with the state of the
+revision the Deployment declares active: being ready means being ready on
+the new image, not on the one you started from.
 
 ```bash
 dsoxlab check ckad-rolling-update-strategy

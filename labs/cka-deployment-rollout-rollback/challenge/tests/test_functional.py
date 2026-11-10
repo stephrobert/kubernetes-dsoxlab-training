@@ -3,15 +3,15 @@
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées, et jamais un
 fichier YAML du poste.
 
-Un test vérifie un seul état demandé par l'énoncé. Les quatre premiers lisent
-le Deployment lui-même : l'image qu'il demande, le nombre de replicas qu'il
-demande, les replicas réellement disponibles et à jour, et l'absence de Pod
-resté sans image. Les quatre suivants lisent les ReplicaSets du Deployment et
-leurs numéros de révision : l'historique conservé, la révision de la version
-d'avant, la version fautive gardée à zéro, et la révision finale. Le dernier
-lit la cause de changement LÀ OÙ L'ÉNONCÉ LA DEMANDE, sur le Deployment.
+Un test vérifie un seul état demandé par l'énoncé. Les trois premiers lisent
+le Deployment lui-même : l'image qu'il demande, les replicas réellement
+disponibles et à jour, et l'absence de Pod resté sans image. Les quatre
+suivants lisent les ReplicaSets du Deployment et leurs numéros de révision :
+l'historique conservé, la révision de la version d'avant, la version fautive
+gardée à zéro, et la révision finale. Le dernier lit la cause de changement
+LÀ OÙ L'ÉNONCÉ LA DEMANDE, sur le Deployment.
 
-Deux choix de mesure, qui valent d'être dits.
+Trois choix de mesure, qui valent d'être dits.
 
 1. Les ReplicaSets sont sélectionnés par leur PROPRIÉTAIRE
    (``ownerReferences`` qui nomme le Deployment webapp), pas par le label
@@ -23,6 +23,15 @@ Deux choix de mesure, qui valent d'être dits.
    eux. Un simple ordre se reproduit à la main, et ces annotations sont
    écrivables : exiger les valeurs exactes ne rend pas la triche impossible,
    mais elle ne coûte plus moins cher que le travail demandé.
+
+3. CHAQUE TEST DOIT POUVOIR REFUSER AVANT LE TRAVAIL. Une campagne du
+   2026-11-10 en a trouvé deux qui passaient déjà sur l'état posé par le
+   setup, donc qui donnaient des points pour rien : les trois replicas, que
+   le setup demande déjà, et l'historique, que le setup crée déjà complet.
+   Ils ont été corrigés dans deux directions différentes, chacune expliquée
+   là où elle est écrite : l'historique exige désormais la révision finale,
+   que seul le travail produit, et les trois replicas sont devenus une
+   assertion du test de la révision finale au lieu d'un test à part.
 
 Ce que ces tests NE prouvent PAS, et qu'ils ne prétendent donc pas prouver :
 le geste. Un retour à l'image précédente par ``kubectl set image`` laisse
@@ -212,18 +221,6 @@ def test_le_deploiement_demande_la_bonne_image(host):
     )
 
 
-def test_le_deploiement_demande_trois_replicas(host):
-    voulus = _deploiement(host)["spec"].get("replicas")
-    assert voulus == REPLICAS, message(
-        en=f"webapp asks for {voulus} replica(s) instead of {REPLICAS}. "
-        "The number of replicas is not changed by an image update: it is the "
-        "one the Deployment carried before, and it must stay.",
-        fr=f"webapp demande {voulus} replica(s) au lieu de {REPLICAS}. "
-        "Le nombre de replicas ne change pas lors d'une mise à jour d'image : "
-        "c'est celui que le Deployment portait avant, et il doit le rester.",
-    )
-
-
 def test_les_trois_replicas_sont_disponibles_et_a_jour(deploiement_stabilise):
     statut = deploiement_stabilise["status"]
     disponibles = statut.get("availableReplicas", 0)
@@ -262,7 +259,29 @@ def test_aucun_pod_n_est_en_erreur_d_image(host):
 # 2. Ce que l'historique raconte.
 # ----------------------------------------------------------------------
 def test_l_historique_du_deploiement_est_intact(host):
+    """« Intact » ne veut rien dire avant la livraison finale.
+
+    Le setup crée lui-même les deux révisions que ce test lisait : celle qui
+    marchait et la fautive. L'historique était donc intact au départ, et ce
+    test passait AVANT le travail, où il ne mesurait rien. Ce que l'énoncé
+    demande, c'est que le retour arrière PUIS la livraison n'aient détruit
+    aucune révision précédente, un état qui n'existe qu'après le travail. Il
+    exige donc d'abord la révision finale, que seul le travail produit, puis
+    la survie des deux anciennes. Le NUMÉRO de cette révision finale reste
+    jugé par son propre test : ici, c'est sa seule existence qui donne un
+    sens à la survie des autres.
+    """
     rs = _replicasets(host)
+    assert IMAGE in rs, message(
+        en=f"No ReplicaSet of webapp carries {IMAGE!r}, the image to ship: the "
+        "final delivery has not happened yet. A kept history is judged on "
+        "what the rollback and the delivery LEFT behind, so there is nothing "
+        "to judge before they are done.",
+        fr=f"Aucun ReplicaSet de webapp ne porte {IMAGE!r}, l'image à livrer : la "
+        "livraison finale n'a pas encore eu lieu. Un historique conservé se "
+        "juge sur ce que le retour arrière et la livraison ont LAISSÉ "
+        "derrière eux, il n'y a donc rien à juger avant qu'ils soient faits.",
+    )
     assert IMAGE_AVANT in rs, message(
         en=f"No ReplicaSet of webapp carries {IMAGE_AVANT!r}, the version that "
         "worked. A Deployment deleted and recreated starts a new history, "
@@ -323,6 +342,19 @@ def test_la_version_fautive_est_conservee_a_zero(host):
 
 
 def test_la_revision_finale_est_celle_de_la_bonne_image(host):
+    """La révision finale, et la non-régression des trois replicas avec elle.
+
+    La troisième assertion était un test et un critère à part, « le
+    Deployment demande trois replicas ». C'est une exigence de NON-RÉGRESSION
+    et le setup pose déjà trois replicas : elle était donc vraie par nature
+    avant le travail, et elle donnait des points pour l'état de départ.
+    Exiger un autre nombre au départ changerait le sujet du lab, qui porte
+    sur le rollout, pas sur la mise à l'échelle. Elle est donc rattachée ici,
+    à un état que seul le travail produit : on perd un critère, on gagne une
+    exigence qui ne peut plus passer avant le travail, puisque les deux
+    assertions qui la précèdent refusent tant que la bonne image n'est pas
+    livrée en révision 4.
+    """
     finale = _replicasets(host).get(IMAGE)
     assert finale is not None, _absent(IMAGE, "the image to ship", "l'image à livrer")
     assert finale["revision"] == REV_FINALE, message(
@@ -341,6 +373,17 @@ def test_la_revision_finale_est_celle_de_la_bonne_image(host):
         fr=f"Le ReplicaSet {finale['nom']} de {IMAGE!r} demande "
         f"{finale['voulus']} replica(s) au lieu de {REPLICAS} : la révision de "
         "la bonne image n'est pas celle qui sert le trafic.",
+    )
+    voulus = _deploiement(host)["spec"].get("replicas")
+    assert voulus == REPLICAS, message(
+        en=f"webapp asks for {voulus} replica(s) instead of {REPLICAS}. "
+        "The number of replicas is not changed by an image update nor by a "
+        "rollback: it is the one the Deployment carried before, and it must "
+        "stay after the delivery.",
+        fr=f"webapp demande {voulus} replica(s) au lieu de {REPLICAS}. "
+        "Le nombre de replicas ne change ni lors d'une mise à jour d'image ni "
+        "lors d'un retour arrière : c'est celui que le Deployment portait "
+        "avant, et il doit le rester après la livraison.",
     )
 
 

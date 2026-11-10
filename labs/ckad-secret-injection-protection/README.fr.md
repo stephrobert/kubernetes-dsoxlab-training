@@ -23,10 +23,19 @@ l'objet où elle atterrit.
 
 Aucune des deux moitiés « elle a quitté le manifeste » et « le conteneur la
 voit » ne prouve quoi que ce soit seule, et cela reste vrai : la première est
-verte si le candidat supprime la variable et casse l'application, la seconde est
-déjà vraie AVANT le travail. Les deux sont donc exigées, en tests distincts,
-pour qu'un travail incomplet s'entende dire quel état manque plutôt que le seul
+verte si le candidat supprime la variable et casse l'application, et la seconde
+était déjà vraie AVANT le travail, puisque la variable portait déjà la bonne
+valeur, venue du manifeste. Les deux sont donc exigées, en tests distincts, pour
+qu'un travail incomplet s'entende dire quel état manque plutôt que le seul
 premier échec.
+
+Et puisqu'une moitié déjà vraie au départ ne mesure rien, **chaque test exige
+désormais l'état d'arrivée**. Trois passaient avant tout travail, relevés le
+2026-11-10 : le balayage des ConfigMaps, parce qu'une absence est vraie avant
+qu'on commence ; « un Pod tourne », parce que le setup en fait déjà tourner un ;
+et `DB_PASSWORD` dans le conteneur, pour la raison ci-dessus. Le premier est
+conditionné à la présence de la valeur dans un Secret, les deux autres lisent le
+Pod qui tourne et y exigent la projection du Secret et l'origine de la variable.
 
 Le lab demande les **deux** chemins d'injection, parce qu'ils ne se valent pas :
 une variable d'environnement est figée pour la vie du processus, un fichier

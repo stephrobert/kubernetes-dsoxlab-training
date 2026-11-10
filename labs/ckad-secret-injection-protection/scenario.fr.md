@@ -22,19 +22,27 @@ connaître.
 
 3. Le mot de passe n'est en clair **nulle part ailleurs** dans le namespace, et
    dans **aucun ConfigMap** en particulier. Déplacer la valeur du Deployment
-   vers un ConfigMap la ferait quitter le manifeste sans rien protéger.
+   vers un ConfigMap la ferait quitter le manifeste sans rien protéger. Cet
+   état est **contrôlé avec le précédent** : la valeur est dans un Secret, *et*
+   elle n'est dans aucun ConfigMap. Pris seul, « dans aucun ConfigMap » est
+   déjà vrai avant que vous commenciez, et ne mesure donc rien.
 
 4. L'application reçoit toujours son mot de passe dans la variable
    **`DB_PASSWORD`**, à l'identique, et cette variable **tire sa valeur de ce
-   Secret**, par référence.
+   Secret**, par référence. Là encore, la valeur seule n'est pas l'état
+   demandé : cette variable porte **déjà** la bonne valeur au départ, écrite en
+   clair dans le manifeste. Ce qui est mesuré, c'est son origine.
 
 5. La même valeur est **aussi** disponible sous forme de **fichier**, dans le
    répertoire `/etc/passerelle` du conteneur. Le volume doit désigner ce
    Secret, et être monté à ce chemin exact.
 
-6. Le Deployment continue de tourner : sa bascule va au bout, et un Pod à jour
-   est prêt. Supprimer la variable serait une façon de faire disparaître la
-   valeur du manifeste, mais pas celle qu'on vous demande.
+6. Le Deployment continue de tourner : sa bascule va au bout, et le Pod qui est
+   prêt est celui **né du gabarit modifié**, reconnaissable à la projection du
+   Secret qu'il porte dans son propre spec. Un Pod tournait déjà avant que vous
+   commenciez : « un Pod tourne » ne prouve donc rien à lui seul. Supprimer la
+   variable serait une façon de faire disparaître la valeur du manifeste, mais
+   pas celle qu'on vous demande.
 
 Modifiez ce qui existe. Le Deployment est **mis à jour sur place**, en gardant
 son nom et son historique : le supprimer puis le recréer est refusé, et
@@ -73,6 +81,15 @@ Supprimer la variable échoue toujours, comme auparavant : les tests qui entrent
 dans le conteneur prouvent que l'application reçoit son mot de passe, par la
 variable et par le fichier. Et les tests qui lisent le cluster disent **lequel**
 des états manque, au lieu de s'arrêter au premier.
+
+**Chacun des neuf refuse la situation de départ.** Trois d'entre eux passaient
+auparavant avant tout travail : celui qui balaye les ConfigMaps, parce qu'une
+absence est vraie avant qu'on commence ; celui qui voyait un Pod tourner, parce
+que le setup en fait déjà tourner un ; et celui qui lisait `DB_PASSWORD` dans le
+conteneur, parce qu'elle y portait déjà la bonne valeur, venue du manifeste.
+Chacun exige maintenant l'état que le travail produit, et non un fait qui était
+vrai au départ. Un test qui ne sait pas refuser ne mesure rien, et vous
+donnerait un neuvième de la note pour la situation qu'on vous a remise.
 
 ```bash
 dsoxlab check ckad-secret-injection-protection

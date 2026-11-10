@@ -10,19 +10,17 @@ description: |
 criteria:
   - id: le-deploiement-demande-la-bonne-image
     label: "Le Deployment webapp demande l'image nginx:1.27-alpine"
-  - id: le-deploiement-demande-trois-replicas
-    label: "Le Deployment webapp demande trois replicas"
   - id: les-trois-replicas-sont-disponibles-et-a-jour
     label: "Les trois replicas sont disponibles et à jour"
   - id: aucun-pod-n-est-en-erreur-d-image
     label: "Aucun Pod de webapp n'est resté en erreur d'image"
   - id: l-historique-du-deploiement-est-intact
-    label: "L'historique garde un ReplicaSet de la version qui marchait et un de la fautive"
+    label: "Une fois la livraison faite, l'historique garde encore la version qui marchait et la fautive"
   - id: le-retour-arriere-a-ete-fait-avant-la-livraison
     label: "La version qui marchait est remise en service en révision 3, avant la livraison finale"
   - id: la-version-fautive-est-conservee-a-zero
     label: "La révision fautive est conservée, réduite à zéro"
   - id: la-revision-finale-est-celle-de-la-bonne-image
-    label: "La révision finale 4 est celle de nginx:1.27-alpine, à trois replicas"
+    label: "La révision finale 4 est celle de nginx:1.27-alpine, avec les trois replicas conservés"
   - id: le-deploiement-porte-la-cause-de-changement
     label: "Le Deployment webapp porte l'annotation kubernetes.io/change-cause"

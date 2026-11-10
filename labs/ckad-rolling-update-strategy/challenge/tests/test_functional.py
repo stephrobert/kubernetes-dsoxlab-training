@@ -3,10 +3,26 @@
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées, et jamais un
 fichier YAML du poste.
 
-Neuf affirmations, une par état demandé par l'énoncé : la stratégie (son type,
-son maxSurge, son maxUnavailable), l'image, le nombre de replicas voulus, les
-replicas prêts et à jour, puis l'historique des ReplicaSets (deux révisions, la
-nouvelle au complet, les anciennes à zéro).
+Huit affirmations, une par état demandé par l'énoncé : la stratégie (son type,
+son maxSurge, son maxUnavailable), l'image, les cinq replicas prêts sur la
+NOUVELLE image, puis l'historique des ReplicaSets (deux révisions, la nouvelle
+au complet, les anciennes à zéro).
+
+CHAQUE TEST DOIT POUVOIR REFUSER AVANT LE TRAVAIL, et trois d'entre eux ne le
+pouvaient pas, mesuré en campagne le 2026-11-10 : 3 tests sur 9 passaient sur
+la situation de départ, donnant des points pour l'état initial.
+
+  - La stratégie : RollingUpdate est le DÉFAUT de Kubernetes, un Deployment
+    créé sans `spec.strategy` le porte déjà. C'est la SITUATION qui a changé,
+    pas le test : `fixtures/prepare.sh` pose désormais `type: Recreate`, donc
+    un état qui viole l'exigence.
+  - Les cinq replicas prêts : ils l'étaient au départ, sur l'ancienne image, et
+    `updatedReplicas` dit « conforme au template COURANT », pas « sur la
+    nouvelle image ». Le test exige donc l'état final COMPLET, image du
+    ReplicaSet courant comprise.
+  - Les cinq replicas voulus : une exigence de NON-RÉGRESSION est vraie avant
+    le travail par construction. Elle n'a plus de critère à elle, et vit comme
+    assertion du test précédent, qui lui ne peut pas passer avant le travail.
 
 CE QUE L'HISTORIQUE PROUVE, ET CE QU'IL NE PROUVE PAS. Les ReplicaSets
 établissent qu'un remplacement progressif a eu lieu et qu'il est allé au bout ;
@@ -93,25 +109,67 @@ def _lire_replicasets(host) -> tuple[dict[str, dict], list[str]]:
     appartenir au Deployment. Les seconds ne sont pas ignorés en silence : un
     test les refuse explicitement.
     """
+    rattaches, orphelins = _replicasets_rattaches(host)
+    # Tri par révision croissante : si deux ReplicaSets portent la même image,
+    # c'est le plus récent que la table retient, pas celui que kubectl a listé
+    # en dernier.
+    par_image: dict[str, dict] = {
+        rs["image"]: rs for rs in sorted(rattaches, key=lambda rs: rs["revision"])
+    }
+    return par_image, orphelins
+
+
+def _replicasets_rattaches(host) -> tuple[list[dict], list[str]]:
+    """Les ReplicaSets de webapp, un par objet, et les intrus non rattachés.
+
+    La liste brute plutôt que la table par image : deux ReplicaSets peuvent
+    porter la MÊME image et des révisions différentes, par exemple après un
+    `kubectl rollout restart`, et l'un écraserait l'autre dans la table.
+    """
     items = _json(host, f"-n {NAMESPACE} get replicasets -l app={DEPLOYMENT}", message(
         en="Cannot read the ReplicaSets.",
         fr="Lecture des ReplicaSets impossible.",
     ))["items"]
-    par_image: dict[str, dict] = {}
+    rattaches: list[dict] = []
     orphelins: list[str] = []
     for rs in items:
         if not _appartient_au_deployment(rs):
             orphelins.append(rs["metadata"]["name"])
             continue
-        image = rs["spec"]["template"]["spec"]["containers"][0].get("image", "")
-        par_image[image] = {
+        rattaches.append({
             "nom": rs["metadata"]["name"],
+            "image": rs["spec"]["template"]["spec"]["containers"][0].get("image", ""),
             "revision": int((rs["metadata"].get("annotations") or {}).get(REVISION, "0")),
             "voulus": rs["spec"].get("replicas", 0),
             "actuels": rs["status"].get("replicas", 0),
             "prets": rs["status"].get("readyReplicas", 0),
-        }
-    return par_image, orphelins
+        })
+    return rattaches, orphelins
+
+
+def _revision_courante(deploiement: dict) -> int:
+    """Le numéro de révision que le Deployment déclare actif.
+
+    Le contrôleur l'écrit sur le Deployment lui-même, et le ReplicaSet qui
+    porte le même numéro est celui sur lequel tournent les Pods à jour.
+    """
+    return int((deploiement["metadata"].get("annotations") or {}).get(REVISION, "0"))
+
+
+def _replicaset_de_revision(host, revision: int) -> dict:
+    """Le ReplicaSet de cette révision, avec son image, ou {} s'il n'y en a pas.
+
+    C'est par lui qu'on sait sur QUELLE image tournent les replicas prêts :
+    `status.updatedReplicas` du Deployment ne le dit pas, il compte les Pods
+    conformes au template courant, quel que soit ce template.
+    """
+    if not revision:
+        return {}
+    rattaches, _ = _replicasets_rattaches(host)
+    for rs in rattaches:
+        if rs["revision"] == revision:
+            return rs
+    return {}
 
 
 def _attendre_replicasets(host, stable) -> tuple[dict[str, dict], list[str]]:
@@ -138,6 +196,12 @@ def _attendre_replicasets(host, stable) -> tuple[dict[str, dict], list[str]]:
 # 1. La stratégie : son type, puis ses deux bornes.
 # ----------------------------------------------------------------------
 def test_la_strategie_est_rollingupdate(host):
+    """Exige RollingUpdate, là où la situation pose Recreate.
+
+    Ce test ne pourrait rien refuser si la situation partait de la stratégie
+    par défaut, RollingUpdate étant ce défaut. C'est `fixtures/prepare.sh` qui
+    rend l'exigence mesurable, en posant `type: Recreate` au départ.
+    """
     strategie = _strategie(host)
     assert strategie.get("type") == "RollingUpdate", message(
         en=f"The strategy of {DEPLOYMENT} is {strategie.get('type')!r}, expected 'RollingUpdate'. "
@@ -172,7 +236,7 @@ def test_maxunavailable_vaut_un(host):
 
 
 # ----------------------------------------------------------------------
-# 2. Le Deployment : son image, sa taille, son état.
+# 2. Le Deployment : son image, puis son état final complet.
 # ----------------------------------------------------------------------
 def test_l_image_est_la_nouvelle(host):
     image = _deployment(host)["spec"]["template"]["spec"]["containers"][0].get("image")
@@ -184,7 +248,27 @@ def test_l_image_est_la_nouvelle(host):
     )
 
 
-def test_les_replicas_restent_cinq(host):
+def test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image(host):
+    """Les cinq replicas sont prêts, à jour, ET sur la nouvelle image.
+
+    POURQUOI L'ÉTAT FINAL COMPLET. Lire `readyReplicas == 5` et
+    `updatedReplicas == 5` ne mesure rien ici : au départ, les cinq Pods de
+    l'ancienne image sont prêts, et ils sont « à jour » au sens de Kubernetes,
+    qui compare les Pods au template COURANT du Deployment sans savoir quelle
+    image l'énoncé demande. Le test lit donc en plus l'image du ReplicaSet que
+    le Deployment déclare actif : au départ elle vaut 1.26, et seul le travail
+    l'amène sur 1.27. L'état mesuré reste un seul état, mais le travail est le
+    seul chemin qui y mène.
+
+    LA NON-RÉGRESSION DES CINQ REPLICAS EST ICI, et plus dans un test à elle.
+    `test_les_replicas_restent_cinq` affirmait que `spec.replicas` vaut 5 : la
+    situation les posant déjà, l'affirmation était vraie avant le travail, donc
+    incapable de refuser. Aucune autre voie n'était acceptable, exiger un autre
+    nombre au départ changeant le sujet. Elle est donc devenue une assertion de
+    ce test, qui lui dépend du travail, et son critère séparé a disparu de
+    `lab.yaml` et de `lab.fr.yaml`. On perd un critère, on gagne un contrôle
+    qui mesure.
+    """
     voulus = _deployment(host)["spec"].get("replicas")
     assert voulus == REPLICAS, message(
         en=f"The Deployment asks for {voulus} replica(s), expected {REPLICAS}. The exercise changes the "
@@ -193,15 +277,31 @@ def test_les_replicas_restent_cinq(host):
         "stratégie et l'image ; la taille du Deployment reste celle que la situation a posée.",
     )
 
-
-def test_les_cinq_replicas_sont_prets_et_a_jour(host):
     statut: dict = {}
+    courant: dict = {}
     for essai in range(ESSAIS):
-        statut = _deployment(host)["status"]
-        if statut.get("readyReplicas", 0) == REPLICAS and statut.get("updatedReplicas", 0) == REPLICAS:
+        deploiement = _deployment(host)
+        statut = deploiement["status"]
+        courant = _replicaset_de_revision(host, _revision_courante(deploiement))
+        if (
+            statut.get("readyReplicas", 0) == REPLICAS
+            and statut.get("updatedReplicas", 0) == REPLICAS
+            and courant.get("image") == IMAGE
+        ):
             break
         if essai < ESSAIS - 1:
             time.sleep(PAUSE)
+
+    assert courant.get("image") == IMAGE, message(
+        en=f"The replicas in service run {courant.get('image')!r}, expected {IMAGE!r}: the revision the "
+        f"Deployment declares active is {courant.get('nom')!r} after {ESSAIS * PAUSE} s. Changing the "
+        "image of the template is what triggers the replacement; until the switch has run, the Pods "
+        "still carry the previous image. kubectl rollout status says where it stands.",
+        fr=f"Les replicas en service portent {courant.get('image')!r}, attendu {IMAGE!r} : la révision "
+        f"que le Deployment déclare active est {courant.get('nom')!r} après {ESSAIS * PAUSE} s. C'est le "
+        "changement d'image du template qui déclenche le remplacement ; tant que la bascule n'a pas eu "
+        "lieu, les Pods portent encore l'image précédente. kubectl rollout status dit où elle en est.",
+    )
     assert statut.get("readyReplicas", 0) == REPLICAS and statut.get("updatedReplicas", 0) == REPLICAS, message(
         en=f"{statut.get('readyReplicas', 0)} ready, {statut.get('updatedReplicas', 0)} up to date "
         f"out of {REPLICAS} after {ESSAIS * PAUSE} s: the update did not go all the way through. "

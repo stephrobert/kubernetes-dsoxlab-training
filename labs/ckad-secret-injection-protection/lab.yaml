@@ -66,7 +66,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-mot-de-passe-n-est-en-clair-nulle-part-ailleurs
-    label: "The password is in clear text nowhere else in the namespace, in particular in no ConfigMap"
+    label: "The password is carried by a Secret and is in clear text nowhere else in the namespace, in no ConfigMap in particular"
     tests:
       - test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs
     lessons:
@@ -79,16 +79,17 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-  - id: un-pod-tourne
-    label: "An up-to-date Pod of the Deployment is running and ready"
+  - id: un-pod-a-jour-porte-la-projection-du-secret
+    label: "The Pod that is running is the one born from the modified template: it carries the Secret projection under /etc/passerelle"
     tests:
-      - test_un_pod_tourne
+      - test_un_pod_a_jour_porte_la_projection_du_secret
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: dans-le-conteneur-db-password-vaut-la-valeur
-    label: "Inside the container, DB_PASSWORD carries the expected value"
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: dans-le-conteneur-db-password-vient-du-secret-et-vaut-la-valeur
+    label: "Inside the container, DB_PASSWORD carries the expected value, and the running Pod takes it from the Secret by reference"
     tests:
-      - test_dans_le_conteneur_db_password_vaut_la_valeur
+      - test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-le-fichier-porte-la-valeur
