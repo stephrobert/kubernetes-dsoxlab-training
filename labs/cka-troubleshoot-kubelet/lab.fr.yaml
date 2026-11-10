@@ -4,3 +4,13 @@ description: |
   Lire dans le journal ce qu'il reproche à sa configuration, corriger le
   fichier sans rien casser d'autre, et prouver que le nœud et son application
   sont revenus.
+
+criteria:
+  - id: le-noeud-est-ready
+    label: "Le Node worker est de nouveau Ready"
+  - id: le-kubelet-tourne
+    label: "Le service kubelet tourne sur le worker"
+  - id: la-configuration-garde-son-dns
+    label: "La configuration du kubelet est réparée et garde l'adresse de kube-dns"
+  - id: l-application-est-revenue
+    label: "L'application est revenue, trois réplicas sur le worker"

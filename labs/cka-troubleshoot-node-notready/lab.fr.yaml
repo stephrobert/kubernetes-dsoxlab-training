@@ -4,3 +4,13 @@ description: |
   dégradée. Trouver sur le nœud pourquoi il ne parle plus au control plane,
   remettre son agent en service de façon durable, et prouver que
   l'application est revenue.
+
+criteria:
+  - id: le-noeud-est-ready
+    label: "Le Node worker est de nouveau Ready"
+  - id: le-kubelet-tourne
+    label: "Le service kubelet tourne sur le worker"
+  - id: le-kubelet-est-active
+    label: "Le kubelet est activé et survivra à un redémarrage"
+  - id: l-application-est-revenue
+    label: "L'application est revenue, trois réplicas sur le worker"

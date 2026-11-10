@@ -2,11 +2,12 @@
 
 Ces tests lisent l'état du CLUSTER et du NŒUD, jamais les commandes tapées.
 
-Trois affirmations. La première lit l'état du nœud depuis l'API ; la
-deuxième interroge systemd et relit la configuration SUR le worker, et c'est
-elle qui distingue une réparation d'une amputation : un kubelet qui démarre
-parce qu'on a vidé clusterDNS tourne, mais ses Pods ne résolvent plus rien.
-La troisième regarde l'application, qui n'a nulle part où aller sans ce nœud.
+Quatre affirmations, un état chacune. La première lit l'état du nœud depuis
+l'API ; la deuxième interroge systemd SUR le worker ; la troisième relit sa
+configuration, et c'est elle qui distingue une réparation d'une amputation :
+un kubelet qui démarre parce qu'on a vidé clusterDNS tourne, mais ses Pods ne
+résolvent plus rien. La quatrième regarde l'application, qui n'a nulle part
+où aller sans ce nœud.
 """
 
 from __future__ import annotations
@@ -69,9 +70,9 @@ def test_le_noeud_est_ready(cp):
 
 
 # ----------------------------------------------------------------------
-# 2. Le kubelet tourne, avec une configuration saine.
+# 2. Le kubelet tourne.
 # ----------------------------------------------------------------------
-def test_le_kubelet_tourne_avec_une_configuration_saine(worker):
+def test_le_kubelet_tourne(worker):
     kubelet = worker.service("kubelet")
     assert kubelet.is_running, message(
         en=f"The kubelet service is not active on {WORKER}. If it stops as soon as "
@@ -79,6 +80,12 @@ def test_le_kubelet_tourne_avec_une_configuration_saine(worker):
         fr=f"Le service kubelet n'est pas actif sur {WORKER}. S'il s'arrête aussitôt "
         "lancé, c'est qu'il refuse sa configuration : le journal nomme le champ.",
     )
+
+
+# ----------------------------------------------------------------------
+# 3. Sa configuration est réparée, pas amputée.
+# ----------------------------------------------------------------------
+def test_la_configuration_du_kubelet_garde_son_dns(worker):
     res = worker.run(f"sudo cat {CONFIG}")
     assert res.rc == 0, message(
         en=f"Cannot read {CONFIG}: {res.stderr.strip()}",
@@ -106,7 +113,7 @@ def test_le_kubelet_tourne_avec_une_configuration_saine(worker):
 
 
 # ----------------------------------------------------------------------
-# 3. L'application est revenue, sur ce nœud.
+# 4. L'application est revenue, sur ce nœud.
 # ----------------------------------------------------------------------
 def test_l_application_est_revenue_sur_le_noeud(cp):
     disponibles, voulus = 0, 0

@@ -19,7 +19,7 @@ session on the worker.
 
 2. The Pod is called **`static-web`**, runs in the `default` namespace,
    carries the label `role: static`, and its container, named `web`, uses
-   the image **`nginx:1.27-alpine`** and exposes **port 80**.
+   the image **`nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10`** and exposes **port 80**.
 
 3. The Pod shows up in the API, **`Running`**, under the name the kubelet
    gives to mirror Pods: the Pod name suffixed with the node name.

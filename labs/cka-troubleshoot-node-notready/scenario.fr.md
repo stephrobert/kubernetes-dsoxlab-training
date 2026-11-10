@@ -30,8 +30,8 @@ control plane. `kubectl describe node` le dit dans ses conditions, avec
 l'heure du dernier signe de vie. Le reste ne se lit pas depuis le control
 plane : il faut aller sur le nœud, et y interroger systemd.
 
-Un service peut être arrêté de deux façons, et l'une des deux ne se voit pas
-dans `systemctl status`.
+Un service peut être hors service de deux façons, et la ligne `Active:` de
+`systemctl status` n'en montre qu'une.
 
 ## Comment vous saurez que c'est bon
 

@@ -12,8 +12,8 @@ not, and everything `kubectl` can do is out of service along with it.
 
 ## What you must achieve
 
-1. The API server **answers**: `kubectl get nodes` works, and `/healthz`
-   returns `ok`.
+1. The API server **answers**: `kubectl get nodes` works, and `/readyz`
+   returns `ok` (`/healthz`, deprecated since Kubernetes 1.16, answers the same).
 
 2. The static Pod **`kube-apiserver-k8s-cp.lab`** runs in `kube-system`,
    without restarting in a loop.

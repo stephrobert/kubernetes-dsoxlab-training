@@ -5,3 +5,13 @@ description: |
   nom de miroir. Le fichier doit être au bon endroit, celui que la
   configuration du kubelet désigne, et le runtime du worker doit
   réellement exécuter le conteneur.
+
+criteria:
+  - id: le-manifeste-est-ou-le-kubelet-le-cherche
+    label: "Le manifeste static-web est dans le staticPodPath du kubelet du worker"
+  - id: le-pod-miroir-vient-d-un-fichier
+    label: "Le Pod miroir vient d'un fichier et appartient au Node worker"
+  - id: le-pod-statique-tourne
+    label: "Le Pod statique est Running avec l'image et le port demandés"
+  - id: le-runtime-du-worker-execute-le-conteneur
+    label: "Le runtime du worker exécute réellement le conteneur web"

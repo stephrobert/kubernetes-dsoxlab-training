@@ -36,7 +36,7 @@ def _kubectl(host, args: str):
 # 1. L'API répond.
 # ----------------------------------------------------------------------
 def test_l_api_repond(host):
-    sante = _kubectl(host, "get --raw /healthz")
+    sante = _kubectl(host, "get --raw /readyz")
     assert sante.rc == 0 and sante.stdout.strip() == "ok", message(
         en="The API server does not answer. kubectl is blind, but the node is "
         "not: the static manifest is in /etc/kubernetes/manifests, crictl "
@@ -49,8 +49,8 @@ def test_l_api_repond(host):
     )
     noeuds = _kubectl(host, "get nodes --no-headers")
     assert noeuds.rc == 0 and NOEUD in noeuds.stdout, message(
-        en=f"/healthz answers but kubectl get nodes fails: {noeuds.stderr.strip()[:200]}",
-        fr=f"/healthz répond mais kubectl get nodes échoue : {noeuds.stderr.strip()[:200]}",
+        en=f"/readyz answers but kubectl get nodes fails: {noeuds.stderr.strip()[:200]}",
+        fr=f"/readyz répond mais kubectl get nodes échoue : {noeuds.stderr.strip()[:200]}",
     )
 
 

@@ -124,6 +124,17 @@ repos:
       # amorçage, un lab sur un socle absent sort ROUGE sur son propre socle,
       # avec un cycle par ailleurs parfait. Mesuré le 2026-11-10 : 184 faux
       # écarts, et un `StopIteration` muet sur un hôte nu.
+      # Depuis dsoxlab 0.8.2, `start` ne provisionne que les hôtes DÉCLARÉS par
+      # un lab : sa target résolue et ses `roles`. Un lab qui se sert d'un hôte
+      # sans le déclarer échoue sur un nœud introuvable. Mesuré le 2026-11-10 :
+      # sept labs nommaient `k8s-w1.lab` sans le déclarer.
+      - id: hotes-nommes-declares
+        name: un lab qui nomme un hôte du catalogue le déclare
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_hotes_nommes_sont_declares.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: amorcage-du-socle
         name: le validateur amorce le socle, et un socle absent n'accuse pas le lab
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_amorcage_du_socle.py -q

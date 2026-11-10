@@ -19,7 +19,7 @@ ouvre une session sur le worker.
 
 2. Le Pod s'appelle **`static-web`**, tourne dans le namespace `default`,
    porte le label `role: static`, et son conteneur, nommé `web`, utilise
-   l'image **`nginx:1.27-alpine`** et expose le **port 80**.
+   l'image **`nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10`** et expose le **port 80**.
 
 3. Le Pod apparaît dans l'API, en **`Running`**, sous le nom que le kubelet
    donne aux Pods miroirs : le nom du Pod suffixé du nom du nœud.
