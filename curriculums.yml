@@ -1,5 +1,5 @@
 ---
-# Les curriculums officiels des trois certifications, et le poids de chaque
+# Les curriculums officiels des quatre certifications, et le poids de chaque
 # domaine. Source unique du dépôt pour ces chiffres.
 #
 # POURQUOI CE FICHIER EXISTE, et il a une date de naissance.
@@ -64,3 +64,18 @@ certifications:
       "Cluster Setup": 15
       "Cluster Hardening": 15
       "System Hardening": 10
+
+  # Ajoutée le 2026-11-10 avec la section kcna du module Architecture,
+  # décision de Stéphane. KCNA_Curriculum.pdf ne porte AUCUN numéro de
+  # version : il se date par son dernier commit dans cncf/curriculum,
+  # c2df915fb5a0 du 2026-03-22 (CreationDate du PDF : 2026-03-22). Relu ce
+  # jour-là avec pdftotext ; les quatre domaines totalisent 100 %.
+  kcna:
+    version: "PDF du 2026-03-22, commit c2df915"
+    titre: "KCNA, Kubernetes and Cloud Native Associate"
+    verifie_le: 2026-11-10
+    domaines:
+      "Kubernetes Fundamentals": 44
+      "Container Orchestration": 28
+      "Cloud Native Application Delivery": 16
+      "Cloud Native Architecture": 12

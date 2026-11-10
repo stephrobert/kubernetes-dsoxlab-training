@@ -19,7 +19,13 @@
 #   - Docker CE du dépôt officiel de Docker, version épinglée ci-dessous ;
 #   - /usr/local/bin/kind et /usr/local/bin/kubectl, empreintes vérifiées ;
 #   - /etc/sysctl.d/99-kind.conf, les limites inotify ;
-#   - le cluster kind_cluster_name, un seul nœud <nom>-control-plane ;
+#   - le cluster kind_cluster_name, un seul nœud <nom>-control-plane par
+#     défaut, ou la topologie multi-nœuds de référence de la formation (règle
+#     11 : un control plane, des workers étiquetés zone-a, zone-b, zone-c)
+#     quand `kind_workers` vaut 1 à 3 ;
+#   - avec `kind_event_ttl` (par exemple 24h), la durée de vie des événements
+#     de l'API server, qui vaut 1h par défaut : un challenge qui fait lire un
+#     événement ne doit pas le voir disparaître pendant que l'apprenant cherche ;
 #   - /etc/kind/<nom>.kubeconfig, 0600 root, que les tests lisent avec sudo ;
 #   - ~/.kube/config de l'utilisateur du lab, réglé sur ce cluster, sauf si
 #     `kind_donner_kubeconfig: false`.
@@ -32,6 +38,8 @@
     kind_nom: "{{ kind_cluster_name | default('lab') }}"
     kind_utilisateur: "{{ ansible_user | default('ansible') }}"
     kind_donner: "{{ kind_donner_kubeconfig | default(true) }}"
+    kind_nb_workers: "{{ kind_workers | default(0) | int }}"
+    kind_ttl: "{{ kind_event_ttl | default('') }}"
     kind_docker_version: "5:29.9.3-1~debian.13~trixie"
     kind_version: "v0.33.0"
     kind_kubectl_version: "v1.37.0"
@@ -124,6 +132,56 @@
     checksum: "sha256:https://dl.k8s.io/release/{{ kind_kubectl_version }}/bin/linux/amd64/kubectl.sha256"
     mode: "0755"
 
+- name: Refuser une topologie que le socle ne sait pas poser
+  ansible.builtin.assert:
+    that:
+      - kind_nb_workers | int >= 0
+      - kind_nb_workers | int <= 3
+    fail_msg: "kind_workers vaut {{ kind_nb_workers }} ; le socle pose de 0 à 3 workers, un par zone."
+
+- name: Créer le répertoire des kubeconfig d'administration
+  ansible.builtin.file:
+    path: /etc/kind
+    state: directory
+    mode: "0700"
+
+# Écrite seulement quand le cluster s'écarte du nœud unique : le chemin des
+# labs à un nœud reste la commande d'origine, sans --config. Les deux patchs
+# kubeadm portent chacun leur apiVersion, et kind n'applique que celui qui
+# correspond à la version de kubeadm qu'il génère : v1beta3 écrit extraArgs en
+# dictionnaire, v1beta4 en liste de paires name/value.
+- name: Écrire la configuration du cluster kind
+  ansible.builtin.copy:
+    dest: "/etc/kind/{{ kind_nom }}.config.yaml"
+    mode: "0600"
+    content: |
+      kind: Cluster
+      apiVersion: kind.x-k8s.io/v1alpha4
+      {% if kind_ttl %}
+      kubeadmConfigPatches:
+        - |
+          apiVersion: kubeadm.k8s.io/v1beta3
+          kind: ClusterConfiguration
+          apiServer:
+            extraArgs:
+              event-ttl: "{{ kind_ttl }}"
+        - |
+          apiVersion: kubeadm.k8s.io/v1beta4
+          kind: ClusterConfiguration
+          apiServer:
+            extraArgs:
+              - name: event-ttl
+                value: "{{ kind_ttl }}"
+      {% endif %}
+      nodes:
+        - role: control-plane
+      {% for zone in ['zone-a', 'zone-b', 'zone-c'][:kind_nb_workers | int] %}
+        - role: worker
+          labels:
+            topology.kubernetes.io/zone: {{ zone }}
+      {% endfor %}
+  when: kind_nb_workers | int > 0 or kind_ttl | length > 0
+
 - name: Lister les clusters kind existants
   ansible.builtin.command: kind get clusters
   register: kind_existants
@@ -132,15 +190,11 @@
 - name: Créer le cluster kind
   ansible.builtin.command: >-
     kind create cluster --name {{ kind_nom }}
-    --image {{ kind_noeud_image }} --wait 180s
+    --image {{ kind_noeud_image }}
+    {% if kind_nb_workers | int > 0 or kind_ttl | length > 0 %}--config /etc/kind/{{ kind_nom }}.config.yaml{% endif %}
+    --wait 180s
   when: kind_nom not in kind_existants.stdout_lines
   changed_when: true
-
-- name: Créer le répertoire des kubeconfig d'administration
-  ansible.builtin.file:
-    path: /etc/kind
-    state: directory
-    mode: "0700"
 
 - name: Exporter le kubeconfig d'administration du cluster
   ansible.builtin.shell: |
@@ -151,7 +205,7 @@
     executable: /bin/bash
   changed_when: false
 
-- name: Attendre que le nœud du cluster soit Ready
+- name: Attendre que les nœuds du cluster soient Ready
   ansible.builtin.command: >-
     kubectl --kubeconfig /etc/kind/{{ kind_nom }}.kubeconfig wait
     --for=condition=Ready node --all --timeout=180s

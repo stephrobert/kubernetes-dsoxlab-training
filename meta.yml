@@ -121,6 +121,24 @@ infra:
 # pour mot. C'est ce qui permet de répondre à la seule question qui compte
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
 sections:
+  # La KCNA vient en tête : c'est le niveau 1, celui des modules qui
+  # enseignent ce qu'est un cluster avant de l'administrer. Section ajoutée le
+  # 2026-11-10 (décision de Stéphane) avec le module Architecture.
+  - id: kcna
+    title: "KCNA, Kubernetes and Cloud Native Associate"
+    description: >-
+      Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a
+      cluster is made of and which component does what, read on a live
+      multi-node cluster.
+    labs:
+      # Le module Architecture de la formation, sur un cluster kind à quatre
+      # nœuds partagé par les quatre labs : un lab guidé par leçon
+      # (architecture, control plane, nœuds worker), puis le challenge.
+      - k8s-suivre-un-pod-de-kubectl-au-conteneur
+      - k8s-observer-la-reconciliation
+      - k8s-lire-un-node
+      - k8s-challenge-lire-un-cluster
+
   - id: cka
     title: "CKA, Certified Kubernetes Administrator"
     description: >-

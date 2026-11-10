@@ -202,6 +202,19 @@ de base se jouent là où ces gestes s'apprennent.
 
 Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet ordre est une progression pédagogique, pas la structure de l'examen : il va de ce dont un cluster est fait vers son diagnostic, et se termine par le capstone, qui suppose le reste joué. La colonne « Domaine du blueprint » répond à l'autre question, celle de la couverture : ce que chaque lab permet de prouver.
 
+### KCNA, Kubernetes and Cloud Native Associate
+
+Quatre domaines. Kubernetes Fundamentals pèse 44 %, le plus lourd : de quoi un cluster est fait et quel composant fait quoi, lu sur un cluster multi-nœuds vivant.
+
+4 lab(s).
+
+| # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
+|---|---|---|---|---|---|---|
+| 1 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Suivre un Pod de kubectl au conteneur | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
+| 2 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Observer la réconciliation du control plane | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
+| 3 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Lire ce que déclare un Node worker | kubernetes-fundamentals | 15m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 4 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Lire un cluster : quel composant fait quoi | kubernetes-fundamentals | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+
 ### CKA, Certified Kubernetes Administrator
 
 Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui savent l'exploiter.
@@ -295,9 +308,9 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Faire baisser le compte d'un audit CIS, et le prouver par un second audit | cluster-setup | 30m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total : **66 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **70 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
-**Runtime validé : Kubernetes v1.37.0, v1.37.1.** **Curriculum de référence : CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
+**Runtime validé : Kubernetes v1.37.0, v1.37.1.** **Curriculum de référence : CKA v1.35, CKAD v1.35, CKS v1.34, KCNA PDF du 2026-03-22, commit c2df915** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 
 <!-- LABS:END -->
 

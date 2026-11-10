@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il installe le socle kind
+# sur k8s-kind.lab, ici un cluster à quatre nœuds, puis pose la situation du
+# challenge. Le kubeconfig de l'apprenant est réglé par le socle sur ce cluster.
+- name: Préparer le challenge k8s-challenge-lire-un-cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kind multi-nœuds
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: architecture
+        kind_workers: 3
+        # L'événement Scheduled du Pod témoin doit survivre à la séance : à
+        # 1h, durée par défaut, il disparaît sous les yeux de qui prend son temps.
+        kind_event_ttl: 24h
+
+    - name: Poser la situation du challenge
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/architecture.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

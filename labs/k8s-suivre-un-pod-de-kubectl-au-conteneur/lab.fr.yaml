@@ -1,0 +1,16 @@
+title: "Suivre un Pod de kubectl au conteneur"
+description: |
+  Créer un Deployment, puis lire les événements de son Pod pour consigner
+  chaque étape entre kubectl et un conteneur qui tourne, et le composant qui
+  agit à chacune : le scheduler pour le placement, le kubelet du Node choisi
+  pour le tirage de l'image, la création et le démarrage du conteneur.
+
+criteria:
+  - id: le-deployment-suivi-tourne
+    label: "Le Deployment suivi a un réplica disponible sur l'image demandée"
+  - id: le-placement-est-attribue-au-scheduler
+    label: "L'étape Scheduled est attribuée au scheduler"
+  - id: les-etapes-du-conteneur-sont-attribuees-au-kubelet
+    label: "Les étapes Pulled, Created et Started sont attribuées au kubelet"
+  - id: le-kubelet-est-celui-du-node-du-pod
+    label: "Le kubelet qui a agi est celui du Node qui fait tourner le Pod"

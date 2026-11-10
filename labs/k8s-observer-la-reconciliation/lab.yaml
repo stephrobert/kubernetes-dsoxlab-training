@@ -1,0 +1,68 @@
+# Lab guidé de la leçon « Le control plane » du module Architecture de la
+# formation. Il fait constater la réconciliation à deux étages : un Pod
+# supprimé est recréé par son ReplicaSet (replicaset-controller), un
+# ReplicaSet supprimé est recréé par son Deployment (deployment-controller).
+#
+# Il tourne sur le cluster kind « architecture », partagé par les quatre labs
+# du module : il ne touche qu'à son namespace, reconciliation.
+id: k8s-observer-la-reconciliation
+title: "Watch the control plane reconcile"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  Delete a Pod, then the ReplicaSet of a Deployment, watch the cluster come
+  back to the requested state, and record which controller recreated each
+  object.
+skills:
+  - kubectl-delete
+  - kubectl-events
+  - replicaset-controller
+  - deployment-controller
+  - reconciliation
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - kcna
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-pod-supprime-est-recree
+    label: "A deleted Pod of vitrine was recreated by its ReplicaSet"
+    tests:
+      - test_le_pod_supprime_a_ete_recree_par_son_replicaset
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+  - id: le-replicaset-supprime-est-remplace
+    label: "The deleted ReplicaSet was replaced and vitrine is back to three available replicas"
+    tests:
+      - test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+  - id: le-controleur-du-pod-est-consigne
+    label: "The controller that recreated the Pod is recorded"
+    tests:
+      - test_le_controleur_qui_recree_le_pod_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+  - id: le-controleur-du-replicaset-est-consigne
+    label: "The controller that recreated the ReplicaSet is recorded"
+    tests:
+      - test_le_controleur_qui_recree_le_replicaset_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
