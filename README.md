@@ -212,10 +212,10 @@ Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
 | 1 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Ship the storefront and bring the stock service back | kubernetes-fundamentals | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
-| 2 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Follow a Pod from kubectl to the container | kubernetes-fundamentals | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
-| 3 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Watch the control plane reconcile | kubernetes-fundamentals | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
-| 4 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Read what a worker Node declares | kubernetes-fundamentals | 15m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
-| 5 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Read a cluster: which component does what | kubernetes-fundamentals | 30m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 2 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Follow a Pod from kubectl to the container | kubernetes-fundamentals | 20m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
+| 3 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Watch the control plane reconcile | kubernetes-fundamentals | 20m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
+| 4 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Read what a worker Node declares | kubernetes-fundamentals | 15m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 5 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Read a cluster: which component does what | kubernetes-fundamentals | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
 
 ### CKA, Certified Kubernetes Administrator
 
