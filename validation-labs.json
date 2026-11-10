@@ -2047,6 +2047,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-lire-un-cluster": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_le_maillon_qui_n_agit_pas_est_identifie",
+    "test_le_noeud_du_control_plane_est_consigne",
+    "test_le_noeud_du_pod_temoin_est_prouve_par_l_evenement_scheduled",
+    "test_le_runtime_de_chaque_worker_est_consigne",
+    "test_les_quatre_composants_du_control_plane_sont_consignes_avec_leur_role"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 89,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-lire-un-cluster.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_maillon_qui_n_agit_pas_est_identifie",
+    "test_le_noeud_du_control_plane_est_consigne",
+    "test_le_noeud_du_pod_temoin_est_prouve_par_l_evenement_scheduled",
+    "test_le_runtime_de_chaque_worker_est_consigne",
+    "test_les_quatre_composants_du_control_plane_sont_consignes_avec_leur_role"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-premier-deploiement": {
   "apres": {
    "echecs": [],
@@ -2076,11 +2133,11 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-10",
-  "duree_s": 212,
+  "duree_s": 108,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/7",
    "après la solution : 7/7",
    "après clean et run : 0/7",
@@ -2135,11 +2192,11 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-10",
-  "duree_s": 335,
+  "duree_s": 312,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/5",
    "après la solution : 5/5",
    "après clean et run : 0/5",
@@ -2162,6 +2219,171 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-lire-un-node": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_capacite_en_cpu_et_en_memoire_est_consignee",
+    "test_la_condition_ready_est_consignee",
+    "test_la_version_du_kubelet_est_consignee",
+    "test_le_runtime_du_worker_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 53,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-lire-un-node.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_capacite_en_cpu_et_en_memoire_est_consignee",
+    "test_la_condition_ready_est_consignee",
+    "test_la_version_du_kubelet_est_consignee",
+    "test_le_runtime_du_worker_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-observer-la-reconciliation": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_le_controleur_qui_recree_le_pod_est_consigne",
+    "test_le_controleur_qui_recree_le_replicaset_est_consigne",
+    "test_le_pod_supprime_a_ete_recree_par_son_replicaset",
+    "test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 92,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-observer-la-reconciliation.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_controleur_qui_recree_le_pod_est_consigne",
+    "test_le_controleur_qui_recree_le_replicaset_est_consigne",
+    "test_le_pod_supprime_a_ete_recree_par_son_replicaset",
+    "test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-suivre-un-pod-de-kubectl-au-conteneur": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_etape_scheduled_est_attribuee_au_scheduler",
+    "test_le_deployment_suivi_a_un_replica_disponible",
+    "test_le_kubelet_qui_agit_est_celui_du_node_du_pod",
+    "test_les_etapes_du_conteneur_sont_attribuees_au_kubelet"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 83,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-suivre-un-pod-de-kubectl-au-conteneur.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_etape_scheduled_est_attribuee_au_scheduler",
+    "test_le_deployment_suivi_a_un_replica_disponible",
+    "test_le_kubelet_qui_agit_est_celui_du_node_du_pod",
+    "test_les_etapes_du_conteneur_sont_attribuees_au_kubelet"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  }
