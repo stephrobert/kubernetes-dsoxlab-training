@@ -1,0 +1,22 @@
+title: "Livrer la vitrine et remettre le stock en marche"
+description: |
+  Sur un cluster kind, régler kubectl sur le bon cluster et le bon namespace,
+  livrer la vitrine à trois réplicas derrière un Service qui répond, consigner
+  pourquoi le service stock préinstallé ne démarre pas avant de le réparer par
+  son manifeste, et protéger le kubeconfig reçu.
+
+criteria:
+  - id: le-contexte-vise-la-boutique-et-la-vitrine
+    label: "Le contexte actif est kind-boutique et son namespace par défaut est vitrine"
+  - id: la-vitrine-a-trois-replicas-disponibles
+    label: "Le Deployment vitrine a trois réplicas disponibles sur l'image demandée"
+  - id: le-service-compte-trois-endpoints-prets
+    label: "Le Service vitrine compte trois endpoints prêts"
+  - id: la-vitrine-repond
+    label: "La vitrine répond en HTTP 200 depuis un Pod du cluster"
+  - id: la-cause-de-stock-est-consignee-avant-reparation
+    label: "cause-stock.txt nomme la raison et l'image fautive, écrit avant la réparation"
+  - id: stock-est-repare-par-son-manifeste
+    label: "stock tourne sur l'image corrigée, posée dans stock.yaml et appliquée avec kubectl apply"
+  - id: le-kubeconfig-est-protege
+    label: "~/.kube/boutique.yaml n'est lisible que par son propriétaire (droits 600)"

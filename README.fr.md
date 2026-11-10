@@ -36,8 +36,12 @@ Chaque lab pose un état initial, énonce un objectif, et valide en lisant
   **Incus**. Le provider est déclaré en liste dans [`meta.yml`](meta.yml), et
   **une liste ne se résout pas d'elle-même** : choisissez-en un avec
   `dsoxlab use --provider kvm`.
-- **Environ 7 Go de RAM libre et 45 Go de disque** pour les deux machines, et
-  la section suivante dit pourquoi il y en a deux.
+- **Environ 11 Go de RAM libre et 75 Go de disque** pour les trois machines,
+  et la section suivante dit pourquoi il y en a trois. Un module seul en
+  demande moins : les labs du module Fondamentaux tournent sur le seul hôte
+  kind, soit **4 Go et 30 Go**, et les labs kubeadm sur les deux autres, soit
+  **6,5 Go et 45 Go**. Ces tailles sont mesurées, pas estimées, et le
+  [`meta.yml`](meta.yml) porte le relevé.
 - **Les collections Ansible** de [`requirements.yml`](requirements.yml), dont
   les versions sont **bornées à dessein** : celles qui ont validé le catalogue,
   pas les dernières publiées.
@@ -75,7 +79,7 @@ Le cluster doit exister d'abord : rien ici ne tourne sur votre propre poste.
 ```bash
 export LAB_HOME=$PWD
 dsoxlab use --provider kvm           # une liste de providers ne se résout pas seule
-dsoxlab provision                    # crée les deux machines et le cluster
+dsoxlab provision                    # crée les trois machines et le cluster
 
 dsoxlab list-labs
 dsoxlab run       cks-apparmor-confiner-un-pod
@@ -109,7 +113,7 @@ Le catalogue est décrit par des données, pas par du code, et c'est ce qui gard
 le moteur `dsoxlab` indépendant du domaine :
 
 - **`meta.yml`** à la racine déclare l'identité du dépôt, l'**infrastructure**
-  (provider, réseau `lab-k8s`, `10.10.50.0/24`, et les deux hôtes avec leurs
+  (provider, réseau `lab-k8s`, `10.10.50.0/24`, et les trois hôtes avec leurs
   rôles) et l'**ordre** des sections affichées par `list-labs` ;
 - **`lab.yaml`** par lab déclare ses `skills`, son `level`, son `runtime` (type
   et targets), ses `distros`, son `doc_url`, ses `certification_tags` et un
@@ -136,10 +140,15 @@ dsoxlab progress               # avancement par section, score moyen
 
 | Runtime | Ce que le lab demande |
 |---|---|
-| `vm` | les deux machines provisionnées par `dsoxlab provision`, avec le cluster kubeadm déjà debout. Les tests interrogent le serveur d'API et entrent dans les nœuds. |
+| `vm` | les machines provisionnées par `dsoxlab provision`. Les tests interrogent le serveur d'API et entrent dans les nœuds. |
 
 Tous les labs sont `vm`, et aucun ne déclare `runtime.services` : le cluster
 est le sujet, donc il vit dans les machines et non sur votre poste.
+
+**D'où vient le cluster dépend de l'hôte.** Les labs des deux machines kubeadm
+le trouvent déjà debout. Ceux de l'hôte kind le voient créé par leur propre
+`setup.yaml`, et chacun crée le sien : aucun `cleanup` ne détruit son cluster,
+puisque ce cluster est son socle.
 
 ### Le modèle de validation
 
@@ -169,17 +178,23 @@ un échec : si tous les tests collectés skippent, `check` n'enregistre aucune
 note et dit pourquoi. Un 0 accuserait le lab de ce qui manque au cluster, qui
 est ici le plus souvent le cluster non provisionné.
 
-### L'infrastructure : un cluster kubeadm vanilla
+### L'infrastructure : un cluster kubeadm, et un hôte kind
 
 Deux VM Ubuntu 24.04, la distribution que recommande le guide kubeadm publié :
 un control plane, `k8s-cp.lab`, et un worker, `k8s-w1.lab`, joignable par `ssh`
 depuis le control plane comme à l'examen. Le socle installe un cluster
 **Kubernetes 1.37**, la version qu'enseigne la formation, avec Calico comme CNI.
 
-**Pourquoi pas kind ?** Parce que certains faits ne se prouvent pas dans un
-conteneur. Sur un nœud kind, le kubelet refuse un Pod AppArmor avec
-`Cannot enforce AppArmor: AppArmor is not enabled on the host`. La formation
-enseigne sur kind, ce catalogue éprouve sur des machines.
+**Et une troisième VM pour kind.** `k8s-kind.lab`, en Debian 13, porte Docker
+et kind : c'est là que tournent les labs du module Fondamentaux de la
+formation, qui enseigne sur kind. Ils s'y jouent donc avec l'outil que
+l'apprenant aura devant lui.
+
+**Pourquoi pas kind partout, alors ?** Parce que certains faits ne se prouvent
+pas dans un conteneur. Sur un nœud kind, le kubelet refuse un Pod AppArmor avec
+`Cannot enforce AppArmor: AppArmor is not enabled on the host`. Les labs qui
+éprouvent ces faits exigent de vraies machines ; ceux qui enseignent les gestes
+de base se jouent là où ces gestes s'apprennent.
 
 ## Le catalogue
 
@@ -225,7 +240,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 
 Cinq domaines orientés application. « Application Environment, Configuration and Security » pèse 25 %, le plus lourd des cinq.
 
-20 lab(s).
+22 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -249,6 +264,8 @@ Cinq domaines orientés application. « Application Environment, Configuration a
 | 18 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | Un Pod bloqué par un ConfigMap qui n'existe pas | application-observability | 10m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 | 19 | [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) | Trois Pods en CrashLoopBackOff, trois causes | application-observability | 15m | 2026-09-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone : livrer la boutique, à partir du seul cahier des charges | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
+| 21 | [`k8s-lire-l-etat-d-un-pod-en-erreur`](labs/k8s-lire-l-etat-d-un-pod-en-erreur/) | Lire l'état d'un Pod en erreur | application-observability | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/) |
+| 22 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Livrer la vitrine et remettre le stock en marche | application-deployment | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -278,7 +295,7 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Faire baisser le compte d'un audit CIS, et le prouver par un second audit | cluster-setup | 30m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total : **64 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **66 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0, v1.37.1.** **Curriculum de référence : CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

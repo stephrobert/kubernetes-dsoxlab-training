@@ -63,7 +63,7 @@ a public SSH key.
   fixture script or a test that does something other than what it announces;
 - a leaked secret, or a private key committed by mistake;
 - a flaw in the `shared/` foundation: it is included by every lab and runs as
-  `root` on both machines.
+  `root` on all three machines.
 
 One remark is specific to this catalogue: **several labs deliberately install a
 broken or weakened state**, because that is their subject. A troubleshooting lab

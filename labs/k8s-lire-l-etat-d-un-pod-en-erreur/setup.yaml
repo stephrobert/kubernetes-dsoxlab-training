@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il installe le socle kind
+# sur k8s-kind.lab, puis pose les deux pannes du scénario. Rien n'est à
+# réparer : le travail consiste à lire.
+- name: Préparer le lab k8s-lire-l-etat-d-un-pod-en-erreur
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, un cluster kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

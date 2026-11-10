@@ -53,7 +53,33 @@ from lecture_solution import lire_solution
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 RESULTATS = RACINE / "validation-labs.json"
-CACHE = Path.home() / ".cache" / "dsoxlab" / RACINE.name
+
+
+def _identifiant_du_depot() -> str:
+    """Rend le `repo.id` du meta.yml, qui nomme le cache de dsoxlab.
+
+    LE NOM DU DOSSIER NE CONVIENT PAS, et l'écart ne se voit pas depuis un
+    clone ordinaire : là, le dossier s'appelle comme le dépôt et les deux
+    coïncident. Depuis un WORKTREE, non. Mesuré le 2026-11-10 : une campagne
+    lancée depuis `kubernetes-dsoxlab-training-pilote` cherchait son
+    `ssh_config` sous ce nom, alors que dsoxlab l'écrit sous `repo.id`. Les
+    cinq labs ont échoué en une seconde, sans rien écrire.
+
+    C'est le pire genre de défaut : il tient tant qu'on travaille là où on a
+    toujours travaillé, et il tombe la première fois qu'on s'en écarte.
+
+    Repli sur le nom du dossier si le meta.yml est illisible : ce script doit
+    pouvoir dire ce qui ne va pas, pas mourir sur sa première ligne.
+    """
+    try:
+        meta = yaml.safe_load((RACINE / "meta.yml").read_text(encoding="utf-8")) or {}
+        identifiant = ((meta.get("repo") or {}).get("id") or "").strip()
+    except (OSError, yaml.YAMLError):
+        identifiant = ""
+    return identifiant or RACINE.name
+
+
+CACHE = Path.home() / ".cache" / "dsoxlab" / _identifiant_du_depot()
 SSH_CONFIG = CACHE / "ssh_config"
 
 # Exécuté SUR le nœud, en root, par ssh : il rend une photographie JSON de ce
@@ -61,59 +87,95 @@ SSH_CONFIG = CACHE / "ssh_config"
 # changent à chaque redémarrage, on y regarde les Deployments, DaemonSets,
 # Pods statiques et ConfigMaps ; ailleurs, chaque objet compte.
 PHOTOGRAPHIE = r'''
-import hashlib, json, subprocess
-K = ["kubectl", "--kubeconfig", "/etc/kubernetes/admin.conf"]
+import glob, hashlib, json, os, subprocess
+# Un nœud kubeadm porte /etc/kubernetes/admin.conf. Un hôte kind (k8s-kind.lab)
+# porte un kubeconfig d'administration par cluster, dans /etc/kind : on les
+# photographie tous, chacun préfixé de son nom, parce que deux labs kind peuvent
+# laisser chacun leur cluster sur le même hôte.
+if os.path.exists("/etc/kubernetes/admin.conf"):
+    CIBLES = [("", "/etc/kubernetes/admin.conf")]
+else:
+    CIBLES = [(os.path.basename(c)[:-len(".kubeconfig")] + ":", c) for c in sorted(glob.glob("/etc/kind/*.kubeconfig"))]
+K = []
 def get(*args):
     out = subprocess.run(K + list(args) + ["-o", "json"], capture_output=True, text=True)
     return json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {"items": []}
-photo = {"noeuds": {}, "cluster": {}, "kube-system": {}}
-for n in get("get", "nodes")["items"]:
-    conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
-    photo["noeuds"][n["metadata"]["name"]] = {
-        "ready": conds.get("Ready"),
-        "unschedulable": bool(n["spec"].get("unschedulable", False)),
-        "taints": sorted(t["key"] + "=" + t.get("value", "") + ":" + t["effect"] for t in n["spec"].get("taints") or []),
-        "labels": n["metadata"].get("labels", {}),
-        "version": n["status"]["nodeInfo"]["kubeletVersion"],
-    }
-ns = get("get", "namespaces")["items"]
-photo["namespaces"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") != "Terminating")
-photo["terminating"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") == "Terminating")
-for kind in ("clusterroles", "clusterrolebindings", "storageclasses", "persistentvolumes", "runtimeclasses",
-             "priorityclasses", "crds", "validatingwebhookconfigurations", "mutatingwebhookconfigurations",
-             "ingressclasses"):
-    photo["cluster"][kind] = sorted(x["metadata"]["name"] for x in get("get", kind)["items"])
-ks = photo["kube-system"]
-for d in get("get", "deployments", "-n", "kube-system")["items"]:
-    ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
-for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
-    ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
-# Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
-# redémarrage, on ne retient que le compte de son DaemonSet.
-for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
-    ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
-for p in get("get", "pods", "-n", "kube-system")["items"]:
-    if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
-        ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
-for c in get("get", "configmaps", "-n", "kube-system")["items"]:
-    empreinte = hashlib.sha256(json.dumps(c.get("data") or {}, sort_keys=True).encode()).hexdigest()[:12]
-    ks["configmap/" + c["metadata"]["name"]] = empreinte
-objets = []
-for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemonsets", "statefulsets", "jobs",
-             "cronjobs", "networkpolicies", "serviceaccounts", "roles", "rolebindings", "persistentvolumeclaims",
-             "ingresses", "resourcequotas", "limitranges"):
-    for x in get("get", kind, "-A")["items"]:
-        nsn = x["metadata"]["namespace"]
-        if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
-            continue
-        objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
-photo["objets"] = sorted(objets)
+def photographier_un(prefixe):
+    photo = {"noeuds": {}, "cluster": {}, "kube-system": {}}
+    for n in get("get", "nodes")["items"]:
+        conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
+        photo["noeuds"][n["metadata"]["name"]] = {
+            "ready": conds.get("Ready"),
+            "unschedulable": bool(n["spec"].get("unschedulable", False)),
+            "taints": sorted(t["key"] + "=" + t.get("value", "") + ":" + t["effect"] for t in n["spec"].get("taints") or []),
+            "labels": n["metadata"].get("labels", {}),
+            "version": n["status"]["nodeInfo"]["kubeletVersion"],
+        }
+    ns = get("get", "namespaces")["items"]
+    photo["namespaces"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") != "Terminating")
+    photo["terminating"] = sorted(x["metadata"]["name"] for x in ns if x["status"].get("phase") == "Terminating")
+    for kind in ("clusterroles", "clusterrolebindings", "storageclasses", "persistentvolumes", "runtimeclasses",
+                 "priorityclasses", "crds", "validatingwebhookconfigurations", "mutatingwebhookconfigurations",
+                 "ingressclasses"):
+        photo["cluster"][kind] = sorted(x["metadata"]["name"] for x in get("get", kind)["items"])
+    ks = photo["kube-system"]
+    for d in get("get", "deployments", "-n", "kube-system")["items"]:
+        ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
+    for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
+        ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+    # Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
+    # redémarrage, on ne retient que le compte de son DaemonSet.
+    for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
+        ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+    for p in get("get", "pods", "-n", "kube-system")["items"]:
+        if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
+            ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
+    for c in get("get", "configmaps", "-n", "kube-system")["items"]:
+        empreinte = hashlib.sha256(json.dumps(c.get("data") or {}, sort_keys=True).encode()).hexdigest()[:12]
+        ks["configmap/" + c["metadata"]["name"]] = empreinte
+    objets = []
+    for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemonsets", "statefulsets", "jobs",
+                 "cronjobs", "networkpolicies", "serviceaccounts", "roles", "rolebindings", "persistentvolumeclaims",
+                 "ingresses", "resourcequotas", "limitranges"):
+        for x in get("get", kind, "-A")["items"]:
+            nsn = x["metadata"]["namespace"]
+            if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
+                continue
+            objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
+    photo["objets"] = sorted(objets)
+    return photo
+totale = {"noeuds": {}, "cluster": {}, "kube-system": {}, "namespaces": [], "terminating": [], "objets": []}
+for prefixe, chemin in CIBLES:
+    K[:] = ["kubectl", "--kubeconfig", chemin]
+    une = photographier_un(prefixe)
+    totale["noeuds"].update(une["noeuds"])
+    for kind, noms in une["cluster"].items():
+        totale["cluster"].setdefault(kind, []).extend(prefixe + n for n in noms)
+    totale["kube-system"].update({prefixe + k: v for k, v in une["kube-system"].items()})
+    for cle in ("namespaces", "terminating", "objets"):
+        totale[cle].extend(prefixe + n for n in une[cle])
+photo = totale
 print(json.dumps(photo))
 '''
 
 
 class Echec(Exception):
     pass
+
+
+class SocleAbsent(Echec):
+    """Le socle n'a pas pu être posé : rien n'est mesurable, rien n'est faux.
+
+    Distinct d'`Echec` parce que le verdict qui en découle est distinct. Un
+    lab dont le socle refuse de monter n'est pas un lab fautif : c'est un lab
+    QU'ON N'A PAS JOUÉ. Le déclarer ROUGE est la faute la plus coûteuse qu'un
+    validateur puisse commettre, parce qu'un verdict manquant se remesure,
+    tandis qu'un faux rouge envoie corriger un lab qui n'a rien.
+
+    La règle du dépôt le dit déjà pour les contrôles de `doctor`, et elle vaut
+    ici : un contrôle qui n'a pas pu regarder ne conclut jamais, ni au vert, ni
+    au rouge. Il dit qu'il reste à mesurer.
+    """
 
 
 def commande(args: list[str], journal, timeout: int, entree: str | None = None) -> subprocess.CompletedProcess:
@@ -318,7 +380,65 @@ def ecarts(avant: dict, apres: dict, ident: str = "") -> list[str]:
     return out
 
 
-def valider(lab: Path, rejeu: bool) -> dict:
+def amorcer(ident: str, journal, dire) -> None:
+    """Pose le socle du lab, puis retire sa situation, AVANT la photographie.
+
+    POURQUOI CETTE ÉTAPE EXISTE. L'étape 0 photographie le cluster, et elle
+    passe avant le premier `dsoxlab run`. Or aucun socle n'est posé par le
+    `provision` : c'est le `setup.yaml` de CHAQUE lab qui inclut le sien,
+    `shared/kubeadm-cluster.yml` ou `shared/kind-cluster.yml`. Sur une
+    infrastructure fraîchement provisionnée, il n'y a donc rien à
+    photographier, et le script échouait de deux façons, les deux mesurées le
+    2026-11-10 :
+
+      - HÔTE NU : ni Docker, ni kind, ni kubectl, `/etc/kind/` absent, zéro
+        cible pour la photographie, et le script mourait sur un
+        `StopIteration` en une seconde, sans rien écrire ;
+      - SOCLE DU LAB ABSENT MAIS UN AUTRE CLUSTER PRÉSENT : la campagne se
+        jouait, le cycle `0 → N → 0` était PARFAIT, et le verdict sortait
+        ROUGE sur des centaines de faux écarts qui étaient le socle lui-même.
+        Relevé : 184 écarts reprochant à un challenge d'avoir laissé le
+        cluster `boutique`, c'est-à-dire SON PROPRE SOCLE, que son
+        `cleanup.yaml` déclare expressément conserver.
+
+    Les labs kubeadm n'y échappaient que parce qu'un lab joué plus tôt avait
+    laissé le cluster debout : un succès qui dépend de l'ORDRE D'EXÉCUTION,
+    donc un succès que rien ne garantit et qu'aucun contrôle ne mesurait.
+
+    POURQUOI INCONDITIONNEL, et non « seulement si le socle manque ». Parce
+    que savoir si le socle d'un lab est en place demanderait de savoir QUEL
+    cluster ce lab va créer, et ce nom vit dans son `setup.yaml`
+    (`kind_cluster_name`). Le lire ici mettrait une connaissance du domaine
+    dans l'outillage, là où le dépôt s'astreint à ne pas en avoir. Le coût est
+    une exécution de plus par lab, et il est modeste parce que les socles sont
+    IDEMPOTENTS : sur un socle déjà posé, le `run` constate et rend la main.
+    En face, un faux rouge coûte une correction inutile sur un lab sain.
+
+    LE `--yes` N'EST PAS DÉCORATIF. Hors terminal, `dsoxlab clean` demande une
+    confirmation que l'entrée fermée ne peut pas donner, et sort en 2 sans
+    rien nettoyer.
+
+    Lève `SocleAbsent`, et jamais `Echec` : si le socle ne monte pas, le lab
+    n'a pas été joué, et le verdict doit le dire au lieu de l'accuser.
+    """
+    res = dsoxlab(["run", ident], journal, 1800)
+    if res.returncode != 0:
+        raise SocleAbsent(
+            f"le socle n'a pas pu être posé : « dsoxlab run {ident} » a rendu "
+            f"{res.returncode}. {(res.stdout + res.stderr).strip()[-400:]}"
+        )
+    res = dsoxlab(["clean", ident, "--yes"], journal, 900)
+    if res.returncode != 0:
+        raise SocleAbsent(
+            f"le socle est posé mais la situation du lab n'a pas pu être "
+            f"retirée : « dsoxlab clean {ident} --yes » a rendu "
+            f"{res.returncode}. La photographie de référence porterait alors "
+            f"l'état de travail, et tous les écarts qui suivraient seraient "
+            f"faux. {(res.stdout + res.stderr).strip()[-400:]}"
+        )
+
+
+def valider(lab: Path, rejeu: bool, amorcage: bool = True) -> dict:
     ident = lab.name
     hote = cible(lab)
     CACHE.mkdir(parents=True, exist_ok=True)
@@ -333,6 +453,9 @@ def valider(lab: Path, rejeu: bool) -> dict:
 
     with journal_path.open("w", encoding="utf-8") as journal:
         try:
+            if amorcage:
+                amorcer(ident, journal, dire)
+                dire("socle amorcé, le lab a été joué puis nettoyé une fois")
             avant_photo = attendre_stabilite(hote, journal)
             resultat["kubernetes"] = next(iter(avant_photo["noeuds"].values()))["version"]
             dire(f"cluster photographié, {resultat['kubernetes']}, {len(avant_photo['objets'])} objets hors kube-system")
@@ -369,6 +492,11 @@ def valider(lab: Path, rejeu: bool) -> dict:
             apres_photo = attendre_stabilite(hote, journal)
             resultat["ecarts"] = ecarts(avant_photo, apres_photo, ident)
             dire("cluster rendu intact" if not resultat["ecarts"] else f"{len(resultat['ecarts'])} écart(s) après clean")
+        except SocleAbsent as e:
+            # PAS dans `erreur` : ce champ vaut ROUGE dans `verdict()`, et un
+            # socle qui ne monte pas n'accuse pas le lab. Il se remesure.
+            resultat["non_mesurable"] = str(e)
+            dire(f"NON MESURABLE : {e}")
         except Echec as e:
             resultat["erreur"] = str(e)
             dire(f"ÉCHEC : {e}")
@@ -383,6 +511,13 @@ def valider(lab: Path, rejeu: bool) -> dict:
 
 
 def verdict(r: dict, rejeu: bool) -> str:
+    # AVANT le test de `erreur`, et l'ordre est le fond du sujet : un socle qui
+    # n'a pas pu être posé n'est pas un lab fautif, c'est un lab qu'on n'a pas
+    # joué. L'ordre inverse le rangeait en ROUGE et envoyait corriger un lab
+    # sain.
+    if "non_mesurable" in r:
+        r["raisons"] = [r["non_mesurable"]]
+        return verdict_check.SKIP
     if "erreur" in r:
         return "ROUGE"
     # Trois issues, pas deux. Une exécution qui n'a RIEN mesuré n'accuse pas le
@@ -417,6 +552,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--lab", action="append", help="ne jouer que ce lab (répétable)")
     ap.add_argument("--sans-rejeu", action="store_true", help="sauter l'étape clean, run, check")
+    ap.add_argument(
+        "--sans-amorcage",
+        action="store_true",
+        help="sauter la pose du socle avant la photographie (voir amorcer() : "
+             "à n'employer que si le socle de CE lab est déjà en place, sans "
+             "quoi le verdict sera un faux rouge sur son propre socle)",
+    )
     args = ap.parse_args()
 
     if not SSH_CONFIG.is_file():
@@ -437,7 +579,7 @@ def main() -> int:
     skips = 0
     for lab in labs:
         print(f"\n{lab.name}", flush=True)
-        r = valider(lab, rejeu=not args.sans_rejeu)
+        r = valider(lab, rejeu=not args.sans_rejeu, amorcage=not args.sans_amorcage)
         anciens[lab.name] = r
         RESULTATS.write_text(json.dumps(anciens, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
                              encoding="utf-8")
