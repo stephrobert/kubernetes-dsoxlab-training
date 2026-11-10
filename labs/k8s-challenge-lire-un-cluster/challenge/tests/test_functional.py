@@ -37,6 +37,20 @@ ETIQUETTE_CP = "node-role.kubernetes.io/control-plane"
 
 # Ce que `n-agit-pas` ne doit pas nommer en plus du scheduler : un texte qui
 # accuse tout le monde n'a rien diagnostiqué.
+def _forme(texte: str) -> str:
+    """Le texte sans accents ni casse, espaces et soulignés changés en tirets :
+    « Replica Set », « replica_set » et « ReplicaSet » se comparent pareil."""
+    import unicodedata
+    decompose = unicodedata.normalize("NFKD", texte.lower())
+    sans = "".join(c for c in decompose if not unicodedata.combining(c))
+    return "-".join(sans.replace("_", " ").split())
+
+
+#: Qui a créé ou recréé un Pod : le contrôleur exact, le processus qui l'héberge,
+#: ou l'objet qui le porte, comme les leçons le disent (« le ReplicaSet recrée »).
+CREATEURS_DE_POD = ("replicaset-controller", "kube-controller-manager",
+                    "controller-manager", "replicaset", "replica-set")
+
 AUTRES_COMPOSANTS = (
     "kubelet", "controller", "apiserver", "api-server", "api server", "etcd",
     "proxy", "containerd", "runtime", "controleur",
@@ -280,11 +294,16 @@ def test_le_maillon_qui_n_agit_pas_est_identifie(host, releve):
     )
 
     auteur = _valeur(releve, "cree-par")
-    assert "replicaset-controller" in auteur.lower(), message(
+    forme = _forme(auteur)
+    nomme_le_createur = any(nom in forme for nom in CREATEURS_DE_POD)
+    accuse_un_autre = any(nom in forme for nom in ("scheduler", "kubelet", "deployment", "etcd", "apiserver"))
+    assert nomme_le_createur and not accuse_un_autre, message(
         en=f"cree-par is {auteur!r}; it must name the component that created the Pods "
-           "of file-attente, as shown in the SuccessfulCreate event.",
+           "of file-attente, and only that one: the From column of the SuccessfulCreate "
+           "event, in kubectl describe, gives its exact name.",
         fr=f"cree-par vaut {auteur!r} ; il doit nommer le composant qui a créé les Pods "
-           "de file-attente, tel que l'affiche l'événement SuccessfulCreate.",
+           "de file-attente, et lui seul : la colonne From de l'événement SuccessfulCreate, "
+           "dans kubectl describe, donne son nom exact.",
     )
 
     absent = _sans_accents(_valeur(releve, "n-agit-pas"))
