@@ -30,8 +30,22 @@ runtime:
   targets:
     - name: cp
       host: k8s-cp.lab
+      # Ce lab interroge k8s-w1.lab par l'API du cluster : il lui faut
+      # donc ce noeud, et `roles` est le champ que le contrat prevoit pour
+      # « les hotes additionnels utilises simultanement ». Sans lui,
+      # `dsoxlab start` ne le provisionne pas depuis la 0.8.2, et le lab
+      # echoue sur un noeud introuvable.
+      roles:
+        worker: k8s-w1.lab
     - name: w1
       host: k8s-w1.lab
+      # Ce lab interroge k8s-cp.lab par l'API du cluster : il lui faut
+      # donc ce noeud, et `roles` est le champ que le contrat prevoit pour
+      # « les hotes additionnels utilises simultanement ». Sans lui,
+      # `dsoxlab start` ne le provisionne pas depuis la 0.8.2, et le lab
+      # echoue sur un noeud introuvable.
+      roles:
+        control_plane: k8s-cp.lab
   default: cp
 
 validation:
