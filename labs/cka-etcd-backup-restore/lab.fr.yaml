@@ -6,3 +6,23 @@ description: |
   périmé. Les tests prouvent qu'etcd tourne sur un répertoire produit
   pendant le lab, que les objets reviennent avec leur UID d'origine, et que
   ce qui a été écrit après la sauvegarde a disparu.
+
+criteria:
+  - id: la-sauvegarde-fraiche-existe-et-est-lisible
+    label: "Une sauvegarde fraîche existe dans /opt/backup/etcd-snapshot.db et elle est valide"
+  - id: la-sauvegarde-fraiche-photographie-l-etat-d-avant-la-restauration
+    label: "La sauvegarde fraîche photographie l'état d'avant la restauration"
+  - id: etcd-repond-sur-son-port
+    label: "Après la restauration, etcd tourne et répond"
+  - id: etcd-tourne-sur-un-repertoire-de-donnees-neuf
+    label: "etcd tourne sur un répertoire de données neuf, produit par la restauration"
+  - id: le-cluster-est-sain-apres-la-restauration
+    label: "Après la restauration, l'API répond et les deux nœuds sont Ready"
+  - id: le-namespace-important-data-est-revenu-a-l-identique
+    label: "Le namespace important-data est de retour, avec son identité d'origine"
+  - id: le-configmap-mission-critical-est-revenu-a-l-identique
+    label: "Le ConfigMap mission-critical est de retour, avec son identité et son contenu d'origine"
+  - id: l-objet-ecrit-apres-la-sauvegarde-a-disparu
+    label: "L'objet écrit après la sauvegarde d'hier soir n'existe plus"
+  - id: l-api-server-ne-sert-plus-son-cache-d-avant-la-restauration
+    label: "L'API server ne sert plus son cache d'avant la restauration"

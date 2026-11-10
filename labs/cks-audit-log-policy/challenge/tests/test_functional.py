@@ -1,6 +1,6 @@
 """test_functional.py : cks-audit-log-policy
 
-Trois affirmations qui lisent l'état du NŒUD et du cluster, jamais les
+Un test par état demandé, qui lisent l'état du NŒUD et du cluster, jamais les
 commandes tapées.
 
 La dernière est la seule qui prouve quelque chose, et elle est la raison d'être
@@ -63,7 +63,7 @@ def _lignes_d_audit(host, motif: str, depuis: int = 400) -> list[dict]:
 # ----------------------------------------------------------------------
 # 1. La politique existe, et elle distingue deux niveaux.
 # ----------------------------------------------------------------------
-def test_la_politique_distingue_les_secrets_du_reste(host):
+def _contenu_de_la_politique(host) -> str:
     """Une politique à un seul niveau répondrait à côté de la demande.
 
     On lit le fichier sur le nœud, pas dans le cluster : une politique d'audit
@@ -79,7 +79,11 @@ def test_la_politique_distingue_les_secrets_du_reste(host):
         "du cluster : c'est un fichier du nœud, que l'API server lit au "
         "démarrage.",
     )
-    contenu = res.stdout
+    return res.stdout
+
+
+def test_la_politique_enregistre_les_secrets_en_requestresponse(host):
+    contenu = _contenu_de_la_politique(host)
     assert "RequestResponse" in contenu, message(
         en="The policy nowhere asks for the RequestResponse level, the only one "
         "that records the body of the request and of the response. Without it, you "
@@ -87,14 +91,6 @@ def test_la_politique_distingue_les_secrets_du_reste(host):
         fr="La politique ne demande nulle part le niveau RequestResponse, le seul "
         "qui enregistre le corps de la requête et de la réponse. Sans lui, on "
         "sait qu'un Secret a été lu, pas ce qu'il contenait.",
-    )
-    assert "Metadata" in contenu, message(
-        en="The policy carries no Metadata level for the rest. Auditing "
-        "everything at RequestResponse copies every Secret in clear text into the log "
-        "and fills the disk: that is not what is asked for.",
-        fr="La politique ne porte pas de niveau Metadata pour le reste. Auditer "
-        "tout en RequestResponse recopie chaque Secret en clair dans le journal "
-        "et sature le disque : ce n'est pas ce qui est demandé.",
     )
     assert "secrets" in contenu, message(
         en="The policy does not name the secrets resource: nothing therefore "
@@ -104,10 +100,22 @@ def test_la_politique_distingue_les_secrets_du_reste(host):
     )
 
 
+def test_la_politique_enregistre_le_reste_en_metadata(host):
+    contenu = _contenu_de_la_politique(host)
+    assert "Metadata" in contenu, message(
+        en="The policy carries no Metadata level for the rest. Auditing "
+        "everything at RequestResponse copies every Secret in clear text into the log "
+        "and fills the disk: that is not what is asked for.",
+        fr="La politique ne porte pas de niveau Metadata pour le reste. Auditer "
+        "tout en RequestResponse recopie chaque Secret en clair dans le journal "
+        "et sature le disque : ce n'est pas ce qui est demandé.",
+    )
+
+
 # ----------------------------------------------------------------------
 # 2. L'API server a été relancé avec cette politique, et il répond.
 # ----------------------------------------------------------------------
-def test_l_api_server_tourne_avec_l_audit(host):
+def _manifeste_de_l_api_server(host) -> str:
     """Deux affirmations, et la seconde est la vraie.
 
     Des flags dans le manifeste ne suffisent pas : l'API server est un Pod, et
@@ -119,26 +127,49 @@ def test_l_api_server_tourne_avec_l_audit(host):
         en="The API server's manifest cannot be read.",
         fr="Le manifeste de l'API server est illisible.",
     )
-    manquants = [
-        flag
-        for flag in ("--audit-policy-file", "--audit-log-path")
-        if flag not in res.stdout
-    ]
-    assert not manquants, message(
-        en=f"The manifest does not carry: {', '.join(manquants)}. The API server therefore "
-        "knows neither which policy to apply, nor where to write.",
-        fr=f"Le manifeste ne porte pas : {', '.join(manquants)}. L'API server ne "
-        "sait donc ni quelle politique appliquer, ni où écrire.",
+    return res.stdout
+
+
+def test_l_api_server_applique_la_politique(host):
+    manifeste = _manifeste_de_l_api_server(host)
+    assert "--audit-policy-file" in manifeste, message(
+        en="The manifest does not carry --audit-policy-file. The API server therefore "
+        "does not know which policy to apply.",
+        fr="Le manifeste ne porte pas --audit-policy-file. L'API server ne "
+        "sait donc pas quelle politique appliquer.",
     )
-    assert POLITIQUE in res.stdout and JOURNAL in res.stdout, message(
-        en="The flags are there, but the mounted paths do not match those "
-        "of the policy and of the log: check the hostPath volumes and their "
-        "volumeMounts.",
-        fr="Les flags sont là, mais les chemins montés ne correspondent pas à ceux "
-        "de la politique et du journal : vérifiez les volumes hostPath et leurs "
-        "volumeMounts.",
+    assert POLITIQUE in manifeste, message(
+        en=f"The flag is there, but it does not point at {POLITIQUE}, and the policy file "
+        "must also be mounted in the container: check the hostPath volume and its volumeMount.",
+        fr=f"Le flag est là, mais il ne désigne pas {POLITIQUE}, et le fichier de politique doit "
+        "aussi être monté dans le conteneur : vérifiez le volume hostPath et son volumeMount.",
     )
 
+
+def test_le_journal_est_ecrit_dans_un_fichier_du_noeud(host):
+    manifeste = _manifeste_de_l_api_server(host)
+    assert "--audit-log-path" in manifeste, message(
+        en="The manifest does not carry --audit-log-path. The API server therefore "
+        "does not know where to write.",
+        fr="Le manifeste ne porte pas --audit-log-path. L'API server ne "
+        "sait donc pas où écrire.",
+    )
+    assert JOURNAL in manifeste, message(
+        en=f"The flag is there, but the log path is not {JOURNAL}, and its directory must "
+        "be a hostPath volume mounted in the container so that the log survives the Pod.",
+        fr=f"Le flag est là, mais le chemin du journal n'est pas {JOURNAL}, et son répertoire doit "
+        "être un volume hostPath monté dans le conteneur pour que le journal survive au Pod.",
+    )
+
+
+def test_l_api_server_repond_apres_la_modification(host):
+    # Garde : l'API répond aussi quand on n'a rien modifié. L'état demandé est
+    # « répond TOUJOURS après la modification », donc après avoir modifié.
+    manifeste = _manifeste_de_l_api_server(host)
+    assert "--audit-policy-file" in manifeste or "--audit-log-path" in manifeste, message(
+        en="The API server's manifest has not been modified: there is nothing to check yet.",
+        fr="Le manifeste de l'API server n'a pas été modifié : il n'y a encore rien à contrôler.",
+    )
     rc, _, diagnostic = _kubectl(host, "get --raw /healthz")
     assert rc == 0, message(
         en="The API server no longer answers after the manifest was modified. That is "
@@ -155,7 +186,7 @@ def test_l_api_server_tourne_avec_l_audit(host):
 # ----------------------------------------------------------------------
 # 3. LE test : le journal prouve que l'audit agit, et aux deux niveaux.
 # ----------------------------------------------------------------------
-def test_le_journal_enregistre_les_secrets_en_entier_et_le_reste_en_metadonnees(host):
+def _provoquer_les_deux_lectures(host):
     """On provoque les deux opérations, puis on relit ce que l'audit en a fait.
 
     Les deux sens dans la même mesure : le Secret doit apparaître avec son
@@ -182,6 +213,10 @@ def test_le_journal_enregistre_les_secrets_en_entier_et_le_reste_en_metadonnees(
         "correspond pas à celui du volume.",
     )
 
+
+
+def test_le_journal_enregistre_la_lecture_du_secret_en_requestresponse(host):
+    _provoquer_les_deux_lectures(host)
     secrets = [
         ligne
         for ligne in _lignes_d_audit(host, f'"name":"{SECRET}"')
@@ -209,6 +244,10 @@ def test_le_journal_enregistre_les_secrets_en_entier_et_le_reste_en_metadonnees(
         "des Secrets, c'est elle qui gagne : l'ordre des règles décide.",
     )
 
+
+
+def test_le_journal_enregistre_une_lecture_banale_en_metadata_seulement(host):
+    _provoquer_les_deux_lectures(host)
     banales = [
         ligne
         for ligne in _lignes_d_audit(host, '"resource":"pods"')
