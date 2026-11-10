@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab run` : installe le socle partagé du module Architecture,
+# le cluster kind « architecture » à quatre nœuds, puis pose la situation du
+# lab dans son seul namespace.
+- name: Préparer le lab k8s-lire-un-node
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kind partagé du module Architecture
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: architecture
+        kind_workers: 3
+        kind_event_ttl: 24h
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/architecture.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

@@ -20,10 +20,12 @@ ADMIN=/etc/kind/boutique.kubeconfig
 IMAGE_FAUTIVE="nginx:1.300"
 
 # 1. Des namespaces neufs : catalogue repart de zéro, vitrine n'existe pas.
+# --ignore-not-found et non un « get » préalable : le cleanup supprime ces
+# namespaces sans attendre, et un namespace encore en Terminating au moment du
+# get disparaissait avant le delete, qui sortait en NotFound et arrêtait le
+# script (set -e). Mesuré le 2026-11-10 au rejeu de valider-labs.py.
 for ns in vitrine catalogue; do
-  if kubectl get namespace "$ns" >/dev/null 2>&1; then
-    kubectl delete namespace "$ns" --wait=true --timeout=180s
-  fi
+  kubectl delete namespace "$ns" --ignore-not-found --wait=true --timeout=180s
 done
 kubectl create namespace catalogue
 

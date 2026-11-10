@@ -1,0 +1,70 @@
+# Lab guidé de la leçon « Architecture Kubernetes » du module Architecture de
+# la formation. Il fait suivre une requête kubectl jusqu'au conteneur, par les
+# événements du Pod : qui place le Pod (le scheduler), qui tire l'image, crée
+# et démarre le conteneur (le kubelet du Node choisi).
+#
+# Il tourne sur le cluster kind « architecture », partagé par les quatre labs
+# du module : il ne touche qu'à son namespace, suivre-un-pod, jamais aux Nodes
+# ni à kube-system.
+id: k8s-suivre-un-pod-de-kubectl-au-conteneur
+title: "Follow a Pod from kubectl to the container"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  Create a Deployment, then read the events of its Pod to record each step
+  between kubectl and a running container, and the component that acts at
+  each one: the scheduler for placement, the kubelet of the chosen Node for
+  the image pull, the creation and the start of the container.
+skills:
+  - kubectl-create
+  - kubectl-describe
+  - kubectl-events
+  - kube-scheduler
+  - kubelet
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - kcna
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-deployment-suivi-tourne
+    label: "The suivi Deployment has one available replica on the required image"
+    tests:
+      - test_le_deployment_suivi_a_un_replica_disponible
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+  - id: le-placement-est-attribue-au-scheduler
+    label: "The Scheduled step is attributed to the scheduler"
+    tests:
+      - test_l_etape_scheduled_est_attribuee_au_scheduler
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+  - id: les-etapes-du-conteneur-sont-attribuees-au-kubelet
+    label: "The Pulled, Created and Started steps are attributed to the kubelet"
+    tests:
+      - test_les_etapes_du_conteneur_sont_attribuees_au_kubelet
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+  - id: le-kubelet-est-celui-du-node-du-pod
+    label: "The kubelet that acted is the one of the Node running the Pod"
+    tests:
+      - test_le_kubelet_qui_agit_est_celui_du_node_du_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/

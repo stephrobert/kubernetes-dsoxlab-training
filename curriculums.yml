@@ -1,5 +1,5 @@
 ---
-# Les curriculums officiels des trois certifications, et le poids de chaque
+# Les curriculums officiels des quatre certifications, et le poids de chaque
 # domaine. Source unique du dépôt pour ces chiffres.
 #
 # POURQUOI CE FICHIER EXISTE, et il a une date de naissance.
@@ -18,7 +18,7 @@
 # COMMENT REVÉRIFIER, en deux commandes qui ne supposent rien :
 #
 #   gh api repos/cncf/curriculum/contents --jq '.[].name'   # les versions publiées
-#   curl -sSL -o cks.pdf "https://raw.githubusercontent.com/cncf/curriculum/master/CKS_Curriculum%20v1.34.pdf"
+#   curl -sSL -o cks.pdf "https://raw.githubusercontent.com/cncf/curriculum/master/CKS_Curriculum%20v1.37.pdf"
 #   pdftotext cks.pdf - | grep -E '^[0-9]+%'
 #
 # Le nom du fichier PDF porte la version : c'est lui qui dit quel curriculum
@@ -30,12 +30,19 @@ verifie_le: 2026-09-15
 # labs tournent. Le runtime réellement joué est mesuré, pas déclaré : il est lu
 # dans `validation-labs.json`, que `scripts/valider-labs.py` écrit. Au
 # 2026-09-15, les labs tournent sur Kubernetes 1.37 alors que le curriculum
-# CKA publié est la v1.35. Ne jamais recopier le runtime ici : une version
+# CKA publié était la v1.35 ; il est en v1.37 depuis le 2026-10-15. Ne jamais recopier le runtime ici : une version
 # annoncée qui ne serait plus celle des validations est pire que pas de
 # version du tout.
 certifications:
+  # CKA, CKAD et CKS relues en v1.37 le 2026-11-10 : PDF CKA du 2026-10-15
+  # (commit b3c8508), CKAD du 2026-10-01 (f423fa4), CKS du 2026-11-03
+  # (4de0c31). Les poids sont identiques à ceux des versions précédentes
+  # (CKA et CKAD v1.35, CKS v1.34) ; seule la référence de version change. Le
+  # PDF CKA v1.37 écrit « Servicing and Networking » : coquille du PDF, le
+  # domaine garde son nom officiel.
   cka:
-    version: v1.35
+    version: v1.37
+    verifie_le: 2026-11-10
     titre: "CKA, Certified Kubernetes Administrator"
     domaines:
       "Troubleshooting": 30
@@ -45,7 +52,8 @@ certifications:
       "Storage": 10
 
   ckad:
-    version: v1.35
+    version: v1.37
+    verifie_le: 2026-11-10
     titre: "CKAD, Certified Kubernetes Application Developer"
     domaines:
       "Application Environment, Configuration and Security": 25
@@ -55,7 +63,8 @@ certifications:
       "Application Observability and Maintenance": 15
 
   cks:
-    version: v1.34
+    version: v1.37
+    verifie_le: 2026-11-10
     titre: "CKS, Certified Kubernetes Security Specialist"
     domaines:
       "Minimize Microservice Vulnerabilities": 20
@@ -64,3 +73,18 @@ certifications:
       "Cluster Setup": 15
       "Cluster Hardening": 15
       "System Hardening": 10
+
+  # Ajoutée le 2026-11-10 avec la section kcna du module Architecture,
+  # décision de Stéphane. KCNA_Curriculum.pdf ne porte AUCUN numéro de
+  # version : il se date par son dernier commit dans cncf/curriculum,
+  # c2df915fb5a0 du 2026-03-22 (CreationDate du PDF : 2026-03-22). Relu ce
+  # jour-là avec pdftotext ; les quatre domaines totalisent 100 %.
+  kcna:
+    version: "PDF 2026-03-22 (c2df915)"
+    titre: "KCNA, Kubernetes and Cloud Native Associate"
+    verifie_le: 2026-11-10
+    domaines:
+      "Kubernetes Fundamentals": 44
+      "Container Orchestration": 28
+      "Cloud Native Application Delivery": 16
+      "Cloud Native Architecture": 12

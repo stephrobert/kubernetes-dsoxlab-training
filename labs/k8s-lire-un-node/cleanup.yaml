@@ -1,0 +1,12 @@
+---
+# Joué par `dsoxlab clean` : retire la fiche de l'apprenant. Le lab ne crée
+# aucun objet dans le cluster, qui reste : il est le socle partagé du module
+# Architecture.
+- name: Nettoyer le lab k8s-lire-un-node
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer la fiche de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/lire-un-node"
+        state: absent

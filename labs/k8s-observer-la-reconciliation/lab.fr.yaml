@@ -1,0 +1,15 @@
+title: "Observer la réconciliation du control plane"
+description: |
+  Supprimer un Pod, puis le ReplicaSet d'un Deployment, constater que le
+  cluster revient à l'état demandé, et consigner quel contrôleur a recréé
+  chaque objet.
+
+criteria:
+  - id: le-pod-supprime-est-recree
+    label: "Un Pod supprimé de vitrine a été recréé par son ReplicaSet"
+  - id: le-replicaset-supprime-est-remplace
+    label: "Le ReplicaSet supprimé a été remplacé et vitrine est revenu à trois réplicas disponibles"
+  - id: le-controleur-du-pod-est-consigne
+    label: "Le contrôleur qui a recréé le Pod est consigné"
+  - id: le-controleur-du-replicaset-est-consigne
+    label: "Le contrôleur qui a recréé le ReplicaSet est consigné"

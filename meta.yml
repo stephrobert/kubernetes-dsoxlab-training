@@ -121,6 +121,28 @@ infra:
 # pour mot. C'est ce qui permet de répondre à la seule question qui compte
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
 sections:
+  # La KCNA vient en tête : c'est le niveau 1, celui des modules qui
+  # enseignent ce qu'est un cluster avant de l'administrer. Section ajoutée le
+  # 2026-11-10 (décision de Stéphane) avec le module Architecture.
+  - id: kcna
+    title: "KCNA, Kubernetes and Cloud Native Associate"
+    description: >-
+      Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a
+      cluster is made of and which component does what, read on a live
+      multi-node cluster.
+    labs:
+      # Le challenge du module Fondamentaux, sur le cluster kind « boutique » :
+      # le référentiel KCNA rattache sa leçon Concepts clés à « Kubernetes Core
+      # Concepts », le référentiel CKAD n'en rattache aucune.
+      - k8s-challenge-premier-deploiement
+      # Le module Architecture de la formation, sur un cluster kind à quatre
+      # nœuds partagé par les quatre labs : un lab guidé par leçon
+      # (architecture, control plane, nœuds worker), puis le challenge.
+      - k8s-suivre-un-pod-de-kubectl-au-conteneur
+      - k8s-observer-la-reconciliation
+      - k8s-lire-un-node
+      - k8s-challenge-lire-un-cluster
+
   - id: cka
     title: "CKA, Certified Kubernetes Administrator"
     description: >-
@@ -193,10 +215,10 @@ sections:
       # il ne s'adresse qu'à qui a déjà joué les dix-sept précédents, puisqu'il
       # ne dit plus quel objet employer.
       - ckad-capstone-boutique
-      # Servent le module Fondamentaux de la formation, sur un cluster kind :
-      # le lab de la leçon « Lire l'état du cluster », puis le challenge du module.
+      # Sert le module Fondamentaux de la formation, sur un cluster kind : le
+      # lab de la leçon « Lire l'état du cluster ». Le challenge du module est
+      # rangé en kcna depuis le 2026-11-10.
       - k8s-lire-l-etat-d-un-pod-en-erreur
-      - k8s-challenge-premier-deploiement
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

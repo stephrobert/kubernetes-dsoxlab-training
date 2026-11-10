@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace du lab et le relevé. Le
+# cluster kind reste, il est le socle partagé du module Architecture.
+- name: Nettoyer le lab k8s-suivre-un-pod-de-kubectl-au-conteneur
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/architecture.kubeconfig delete namespace
+        suivre-un-pod --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le relevé de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/suivre-un-pod"
+        state: absent
