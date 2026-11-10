@@ -7,8 +7,8 @@
 # lire l'état d'un Pod en erreur avant de le réparer par son manifeste.
 id: k8s-challenge-premier-deploiement
 title: "Ship the storefront and bring the stock service back"
-level: application-deployment
-section: ckad
+level: kubernetes-fundamentals
+section: kcna
 difficulty: beginner
 description: |
   On a kind cluster, point kubectl at the right cluster and namespace, ship
@@ -35,7 +35,7 @@ exam_blocking_checks:
 estimated_time: 30m
 
 certification_tags:
-  - ckad
+  - kcna
 
 runtime:
   type: vm

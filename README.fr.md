@@ -206,14 +206,15 @@ Un tableau par examen, dans l'ordre que `meta.yml` déclare. Cet ordre est une p
 
 Quatre domaines. Kubernetes Fundamentals pèse 44 %, le plus lourd : de quoi un cluster est fait et quel composant fait quoi, lu sur un cluster multi-nœuds vivant.
 
-4 lab(s).
+5 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
-| 1 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Suivre un Pod de kubectl au conteneur | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
-| 2 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Observer la réconciliation du control plane | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
-| 3 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Lire ce que déclare un Node worker | kubernetes-fundamentals | 15m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
-| 4 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Lire un cluster : quel composant fait quoi | kubernetes-fundamentals | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 1 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Livrer la vitrine et remettre le stock en marche | kubernetes-fundamentals | 30m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
+| 2 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Suivre un Pod de kubectl au conteneur | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
+| 3 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Observer la réconciliation du control plane | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
+| 4 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Lire ce que déclare un Node worker | kubernetes-fundamentals | 15m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 5 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Lire un cluster : quel composant fait quoi | kubernetes-fundamentals | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
 
 ### CKA, Certified Kubernetes Administrator
 
@@ -253,7 +254,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 
 Cinq domaines orientés application. « Application Environment, Configuration and Security » pèse 25 %, le plus lourd des cinq.
 
-22 lab(s).
+21 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -278,7 +279,6 @@ Cinq domaines orientés application. « Application Environment, Configuration a
 | 19 | [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) | Trois Pods en CrashLoopBackOff, trois causes | application-observability | 15m | 2026-09-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone : livrer la boutique, à partir du seul cahier des charges | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 | 21 | [`k8s-lire-l-etat-d-un-pod-en-erreur`](labs/k8s-lire-l-etat-d-un-pod-en-erreur/) | Lire l'état d'un Pod en erreur | application-observability | 20m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/) |
-| 22 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Livrer la vitrine et remettre le stock en marche | application-deployment | 30m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
