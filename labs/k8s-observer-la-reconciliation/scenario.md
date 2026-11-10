@@ -33,7 +33,8 @@ while you delete.
 Each controller signs what it does. A ReplicaSet that creates a Pod writes a
 `SuccessfulCreate` event on itself; a Deployment that creates a ReplicaSet
 writes a `ScalingReplicaSet` event on itself. `kubectl describe` shows them in
-the **From** column, `kubectl get events -o wide` in the SOURCE column.
+the **From** column, `kubectl get events -o wide` in the SOURCE column: that is
+the exact name to record.
 
 Delete only the Pod, then only the ReplicaSet. A `kubectl rollout restart`
 would also create a new ReplicaSet, but by changing the Deployment: that is

@@ -33,7 +33,8 @@ Chaque contrôleur signe ce qu'il fait. Un ReplicaSet qui crée un Pod écrit un
 événement `SuccessfulCreate` sur lui-même ; un Deployment qui crée un
 ReplicaSet écrit un événement `ScalingReplicaSet` sur lui-même.
 `kubectl describe` les montre dans la colonne **From**,
-`kubectl get events -o wide` dans la colonne SOURCE.
+`kubectl get events -o wide` dans la colonne SOURCE : c'est le nom exact à
+consigner.
 
 Supprimez seulement le Pod, puis seulement le ReplicaSet. Un
 `kubectl rollout restart` créerait lui aussi un nouveau ReplicaSet, mais en

@@ -31,7 +31,9 @@ line.
 
 5. For `file-attente`, **`cree-par`** names the component that created its
    Pods, and **`n-agit-pas`** names the one component that does not act on
-   them. Diagnose only: do not repair the Deployment.
+   them. Diagnose only: do not repair the Deployment. The From column of the
+   Events section of `kubectl describe` gives the exact name of the component
+   that acted.
 
 ## How you are graded
 
