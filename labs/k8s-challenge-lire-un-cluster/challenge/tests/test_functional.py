@@ -310,8 +310,8 @@ def test_le_maillon_qui_n_agit_pas_est_identifie(host, releve):
     nomme_le_scheduler = "scheduler" in absent or "ordonnanceur" in absent
     autres = [nom for nom in AUTRES_COMPOSANTS if nom in absent]
     assert nomme_le_scheduler and not autres, message(
-        en="n-agit-pas must name the one component that does not act on the Pods of "
-           "file-attente, and only that one.",
-        fr="n-agit-pas doit nommer le seul composant qui n'agit pas sur les Pods de "
-           "file-attente, et lui seul.",
+        en="n-agit-pas must name the first link of the chain that does not act on the "
+           "Pods of file-attente, and only that one.",
+        fr="n-agit-pas doit nommer le premier maillon de la chaîne qui n'agit pas sur les "
+           "Pods de file-attente, et lui seul.",
     )
