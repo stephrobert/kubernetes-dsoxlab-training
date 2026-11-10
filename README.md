@@ -311,7 +311,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 
 Total: **70 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
-**Runtime validated: Kubernetes v1.37.0, v1.37.1.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34, KCNA PDF du 2026-03-22, commit c2df915** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
+**Runtime validated: Kubernetes v1.37.0, v1.37.1.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
 <!-- LABS:END -->
 

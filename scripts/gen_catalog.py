@@ -104,7 +104,7 @@ def _sections_du_contrat(langue: str) -> tuple[tuple[str, str, str], ...]:
 #: curriculum est ce que la CNCF publie et sur quoi l'examen porte ; le runtime
 #: est ce sur quoi les labs ont été validés ici. Le second avance plus vite que
 #: le premier : au 2026-09-15, les labs tournent sur Kubernetes 1.37 alors que
-#: les curriculums publiés sont CKA/CKAD v1.35 et CKS v1.34.
+#: les curriculums publiés étaient CKA/CKAD v1.35 et CKS v1.34 (tous en v1.37 au 2026-11-10).
 #:
 #: Les versions ne sont plus écrites ici : elles vivent dans `curriculums.yml`,
 #: avec le poids de chaque domaine, leur source et la date de la dernière
