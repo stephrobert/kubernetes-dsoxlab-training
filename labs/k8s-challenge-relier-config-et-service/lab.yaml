@@ -1,0 +1,91 @@
+# Challenge du module « Les ressources de base » de la formation Kubernetes.
+#
+# `lab_type: challenge` : il ÉVALUE, sans guidage. Les leçons du module ont
+# enseigné les gestes : un namespace dédié, un Deployment, une configuration
+# venue d'un ConfigMap, un mot de passe venu d'un Secret, un Service, une mise
+# à jour d'image. Ici, l'apprenant les relie sur un cluster vivant.
+#
+# Il tourne sur le cluster kind « boutique » du module Fondamentaux, le fil
+# rouge de la boutique, dans son propre namespace (magasin) : il n'ajoute aucun
+# nœud à l'hôte kind, dont la mémoire est mesurée au plus juste.
+#
+# Section ckad : quatre des six états portent sur des objectifs que le
+# référentiel CKAD rattache aux leçons du module (ConfigMaps, Secrets,
+# Services, rolling updates) ; le référentiel KCNA ne couvre ni ConfigMap ni
+# Secret. Niveau application-environment, le domaine des deux états qui font
+# le cœur du challenge.
+id: k8s-challenge-relier-config-et-service
+title: "Wire a ConfigMap, a Secret and a Service to a Deployment"
+level: application-environment
+section: ckad
+difficulty: beginner
+description: |
+  In a dedicated namespace, run the storefront with three replicas, give it a
+  configuration value from a ConfigMap and a password from a Secret without
+  writing the password in the Deployment, expose it through a Service that
+  answers, then update its image while keeping the previous ReplicaSet.
+skills:
+  - kubectl-create-namespace
+  - kubectl-create-deployment
+  - configmap
+  - secret
+  - kubectl-expose
+  - kubectl-set-image
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+estimated_time: 30m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: tout-est-dans-le-namespace-magasin
+    label: "The storefront objects are in the magasin namespace, none in default"
+    tests:
+      - test_les_objets_sont_dans_magasin_et_aucun_dans_default
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+  - id: la-vitrine-a-trois-replicas-disponibles
+    label: "The vitrine Deployment has three available replicas"
+    tests:
+      - test_la_vitrine_a_trois_replicas_disponibles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: la-configuration-vient-du-configmap
+    label: "MESSAGE_ACCUEIL comes from the ConfigMap, read inside the Pod"
+    tests:
+      - test_la_configuration_arrive_depuis_le_configmap
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-mot-de-passe-vient-du-secret
+    label: "DB_PASSWORD comes from the Secret, read inside the Pod, never in clear in the Deployment"
+    tests:
+      - test_le_mot_de_passe_arrive_depuis_le_secret_sans_etre_en_clair
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: le-service-repond
+    label: "The vitrine Service has three ready endpoints and answers HTTP from a client Pod"
+    tests:
+      - test_le_service_compte_trois_endpoints_et_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: la-mise-a-jour-garde-l-ancien-replicaset
+    label: "After the update, three replicas run the new image and the previous ReplicaSet is kept at zero"
+    tests:
+      - test_la_mise_a_jour_garde_l_ancien_replicaset_a_zero
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/

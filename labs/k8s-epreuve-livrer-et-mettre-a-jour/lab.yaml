@@ -1,0 +1,96 @@
+# Épreuve de fin du niveau 1 de la formation Kubernetes (fiche KUBERN-EPREUVE-N1).
+#
+# `lab_type: challenge` comme les épreuves du catalogue containers : capstone
+# est réservé aux certifications. Le cahier des charges ne nomme aucun objet
+# Kubernetes : l'apprenant choisit lui-même ses ressources, et les tests les
+# retrouvent sur le cluster (le Deployment qui porte la vitrine, le Service
+# vitrine que l'adresse demandée impose).
+#
+# Seuil 70 sur 100 (décision D06), et quatre contrôles critiques, P01 à P04,
+# qu'aucune moyenne ne compense : la vitrine en version 2, joignable, nourrie
+# par un ConfigMap et un Secret, avec un retour arrière possible.
+#
+# Il tourne sur le cluster kind « boutique », le fil rouge, dans son namespace
+# boutique : aucun nœud de plus sur l'hôte kind.
+id: k8s-epreuve-livrer-et-mettre-a-jour
+title: "Level 1 test: ship and update an application"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  From requirements that name no Kubernetes object, ship the shop's storefront
+  with three copies reachable inside the cluster, fed by a configuration and a
+  secret managed apart, then move it to the next version without downtime
+  while keeping a way back.
+skills:
+  - deployment
+  - service
+  - configmap
+  - secret
+  - rolling-update
+  - rollout-history
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # P01 à P04 : les contrôles critiques de la fiche, sans compensation.
+  - test_p01_trois_replicas_sur_la_version_2
+  - test_p02_le_service_repond_avec_trois_endpoints
+  - test_p03_configuration_et_secret_sans_valeur_en_clair
+  - test_p04_la_revision_precedente_porte_la_version_1
+estimated_time: 45m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: p01-trois-replicas-en-version-2
+    label: "P01 (critical): three available replicas of the storefront, all on version 2 by digest"
+    tests:
+      - test_p01_trois_replicas_sur_la_version_2
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: p02-le-service-repond
+    label: "P02 (critical): the vitrine Service has three ready endpoints and answers HTTP"
+    tests:
+      - test_p02_le_service_repond_avec_trois_endpoints
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: p03-configuration-et-secret
+    label: "P03 (critical): the configuration comes from a ConfigMap and the password from a Secret, none in clear"
+    tests:
+      - test_p03_configuration_et_secret_sans_valeur_en_clair
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: p04-retour-arriere-possible
+    label: "P04 (critical): the previous revision of the Deployment runs version 1"
+    tests:
+      - test_p04_la_revision_precedente_porte_la_version_1
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: p05-mise-a-jour-sans-coupure
+    label: "P05: the update strategy is RollingUpdate with maxUnavailable 0"
+    tests:
+      - test_p05_strategie_sans_indisponibilite
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: p06-aucun-pod-en-erreur
+    label: "P06: the storefront runs and no Pod of the namespace is in error"
+    tests:
+      - test_p06_aucun_pod_en_erreur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
