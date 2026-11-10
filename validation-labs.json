@@ -2046,5 +2046,123 @@
    "total": 2
   },
   "verdict": "VALIDE"
+ },
+ "k8s-challenge-premier-deploiement": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_la_cause_de_stock_est_consignee_avant_la_reparation",
+    "test_la_vitrine_a_trois_replicas_disponibles_sur_la_bonne_image",
+    "test_la_vitrine_repond_en_http_depuis_le_cluster",
+    "test_le_contexte_actif_vise_la_boutique_et_la_vitrine",
+    "test_le_kubeconfig_de_la_boutique_n_est_lisible_que_par_son_proprietaire",
+    "test_le_service_vitrine_compte_trois_endpoints_prets",
+    "test_stock_est_repare_par_son_manifeste"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 212,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-premier-deploiement.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_cause_de_stock_est_consignee_avant_la_reparation",
+    "test_la_vitrine_a_trois_replicas_disponibles_sur_la_bonne_image",
+    "test_la_vitrine_repond_en_http_depuis_le_cluster",
+    "test_le_contexte_actif_vise_la_boutique_et_la_vitrine",
+    "test_le_kubeconfig_de_la_boutique_n_est_lisible_que_par_son_proprietaire",
+    "test_le_service_vitrine_compte_trois_endpoints_prets",
+    "test_stock_est_repare_par_son_manifeste"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-lire-l-etat-d-un-pod-en-erreur": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_l_erreur_de_batch_est_consignee",
+    "test_la_cause_de_api_est_consignee",
+    "test_le_code_de_sortie_de_batch_est_consigne",
+    "test_le_pod_le_plus_gourmand_est_consigne",
+    "test_rien_n_a_ete_repare"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 335,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-lire-l-etat-d-un-pod-en-erreur.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_erreur_de_batch_est_consignee",
+    "test_la_cause_de_api_est_consignee",
+    "test_le_code_de_sortie_de_batch_est_consigne",
+    "test_le_pod_le_plus_gourmand_est_consigne",
+    "test_rien_n_a_ete_repare"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
  }
 }
