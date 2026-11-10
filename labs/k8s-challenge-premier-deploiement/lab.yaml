@@ -1,0 +1,95 @@
+# Challenge du module Fondamentaux de la formation Kubernetes.
+#
+# `lab_type: challenge` et non `lab` : c'est ce qui autorise
+# `exam_passing_score`, et ce qui dit à l'apprenant que ce challenge ÉVALUE.
+# Rien n'y est réexpliqué : les leçons du module l'ont enseigné, à savoir
+# régler son kubeconfig et ses contextes, déployer et exposer une application,
+# lire l'état d'un Pod en erreur avant de le réparer par son manifeste.
+id: k8s-challenge-premier-deploiement
+title: "Ship the storefront and bring the stock service back"
+level: application-deployment
+section: ckad
+difficulty: beginner
+description: |
+  On a kind cluster, point kubectl at the right cluster and namespace, ship
+  the storefront with three replicas behind a Service that answers, record why
+  the preinstalled stock service will not start before repairing it through
+  its manifest, and protect the kubeconfig you were given.
+skills:
+  - kubeconfig
+  - kubectl-create
+  - kubectl-expose
+  - kubectl-describe
+  - kubectl-apply
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les deux exigences qu'aucun total ne compense : la vitrine qui répond est le
+  # livrable du challenge, et un kubeconfig lisible par tous donne l'accès au
+  # cluster à quiconque lit le fichier.
+  - test_la_vitrine_repond_en_http_depuis_le_cluster
+  - test_le_kubeconfig_de_la_boutique_n_est_lisible_que_par_son_proprietaire
+estimated_time: 30m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+# Critères : un nom stable et un libellé par capacité que le challenge mesure,
+# et la leçon où la réviser.
+criteria:
+  - id: le-contexte-vise-la-boutique-et-la-vitrine
+    label: "The active context is kind-boutique and its default namespace is vitrine"
+    tests:
+      - test_le_contexte_actif_vise_la_boutique_et_la_vitrine
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+  - id: la-vitrine-a-trois-replicas-disponibles
+    label: "The vitrine Deployment has three available replicas on the required image"
+    tests:
+      - test_la_vitrine_a_trois_replicas_disponibles_sur_la_bonne_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: le-service-compte-trois-endpoints-prets
+    label: "The vitrine Service has three ready endpoints"
+    tests:
+      - test_le_service_vitrine_compte_trois_endpoints_prets
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: la-vitrine-repond
+    label: "The storefront answers HTTP 200 from a Pod of the cluster"
+    tests:
+      - test_la_vitrine_repond_en_http_depuis_le_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: la-cause-de-stock-est-consignee-avant-reparation
+    label: "cause-stock.txt names the reason and the faulty image, written before the repair"
+    tests:
+      - test_la_cause_de_stock_est_consignee_avant_la_reparation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+  - id: stock-est-repare-par-son-manifeste
+    label: "stock runs on the corrected image, set in stock.yaml and applied with kubectl apply"
+    tests:
+      - test_stock_est_repare_par_son_manifeste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: le-kubeconfig-est-protege
+    label: "~/.kube/boutique.yaml is readable by its owner only (mode 600)"
+    tests:
+      - test_le_kubeconfig_de_la_boutique_n_est_lisible_que_par_son_proprietaire
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/

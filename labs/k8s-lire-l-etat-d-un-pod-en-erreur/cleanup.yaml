@@ -1,0 +1,27 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé, le namespace
+# diagnostic, metrics-server et le répertoire des livrables. Le cluster kind
+# reste, il fait partie du socle.
+- name: Nettoyer le lab k8s-lire-l-etat-d-un-pod-en-erreur
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace diagnostic
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer metrics-server, installé par le setup
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete
+        -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.9.1/components.yaml
+        --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire des livrables
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/diagnostic"
+        state: absent

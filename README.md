@@ -36,8 +36,12 @@ state of the system**, never the commands typed.
   **Incus**. The provider is declared as a list in [`meta.yml`](meta.yml), and
   **a list does not resolve on its own**: pick one with
   `dsoxlab use --provider kvm`.
-- **About 7 GB of free RAM and 45 GB of disk** for the two machines, and the
-  next section says why there are two.
+- **About 11 GB of free RAM and 75 GB of disk** for the three machines, and
+  the next section says why there are three. A single module asks for less: the
+  labs of the Fundamentals module run on the kind host alone, **4 GB and
+  30 GB**, and the kubeadm labs on the other two, **6.5 GB and 45 GB**. These
+  sizes are measured, not estimated, and [`meta.yml`](meta.yml) carries the
+  reading.
 - **The Ansible collections** of [`requirements.yml`](requirements.yml), whose
   versions are **bounded on purpose**: the ones that validated the catalogue,
   not the latest published.
@@ -75,7 +79,7 @@ The cluster has to exist first: nothing here runs on your own host.
 ```bash
 export LAB_HOME=$PWD
 dsoxlab use --provider kvm           # a list of providers does not resolve on its own
-dsoxlab provision                    # creates the two machines and the cluster
+dsoxlab provision                    # creates the three machines and the cluster
 
 dsoxlab list-labs
 dsoxlab run       cks-apparmor-confiner-un-pod
@@ -108,7 +112,7 @@ The catalogue is described by data, not code, which is what keeps the `dsoxlab`
 engine domain-agnostic:
 
 - **`meta.yml`** at the root declares the repository identity, the
-  **infrastructure** (provider, network `lab-k8s`, `10.10.50.0/24`, and the two
+  **infrastructure** (provider, network `lab-k8s`, `10.10.50.0/24`, and the three
   hosts with their roles) and the **order** of the sections shown by
   `list-labs`;
 - **`lab.yaml`** per lab declares its `skills`, `level`, `runtime` (type and
@@ -137,10 +141,15 @@ dsoxlab progress               # per-section progress, average score
 
 | Runtime | What the lab asks for |
 |---|---|
-| `vm` | the two machines provisioned by `dsoxlab provision`, with the kubeadm cluster already up. The tests query the API server and enter the nodes. |
+| `vm` | the machines provisioned by `dsoxlab provision`. The tests query the API server and enter the nodes. |
 
 Every lab is `vm`, and none declares `runtime.services`: the cluster is the
 subject, so it lives in the machines and not on your host.
+
+**Where the cluster comes from depends on the host.** The labs on the two
+kubeadm machines find it already up. Those on the kind host see it created by
+their own `setup.yaml`, and each creates its own: no `cleanup` destroys its
+cluster, because that cluster is its foundation.
 
 ### The validation model
 
@@ -170,17 +179,23 @@ failure: if every collected test skips, `check` records no score and says why.
 A score of 0 would accuse the lab of what is missing from the cluster, which
 here is usually the cluster not being provisioned.
 
-### The infrastructure: a vanilla kubeadm cluster
+### The infrastructure: a kubeadm cluster, and a kind host
 
 Two Ubuntu 24.04 VMs, the distribution the published kubeadm guide recommends:
 a control plane, `k8s-cp.lab`, and a worker, `k8s-w1.lab`, reachable over `ssh`
 from the control plane as in the exam. The foundation installs a **Kubernetes
 1.37** cluster, the version the training teaches, with Calico as the CNI.
 
-**Why not kind?** Because some facts cannot be proven inside a container. On a
-kind node, the kubelet refuses an AppArmor Pod with
-`Cannot enforce AppArmor: AppArmor is not enabled on the host`. The training
-teaches on kind, this catalogue proves on machines.
+**And a third VM for kind.** `k8s-kind.lab`, on Debian 13, carries Docker and
+kind: that is where the labs of the training's Fundamentals module run, the
+module that teaches on kind. They are therefore played with the tool the
+learner will actually have in front of them.
+
+**Then why not kind everywhere?** Because some facts cannot be proven inside a
+container. On a kind node, the kubelet refuses an AppArmor Pod with
+`Cannot enforce AppArmor: AppArmor is not enabled on the host`. The labs that
+prove such facts need real machines; those that teach the basic moves are
+played where those moves are learned.
 
 ## Catalog
 
@@ -226,7 +241,7 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 
 Five application-facing domains. « Application Environment, Configuration and Security » weighs 25 %, the heaviest of the five.
 
-20 lab(s).
+22 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -250,6 +265,8 @@ Five application-facing domains. « Application Environment, Configuration and S
 | 18 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | A Pod blocked by a ConfigMap that does not exist | application-observability | 10m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 | 19 | [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) | Three Pods in CrashLoopBackOff, three causes | application-observability | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone: ship the shop, from the specification alone | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
+| 21 | [`k8s-lire-l-etat-d-un-pod-en-erreur`](labs/k8s-lire-l-etat-d-un-pod-en-erreur/) | Read the state of a failing Pod | application-observability | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/) |
+| 22 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Ship the storefront and bring the stock service back | application-deployment | 30m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -279,7 +296,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **64 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **66 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0, v1.37.1.** **Reference curriculum: CKA v1.35, CKAD v1.35, CKS v1.34** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
