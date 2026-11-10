@@ -2,11 +2,12 @@
 
 Ces tests lisent l'état du CLUSTER et du NŒUD, jamais les commandes tapées.
 
-Trois affirmations. La première lit l'état du nœud depuis l'API ; la
-deuxième interroge systemd SUR le worker, et c'est elle qui distingue une
-réparation durable d'une réparation d'une heure : un kubelet démarré mais
-resté désactivé ne reviendra pas au prochain redémarrage. La troisième
-regarde l'application, qui n'a nulle part où aller sans ce nœud.
+Quatre affirmations, un état chacune. La première lit l'état du nœud depuis
+l'API ; la deuxième et la troisième interrogent systemd SUR le worker, et la
+troisième distingue une réparation durable d'une réparation d'une heure : un
+kubelet démarré mais resté désactivé ne reviendra pas au prochain
+redémarrage. La quatrième regarde l'application, qui n'a nulle part où aller
+sans ce nœud.
 """
 
 from __future__ import annotations
@@ -67,9 +68,9 @@ def test_le_noeud_est_ready(cp):
 
 
 # ----------------------------------------------------------------------
-# 2. Le kubelet tourne, et il survivra à un redémarrage.
+# 2. Le kubelet tourne.
 # ----------------------------------------------------------------------
-def test_le_kubelet_tourne_et_survivra_au_redemarrage(worker):
+def test_le_kubelet_tourne(worker):
     kubelet = worker.service("kubelet")
     assert kubelet.is_running, message(
         en=f"The kubelet service is not active on {WORKER}. As long as it is not "
@@ -77,6 +78,13 @@ def test_le_kubelet_tourne_et_survivra_au_redemarrage(worker):
         fr=f"Le service kubelet n'est pas actif sur {WORKER}. Tant qu'il ne tourne "
         "pas, le nœud reste NotReady : systemctl status kubelet, puis démarrez-le.",
     )
+
+
+# ----------------------------------------------------------------------
+# 3. Le kubelet survivra à un redémarrage de la machine.
+# ----------------------------------------------------------------------
+def test_le_kubelet_est_active_au_demarrage(worker):
+    kubelet = worker.service("kubelet")
     assert kubelet.is_enabled, message(
         en=f"The kubelet is running on {WORKER}, but it is disabled: at the machine's "
         "next reboot it will not come back, and neither will the fix. A service "
@@ -88,7 +96,7 @@ def test_le_kubelet_tourne_et_survivra_au_redemarrage(worker):
 
 
 # ----------------------------------------------------------------------
-# 3. L'application est revenue, sur ce nœud.
+# 4. L'application est revenue, sur ce nœud.
 # ----------------------------------------------------------------------
 def test_l_application_est_revenue_sur_le_noeud(cp):
     disponibles, voulus = 0, 0

@@ -14,7 +14,7 @@ skills:
   - systemd
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/#mettre-en-pratique
 lab_type: lab
 estimated_time: 15m
 
@@ -51,3 +51,30 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+# Un critère par état demandé, et la leçon où le réviser.
+criteria:
+  - id: le-noeud-est-ready
+    label: "The worker Node is Ready again"
+    tests:
+      - test_le_noeud_est_ready
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+  - id: le-kubelet-tourne
+    label: "The kubelet service runs on the worker"
+    tests:
+      - test_le_kubelet_tourne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+  - id: le-kubelet-est-active
+    label: "The kubelet is enabled and will survive a reboot"
+    tests:
+      - test_le_kubelet_est_active_au_demarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+  - id: l-application-est-revenue
+    label: "The application is back, three replicas on the worker"
+    tests:
+      - test_l_application_est_revenue_sur_le_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/

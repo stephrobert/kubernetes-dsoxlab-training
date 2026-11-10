@@ -15,7 +15,7 @@ skills:
   - staticPodPath
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique
 lab_type: lab
 estimated_time: 10m
 
@@ -53,3 +53,30 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+# Un critère par état demandé, et la leçon où le réviser.
+criteria:
+  - id: le-manifeste-est-ou-le-kubelet-le-cherche
+    label: "The static-web manifest is in the staticPodPath of the worker's kubelet"
+    tests:
+      - test_le_manifeste_est_dans_le_repertoire_du_kubelet
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: le-pod-miroir-vient-d-un-fichier
+    label: "The mirror Pod comes from a file and belongs to the worker Node"
+    tests:
+      - test_le_pod_miroir_vient_d_un_fichier
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: le-pod-statique-tourne
+    label: "The static Pod is Running with the required image and port"
+    tests:
+      - test_le_pod_statique_tourne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: le-runtime-du-worker-execute-le-conteneur
+    label: "The worker's runtime really runs the web container"
+    tests:
+      - test_le_runtime_du_worker_execute_le_conteneur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/

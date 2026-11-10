@@ -4,3 +4,11 @@ description: |
   démarrage. Sans API, diagnostiquer sur le nœud, dans les conteneurs et les
   journaux du kubelet, corriger le manifeste statique, et prouver que l'API
   répond sans avoir affaibli son autorisation.
+
+criteria:
+  - id: l-api-repond
+    label: "L'API server répond de nouveau"
+  - id: le-pod-statique-de-l-api-tourne
+    label: "Le Pod statique kube-apiserver est Running"
+  - id: le-manifeste-est-sain-et-autorise
+    label: "Le manifeste est réparé et déclare toujours l'autorisation Node,RBAC"
