@@ -6,6 +6,47 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/), and the project
 follows [semantic versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- **The `k8s-kind.lab` host drops from 8192 MB and 4 vCPU to 4096 MB and
+  2 vCPU**, measured rather than estimated. Both labs of the Fundamentals
+  module come out VALID at that size, `0 → N → 0` cycle and cluster photograph
+  included.
+
+  The original 8192 MB came from a brief, with no measurement, and pushed the
+  catalogue to 14.5 GB: enough to contradict the "Sizing your machine" lesson,
+  which promises that a catalogue fits on 16 GB on its own. It now asks for
+  **10.5 GB** in full, **6.5 GB** for the kubeadm labs alone and **4 GB** for
+  the Fundamentals module alone.
+
+  The measurement covers the **worst case**, which is not a single lab. Each
+  kind lab creates **its own** cluster, `lab` and `boutique`, and no `cleanup`
+  destroys its own since it is its foundation: a learner who plays the whole
+  module therefore carries **two simultaneous kind clusters**. Sampled inside
+  the VM at that moment, over 39 readings with no loss, **2059 MB remained
+  available at the peak**, 53 % of the memory unused, without a single OOM or a
+  single `Pending` Pod.
+
+  The floor does not go lower without a new measurement, and certainly not from
+  memory: the VM has **no swap at all**, so an overrun would be a hard OOM with
+  no slowdown to warn of it. 3072 MB has not been tested.
+
+### Fixed
+
+- **Eleven passages of the documentation announced two machines** for a
+  catalogue that has declared three since the Fundamentals module: the
+  requirements of both `README` files ("about 7 GB of free RAM and 45 GB of
+  disk"), the `provision` line of the quickstart, the runtimes table, the
+  `meta.yml` description, and the passage of both `SECURITY` files about the
+  foundation running as `root`.
+
+  The "Why not kind?" section had become false in the literal sense: it argued
+  that "this catalogue proves on machines" while the branch was placing two
+  kind labs there. It now distinguishes the two uses, and keeps the reason that
+  still holds, namely that a kind node cannot prove an AppArmor fact.
+
 ## [0.2.3] - 2026-10-23
 
 ### Added

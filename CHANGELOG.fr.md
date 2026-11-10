@@ -6,6 +6,48 @@ Tous les changements notables de ce projet sont consignés dans ce fichier. Le
 format s'appuie sur [Keep a Changelog](https://keepachangelog.com/), et le
 projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## Non publié
+
+### Modifié
+
+- **L'hôte `k8s-kind.lab` descend de 8192 Mo et 4 vCPU à 4096 Mo et 2 vCPU**,
+  sur mesure et non sur estimation. Les deux labs du module Fondamentaux
+  sortent VALIDE à cette taille, cycle `0 → N → 0` et photographie du cluster
+  comprises.
+
+  Les 8192 Mo d'origine venaient d'un brief, sans mesure, et portaient le
+  catalogue à 14,5 Go : de quoi contredire la leçon « Dimensionner sa machine »,
+  qui promet qu'un catalogue tient seul sur 16 Go. Il en demande désormais
+  **10,5 Go** au complet, **6,5 Go** pour les seuls labs kubeadm et **4 Go**
+  pour le seul module Fondamentaux.
+
+  La mesure porte sur le **pire cas**, qui n'est pas un lab joué seul. Chaque
+  lab kind crée **son** cluster, `lab` et `boutique`, et aucun `cleanup` ne
+  détruit le sien puisqu'il est son socle : un apprenant qui joue le module en
+  entier porte donc **deux clusters kind simultanés**. Relevé dans la VM à ce
+  moment-là, sur 39 échantillons sans perte, il restait **2059 Mo disponibles
+  au plus fort**, soit 53 % de la mémoire inemployée, sans un seul OOM ni un
+  seul Pod en `Pending`.
+
+  Le plancher ne descend pas plus bas sans nouvelle mesure, et surtout pas de
+  mémoire : la VM n'a **aucun swap**, donc un dépassement serait un OOM franc,
+  sans ralentissement qui avertirait. 3072 Mo n'a pas été éprouvé.
+
+### Corrigé
+
+- **Onze passages de la documentation annonçaient deux machines** pour un
+  catalogue qui en déclare trois depuis le module Fondamentaux : les prérequis
+  des deux `README` (« environ 7 Go de RAM libre et 45 Go de disque »), la
+  ligne `provision` du démarrage rapide, le tableau des runtimes, la
+  description du `meta.yml`, et le passage des deux `SECURITY` sur le socle
+  exécuté en `root`.
+
+  La section « Pourquoi pas kind ? » était devenue fausse au sens propre :
+  elle soutenait que « ce catalogue éprouve sur des machines » alors que la
+  branche y posait deux labs kind. Elle distingue désormais les deux usages,
+  et garde la raison qui tient toujours, à savoir qu'un nœud kind ne peut pas
+  prouver un fait AppArmor.
+
 ## [0.2.3] - 2026-10-23
 
 ### Ajouté

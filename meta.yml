@@ -87,11 +87,34 @@ infra:
     # kind, l'outil que la formation enseigne : un seul nœud, dans une VM, avec
     # Docker et kind posés par shared/kind-cluster.yml. Rôle `kind` et non
     # `worker` : le socle kubeadm rejoint tout hôte `worker` au cluster.
+    #
+    # 4096 Mo et 2 vCPU sont MESURÉS, le 2026-11-10, et non estimés : les deux
+    # labs du module sortent VALIDE à cette taille, cycle 0 → 7/7 → 0 compris.
+    # La mesure porte sur le PIRE cas, qui n'est pas un lab seul : chaque lab
+    # kind crée SON cluster (`lab` et `boutique`), et aucun cleanup ne détruit
+    # le sien, puisqu'il est le socle. Un apprenant qui joue le module en
+    # entier porte donc DEUX clusters kind simultanés. Relevé dans la VM à ce
+    # moment-là, 39 échantillons sans perte :
+    #
+    #   au repos, avant tout socle       3581 Mo disponibles sur 3915 utiles
+    #   un cluster kind                  1179 Mo utilisés
+    #   les deux clusters, au repos      1623 Mo utilisés
+    #   au pire instant mesuré           2059 Mo encore disponibles
+    #   OOM, Pods en Pending             aucun
+    #
+    # Soit 53 % de la mémoire inemployée au plus fort. Les 8192 Mo d'origine
+    # réservaient plus du double du pic, ce qui portait le catalogue à 14,5 Go
+    # et contredisait la leçon « Dimensionner sa machine » : un catalogue doit
+    # tenir seul sur 16 Go.
+    #
+    # Ne pas descendre plus bas sans le mesurer, et surtout pas de mémoire :
+    # la VM n'a AUCUN swap, donc un dépassement est un OOM franc, sans phase
+    # de ralentissement qui avertirait. 3072 Mo n'a pas été éprouvé.
     - name: k8s-kind.lab
       distro: debian13
       role: kind
-      ram_mb: 8192
-      vcpu: 4
+      ram_mb: 4096
+      vcpu: 2
       disk_gb: 30
 
 # Sections et niveaux reprennent les DOMAINES des blueprints officiels, mot

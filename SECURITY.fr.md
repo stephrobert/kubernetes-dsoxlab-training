@@ -65,7 +65,7 @@ Sont **dans** le périmètre :
   qu'il annonce ;
 - une fuite de secret, ou une clé privée commitée par erreur ;
 - un défaut du socle `shared/` : il est inclus par tous les labs et s'exécute en
-  `root` sur les deux machines.
+  `root` sur les trois machines.
 
 Une remarque particulière sur ce catalogue : **plusieurs labs installent
 délibérément un état cassé ou affaibli**, parce que c'est leur sujet. Un lab de
