@@ -19,6 +19,12 @@ kubectl get namespace lab >/dev/null 2>&1 || kubectl create namespace lab
 kubectl -n lab delete service app-prod --ignore-not-found
 kubectl -n lab delete deployment app-blue app-green --ignore-not-found --wait=true
 
+# Le client est l'instrument de mesure du lab, et les tests contrôlent son
+# identité : un passage précédent a pu le remplacer par autre chose. On le
+# retire donc avant de le reposer, plutôt que de compter sur `apply`, qui
+# refuse de modifier les champs immuables d'un Pod déjà là.
+kubectl -n lab delete pod client --ignore-not-found --wait=true
+
 cat <<'EOF' | kubectl apply -f -
 apiVersion: v1
 kind: Pod
@@ -28,7 +34,7 @@ metadata:
 spec:
   containers:
     - name: client
-      image: busybox:1.36
+      image: busybox:1.37
       command: ["sh", "-c", "sleep 3600"]
 EOF
 kubectl -n lab wait --for=condition=Ready pod/client --timeout=180s

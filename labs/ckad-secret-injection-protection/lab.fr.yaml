@@ -4,3 +4,23 @@ description: |
   quiconque peut lire le lit aussi. Déplacez-le dans un Secret, injectez-le à la
   fois en variable d'environnement et en fichier monté, et laissez l'application
   tourner.
+
+criteria:
+  - id: le-secret-porte-le-mot-de-passe
+    label: "Un Secret du namespace porte le mot de passe comme contenu d'une de ses clés"
+  - id: db-password-vient-du-secret-par-reference
+    label: "DB_PASSWORD tire sa valeur de ce Secret, par référence"
+  - id: le-secret-est-monte-sous-etc-passerelle
+    label: "Ce même Secret est monté en volume sous /etc/passerelle"
+  - id: le-mot-de-passe-a-quitte-le-manifeste
+    label: "Le mot de passe n'apparaît plus dans le manifeste du Deployment"
+  - id: le-mot-de-passe-n-est-en-clair-nulle-part-ailleurs
+    label: "Le mot de passe est porté par un Secret et n'est en clair nulle part ailleurs dans le namespace, dans aucun ConfigMap en particulier"
+  - id: le-deployment-a-ete-modifie-pas-remplace
+    label: "Le Deployment a été modifié sur place et sa bascule est allée au bout"
+  - id: un-pod-a-jour-porte-la-projection-du-secret
+    label: "Le Pod qui tourne est celui né du gabarit modifié : il porte la projection du Secret sous /etc/passerelle"
+  - id: dans-le-conteneur-db-password-vient-du-secret-et-vaut-la-valeur
+    label: "Dans le conteneur, DB_PASSWORD porte la valeur attendue, et le Pod qui tourne la tire du Secret par référence"
+  - id: dans-le-conteneur-le-fichier-porte-la-valeur
+    label: "Dans le conteneur, le fichier de /etc/passerelle porte la valeur attendue"

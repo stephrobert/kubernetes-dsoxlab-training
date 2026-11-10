@@ -1,7 +1,26 @@
 title: "Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version"
 description: |
   Une mise à jour est partie avec un nom d'image faux et le déploiement est
-  bloqué. Revenir à la révision qui marchait par l'historique du Deployment,
-  puis livrer l'image correcte avec une cause de changement. Les tests
-  lisent les ReplicaSets et leurs numéros de révision : ils racontent ce qui
-  s'est passé, et un Deployment recréé de zéro ne raconte rien.
+  bloqué. Remettre en service la révision qui marchait, puis livrer l'image
+  correcte et porter une cause de changement sur le Deployment. Les tests
+  lisent les ReplicaSets qui appartiennent au Deployment et les numéros de
+  révision exacts attendus : un Deployment supprimé puis recréé n'a plus
+  l'historique qu'ils lisent.
+
+criteria:
+  - id: le-deploiement-demande-la-bonne-image
+    label: "Le Deployment webapp demande l'image nginx:1.27-alpine"
+  - id: les-trois-replicas-sont-disponibles-et-a-jour
+    label: "Les trois replicas sont disponibles et à jour"
+  - id: aucun-pod-n-est-en-erreur-d-image
+    label: "Aucun Pod de webapp n'est resté en erreur d'image"
+  - id: l-historique-du-deploiement-est-intact
+    label: "Une fois la livraison faite, l'historique garde encore la version qui marchait et la fautive"
+  - id: le-retour-arriere-a-ete-fait-avant-la-livraison
+    label: "La version qui marchait est remise en service en révision 3, avant la livraison finale"
+  - id: la-version-fautive-est-conservee-a-zero
+    label: "La révision fautive est conservée, réduite à zéro"
+  - id: la-revision-finale-est-celle-de-la-bonne-image
+    label: "La révision finale 4 est celle de nginx:1.27-alpine, avec les trois replicas conservés"
+  - id: le-deploiement-porte-la-cause-de-changement
+    label: "Le Deployment webapp porte l'annotation kubernetes.io/change-cause"

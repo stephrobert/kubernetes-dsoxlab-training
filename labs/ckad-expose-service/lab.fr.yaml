@@ -3,3 +3,27 @@ description: |
   Déployer trois replicas d'un serveur et les exposer par un Service
   interne. Prouver depuis un client que le Service répond par son nom, et
   qu'il répartit réellement les requêtes entre les trois Pods.
+
+criteria:
+  - id: le-deployment-demande-trois-replicas
+    label: "Le Deployment web demande trois replicas"
+  - id: les-trois-replicas-sont-disponibles
+    label: "Les trois replicas de web sont disponibles"
+  - id: les-pods-portent-le-label-app-web
+    label: "Les Pods de web portent le label app=web"
+  - id: les-pods-tournent-avec-l-image-demandee
+    label: "Les Pods de web tournent avec l'image busybox:1.36"
+  - id: le-service-est-de-type-clusterip
+    label: "Le Service web-svc est de type ClusterIP"
+  - id: le-service-ecoute-sur-80-vers-8080
+    label: "Le Service web-svc écoute sur 80 et vise le port 8080 des Pods"
+  - id: le-service-selectionne-app-web
+    label: "Le selector de web-svc vaut app=web"
+  - id: le-service-a-trois-endpoints-prets
+    label: "Le Service web-svc a exactement trois endpoints prêts"
+  - id: le-service-repond-sous-son-nom-depuis-le-client
+    label: "http://web-svc/ répond depuis le Pod client"
+  - id: chaque-pod-repond-son-propre-nom
+    label: "Chaque Pod sert son propre nom d'hôte, comparé à la liste réelle des Pods"
+  - id: le-service-repartit-entre-plusieurs-pods
+    label: "Sur dix requêtes, au moins deux Pods différents répondent"

@@ -6,7 +6,8 @@ difficulty: intermediate
 description: |
   Run two versions of an application side by side, then switch all the traffic
   from one to the other by changing a Service selector. Prove the switch from
-  a client: every request reaches the new version, none the old one.
+  a client: every request reaches the new version, none the old one, and the
+  old one stays up and serving.
 skills:
   - blue-green
   - deployment-strategy
@@ -35,3 +36,67 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: blue-tourne-en-deux-replicas
+    label: "The Deployment app-blue has its 2 replicas available"
+    tests:
+      - test_blue_tourne_en_deux_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: blue-porte-les-labels-de-version
+    label: "The blue Pods carry the labels app=myapp and version=blue"
+    tests:
+      - test_blue_porte_les_labels_de_version
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: blue-sert-sa-version
+    label: "Each blue Pod answers blue over HTTP on port 8080"
+    tests:
+      - test_blue_sert_sa_version
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: green-tourne-en-deux-replicas
+    label: "The Deployment app-green has its 2 replicas available"
+    tests:
+      - test_green_tourne_en_deux_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: green-porte-les-labels-de-version
+    label: "The green Pods carry the labels app=myapp and version=green"
+    tests:
+      - test_green_porte_les_labels_de_version
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: green-sert-sa-version
+    label: "Each green Pod answers green over HTTP on port 8080"
+    tests:
+      - test_green_sert_sa_version
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: le-service-ecoute-sur-8080
+    label: "The Service app-prod listens on port 8080"
+    tests:
+      - test_le_service_ecoute_sur_8080
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: le-selector-vise-la-version-green
+    label: "The selector of app-prod names app=myapp and version=green"
+    tests:
+      - test_le_selector_vise_la_version_green
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: les-endpoints-sont-exactement-les-pods-green
+    label: "The endpoints of app-prod are exactly the ready green Pods"
+    tests:
+      - test_les_endpoints_sont_exactement_les_pods_green
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: toutes-les-requetes-atteignent-green
+    label: "From the client, all six requests to app-prod answer green"
+    tests:
+      - test_toutes_les_requetes_atteignent_green
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+
+feedback: full
