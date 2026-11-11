@@ -2808,11 +2808,11 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-11",
-  "duree_s": 149,
+  "duree_s": 259,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
    "avant le travail : 0/10",
    "après la solution : 10/10",
    "après clean et run : 0/10",
