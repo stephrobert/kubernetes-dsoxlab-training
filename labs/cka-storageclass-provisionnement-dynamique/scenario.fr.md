@@ -11,13 +11,17 @@ demander.
 
 ## Ce que vous devez obtenir
 
-1. La revendication `donnees` est **liée**, et le volume auquel elle est liée a
-   été **créé pour elle** : personne ne l'a préparé d'avance.
+1. La revendication `donnees`, qui garde son nom et son namespace, désigne la
+   classe **`local-path`**.
 
-2. Un Pod nommé **`registre`** monte cette revendication sur `/data` et y écrit
-   un fichier **`/data/temoin`**.
+2. Elle est **liée**, et le volume auquel elle est liée a été **créé pour elle**
+   par le provisionneur de la classe : personne ne l'a préparé d'avance.
 
-3. La revendication garde son nom et son namespace.
+3. Ce volume porte la **reclaim policy** que sa classe lui impose.
+
+4. Un Pod nommé **`registre`** monte cette revendication sur **`/data`**.
+
+5. Il y écrit un fichier **`/data/temoin`**, dans le volume.
 
 ## Les repères utiles
 
@@ -42,10 +46,11 @@ où la revendication disparaîtra.
 
 ## Comment vous saurez que c'est bon
 
-Le dernier test ne se contente pas de voir la revendication liée : il vérifie
-que le volume appartient bien à la classe, et qu'il en porte la politique.
-Créer un volume à la main lierait aussi la revendication, sans rien avoir
-provisionné à la demande. C'est le lab voisin, pas celui-ci.
+Chaque test vérifie un des cinq états ci-dessus. Le deuxième ne se contente pas
+de voir la revendication liée : il vérifie que le provisionneur de la classe a
+créé le volume pour cette revendication. Créer un volume à la main, même avec
+la bonne classe, lierait aussi la revendication, sans rien avoir provisionné à
+la demande. C'est le lab voisin, pas celui-ci.
 
 ```bash
 dsoxlab check cka-storageclass-provisionnement-dynamique

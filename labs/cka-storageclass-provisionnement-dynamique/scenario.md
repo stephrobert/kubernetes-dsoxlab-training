@@ -11,13 +11,17 @@ ask.
 
 ## What you must achieve
 
-1. The `donnees` claim is **Bound**, and the volume it is bound to was
-   **created for it**: nobody prepared it in advance.
+1. The `donnees` claim, which keeps its name and namespace, names the
+   **`local-path`** class.
 
-2. A Pod named **`registre`** mounts that claim on `/data` and writes a
-   **`/data/temoin`** file there.
+2. It is **Bound**, and the volume it is bound to was **created for it** by the
+   provisioner of the class: nobody prepared it in advance.
 
-3. The claim keeps its name and namespace.
+3. That volume carries the **reclaim policy** its class imposes.
+
+4. A Pod named **`registre`** mounts that claim on **`/data`**.
+
+5. It writes a **`/data/temoin`** file there, in the volume.
 
 ## Useful bearings
 
@@ -39,10 +43,11 @@ class imposes on it, which decides its fate the day the claim disappears.
 
 ## How you will know it works
 
-The last test does not settle for seeing the claim Bound: it checks the volume
-belongs to the class, and carries its policy. Creating a volume by hand would
-bind the claim too, without having provisioned anything on demand. That is the
-neighbouring lab, not this one.
+Each test checks one of the five states above. The second does not settle for
+seeing the claim Bound: it checks that the provisioner of the class created the
+volume for this claim. Creating a volume by hand, even with the right class,
+would bind the claim too, without having provisioned anything on demand. That is
+the neighbouring lab, not this one.
 
 ```bash
 dsoxlab check cka-storageclass-provisionnement-dynamique

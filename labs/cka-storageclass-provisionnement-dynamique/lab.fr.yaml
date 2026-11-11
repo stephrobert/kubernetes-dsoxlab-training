@@ -3,3 +3,15 @@ description: |
   Une revendication bloquée en attente parce que personne n'a préparé de volume
   à la main. Laissez le cluster le provisionner à la demande, puis observez ce
   que la classe décide quand la revendication disparaît : le volume la suit.
+
+criteria:
+  - id: designe-la-classe
+    label: "La revendication donnees désigne la classe local-path"
+  - id: volume-cree-pour-elle
+    label: "Le volume lié à donnees a été créé pour elle par le provisionneur de la classe"
+  - id: politique-de-la-classe
+    label: "Le volume porte la reclaim policy de sa classe"
+  - id: registre-monte
+    label: "Le Pod registre monte la revendication sur /data"
+  - id: temoin-ecrit
+    label: "Le Pod registre a écrit le fichier témoin dans le volume"

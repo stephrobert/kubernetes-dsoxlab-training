@@ -14,7 +14,7 @@ skills:
   - reclaimpolicy
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
 lab_type: lab
 estimated_time: 25m
 
@@ -37,3 +37,38 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: designe-la-classe
+    label: "The claim donnees names the class local-path"
+    tests:
+      - test_la_revendication_designe_la_classe_local_path
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: volume-cree-pour-elle
+    label: "The volume bound to donnees was created for it by the provisioner of the class"
+    tests:
+      - test_le_volume_lie_a_ete_cree_pour_elle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: politique-de-la-classe
+    label: "The volume carries the reclaim policy of its class"
+    tests:
+      - test_le_volume_porte_la_reclaim_policy_de_la_classe
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: registre-monte
+    label: "The Pod registre mounts the claim on /data"
+    tests:
+      - test_registre_monte_la_revendication_sur_data
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: temoin-ecrit
+    label: "The Pod registre wrote the witness file into the volume"
+    tests:
+      - test_registre_a_ecrit_le_temoin
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+
+feedback: full

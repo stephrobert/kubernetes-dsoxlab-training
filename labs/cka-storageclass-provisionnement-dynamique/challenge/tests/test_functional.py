@@ -1,13 +1,17 @@
 """test_functional.py : cka-storageclass-provisionnement-dynamique
 
-Deux affirmations qui lisent l'état réel du cluster et l'intérieur du
-conteneur, jamais les commandes tapées.
+Ces tests lisent l'état réel du cluster et l'intérieur du conteneur, jamais
+les commandes tapées. Un test vérifie un seul état.
 
-Le dernier test ne se contente pas de constater que la revendication est liée :
-il vérifie que le volume a été **créé pour elle**, et qu'il porte bien la
-politique de la classe. Un candidat qui aurait créé un PersistentVolume à la
-main obtiendrait une revendication liée sans avoir rien provisionné
-dynamiquement, ce qui est précisément le lab voisin.
+Le test du volume ne se contente pas de constater que la revendication est
+liée : il vérifie que le volume a été **créé pour elle** par le provisionneur
+de la classe. Un PersistentVolume créé à la main, même avec la bonne classe,
+lie aussi la revendication sans que rien ait été provisionné à la demande :
+c'est le lab voisin.
+
+Tous échouent avant le travail : la revendication posée par le setup ne
+désigne aucune classe, et aucun Pod registre n'existe. Une attente ne s'ouvre
+que si un Pod monte déjà la revendication, seul cas où elle peut se lier.
 """
 
 from __future__ import annotations
@@ -23,14 +27,14 @@ NAMESPACE = "archives"
 PVC = "donnees"
 POD = "registre"
 CLASSE = "local-path"
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
-TEMOIN = "/data/temoin"
+CHEMIN = "/data"
+TEMOIN = f"{CHEMIN}/temoin"
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
 # La classe est en WaitForFirstConsumer : la liaison n'arrive qu'au placement
-# du Pod, puis la création du volume prend quelques secondes. Budget borné,
-# pour ne pas recaler un candidat dont la correction est juste.
-BUDGET_S = 120
-PAS_S = 3
+# du Pod, puis la création du volume prend quelques secondes.
+ATTENTE = 120
+PAS = 3
 
 
 @pytest.fixture(scope="module")
@@ -38,126 +42,137 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    """Rend (code, sortie standard, diagnostic), les trois SÉPARÉS."""
-    res = host.run(f"sudo {KUBECTL} {args}")
-    return res.rc, res.stdout.strip(), res.stderr.strip()
+def _json(host, args: str) -> dict | None:
+    res = host.run(f"{ADMIN} {args} -o json")
+    if res.rc != 0 or not res.stdout.strip():
+        return None
+    return json.loads(res.stdout)
 
 
-# ----------------------------------------------------------------------
-# 1. La revendication demande une classe, et le Pod l'utilise.
-# ----------------------------------------------------------------------
-def test_la_revendication_designe_une_classe(host):
-    """Ce test ne prouve rien à lui seul, et c'est voulu : il est là pour que
-    l'échec du test suivant soit diagnosticable. Une revendication peut
-    désigner une classe qui n'existe pas, et rester en attente pour toujours."""
-    rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get pvc {PVC} -o json")
-    assert rc == 0 and sortie, message(
-        en=f"Claim {PVC} cannot be found in {NAMESPACE}. Setup "
-        f"had placed it there: it must be recreated under the same name. {diagnostic}",
-        fr=f"La revendication {PVC} est introuvable dans {NAMESPACE}. Le setup "
-        f"l'avait posée : elle doit être recréée sous le même nom. {diagnostic}",
-    )
-    spec = json.loads(sortie)["spec"]
-    classe = spec.get("storageClassName")
-    assert classe, message(
-        en="The claim names no storage class: "
-        f"storageClassName is \"{classe}\". An EMPTY string is not an absent "
-        "field: it explicitly disables dynamic provisioning, and the claim "
-        "then waits for a volume created by hand.",
-        fr="La revendication ne désigne aucune classe de stockage : "
-        f"storageClassName vaut « {classe} ». Une chaîne VIDE n'est pas un "
-        "champ absent : elle désactive explicitement le provisionnement "
-        "dynamique, et la revendication attend alors un volume créé à la main.",
-    )
+def _monte_la_revendication(pod: dict | None) -> bool:
+    return any((v.get("persistentVolumeClaim") or {}).get("claimName") == PVC
+               for v in (pod or {}).get("spec", {}).get("volumes") or [])
 
-    rc, sortie, _ = _kubectl(host, "get storageclass -o json")
-    connues = [c["metadata"]["name"] for c in json.loads(sortie or "{}").get("items", [])]
-    assert classe in connues, message(
-        en=f"The claim asks for class \"{classe}\", which the cluster does not "
-        f"know. The available classes are {connues}. A claim naming a "
-        "non-existent class stays pending forever, with no error.",
-        fr=f"La revendication demande la classe « {classe} », que le cluster ne "
-        f"connaît pas. Les classes disponibles sont {connues}. Une "
-        "revendication qui désigne une classe inexistante reste en attente "
-        "indéfiniment, sans erreur.",
+
+def _revendication(host) -> dict | None:
+    pvc = _json(host, f"-n {NAMESPACE} get pvc {PVC}")
+    fin = time.monotonic() + ATTENTE
+    while pvc is not None and pvc["status"].get("phase") != "Bound" \
+            and _monte_la_revendication(_json(host, f"-n {NAMESPACE} get pod {POD}")) and time.monotonic() < fin:
+        time.sleep(PAS)
+        pvc = _json(host, f"-n {NAMESPACE} get pvc {PVC}") or pvc
+    return pvc
+
+
+def _volume(host) -> dict | None:
+    nom = ((_revendication(host) or {}).get("spec") or {}).get("volumeName")
+    return _json(host, f"get pv {nom}") if nom else None
+
+
+def _absente() -> str:
+    return message(
+        en=f"Claim {PVC} cannot be found in {NAMESPACE}: it must exist under this name.",
+        fr=f"La revendication {PVC} est introuvable dans {NAMESPACE} : elle doit exister sous ce nom.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. LE test : le volume a été créé pour elle, et le Pod écrit dedans.
+# 1. La revendication désigne la classe du cluster.
 # ----------------------------------------------------------------------
-def test_le_volume_est_provisionne_a_la_demande_et_ecrit(host):
-    """La preuve, prise sur le volume lui-même.
-
-    Le contrôle décisif est que le PersistentVolume porte
-    `claimRef` vers cette revendication ET une classe : un volume créé à la
-    main lierait aussi la revendication, sans qu'aucun provisionnement dynamique
-    n'ait eu lieu. C'est le lab voisin, pas celui-ci.
-
-    Mesuré le 2026-09-17 : la classe `local-path` est en WaitForFirstConsumer,
-    donc la liaison n'arrive qu'au placement du Pod, et sa reclaimPolicy est
-    `Delete`.
-    """
-    fin = time.monotonic() + BUDGET_S
-    phase, volume = "", ""
-    while time.monotonic() < fin:
-        rc, sortie, _ = _kubectl(host, f"-n {NAMESPACE} get pvc {PVC} -o json")
-        if rc == 0 and sortie:
-            pvc = json.loads(sortie)
-            phase = pvc.get("status", {}).get("phase", "")
-            volume = pvc.get("spec", {}).get("volumeName", "")
-            if phase == "Bound" and volume:
-                break
-        time.sleep(PAS_S)
-
-    assert phase == "Bound", message(
-        en=f"Claim {PVC} is \"{phase or 'unknown'}\" after "
-        f"{BUDGET_S} seconds. This cluster's class waits for its first "
-        "consumer before provisioning: as long as no Pod uses the claim, it "
-        "stays pending, and that is normal. So one is needed.",
-        fr=f"La revendication {PVC} est en « {phase or 'inconnu'} » après "
-        f"{BUDGET_S} secondes. La classe de ce cluster attend son premier "
-        "consommateur avant de provisionner : tant qu'aucun Pod n'utilise la "
-        "revendication, elle reste en attente, et c'est normal. Il en faut "
-        "donc un.",
+def test_la_revendication_designe_la_classe_local_path(host):
+    pvc = _json(host, f"-n {NAMESPACE} get pvc {PVC}")
+    assert pvc is not None, _absente()
+    classe = pvc["spec"].get("storageClassName")
+    assert classe == CLASSE, message(
+        en=f"{PVC} names the class {classe!r}. Expected {CLASSE}, the class this cluster offers. An empty "
+        "string is not an absent field: it explicitly disables provisioning on demand.",
+        fr=f"{PVC} désigne la classe {classe!r}. Attendu {CLASSE}, la classe que ce cluster propose. Une chaîne "
+        "vide n'est pas un champ absent : elle désactive explicitement le provisionnement à la demande.",
     )
 
-    rc, sortie, diagnostic = _kubectl(host, f"get pv {volume} -o json")
-    assert rc == 0 and sortie, message(
-        en=f"Volume {volume} cannot be found. {diagnostic}",
-        fr=f"Le volume {volume} est introuvable. {diagnostic}",
+
+# ----------------------------------------------------------------------
+# 2. Le volume lié a été créé pour elle par le provisionneur de la classe.
+# ----------------------------------------------------------------------
+def test_le_volume_lie_a_ete_cree_pour_elle(host):
+    pvc = _revendication(host)
+    assert pvc is not None, _absente()
+    assert pvc["status"].get("phase") == "Bound", message(
+        en=f"{PVC} is {pvc['status'].get('phase')}. This class provisions only when a Pod uses the claim: "
+        "without one, it stays Pending, and that is normal.",
+        fr=f"{PVC} est {pvc['status'].get('phase')}. Cette classe ne provisionne que lorsqu'un Pod utilise la "
+        "revendication : sans lui, elle reste Pending, et c'est normal.",
     )
-    pv = json.loads(sortie)
-    assert pv["spec"].get("storageClassName") == CLASSE, message(
-        en=f"Volume {volume} does not belong to class \"{CLASSE}\" but to "
-        f"\"{pv['spec'].get('storageClassName') or 'none'}\". A volume created "
-        "by hand also binds a claim, but then nothing was provisioned on "
-        "demand: that is the subject of the neighbouring lab.",
-        fr=f"Le volume {volume} n'appartient pas à la classe « {CLASSE} » mais à "
-        f"« {pv['spec'].get('storageClassName') or 'aucune'} ». Un volume créé "
-        "à la main lie aussi une revendication, mais rien n'a alors été "
-        "provisionné à la demande : c'est l'objet du lab voisin.",
-    )
-    reclaim = pv["spec"].get("persistentVolumeReclaimPolicy")
-    assert reclaim == "Delete", message(
-        en=f"The volume carries the \"{reclaim}\" policy and not \"Delete\". A "
-        "dynamically provisioned volume inherits its class's policy, which "
-        "decides its fate when the claim disappears.",
-        fr=f"Le volume porte la politique « {reclaim} » et non « Delete ». Un "
-        "volume provisionné dynamiquement hérite de la politique de sa classe, "
-        "qui décide de son sort quand la revendication disparaît.",
+    pv = _json(host, f"get pv {pvc['spec'].get('volumeName')}")
+    classe = _json(host, f"get storageclass {CLASSE}")
+    fournisseur = ((pv or {}).get("metadata", {}).get("annotations") or {}).get("pv.kubernetes.io/provisioned-by")
+    assert pv is not None and classe is not None and fournisseur == classe.get("provisioner") \
+        and (pv["spec"].get("claimRef") or {}).get("uid") == pvc["metadata"]["uid"], message(
+        en=f"The volume bound to {PVC} was not created for it by the provisioner of {CLASSE}: it was prepared "
+        "by hand. That binds a claim too, but nothing was provisioned on demand.",
+        fr=f"Le volume lié à {PVC} n'a pas été créé pour elle par le provisionneur de {CLASSE} : il a été "
+        "préparé à la main. Cela lie aussi une revendication, mais rien n'a été provisionné à la demande.",
     )
 
-    rc, contenu, diagnostic = _kubectl(
-        host,
-        f"-n {NAMESPACE} exec {POD} --request-timeout=30s -- cat {TEMOIN}",
+
+# ----------------------------------------------------------------------
+# 3. Le volume porte la politique que la classe lui impose.
+# ----------------------------------------------------------------------
+def test_le_volume_porte_la_reclaim_policy_de_la_classe(host):
+    pv = _volume(host)
+    assert pv is not None, message(
+        en=f"No volume is bound to {PVC}: there is no policy to read yet.",
+        fr=f"Aucun volume n'est lié à {PVC} : il n'y a pas encore de politique à lire.",
     )
-    assert rc == 0 and contenu, message(
-        en=f"Pod {POD} wrote nothing into {TEMOIN}, or is not running. A "
-        "bound volume that receives nothing proves very little: it has to be "
-        f"used. {diagnostic}",
-        fr=f"Le Pod {POD} n'a rien écrit dans {TEMOIN}, ou ne tourne pas. Un "
-        "volume lié qui ne reçoit rien ne prouve pas grand-chose : il faut "
-        f"qu'il serve. {diagnostic}",
+    classe = _json(host, f"get storageclass {CLASSE}") or {}
+    attendue = classe.get("reclaimPolicy", "Delete")
+    politique = pv["spec"].get("persistentVolumeReclaimPolicy")
+    assert politique == attendue, message(
+        en=f"The volume carries the policy {politique}, its class imposes {attendue}. A volume provisioned on "
+        "demand inherits the policy of its class.",
+        fr=f"Le volume porte la politique {politique}, sa classe impose {attendue}. Un volume provisionné à la "
+        "demande hérite de la politique de sa classe.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 4. Le Pod registre monte la revendication sur /data.
+# ----------------------------------------------------------------------
+def test_registre_monte_la_revendication_sur_data(host):
+    pod = _json(host, f"-n {NAMESPACE} get pod {POD}")
+    assert pod is not None, message(en=f"No Pod {POD} in {NAMESPACE}.", fr=f"Aucun Pod {POD} dans {NAMESPACE}.")
+    volumes = {v["name"] for v in pod["spec"].get("volumes") or []
+               if (v.get("persistentVolumeClaim") or {}).get("claimName") == PVC}
+    monte = any(m.get("mountPath") == CHEMIN and m["name"] in volumes
+                for c in pod["spec"]["containers"] for m in c.get("volumeMounts") or [])
+    assert monte, message(
+        en=f"{POD} does not mount the claim {PVC} on {CHEMIN}.",
+        fr=f"{POD} ne monte pas la revendication {PVC} sur {CHEMIN}.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 5. Le Pod a écrit le fichier témoin dans le volume.
+# ----------------------------------------------------------------------
+def test_registre_a_ecrit_le_temoin(host):
+    pod = _json(host, f"-n {NAMESPACE} get pod {POD}")
+    if pod is None:
+        pytest.fail(message(en=f"No Pod {POD} in {NAMESPACE}.", fr=f"Aucun Pod {POD} dans {NAMESPACE}."))
+    fin = time.monotonic() + ATTENTE
+    while pod["status"].get("phase") == "Pending" and _monte_la_revendication(pod) and time.monotonic() < fin:
+        time.sleep(PAS)
+        pod = _json(host, f"-n {NAMESPACE} get pod {POD}") or pod
+    # Le témoin compte s'il est écrit DANS le volume : un fichier posé dans un
+    # emptyDir monté au même chemin disparaîtrait avec le Pod.
+    if not _monte_la_revendication(pod):
+        pytest.fail(message(
+            en=f"{POD} does not use the claim {PVC}: a file in {CHEMIN} would not be in the volume.",
+            fr=f"{POD} n'utilise pas la revendication {PVC} : un fichier dans {CHEMIN} ne serait pas dans le volume.",
+        ))
+    res = host.run(f"{ADMIN} -n {NAMESPACE} exec {POD} --request-timeout=30s -- cat {TEMOIN}")
+    assert res.rc == 0 and res.stdout.strip(), message(
+        en=f"{POD} wrote nothing into {TEMOIN}, or does not run. A bound volume that receives nothing proves "
+        "very little.",
+        fr=f"{POD} n'a rien écrit dans {TEMOIN}, ou ne tourne pas. Un volume lié qui ne reçoit rien ne prouve "
+        "pas grand-chose.",
     )

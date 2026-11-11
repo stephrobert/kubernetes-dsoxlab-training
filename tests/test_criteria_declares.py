@@ -62,7 +62,6 @@ DETTE: set[str] = {
     "cka-node-drain-cordon",
     "cka-rbac-serviceaccount",
     "cka-resourcequota-limitrange",
-    "cka-storageclass-provisionnement-dynamique",
     "cka-taints-tolerations-placement",
     "cka-troubleshoot-crashloopbackoff",
     "cka-troubleshoot-dns",
