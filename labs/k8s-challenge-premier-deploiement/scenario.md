@@ -45,6 +45,13 @@ files, never on the commands typed. The pass mark is 70 out of 100, and both
 blocking requirements must succeed whatever the total. No step-by-step
 instructions: the lessons of the Fundamentals module taught everything.
 
+The seven requirements all weigh the same. Four **hints** are offered, and
+each one takes points off the scale before the score is computed: 2, 3, 5
+then 5, so 15 at most. They cap the score without ever failing a flawless
+run: with all four, seven requirements met give 85 and six give 73. With five
+requirements met there is no margin left: 71 without a hint, 70 with the
+first one, still a pass, but 68 from the second one, below the pass mark.
+
 `dsoxlab check` shows the requirements still failing; `dsoxlab submit` gives the verdict of the challenge, and it is the one that applies the pass mark and the blocking requirements.
 
 ```bash

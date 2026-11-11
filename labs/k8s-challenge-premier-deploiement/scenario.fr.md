@@ -46,6 +46,13 @@ sur les commandes tapées. Le seuil est de 70 sur 100, et les deux exigences
 bloquantes doivent réussir quel que soit le total. Aucune consigne pas à pas :
 les leçons du module Fondamentaux ont tout enseigné.
 
+Les sept exigences pèsent toutes autant. Quatre **indices** sont proposés, et
+chacun retire des points du barème avant le calcul de la note : 2, 3, 5 puis
+5, soit 15 au plus. Ils plafonnent la note sans jamais recaler un sans-faute :
+avec les quatre, sept exigences réussies donnent 85 et six en donnent 73. Avec
+cinq exigences réussies, la marge est nulle : 71 sans indice, 70 avec le
+premier, encore reçu, mais 68 dès le deuxième, sous le seuil.
+
 `dsoxlab check` montre les exigences encore en échec ; `dsoxlab submit` rend le verdict du challenge, et c'est lui qui applique le seuil et les exigences bloquantes.
 
 ```bash
