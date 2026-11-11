@@ -1,0 +1,17 @@
+title: "Remonter d'un Pod à son Deployment"
+description: |
+  Dans le namespace replicasets, un Deployment mis à jour une fois garde deux
+  ReplicaSets, et un second Deployment ne crée aucun Pod. Consignez quel
+  ReplicaSet est actif et lequel est gardé à zéro, lisez pourquoi le second
+  bloque dans les événements de son ReplicaSet, puis réparez-le jusqu'à ce que
+  ses réplicas soient disponibles.
+
+criteria:
+  - id: le-replicaset-actif-est-consigne
+    label: "Le ReplicaSet actif de api est consigné"
+  - id: l-ancien-replicaset-est-consigne
+    label: "L'ancien ReplicaSet de api, gardé à zéro, est consigné"
+  - id: la-cause-du-failedcreate-est-consignee
+    label: "La cause du FailedCreate de compte-absent est consignée"
+  - id: le-deployment-bloque-est-repare
+    label: "compte-absent, réparé sans être recréé, a ses deux réplicas disponibles"

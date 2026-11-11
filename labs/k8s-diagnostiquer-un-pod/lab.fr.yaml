@@ -1,0 +1,17 @@
+title: "Diagnostiquer deux Pods en échec"
+description: |
+  Deux Pods sont en panne dans le namespace pods-en-panne : l'un ne parvient
+  pas à télécharger son image, le conteneur de l'autre sort en erreur. Lisez
+  chaque cause dans le cluster et consignez-la, puis réparez chaque Pod du
+  geste juste : l'image en place, la commande en recréant le Pod sous le même
+  nom.
+
+criteria:
+  - id: la-raison-d-attente-est-consignee
+    label: "La raison d'attente de image-fausse est consignée"
+  - id: le-code-de-sortie-est-consigne
+    label: "Le code de sortie du conteneur de plante est consigné"
+  - id: l-image-est-corrigee-en-place
+    label: "image-fausse tourne, son image corrigée en place sur le même Pod"
+  - id: la-commande-est-corrigee
+    label: "plante tourne sans redémarrer, même nom et même image, sa commande corrigée"

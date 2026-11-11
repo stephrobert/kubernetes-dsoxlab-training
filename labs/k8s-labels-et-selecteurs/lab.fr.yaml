@@ -1,0 +1,14 @@
+title: "Étiqueter et sélectionner des Pods"
+description: |
+  Dans le namespace etiquettes, donnez à tous les Pods du Deployment web le
+  label env=prod d'une façon qui survit à leur remplacement, décrivez web par
+  une annotation, puis consignez un sélecteur à négation qui rend exactement
+  les Pods de api.
+
+criteria:
+  - id: le-label-est-dans-le-modele
+    label: "env=prod est dans le modèle de Pod de web, donc sur tous ses Pods"
+  - id: l-annotation-decrit-web
+    label: "Le Deployment web porte une annotation description"
+  - id: la-selection-rend-les-pods-de-api
+    label: "Le sélecteur consigné, à négation, rend exactement les Pods de api"
