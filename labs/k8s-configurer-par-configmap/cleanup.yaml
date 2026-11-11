@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace du lab. Le cluster kind reste,
+# il est le socle partagé de la boutique.
+- name: Nettoyer le lab k8s-configurer-par-configmap
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        configuration --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

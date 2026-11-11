@@ -1,0 +1,17 @@
+title: "Configurer une application par ConfigMap"
+description: |
+  Dans le namespace configuration, donnez au Deployment app deux valeurs d'un
+  ConfigMap en variables d'environnement et un fichier de configuration d'un
+  autre ConfigMap par un volume, modifiez les deux ConfigMaps, puis redémarrez
+  le Deployment pour que les variables suivent, sans écrire aucune valeur dans
+  le Deployment.
+
+criteria:
+  - id: les-variables-viennent-du-configmap
+    label: "APP_MODE et LOG_LEVEL viennent du ConfigMap app-config, lus dans le Pod"
+  - id: le-fichier-vient-du-volume
+    label: "app.properties vient du ConfigMap app-fichier par un volume, à jour dans le Pod"
+  - id: le-redemarrage-rafraichit-les-variables
+    label: "Après la modification, le Deployment a été redémarré et les variables portent la nouvelle valeur"
+  - id: aucune-valeur-en-dur
+    label: "Aucune valeur n'est écrite directement dans le Deployment"

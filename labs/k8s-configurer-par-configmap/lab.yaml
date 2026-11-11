@@ -1,0 +1,69 @@
+# Lab guidé de la leçon « ConfigMaps » du module « Les ressources de base » de
+# la formation. Il reprend la démonstration : deux ConfigMaps, l'un de valeurs,
+# l'autre d'un fichier ; un Deployment qui reçoit les valeurs en variables et le
+# fichier par un volume ; une modification, qui atteint le fichier monté mais
+# pas les variables, jusqu'au rollout restart.
+#
+# Il tourne sur le cluster kind « boutique », dans son propre namespace
+# (configuration).
+id: k8s-configurer-par-configmap
+title: "Configure an application through ConfigMaps"
+level: application-environment
+section: ckad
+difficulty: beginner
+description: |
+  In the configuration namespace, give the app Deployment two values from a
+  ConfigMap as environment variables and a configuration file from another
+  ConfigMap through a volume, change both ConfigMaps, then restart the
+  Deployment so the variables follow, without writing any value in the
+  Deployment.
+skills:
+  - configmap
+  - envfrom
+  - configmap-volume
+  - kubectl-rollout-restart
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: les-variables-viennent-du-configmap
+    label: "APP_MODE and LOG_LEVEL come from the app-config ConfigMap, read inside the Pod"
+    tests:
+      - test_les_variables_viennent_du_configmap_app_config
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-fichier-vient-du-volume
+    label: "app.properties comes from the app-fichier ConfigMap through a volume, up to date inside the Pod"
+    tests:
+      - test_le_fichier_monte_depuis_app_fichier_est_a_jour
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: le-redemarrage-rafraichit-les-variables
+    label: "After the change, the Deployment was restarted and the variables carry the new value"
+    tests:
+      - test_le_rollout_restart_a_rafraichi_les_variables
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: aucune-valeur-en-dur
+    label: "No value is written directly in the Deployment"
+    tests:
+      - test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/

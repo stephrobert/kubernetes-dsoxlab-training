@@ -1,0 +1,14 @@
+title: "Isoler une application dans un namespace"
+description: |
+  Rangez l'application api et son Service dans leur namespace equipe-api, rien
+  dans default, puis depuis un Pod client de equipe-front joignez le Service par
+  son nom qualifié du namespace et consignez la réponse, et consignez ce que
+  donne le nom court depuis là.
+
+criteria:
+  - id: l-application-est-dans-son-namespace
+    label: "Le Deployment et le Service api sont dans equipe-api, et rien ne s'appelle api dans default"
+  - id: le-nom-qualifie-repond
+    label: "Un Pod client de equipe-front joint api par son nom qualifié, réponse consignée"
+  - id: le-nom-court-echoue
+    label: "Depuis equipe-front, le nom court api échoue, et le constat est consigné"
