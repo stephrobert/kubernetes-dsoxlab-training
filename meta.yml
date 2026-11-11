@@ -253,6 +253,9 @@ sections:
       - k8s-creer-ou-appliquer
       - k8s-verifier-et-attendre
       - k8s-gerer-les-images
+      # Le challenge du module, posé dans la leçon « Débugger une application »
+      # (P12, D43), sur le cluster kind « lab ».
+      - k8s-challenge-manifest-robuste
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

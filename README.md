@@ -259,7 +259,7 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 
 Five application-facing domains. « Application Environment, Configuration and Security » weighs 25 %, the heaviest of the five.
 
-35 lab(s).
+36 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -280,7 +280,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 | 15 | [`ckad-helm-install-upgrade`](labs/ckad-helm-install-upgrade/) | Install, upgrade and roll back with Helm 4 | application-deployment | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/) |
 | 16 | [`ckad-job-cronjob`](labs/ckad-job-cronjob/) | A Job with parallel completions, and a CronJob | application-design | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique) |
 | 17 | [`ckad-in-place-pod-vertical-scaling`](labs/ckad-in-place-pod-vertical-scaling/) | Resize a Pod in place, without restarting it | application-environment | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
-| 18 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | A Pod blocked by a ConfigMap that does not exist | application-observability | 15m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
+| 18 | [`ckad-troubleshoot-missing-configmap`](labs/ckad-troubleshoot-missing-configmap/) | A Pod blocked by a ConfigMap that does not exist | application-observability | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
 | 19 | [`ckad-troubleshoot-crashloop`](labs/ckad-troubleshoot-crashloop/) | Three Pods in CrashLoopBackOff, three causes | application-observability | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | 20 | [`ckad-capstone-boutique`](labs/ckad-capstone-boutique/) | Capstone: ship the shop, from the specification alone | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
 | 21 | [`k8s-lire-l-etat-d-un-pod-en-erreur`](labs/k8s-lire-l-etat-d-un-pod-en-erreur/) | Read the state of a failing Pod | application-observability | 20m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/) |
@@ -298,6 +298,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 | 33 | [`k8s-creer-ou-appliquer`](labs/k8s-creer-ou-appliquer/) | Create or apply: apply, server-side apply and prune | application-deployment | 30m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/#mettre-en-pratique) |
 | 34 | [`k8s-verifier-et-attendre`](labs/k8s-verifier-et-attendre/) | Preview with diff, wait with wait | application-deployment | 25m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/#mettre-en-pratique) |
 | 35 | [`k8s-gerer-les-images`](labs/k8s-gerer-les-images/) | Pin an image by digest and pull from a private registry | application-deployment | 30m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/#mettre-en-pratique) |
+| 36 | [`k8s-challenge-manifest-robuste`](labs/k8s-challenge-manifest-robuste/) | Ship a robust manifest from a set of requirements | application-deployment | 60m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -327,7 +328,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **88 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **89 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.1, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
