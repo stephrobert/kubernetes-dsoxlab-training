@@ -1,0 +1,65 @@
+# Lab guidé de la leçon « kubectl create et apply » (KUBERN-06-03) du module
+# « Déployer ses applications ». Quatre pièges de la leçon, chacun lu dans
+# l'état du cluster : un dossier à sous-dossiers, un Deployment piloté par un
+# autoscaler dont le fichier fixe encore replicas, un champ repris par
+# server-side apply, et un élagage qui doit épargner ce qui n'est pas au dossier.
+id: k8s-creer-ou-appliquer
+title: "Create or apply: apply, server-side apply and prune"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Apply a whole folder with its subfolders, stop an apply from overwriting the
+  replicas chosen by an autoscaler, take over a field with server-side apply
+  under a named field manager, and prune what left the folder without touching
+  what never belonged to it.
+skills:
+  - kubectl-apply
+  - last-applied-configuration
+  - server-side-apply
+  - kubectl-prune
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: dossier-applique
+    label: "The whole folder is applied, subfolders included"
+    tests:
+      - test_le_dossier_est_applique_sous_dossiers_compris
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
+  - id: hpa-respecte
+    label: "Applying suivi.yaml again keeps the replicas chosen by the autoscaler"
+    tests:
+      - test_reappliquer_suivi_laisse_les_replicas_de_l_autoscaler
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
+  - id: proprietaire-de-champ
+    label: "The image of tarifs belongs to the equipe-tarifs field manager"
+    tests:
+      - test_l_image_de_tarifs_appartient_au_gestionnaire_equipe_tarifs
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
+  - id: prune-maitrise
+    label: "Pruning removed suivi-ancien and spared journal"
+    tests:
+      - test_prune_retire_suivi_ancien_et_epargne_journal
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/

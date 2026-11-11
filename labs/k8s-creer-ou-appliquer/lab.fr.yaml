@@ -1,0 +1,16 @@
+title: "Créer ou appliquer : apply, server-side apply et prune"
+description: |
+  Appliquez un dossier entier avec ses sous-dossiers, empêchez un apply
+  d'écraser les réplicas choisis par un autoscaler, reprenez un champ par
+  server-side apply sous un gestionnaire nommé, et élaguez ce qui a quitté le
+  dossier sans toucher à ce qui ne lui a jamais appartenu.
+
+criteria:
+  - id: dossier-applique
+    label: "Le dossier entier est appliqué, sous-dossiers compris"
+  - id: hpa-respecte
+    label: "Réappliquer suivi.yaml garde les réplicas choisis par l'autoscaler"
+  - id: proprietaire-de-champ
+    label: "L'image de tarifs appartient au gestionnaire de champs equipe-tarifs"
+  - id: prune-maitrise
+    label: "L'élagage a retiré suivi-ancien et épargné journal"
