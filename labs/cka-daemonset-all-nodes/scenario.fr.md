@@ -14,7 +14,7 @@ Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
 ## Ce que vous devez obtenir
 
 1. Un DaemonSet **`monitor-agent`** dans `monitoring`, image
-   **`busybox:1.37`**, dont le conteneur écrit `heartbeat` dans ses logs
+   **`busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4`**, dont le conteneur écrit `heartbeat` dans ses logs
    toutes les soixante secondes, indéfiniment.
 
 2. Ses Pods portent le label **`app: monitor`**.
@@ -27,7 +27,7 @@ Vous êtes sur le control plane, avec `kubectl` configuré. Le namespace
 Un DaemonSet ne choisit pas les nœuds : il en met un partout où son Pod est
 admis. Un taint `NoSchedule` refuse tout Pod qui ne le tolère pas, et c'est
 dans le template du DaemonSet que la tolérance s'écrit, clé, opérateur et
-effet, recopiés depuis ce que `kubectl describe node` affiche.
+effet, recopiés depuis ce que le nœud affiche de son taint.
 
 Un DaemonSet dont un nœud manque le dit dans son statut : le nombre de Pods
 voulus, planifiés et prêts.

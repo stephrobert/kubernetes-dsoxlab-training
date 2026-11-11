@@ -53,7 +53,6 @@ LABS = RACINE / "labs"
 #: rien : un lab nouveau naît conforme, c'est le sens même de la règle.
 DETTE: set[str] = {
     "cka-capstone-portail",
-    "cka-daemonset-all-nodes",
     "cka-gateway-api-httproute",
     "cka-hpa-autoscaling",
     "cka-ingress-path-routing",
