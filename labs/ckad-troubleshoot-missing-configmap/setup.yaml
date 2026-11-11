@@ -1,9 +1,9 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session : il pose un Pod qui
-# monte un ConfigMap inexistant, et retire le ConfigMap qu'un passage
+# monte une ConfigMap inexistante, et retire la ConfigMap qu'un passage
 # précédent aurait créé.
 #
-# Transposé de K8sExamLab, qui vérifiait « le ConfigMap existe » sans
+# Transposé de K8sExamLab, qui vérifiait « la ConfigMap existe » sans
 # regarder son contenu : ici l'application lit le fichier, et le sert.
 # Confronté à Kubernetes 1.37 le 2026-09-15.
 - name: Préparer le lab ckad-troubleshoot-missing-configmap
@@ -19,3 +19,4 @@
         executable: /bin/bash
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

@@ -1,4 +1,4 @@
-# Un Pod bloqué par un ConfigMap qui n'existe pas
+# Un Pod bloqué par une ConfigMap qui n'existe pas
 
 ## La situation
 
@@ -13,7 +13,9 @@ cluster ; sa configuration, apparemment, non.
 
 ## Ce que vous devez obtenir
 
-1. La cause du blocage, lue dans les **events** du Pod.
+1. La cause du blocage, lue dans les **events** du Pod, consignée dans
+   **`~/broken-app/cause.txt`** **avant toute réparation** : ce que le Pod
+   attend, par son nom, et que cela manque. Ensuite, n'y touchez plus.
 
 2. La ressource manquante créée, avec la clé **`settings.conf`** dont le
    contenu comporte la ligne `mode=production`.
@@ -29,12 +31,13 @@ Un Pod en `ContainerCreating` qui ne bouge pas n'a pas de logs : le
 conteneur n'existe pas encore. Ce qui l'empêche de naître est raconté dans
 ses events, en bas de `kubectl describe pod`, avec le nom de ce qui manque.
 
-Un volume qui référence un ConfigMap absent bloque le Pod indéfiniment, et
-le débloque dès que le ConfigMap existe : pas besoin de le supprimer.
+Un volume qui référence une ConfigMap absente bloque le Pod indéfiniment, et
+le débloque dès que la ConfigMap existe : pas besoin de le supprimer.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent le ConfigMap, l'état du Pod, et interrogent l'application
+Les tests lisent votre relevé et sa date, la ConfigMap, l'état du Pod, et
+interrogent l'application
 depuis le nœud.
 
 ```bash

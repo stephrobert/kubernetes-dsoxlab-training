@@ -12,7 +12,9 @@ cluster; its configuration, apparently, is not.
 
 ## What you must achieve
 
-1. The cause of the blockage, read in the Pod's **events**.
+1. The cause of the blockage, read in the Pod's **events**, recorded in
+   **`~/broken-app/cause.txt`** **before any repair**: what the Pod waits for,
+   by its name, and that it is missing. Then leave the file untouched.
 
 2. The missing resource created, with the key **`settings.conf`** whose
    content carries the line `mode=production`.
@@ -33,8 +35,8 @@ and unblocks it as soon as the ConfigMap exists: no need to delete it.
 
 ## How you will know it works
 
-The tests read the ConfigMap, the state of the Pod, and query the
-application from the node.
+The tests read your record and its date, the ConfigMap, the state of the Pod,
+and query the application from the node.
 
 ```bash
 dsoxlab check ckad-troubleshoot-missing-configmap

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Pose la situation : un Pod dont le volume référence un ConfigMap qui
+# Pose la situation : un Pod dont le volume référence une ConfigMap qui
 # n'existe pas. Il reste en ContainerCreating, sans logs, avec des events.
 #
-# Rejouable : le namespace est attendu s'il se termine, le ConfigMap d'un
+# Rejouable : le namespace est attendu s'il se termine, la ConfigMap d'un
 # passage précédent est retiré, et le Pod est recréé.
 set -euo pipefail
 # La trace complète va dans un journal sur le nœud : dsoxlab ne montre que
@@ -29,7 +29,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: nginx:1.27-alpine
+      image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
       command:
         - sh
         - -c
@@ -53,4 +53,12 @@ for essai in $(seq 1 20); do
   sleep 3
 done
 
-echo "Situation posée : broken-app attend un ConfigMap qui n'existe pas."
+LAB_USER="${LAB_USER:-ansible}"
+LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
+rm -rf "${LAB_HOME:?}/broken-app"
+install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/broken-app"
+install -d -m 0755 /var/lib/dsoxlab
+printf '{"uid": "%s"}\n' "$(kubectl -n lab get pod broken-app -o jsonpath='{.metadata.uid}')" \
+  > /var/lib/dsoxlab/troubleshoot-missing-configmap.json
+
+echo "Situation posée : broken-app attend une ConfigMap qui n'existe pas."

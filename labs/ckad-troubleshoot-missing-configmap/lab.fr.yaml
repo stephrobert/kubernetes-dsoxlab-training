@@ -1,6 +1,16 @@
-title: "Un Pod bloqué par un ConfigMap qui n'existe pas"
+title: "Un Pod bloqué par une ConfigMap qui n'existe pas"
 description: |
   Un Pod ne démarre pas et ne dit rien dans ses logs, parce qu'il n'a pas
   encore de conteneur : ce sont ses events qui parlent. Lire la cause,
   créer la ressource manquante avec le contenu attendu, et prouver que
   l'application sert.
+
+criteria:
+  - id: cause-consignee
+    label: "La cause est consignée, avant la réparation"
+  - id: configmap-attendue
+    label: "La ConfigMap porte la configuration attendue"
+  - id: debloque-sans-recreer
+    label: "broken-app tourne, sans avoir été recréé"
+  - id: application-sert
+    label: "L'application sert sa configuration"

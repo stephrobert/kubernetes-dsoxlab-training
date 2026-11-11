@@ -74,7 +74,6 @@ DETTE: set[str] = {
     "ckad-rbac-role-rolebinding",
     "ckad-security-context-hardened",
     "ckad-troubleshoot-crashloop",
-    "ckad-troubleshoot-missing-configmap",
     "cks-api-server-hardening",
     "cks-apparmor-confiner-un-pod",
     "cks-capstone-enclave",

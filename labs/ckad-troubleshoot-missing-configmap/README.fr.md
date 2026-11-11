@@ -1,17 +1,17 @@
-# Un Pod bloqué par un ConfigMap qui n'existe pas
+# Un Pod bloqué par une ConfigMap qui n'existe pas
 
 Lab **CKAD**, domaine *Application Observability and Maintenance* (15 % de
 l'épreuve), compétence « Debugging in Kubernetes ».
 
 La panne sans logs : le conteneur n'existe pas encore, et seuls les events
-parlent. Le lab hérité vérifiait que le ConfigMap existe ; ici l'application
-doit servir ce qu'il contient.
+parlent. Le lab hérité vérifiait que la ConfigMap existe ; ici la cause est consignée
+avant la réparation, et l'application doit servir ce qu'elle contient.
 
 | | |
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [Débugger une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
+| Leçon jumelée | [Débugger une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   ckad-troubleshoot-missing-configmap

@@ -15,9 +15,9 @@ skills:
   - volumes
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
 lab_type: lab
-estimated_time: 10m
+estimated_time: 15m
 
 # Compétence du blueprint CKAD, domaine Application Observability and
 # Maintenance (15 %) : « Utilize container logs » et « Debugging in
@@ -35,3 +35,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: cause-consignee
+    label: "The cause is recorded, before the repair"
+    tests:
+      - test_la_cause_est_consignee_avant_la_reparation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+  - id: configmap-attendue
+    label: "The ConfigMap carries the expected configuration"
+    tests:
+      - test_la_configmap_porte_la_configuration_attendue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+  - id: debloque-sans-recreer
+    label: "broken-app runs, without having been recreated"
+    tests:
+      - test_broken_app_tourne_sans_avoir_ete_recree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+  - id: application-sert
+    label: "The application serves its configuration"
+    tests:
+      - test_l_application_sert_sa_configuration
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
