@@ -2742,6 +2742,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-donnees-qui-survivent": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_journal_ancien_est_bound",
+    "test_la_cause_du_pending_est_consignee_avant_la_correction",
+    "test_le_temoin_a_survecu_a_la_recreation_du_pod",
+    "test_le_volume_de_registre_donnees_est_en_retain",
+    "test_registre_donnees_est_liee_a_un_volume_cree_par_la_classe",
+    "test_registre_monte_la_revendication_et_a_ecrit_le_temoin"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 131,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-donnees-qui-survivent.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_journal_ancien_est_bound",
+    "test_la_cause_du_pending_est_consignee_avant_la_correction",
+    "test_le_temoin_a_survecu_a_la_recreation_du_pod",
+    "test_le_volume_de_registre_donnees_est_en_retain",
+    "test_registre_donnees_est_liee_a_un_volume_cree_par_la_classe",
+    "test_registre_monte_la_revendication_et_a_ecrit_le_temoin"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-lire-un-cluster": {
   "apres": {
    "echecs": [],
