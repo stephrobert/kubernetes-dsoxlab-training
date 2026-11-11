@@ -1,6 +1,27 @@
 title: "Une base Kustomize et deux overlays, dev et prod"
 description: |
-  Décrire une application une seule fois, dans une base Kustomize, et la
-  déployer dans deux namespaces avec des overlays qui changent le nombre de
-  replicas, préfixent les noms et ajoutent un label d'environnement. Prouver
-  que les deux environnements tournent et se ressemblent.
+  Décrire une application une seule fois, dans une base Kustomize avec une
+  ConfigMap générée, et la déployer dans deux namespaces avec des overlays qui
+  changent le nombre de réplicas, préfixent les noms, ajoutent un label
+  d'environnement et, pour dev seulement, la version de l'image. Laisser le
+  cluster conforme au dossier.
+
+criteria:
+  - id: dev-un-replica
+    label: "dev-app tourne avec un réplica disponible dans dev"
+  - id: prod-trois-replicas
+    label: "prod-app tourne avec trois réplicas disponibles dans prod"
+  - id: label-sur-les-pods
+    label: "Les Pods de chaque environnement portent son label env"
+  - id: service-trouve-ses-pods
+    label: "Chaque Service trouve les Pods de son environnement"
+  - id: meme-structure
+    label: "Les deux environnements ont le même conteneur et le même port"
+  - id: image-changee-par-l-overlay
+    label: "Seul dev passe en version 2, par son overlay, sans modifier la base"
+  - id: configmap-generee
+    label: "La configuration vient d'une ConfigMap générée par Kustomize"
+  - id: une-base-commune
+    label: "Les deux overlays dérivent d'une même base"
+  - id: cluster-conforme-au-dossier
+    label: "Le cluster correspond aux overlays du dossier"
