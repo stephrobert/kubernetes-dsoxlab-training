@@ -5,22 +5,24 @@ section: cka
 difficulty: intermediate
 description: |
   A Pod whose image contains no shell offers nothing to kubectl exec. Attach
-  an ephemeral container to it that shares its processes, reach the node's
-  filesystem through a debug Pod, and leave proof of it.
+  an ephemeral container to it that shares its processes, and read from there
+  the processes the application really runs.
 skills:
   - kubectl-debug
   - ephemeral-container
-  - node-debug
   - troubleshooting
   - distroless
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 10m
 
-# Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
-# clusters and nodes » et « Manage and evaluate container output streams ».
+# Lab de la leçon « Débugger une application » (KUBERN-06-12) du module
+# « Déployer ses applications ». Compétence du blueprint CKA, domaine
+# Troubleshooting (30 %) : « Manage and evaluate container output streams ».
+# Le débogage du nœud en est retiré (décision D42 du 2026-11-11) : la leçon ne
+# l'enseigne pas, il pourra revenir dans un lab du module d'exploitation.
 certification_tags:
   - cka
 
@@ -34,3 +36,17 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: conteneur-ephemere-partage
+    label: "debugger is an ephemeral container sharing the application's processes"
+    tests:
+      - test_debugger_partage_les_processus_de_l_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+  - id: processus-vus-de-l-interieur
+    label: "The process list written from debugger shows coredns"
+    tests:
+      - test_la_liste_des_processus_montre_coredns
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

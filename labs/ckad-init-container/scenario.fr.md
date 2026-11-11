@@ -17,12 +17,12 @@ qu'il faut savoir gérer.
 
 1. Un Pod **`app`** dans `lab`, avec un init container nommé
    **`wait-for-config`** qui attend que `http://config-svc/` réponde, puis
-   un conteneur principal nommé **`main`**, image `nginx:1.27-alpine`.
+   un conteneur principal nommé **`main`**, image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`.
 
 2. Tant que rien ne répond derrière `config-svc`, le Pod `app` reste en
    **`Init`** : constatez-le.
 
-3. Un Pod **`config-server`** dans `lab`, image `nginx:1.27-alpine`, portant
+3. Un Pod **`config-server`** dans `lab`, image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`, portant
    le label **`app=config`**, que le Service `config-svc` sélectionne.
 
 4. Une fois `config-server` prêt, l'init container se termine et `app`
@@ -32,7 +32,8 @@ qu'il faut savoir gérer.
 
 Un init container s'exécute avant les conteneurs principaux, jusqu'au bout,
 et le Pod attend qu'il réussisse. Une boucle `until` avec `wget` fait un
-excellent gardien.
+excellent gardien, dans l'image
+`busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4`.
 
 Un Service se résout dans le DNS dès qu'il existe, même sans endpoint :
 attendre que le nom se résolve n'attend rien. Attendre une réponse HTTP,

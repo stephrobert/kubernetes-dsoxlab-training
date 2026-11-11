@@ -1,12 +1,16 @@
 """test_functional.py : ckad-init-container
 
-Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
+Ces tests lisent l'état du cluster, jamais les commandes tapées. Un test
+vérifie un seul état demandé par l'énoncé.
 
-Trois affirmations. La première lit la définition du Pod app ; la deuxième
-lit les endpoints du Service ; la troisième lit l'état de l'init container,
-terminé avec succès, et du conteneur principal, prêt. Un init container qui
-n'attendrait rien laisserait un Pod Running sans dépendance : on exige donc
-que le gardien vise config-svc, et que la dépendance soit réellement là.
+Le passage seul en Running se prouve par les dates : app a été créé AVANT
+config-server, et c'est le même Pod qui tourne ensuite. Un app supprimé puis
+recréé après la dépendance n'a rien attendu.
+
+Tous échouent avant le travail : ni app ni config-server n'existent. Une
+attente ne s'ouvre que si l'objet attendu existe déjà.
+
+Les messages disent ce qui manque, jamais la commande qui le pose.
 """
 
 from __future__ import annotations
@@ -18,13 +22,16 @@ import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "lab"
+NS = "lab"
 POD = "app"
 INIT = "wait-for-config"
 MAIN = "main"
 SERVEUR = "config-server"
 SERVICE = "config-svc"
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+IMAGE = "nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
+ATTENTE = 90
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -32,111 +39,119 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    return host.run(f"sudo {KUBECTL} {args}")
-
-
-def _json(host, args: str, absent: str) -> dict:
-    res = _kubectl(host, f"{args} -o json")
-    assert res.rc == 0, absent
+def _json(host, args: str) -> dict | None:
+    res = host.run(f"{ADMIN} {args} -o json")
+    if res.rc != 0 or not res.stdout.strip():
+        return None
     return json.loads(res.stdout)
 
 
+def _etat_init(pod: dict) -> dict:
+    statuts = {s["name"]: s for s in (pod.get("status") or {}).get("initContainerStatuses") or []}
+    return (statuts.get(INIT) or {}).get("state") or {}
+
+
+def _attendre_app(host) -> dict | None:
+    """app, attendu Running et init terminé, s'il existe et que la dépendance est là."""
+    pod = _json(host, f"-n {NS} get pod {POD}")
+    if pod is None or _json(host, f"-n {NS} get pod {SERVEUR}") is None:
+        return pod
+    fin = time.monotonic() + ATTENTE
+    while not (pod["status"].get("phase") == "Running" and "terminated" in _etat_init(pod)) \
+            and time.monotonic() < fin:
+        time.sleep(PAS)
+        pod = _json(host, f"-n {NS} get pod {POD}") or pod
+    return pod
+
+
 # ----------------------------------------------------------------------
-# 1. Le Pod app a son gardien, et il vise le bon Service.
+# 1. app a un gardien qui attend config-svc, puis son conteneur principal.
 # ----------------------------------------------------------------------
-def test_le_pod_a_un_init_container_qui_attend_le_service(host):
-    pod = _json(host, f"-n {NAMESPACE} get pod {POD}", message(
-            en=f"No Pod {POD} in {NAMESPACE}.",
-            fr=f"Aucun Pod {POD} dans {NAMESPACE}.",
-        ))
-    inits = {c["name"]: c for c in pod["spec"].get("initContainers") or []}
-    assert INIT in inits, message(
-        en=f"Pod {POD} has no init container {INIT}. Init containers are "
-        f"declared under spec.initContainers, not under containers. Seen: {sorted(inits) or 'none'}",
-        fr=f"Le Pod {POD} n'a pas d'init container {INIT}. Les init containers se "
-        f"déclarent sous spec.initContainers, pas sous containers. Vus : {sorted(inits) or 'aucun'}",
+def test_app_a_un_init_container_qui_attend_config_svc(host):
+    pod = _json(host, f"-n {NS} get pod {POD}")
+    assert pod is not None, message(
+        en=f"No Pod {POD} in {NS}.",
+        fr=f"Aucun Pod {POD} dans {NS}.",
     )
-    commande = " ".join(inits[INIT].get("command") or []) + " " + " ".join(inits[INIT].get("args") or [])
-    assert SERVICE in commande, message(
-        en=f"Init container {INIT} does not wait for {SERVICE}: its command does not "
-        "mention it. A gatekeeper that waits for nothing lets the application start "
+    inits = {c["name"]: c for c in pod["spec"].get("initContainers") or []}
+    commande = " ".join((inits.get(INIT) or {}).get("command") or []) + " " + \
+        " ".join((inits.get(INIT) or {}).get("args") or [])
+    assert INIT in inits and SERVICE in commande, message(
+        en=f"{POD} has no init container {INIT} that waits for {SERVICE} (init containers seen: "
+        f"{sorted(inits) or 'none'}). A gatekeeper that waits for nothing lets the application start "
         "without its dependency.",
-        fr=f"L'init container {INIT} n'attend pas {SERVICE} : sa commande ne le "
-        "mentionne pas. Un gardien qui n'attend rien laisse démarrer l'application "
+        fr=f"{POD} n'a pas d'init container {INIT} qui attend {SERVICE} (init containers vus : "
+        f"{sorted(inits) or 'aucun'}). Un gardien qui n'attend rien laisse démarrer l'application "
         "sans sa dépendance.",
     )
-    principaux = [c["name"] for c in pod["spec"]["containers"]]
-    assert MAIN in principaux, message(
-        en=f"The main container must be named {MAIN}: seen {principaux}.",
-        fr=f"Le conteneur principal doit s'appeler {MAIN} : vus {principaux}.",
+    principaux = {c["name"]: c.get("image") for c in pod["spec"]["containers"]}
+    assert principaux.get(MAIN) == IMAGE, message(
+        en=f"The main container must be {MAIN}, on the image of the requirements pinned by digest: "
+        f"seen {principaux}.",
+        fr=f"Le conteneur principal doit être {MAIN}, sur l'image du cahier des charges épinglée par "
+        f"digest : vu {principaux}.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. La dépendance est là : config-server, sélectionné par config-svc.
+# 2. La dépendance répond derrière le Service.
 # ----------------------------------------------------------------------
-def test_la_dependance_repond_derriere_le_service(host):
-    serveur = _json(host, f"-n {NAMESPACE} get pod {SERVEUR}",
-                    f"Aucun Pod {SERVEUR} dans {NAMESPACE} : rien ne peut répondre derrière {SERVICE}.")
-    assert (serveur["metadata"].get("labels") or {}).get("app") == "config", message(
-        en=f"{SERVEUR} does not carry the app=config label: the Service does not select it. "
-        f"Labels: {serveur['metadata'].get('labels')}",
-        fr=f"{SERVEUR} ne porte pas le label app=config : le Service ne le sélectionne pas. "
-        f"Labels : {serveur['metadata'].get('labels')}",
+def _prets(host) -> int:
+    tranches = _json(host, f"-n {NS} get endpointslices -l kubernetes.io/service-name={SERVICE}") or {}
+    return sum(1 for t in tranches.get("items", []) for e in t.get("endpoints") or []
+               if (e.get("conditions") or {}).get("ready"))
+
+
+def test_config_server_repond_derriere_config_svc(host):
+    serveur = _json(host, f"-n {NS} get pod {SERVEUR}")
+    assert serveur is not None, message(
+        en=f"No Pod {SERVEUR} in {NS}: nothing can answer behind {SERVICE}.",
+        fr=f"Aucun Pod {SERVEUR} dans {NS} : rien ne peut répondre derrière {SERVICE}.",
     )
-    prets = []
-    for _ in range(12):
-        tranches = _json(host, f"-n {NAMESPACE} get endpointslices -l kubernetes.io/service-name={SERVICE}",
-                         message(
-            en="Cannot read the EndpointSlices.",
-            fr="Lecture des EndpointSlices impossible.",
-        ))
-        prets = [
-            a for t in tranches["items"] for e in t.get("endpoints") or []
-            for a in e.get("addresses") or [] if (e.get("conditions") or {}).get("ready")
-        ]
-        if prets:
-            break
-        time.sleep(5)
-    assert prets, message(
-        en=f"{SERVICE} still has no ready endpoint: {SERVEUR} exists but is not "
-        "ready, or the Service does not select it.",
-        fr=f"{SERVICE} n'a toujours aucun endpoint prêt : {SERVEUR} existe mais n'est "
-        "pas prêt, ou le Service ne le sélectionne pas.",
+    fin = time.monotonic() + ATTENTE
+    while _prets(host) == 0 and time.monotonic() < fin:
+        time.sleep(PAS)
+    assert _prets(host) > 0, message(
+        en=f"{SERVICE} has no ready endpoint: {SERVEUR} exists, but it is not ready or the Service "
+        f"does not select it (labels of {SERVEUR}: {serveur['metadata'].get('labels')}).",
+        fr=f"{SERVICE} n'a aucun endpoint prêt : {SERVEUR} existe, mais il n'est pas prêt ou le Service "
+        f"ne le sélectionne pas (labels de {SERVEUR} : {serveur['metadata'].get('labels')}).",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. L'init s'est terminé avec succès, et app tourne.
+# 3. L'init container s'est terminé avec succès.
 # ----------------------------------------------------------------------
-def test_l_init_est_termine_et_app_tourne(host):
-    pod, etat_init = {}, {}
-    for _ in range(18):
-        pod = _json(host, f"-n {NAMESPACE} get pod {POD}", message(
-            en=f"No Pod {POD} in {NAMESPACE}.",
-            fr=f"Aucun Pod {POD} dans {NAMESPACE}.",
-        ))
-        statuts = {s["name"]: s for s in pod["status"].get("initContainerStatuses") or []}
-        etat_init = (statuts.get(INIT) or {}).get("state") or {}
-        if pod["status"].get("phase") == "Running" and "terminated" in etat_init:
-            break
-        time.sleep(5)
-    assert "terminated" in etat_init, message(
-        en=f"Init container {INIT} has not finished: state {etat_init}. As long as it "
-        f"runs, {SERVICE} does not answer it: check what it is waiting for, and what "
-        "stands behind the Service. Its logs say where it stands.",
-        fr=f"L'init container {INIT} n'est pas terminé : état {etat_init}. Tant qu'il "
-        f"tourne, {SERVICE} ne lui répond pas : vérifiez ce qu'il attend, et ce qui "
-        "se tient derrière le Service. Ses logs disent où il en est.",
+def test_l_init_container_s_est_termine_avec_succes(host):
+    pod = _attendre_app(host)
+    etat = _etat_init(pod or {})
+    raison = (etat.get("terminated") or {}).get("reason")
+    assert raison == "Completed", message(
+        en=f"The init container {INIT} has not completed successfully (state: {etat or 'none'}). As long "
+        f"as it runs, {SERVICE} does not answer it; if it ended in error, it gave up instead of "
+        "waiting. Its logs say where it stands.",
+        fr=f"L'init container {INIT} ne s'est pas terminé avec succès (état : {etat or 'aucun'}). Tant "
+        f"qu'il tourne, {SERVICE} ne lui répond pas ; s'il a fini en erreur, il a abandonné au lieu "
+        "d'attendre. Ses logs disent où il en est.",
     )
-    assert etat_init["terminated"].get("reason") == "Completed", message(
-        en=f"The init container ended in {etat_init['terminated'].get('reason')!r} "
-        "and not Completed: it exits with an error instead of waiting.",
-        fr=f"L'init container s'est terminé en {etat_init['terminated'].get('reason')!r} "
-        "et non Completed : il sort en erreur au lieu d'attendre.",
+
+
+# ----------------------------------------------------------------------
+# 4. app est passé seul en Running quand la dépendance a répondu.
+# ----------------------------------------------------------------------
+def test_app_est_passe_seul_en_running_quand_la_dependance_a_repondu(host):
+    pod = _attendre_app(host)
+    serveur = _json(host, f"-n {NS} get pod {SERVEUR}")
+    assert pod is not None and serveur is not None, message(
+        en=f"{POD} and {SERVEUR} must both exist.",
+        fr=f"{POD} et {SERVEUR} doivent exister tous les deux.",
     )
-    assert pod["status"].get("phase") == "Running", message(
-        en=f"The init container has finished but the Pod is in phase {pod['status'].get('phase')!r}.",
-        fr=f"L'init est terminé mais le Pod est en phase {pod['status'].get('phase')!r}.",
+    avant = pod["metadata"]["creationTimestamp"] < serveur["metadata"]["creationTimestamp"]
+    assert avant and pod["status"].get("phase") == "Running", message(
+        en=f"{POD} is in phase {pod['status'].get('phase')!r} and was created "
+        f"{'before' if avant else 'after'} {SERVEUR}. Expected: {POD} created first, waiting in Init, "
+        "then Running on its own once the dependency answered, without being recreated.",
+        fr=f"{POD} est en phase {pod['status'].get('phase')!r} et a été créé "
+        f"{'avant' if avant else 'après'} {SERVEUR}. Attendu : {POD} créé d'abord, en attente dans "
+        "Init, puis Running seul une fois la dépendance prête, sans avoir été recréé.",
     )

@@ -11,3 +11,8 @@
         --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
+
+    - name: Retirer la mémoire de l'état initial
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/in-place-pod-vertical-scaling.json
+        state: absent

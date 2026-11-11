@@ -3,15 +3,14 @@
 Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
 compétence « Understand multi-container Pod design patterns ».
 
-Le sidecar natif, init container à `restartPolicy: Always`, est stable
-depuis la 1.33 : c'est la forme que l'examen attend, et ce lab refuse le
-second conteneur ordinaire qui la remplaçait avant.
+Le sidecar natif, init container à `restartPolicy: Always`, est la forme
+que l'examen attend, et ce lab refuse un second conteneur ordinaire.
 
 | | |
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 15 minutes |
-| Leçon jumelée | [Init Containers et Sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
+| Leçon jumelée | [Init Containers et Sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   ckad-multi-container-sidecar

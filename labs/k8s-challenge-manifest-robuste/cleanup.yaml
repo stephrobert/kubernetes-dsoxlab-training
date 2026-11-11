@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace expedition, le dossier de
+# l'apprenant et la mémoire de l'état initial. Le cluster « lab » reste.
+- name: Nettoyer le challenge k8s-challenge-manifest-robuste
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace expedition
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace expedition
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/expedition"
+        - /var/lib/dsoxlab/challenge-manifest-robuste.json

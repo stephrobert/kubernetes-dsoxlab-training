@@ -43,15 +43,5 @@ spec:
 EOF
 kubectl -n lab wait --for=condition=Ready pod/distroless-app --timeout=180s
 
-# Les traces d'un passage précédent : Pods de débogage du nœud, quel que soit
-# le namespace où l'apprenant les a créés, et fichier témoin sur le nœud.
-kubectl get pods -A -o jsonpath='{range .items[?(@.spec.hostPID==true)]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' \
-  | { grep -v '^kube-system ' || true; } \
-  | while read -r ns nom; do
-      if [[ -n "${nom:-}" ]]; then
-        kubectl -n "$ns" delete pod "$nom" --ignore-not-found --wait=false
-      fi
-    done
-rm -f /tmp/node-debug.txt
 
 echo "Situation posée : distroless-app tourne dans lab, sans shell."

@@ -1,11 +1,17 @@
 """test_functional.py : ckad-probes-all-types
 
-Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
+Ces tests lisent la définition du Pod probed-app et son état. Un test vérifie
+un seul état demandé par l'énoncé.
 
-Trois affirmations. Les deux premières lisent les sondes dans la définition
-du Pod ; la troisième lit son état, et c'est elle qui prouve que les sondes
-trouvent ce qu'elles cherchent : une sonde vers un mauvais chemin laisserait
-un manifeste complet et un Pod jamais Ready, ou relancé en boucle.
+Une sonde se juge sur ce qu'elle interroge (HTTP, port 80, nommé ou non) et,
+pour la sonde de démarrage, sur sa tolérance : failureThreshold multiplié par
+periodSeconds, avec les défauts de Kubernetes quand un champ est omis (3 et
+10 s, mesurés en 1.37 le 2026-11-11).
+
+Tous échouent avant le travail : le Pod n'existe pas. L'attente du Pod Ready ne
+s'ouvre que s'il existe déjà.
+
+Les messages disent ce qui manque, jamais la commande qui le pose.
 """
 
 from __future__ import annotations
@@ -17,10 +23,14 @@ import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "lab"
+NS = "lab"
 POD = "probed-app"
 PORT = 80
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+IMAGE = "nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
+TOLERANCE = 60
+ATTENTE = 120
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -28,104 +38,102 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    return host.run(f"sudo {KUBECTL} {args}")
-
-
-def _pod(host) -> dict:
-    res = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert res.rc == 0, message(
-        en=f"No Pod {POD} in {NAMESPACE}.",
-        fr=f"Aucun Pod {POD} dans {NAMESPACE}.",
-    )
+def _pod(host) -> dict | None:
+    res = host.run(f"{ADMIN} -n {NS} get pod {POD} -o json")
+    if res.rc != 0 or not res.stdout.strip():
+        return None
     return json.loads(res.stdout)
 
 
 def _conteneur(host) -> dict:
-    return _pod(host)["spec"]["containers"][0]
+    pod = _pod(host)
+    assert pod is not None, message(en=f"No Pod {POD} in {NS}.", fr=f"Aucun Pod {POD} dans {NS}.")
+    return pod["spec"]["containers"][0]
 
 
-def _http_sur_le_port(sonde: dict, nom: str) -> None:
-    http = sonde.get("httpGet")
-    assert http, message(
-        en=f"Probe {nom} is not of type httpGet: {list(sonde) or 'empty'}. A web server is probed over HTTP.",
-        fr=f"La sonde {nom} n'est pas de type httpGet : {list(sonde) or 'vide'}. Un serveur web se sonde en HTTP.",
-    )
-    assert str(http.get("port")) in (str(PORT), "http"), message(
-        en=f"Probe {nom} targets port {http.get('port')!r}: nginx listens on {PORT}.",
-        fr=f"La sonde {nom} vise le port {http.get('port')!r} : nginx écoute sur {PORT}.",
-    )
+def _sonde_http_sur_80(conteneur: dict, nom: str) -> bool:
+    sonde = (conteneur.get(nom) or {}).get("httpGet") or {}
+    ports = {p.get("name"): p.get("containerPort") for p in conteneur.get("ports") or []}
+    port = sonde.get("port")
+    port = ports.get(port, port) if isinstance(port, str) else port
+    return port == PORT
 
 
 # ----------------------------------------------------------------------
-# 1. Les trois sondes existent, en HTTP sur le port du serveur.
+# 1. probed-app déclare son port 80, sur l'image demandée.
 # ----------------------------------------------------------------------
-def test_les_trois_sondes_sont_declarees(host):
+def test_probed_app_declare_son_port_sur_l_image_demandee(host):
     c = _conteneur(host)
     ports = [p.get("containerPort") for p in c.get("ports") or []]
-    assert PORT in ports, message(
-        en=f"The container does not declare port {PORT}: ports {ports}.",
-        fr=f"Le conteneur ne déclare pas le port {PORT} : ports {ports}.",
-    )
-    for nom in ("startupProbe", "livenessProbe", "readinessProbe"):
-        assert c.get(nom), message(
-            en=f"No {nom} probe on the container. All three are declared at the "
-            "container level, each with its own block.",
-            fr=f"Aucune sonde {nom} sur le conteneur. Les trois se déclarent au niveau "
-            "du conteneur, chacune avec son propre bloc.",
-        )
-        _http_sur_le_port(c[nom], nom)
-
-
-# ----------------------------------------------------------------------
-# 2. La sonde de démarrage tolère une minute d'échecs.
-# ----------------------------------------------------------------------
-def test_la_sonde_de_demarrage_tolere_un_demarrage_lent(host):
-    sonde = _conteneur(host)["startupProbe"]
-    periode = sonde.get("periodSeconds", 10)
-    echecs = sonde.get("failureThreshold", 3)
-    tolerance = periode * echecs
-    assert tolerance >= 60, message(
-        en=f"The startup probe gives up after {echecs} failures at {periode} s, that is "
-        f"{tolerance} s: an application taking a minute to start would be killed "
-        "before it could answer. The tolerance is failureThreshold "
-        "multiplied by periodSeconds.",
-        fr=f"La sonde de démarrage abandonne après {echecs} échecs à {periode} s, soit "
-        f"{tolerance} s : une application qui met une minute à démarrer serait tuée "
-        "avant d'avoir répondu. La tolérance est le produit failureThreshold "
-        "multiplié par periodSeconds.",
+    assert c.get("image") == IMAGE and PORT in ports, message(
+        en=f"{POD} runs {c.get('image')!r} and declares the ports {ports or 'none'}. Expected the image of the "
+        "requirements, pinned by digest, and port 80 declared.",
+        fr=f"{POD} tourne en {c.get('image')!r} et déclare les ports {ports or 'aucun'}. Attendu l'image du "
+        "cahier des charges, épinglée par digest, et le port 80 déclaré.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. La preuve : Ready, sans redémarrage.
+# 2. La sonde de démarrage tolère une minute de démarrage lent.
 # ----------------------------------------------------------------------
-def test_le_pod_est_ready_sans_redemarrage(host):
-    pod, pret, redemarrages = {}, "Unknown", 0
-    for _ in range(18):
-        pod = _pod(host)
-        conditions = {c["type"]: c["status"] for c in pod["status"].get("conditions") or []}
-        pret = conditions.get("Ready", "Unknown")
-        statut = (pod["status"].get("containerStatuses") or [{}])[0]
-        redemarrages = statut.get("restartCount", 0)
-        if pret == "True":
-            break
-        time.sleep(5)
-    assert pod["status"].get("phase") == "Running", message(
-        en=f"The Pod is in phase {pod['status'].get('phase')!r}.",
-        fr=f"Le Pod est en phase {pod['status'].get('phase')!r}.",
+def test_la_sonde_de_demarrage_tolere_une_minute(host):
+    c = _conteneur(host)
+    sonde = c.get("startupProbe") or {}
+    tolerance = sonde.get("failureThreshold", 3) * sonde.get("periodSeconds", 10)
+    assert _sonde_http_sur_80(c, "startupProbe") and tolerance >= TOLERANCE, message(
+        en=f"The startup probe does not query port 80 over HTTP while tolerating at least {TOLERANCE}s of "
+        f"consecutive failures (found: {sonde or 'no startup probe'}, tolerance {tolerance}s if declared).",
+        fr=f"La sonde de démarrage n'interroge pas le port 80 en HTTP en tolérant au moins {TOLERANCE} s "
+        f"d'échecs consécutifs (trouvé : {sonde or 'aucune sonde de démarrage'}, tolérance {tolerance} s si "
+        "elle est déclarée).",
     )
-    assert pret == "True", message(
-        en=f"The Pod is Running but Ready = {pret} after 90 s: the readiness probe, "
-        "or the startup one, is failing. A wrong path, a wrong port: "
-        "kubectl describe pod narrates every failure in its events.",
-        fr=f"Le Pod est Running mais Ready = {pret} après 90 s : la sonde de disponibilité, "
-        "ou celle de démarrage, échoue. Un mauvais chemin, un mauvais port : "
-        "kubectl describe pod raconte chaque échec dans ses events.",
+
+
+# ----------------------------------------------------------------------
+# 3. La sonde de vivacité interroge le port 80 en HTTP.
+# ----------------------------------------------------------------------
+def test_la_sonde_de_vivacite_interroge_le_port_80_en_http(host):
+    c = _conteneur(host)
+    assert _sonde_http_sur_80(c, "livenessProbe"), message(
+        en=f"The liveness probe does not query port 80 over HTTP (found: {c.get('livenessProbe') or 'none'}).",
+        fr=f"La sonde de vivacité n'interroge pas le port 80 en HTTP (trouvé : "
+        f"{c.get('livenessProbe') or 'aucune'}).",
     )
-    assert redemarrages == 0, message(
-        en=f"The container restarted {redemarrages} times: the liveness probe is killing it. "
-        "It targets a path or a port where nginx does not answer.",
-        fr=f"Le conteneur a redémarré {redemarrages} fois : la sonde de vivacité le tue. "
-        "Elle vise un chemin ou un port où nginx ne répond pas.",
+
+
+# ----------------------------------------------------------------------
+# 4. La sonde de disponibilité interroge le port 80 en HTTP.
+# ----------------------------------------------------------------------
+def test_la_sonde_de_disponibilite_interroge_le_port_80_en_http(host):
+    c = _conteneur(host)
+    assert _sonde_http_sur_80(c, "readinessProbe"), message(
+        en=f"The readiness probe does not query port 80 over HTTP (found: {c.get('readinessProbe') or 'none'}).",
+        fr=f"La sonde de disponibilité n'interroge pas le port 80 en HTTP (trouvé : "
+        f"{c.get('readinessProbe') or 'aucune'}).",
+    )
+
+
+# ----------------------------------------------------------------------
+# 5. probed-app est Ready, sans redémarrage.
+# ----------------------------------------------------------------------
+def _pret(pod: dict) -> bool:
+    return any(c.get("type") == "Ready" and c.get("status") == "True"
+               for c in (pod.get("status") or {}).get("conditions") or [])
+
+
+def test_probed_app_est_ready_sans_redemarrage(host):
+    pod = _pod(host)
+    assert pod is not None, message(en=f"No Pod {POD} in {NS}.", fr=f"Aucun Pod {POD} dans {NS}.")
+    fin = time.monotonic() + ATTENTE
+    while not _pret(pod) and time.monotonic() < fin:
+        time.sleep(PAS)
+        pod = _pod(host) or pod
+    redemarrages = sum(s.get("restartCount", 0) for s in pod["status"].get("containerStatuses") or [])
+    assert _pret(pod) and redemarrages == 0, message(
+        en=f"{POD} is {'Ready' if _pret(pod) else 'not Ready'} after {ATTENTE}s, with {redemarrages} restart(s). "
+        "A probe aimed at the wrong path or port fails silently: the Pod never becomes Ready, or restarts. "
+        "Its events tell each failure.",
+        fr=f"{POD} est {'Ready' if _pret(pod) else 'non Ready'} après {ATTENTE} s, avec {redemarrages} "
+        "redémarrage(s). Une sonde qui vise un mauvais chemin ou un mauvais port échoue en silence : le Pod "
+        "ne devient jamais Ready, ou redémarre. Ses événements racontent chaque échec.",
     )

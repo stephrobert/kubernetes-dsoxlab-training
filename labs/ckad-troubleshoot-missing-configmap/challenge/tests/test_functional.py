@@ -1,26 +1,39 @@
 """test_functional.py : ckad-troubleshoot-missing-configmap
 
-Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
+Ces tests lisent le relevé de la cause et sa date, la ConfigMap créée, le Pod
+broken-app comparé à celui que le setup a posé (uid mémorisé), puis la page
+que l'application sert. Un test vérifie un seul état demandé par l'énoncé.
 
-Trois affirmations. La première lit le ConfigMap ; la deuxième l'état du
-Pod ; la troisième interroge l'application depuis le nœud, et c'est elle qui
-prouve que le fichier monté est bien celui qu'elle attendait : un ConfigMap
-créé vide débloquerait le Pod et ferait servir une page vide.
+La cause doit être consignée AVANT la réparation : le relevé est comparé à la
+date de création de la ConfigMap.
+
+Tous échouent avant le travail : le relevé et la ConfigMap n'existent pas, et
+broken-app reste bloqué. L'attente du Pod Running ne s'ouvre que si la
+ConfigMap existe déjà.
+
+Les messages disent ce qui manque, jamais la commande qui le pose.
 """
 
 from __future__ import annotations
 
 import json
+import re
 import time
+from datetime import datetime
 
 import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "lab"
+NS = "lab"
 POD = "broken-app"
 CONFIGMAP = "app-settings"
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+MEMOIRE = "/var/lib/dsoxlab/troubleshoot-missing-configmap.json"
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
+#: Ce qui dit la cause : la ConfigMap nommée, et le fait qu'elle manque.
+MANQUE = re.compile(r"not found|absent|introuvable|manqu|missing|n'existe pas|inexistant", re.IGNORECASE)
+ATTENTE = 90
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -28,84 +41,105 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    return host.run(f"sudo {KUBECTL} {args}")
+def _maison(host) -> str:
+    """Le répertoire de l'utilisateur du lab : testinfra agit en root par sudo."""
+    return host.check_output('getent passwd "${SUDO_USER:-ansible}" | cut -d: -f6').strip()
 
 
-def _pod(host) -> dict:
-    res = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert res.rc == 0, message(
-        en=f"No Pod {POD} in {NAMESPACE}: it was not to be deleted, only unblocked.",
-        fr=f"Aucun Pod {POD} dans {NAMESPACE} : il ne fallait pas le supprimer, seulement le débloquer.",
-    )
+def _json(host, args: str) -> dict | None:
+    res = host.run(f"{ADMIN} {args} -o json")
+    if res.rc != 0 or not res.stdout.strip():
+        return None
     return json.loads(res.stdout)
 
 
+def _pret(pod: dict) -> bool:
+    statut = (pod.get("status", {}).get("containerStatuses") or [{}])[0]
+    return pod.get("status", {}).get("phase") == "Running" and bool(statut.get("ready"))
+
+
+def _pod_debloque(host) -> dict | None:
+    pod = _json(host, f"-n {NS} get pod {POD}")
+    if pod is None or _json(host, f"-n {NS} get configmap {CONFIGMAP}") is None:
+        return pod
+    fin = time.monotonic() + ATTENTE
+    while not _pret(pod) and time.monotonic() < fin:
+        time.sleep(PAS)
+        pod = _json(host, f"-n {NS} get pod {POD}") or pod
+    return pod
+
+
 # ----------------------------------------------------------------------
-# 1. Le ConfigMap existe, avec la clé et le contenu attendus.
+# 1. La cause est consignée, avant la réparation.
 # ----------------------------------------------------------------------
-def test_le_configmap_porte_la_configuration(host):
-    res = _kubectl(host, f"-n {NAMESPACE} get configmap {CONFIGMAP} -o json")
-    assert res.rc == 0, message(
-        en=f"No ConfigMap {CONFIGMAP} in {NAMESPACE}. That is what the Pod is waiting for: "
-        "its events name it, at the bottom of kubectl describe pod.",
-        fr=f"Aucun ConfigMap {CONFIGMAP} dans {NAMESPACE}. C'est ce que le Pod attend : "
-        "ses events le nomment, en bas de kubectl describe pod.",
+def test_la_cause_est_consignee_avant_la_reparation(host):
+    chemin = f"{_maison(host)}/{POD}/cause.txt"
+    f = host.file(chemin)
+    contenu = f.content_string if f.exists else ""
+    assert CONFIGMAP in contenu and MANQUE.search(contenu), message(
+        en=f"~/{POD}/cause.txt does not say why {POD} is blocked: what it waits for, by its name, and that "
+        "it is missing. The events of the Pod tell it.",
+        fr=f"~/{POD}/cause.txt ne dit pas pourquoi {POD} est bloqué : ce qu'il attend, par son nom, et que "
+        "cela manque. Les events du Pod le racontent.",
     )
-    data = json.loads(res.stdout).get("data") or {}
-    assert "settings.conf" in data, message(
-        en=f"{CONFIGMAP} exists but has no settings.conf key: the Pod mounts the ConfigMap "
-        f"as a directory, and reads that file. Keys: {sorted(data) or 'none'}",
-        fr=f"{CONFIGMAP} existe mais n'a pas de clé settings.conf : le Pod monte le ConfigMap "
-        f"comme un répertoire, et lit ce fichier. Clés : {sorted(data) or 'aucune'}",
-    )
-    assert "mode=production" in data["settings.conf"], message(
-        en=f"settings.conf does not contain 'mode=production': {data['settings.conf'][:100]!r}",
-        fr=f"settings.conf ne contient pas 'mode=production' : {data['settings.conf'][:100]!r}",
+    cm = _json(host, f"-n {NS} get configmap {CONFIGMAP}")
+    if cm is not None:
+        creee = datetime.fromisoformat(cm["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp()
+        ecrit = int(host.check_output(f"stat -c %Y {chemin}"))
+        assert ecrit <= creee, message(
+            en=f"The cause was written, or rewritten, after the repair: ~/{POD}/cause.txt is more recent than "
+            "the ConfigMap. The diagnosis comes first, then the file is left untouched.",
+            fr=f"La cause a été écrite, ou réécrite, après la réparation : ~/{POD}/cause.txt est plus récent "
+            "que la ConfigMap. Le diagnostic vient d'abord, puis on ne touche plus au fichier.",
+        )
+
+
+# ----------------------------------------------------------------------
+# 2. La ConfigMap porte la configuration attendue.
+# ----------------------------------------------------------------------
+def test_la_configmap_porte_la_configuration_attendue(host):
+    cm = _json(host, f"-n {NS} get configmap {CONFIGMAP}")
+    data = (cm or {}).get("data") or {}
+    assert "mode=production" in data.get("settings.conf", ""), message(
+        en=f"The {CONFIGMAP} ConfigMap does not carry a settings.conf key containing the line "
+        f"mode=production (keys found: {sorted(data) if cm else 'no ConfigMap'}).",
+        fr=f"La ConfigMap {CONFIGMAP} ne porte pas de clé settings.conf contenant la ligne mode=production "
+        f"(clés trouvées : {sorted(data) if cm else 'aucune ConfigMap'}).",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. Le Pod s'est débloqué, sans avoir été recréé.
+# 3. broken-app tourne, sans avoir été recréé.
 # ----------------------------------------------------------------------
-def test_le_pod_est_running(host):
-    pod = {}
-    for _ in range(18):
-        pod = _pod(host)
-        if pod["status"].get("phase") == "Running":
-            break
-        time.sleep(5)
-    statut = (pod["status"].get("containerStatuses") or [{}])[0]
-    raison = ((statut.get("state") or {}).get("waiting") or {}).get("reason")
-    assert pod["status"].get("phase") == "Running" and statut.get("ready"), message(
-        en=f"Pod {POD} is in phase {pod['status'].get('phase')!r}, reason {raison}. "
-        "A volume referencing a missing ConfigMap keeps the Pod in "
-        "ContainerCreating; the kubelet retries by itself as soon as it exists.",
-        fr=f"Le Pod {POD} est en phase {pod['status'].get('phase')!r}, raison {raison}. "
-        "Un volume qui référence un ConfigMap absent bloque le Pod en "
-        "ContainerCreating ; le kubelet réessaie tout seul dès qu'il existe.",
+def test_broken_app_tourne_sans_avoir_ete_recree(host):
+    res = host.run(f"sudo cat {MEMOIRE}")
+    if res.rc != 0:
+        pytest.fail(message(
+            en="The memory of the initial state is missing: run dsoxlab reset ckad-troubleshoot-missing-configmap.",
+            fr="La mémoire de l'état initial est absente : lancez dsoxlab reset ckad-troubleshoot-missing-configmap.",
+        ))
+    pod = _pod_debloque(host)
+    meme = pod is not None and pod["metadata"]["uid"] == json.loads(res.stdout)["uid"]
+    identite_fr = "est celui que le lab a posé" if meme else "n'est plus celui que le lab a posé"
+    assert meme and _pret(pod), message(
+        en=f"{POD} is {'the one the lab installed' if meme else 'no longer the one the lab installed'} and "
+        f"{'runs' if pod and _pret(pod) else 'does not run'}. Expected: the same Pod, Running and ready. "
+        "Kubernetes retries on its own as soon as what was missing appears.",
+        fr=f"{POD} {identite_fr} et {'tourne' if pod and _pret(pod) else 'ne tourne pas'}. Attendu : le même "
+        "Pod, Running et prêt. Kubernetes réessaie tout seul dès que ce qui manquait apparaît.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. La preuve : l'application sert la configuration qu'elle a lue.
+# 4. L'application sert sa configuration.
 # ----------------------------------------------------------------------
 def test_l_application_sert_sa_configuration(host):
-    ip = _pod(host)["status"].get("podIP")
-    assert ip, message(
-        en="The Pod has no IP address.",
-        fr="Le Pod n'a pas d'adresse IP.",
-    )
-    res = host.run(f"curl -sS -m 5 http://{ip}/")
-    assert res.rc == 0, message(
-        en=f"Nothing answers on http://{ip}/ from the node: {res.stderr.strip()[:150]}",
-        fr=f"Rien ne répond sur http://{ip}/ depuis le nœud : {res.stderr.strip()[:150]}",
-    )
-    assert "mode=production" in res.stdout, message(
-        en=f"The application answers, but not with its configuration: {res.stdout.strip()[:120]!r}. "
-        "It copies /config/settings.conf into its page at startup: the mounted "
-        "file is not the expected one.",
-        fr=f"L'application répond, mais pas avec sa configuration : {res.stdout.strip()[:120]!r}. "
-        "Elle recopie /config/settings.conf dans sa page au démarrage : le fichier "
-        "monté n'est pas celui attendu.",
+    pod = _pod_debloque(host)
+    ip = (pod or {}).get("status", {}).get("podIP")
+    res = host.run(f"curl -sS -m 5 http://{ip}/") if ip else None
+    assert res is not None and res.rc == 0 and "mode=production" in res.stdout, message(
+        en=f"{POD} does not serve its configuration over HTTP: it copies /config/settings.conf into its page at "
+        "startup, and its page does not show mode=production.",
+        fr=f"{POD} ne sert pas sa configuration en HTTP : il recopie /config/settings.conf dans sa page au "
+        "démarrage, et sa page ne montre pas mode=production.",
     )

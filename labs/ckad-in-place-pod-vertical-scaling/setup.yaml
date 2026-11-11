@@ -1,10 +1,10 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session : il pose le Pod avec son
-# budget trop juste et sa politique de redimensionnement, et note sa date de
-# création dans une annotation, pour prouver ensuite qu'il n'a pas été recréé.
+# budget trop juste et sa politique de redimensionnement, et mémorise son uid
+# dans /var/lib/dsoxlab, pour prouver ensuite qu'il n'a pas été recréé.
 #
-# Transposé de K8sExamLab. Confronté à Kubernetes 1.37 le 2026-09-15 : la
-# sous-ressource resize est là depuis la 1.33, activée par défaut.
+# Transposé de K8sExamLab. Confronté à Kubernetes 1.37 : le Pod se
+# redimensionne par la sous-ressource resize.
 - name: Préparer le lab ckad-in-place-pod-vertical-scaling
   hosts: lab_target
   become: true

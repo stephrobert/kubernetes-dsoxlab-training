@@ -4,3 +4,13 @@ description: |
   un fichier, avec un sidecar natif, déclaré comme init container à
   restartPolicy Always, et un volume partagé. Prouver que le sidecar
   transmet réellement les lignes.
+
+criteria:
+  - id: sidecar-natif
+    label: "log-shipper est un sidecar natif"
+  - id: volume-partage
+    label: "Le volume logs est partagé par les deux conteneurs"
+  - id: application-ecrit
+    label: "app écrit dans le fichier partagé"
+  - id: sidecar-transmet
+    label: "Le sidecar transmet les lignes de l'application"

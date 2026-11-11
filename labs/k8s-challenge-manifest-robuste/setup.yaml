@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab, avec le
+# cluster « lab » et le kubeconfig de l'apprenant, puis pose le namespace
+# expedition et le Pod etiquettes en panne.
+- name: Préparer le challenge k8s-challenge-manifest-robuste
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Poser le namespace expedition et le Pod en panne
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

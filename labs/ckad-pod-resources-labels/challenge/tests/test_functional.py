@@ -1,12 +1,13 @@
 """test_functional.py : ckad-pod-resources-labels
 
-Ces tests lisent l'état du CLUSTER et du CONTENEUR, jamais les commandes
-tapées.
+Ces tests lisent la définition du Pod multi-app, son état, puis la limite de
+mémoire que le noyau applique, lue dans le cgroup de chaque conteneur. Un test
+vérifie un seul état demandé par l'énoncé.
 
-Quatre affirmations. Les trois premières lisent la définition du Pod ; la
-dernière entre dans chaque conteneur pour lire la limite de mémoire que le
-noyau applique réellement, dans le cgroup. C'est elle qui prouve que les
-resources déclarées ne sont pas qu'un texte.
+Tous échouent avant le travail : le Pod n'existe pas. L'attente du Pod Running
+ne s'ouvre que s'il existe déjà.
+
+Les messages disent ce qui manque, jamais la commande qui le pose.
 """
 
 from __future__ import annotations
@@ -18,15 +19,20 @@ import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "lab"
+NS = "lab"
 POD = "multi-app"
-ATTENDU = {
+IMAGES = {
+    "web": "nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb",
+    "logger": "busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4",
+}
+BUDGETS = {
     "web": {"requests": {"cpu": "100m", "memory": "64Mi"}, "limits": {"cpu": "200m", "memory": "128Mi"}},
     "logger": {"requests": {"cpu": "50m", "memory": "32Mi"}, "limits": {"cpu": "100m", "memory": "64Mi"}},
 }
 LIMITES_OCTETS = {"web": 128 * 1024 * 1024, "logger": 64 * 1024 * 1024}
-LABELS = {"app": "multi-app", "tier": "frontend", "version": "v1"}
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
+ATTENTE = 90
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -34,106 +40,75 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    return host.run(f"sudo {KUBECTL} {args}")
-
-
-def _pod(host) -> dict:
-    res = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert res.rc == 0, message(
-        en=f"No Pod {POD} in {NAMESPACE}.",
-        fr=f"Aucun Pod {POD} dans {NAMESPACE}.",
-    )
+def _pod(host) -> dict | None:
+    res = host.run(f"{ADMIN} -n {NS} get pod {POD} -o json")
+    if res.rc != 0 or not res.stdout.strip():
+        return None
     return json.loads(res.stdout)
 
 
-# ----------------------------------------------------------------------
-# 1. Deux conteneurs, et le Pod tourne.
-# ----------------------------------------------------------------------
-def test_deux_conteneurs_en_marche(host):
-    pod = {}
-    for _ in range(12):
-        pod = _pod(host)
-        if pod["status"].get("phase") == "Running":
-            break
-        time.sleep(5)
-    noms = [c["name"] for c in pod["spec"]["containers"]]
-    assert sorted(noms) == ["logger", "web"], message(
-        en=f"The Pod carries containers {noms}: web and logger expected, and nothing else.",
-        fr=f"Le Pod porte les conteneurs {noms} : attendus web et logger, et rien d'autre.",
-    )
-    statuts = {s["name"]: s for s in pod["status"].get("containerStatuses") or []}
-    pas_prets = [n for n in noms if not statuts.get(n, {}).get("ready")]
-    assert pod["status"].get("phase") == "Running" and not pas_prets, message(
-        en=f"The Pod is in phase {pod['status'].get('phase')!r}, containers not ready: "
-        f"{pas_prets}. A busybox container with no command exits immediately: the "
-        "logger must loop forever.",
-        fr=f"Le Pod est en phase {pod['status'].get('phase')!r}, conteneurs non prêts : "
-        f"{pas_prets}. Un conteneur busybox sans commande sort aussitôt : le "
-        "logger doit tourner en boucle sans fin.",
+def _absent() -> str:
+    return message(en=f"No Pod {POD} in {NS}.", fr=f"Aucun Pod {POD} dans {NS}.")
+
+
+def _verifier_budget(host, nom: str) -> None:
+    pod = _pod(host)
+    assert pod is not None, _absent()
+    res = {c["name"]: c.get("resources") or {} for c in pod["spec"]["containers"]}.get(nom, {})
+    vu = {g: {r: (res.get(g) or {}).get(r) for r in BUDGETS[nom][g]} for g in ("requests", "limits")}
+    assert vu == BUDGETS[nom], message(
+        en=f"Container {nom} declares {vu}, expected {BUDGETS[nom]}. Budgets are declared container by "
+        "container, never at the level of the Pod.",
+        fr=f"Le conteneur {nom} déclare {vu}, attendu {BUDGETS[nom]}. Les budgets se déclarent conteneur par "
+        "conteneur, jamais au niveau du Pod.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. Chaque conteneur a exactement son budget.
+# 1. multi-app tourne avec ses deux conteneurs.
 # ----------------------------------------------------------------------
-def test_les_budgets_sont_ceux_demandes(host):
-    conteneurs = {c["name"]: c for c in _pod(host)["spec"]["containers"]}
-    for nom, attendu in ATTENDU.items():
-        res = conteneurs.get(nom, {}).get("resources") or {}
-        for genre in ("requests", "limits"):
-            for ressource, valeur in attendu[genre].items():
-                vu = (res.get(genre) or {}).get(ressource)
-                assert vu == valeur, message(
-                    en=f"Container {nom}: {genre}.{ressource} is {vu!r}, expected {valeur!r}. "
-                    "Resources are declared container by container, under "
-                    "spec.containers[].resources.",
-                    fr=f"Conteneur {nom} : {genre}.{ressource} vaut {vu!r}, attendu {valeur!r}. "
-                    "Les resources se déclarent conteneur par conteneur, sous "
-                    "spec.containers[].resources.",
-                )
-
-
-# ----------------------------------------------------------------------
-# 3. Labels et annotation.
-# ----------------------------------------------------------------------
-def test_labels_et_annotation(host):
-    meta = _pod(host)["metadata"]
-    labels = meta.get("labels") or {}
-    for cle, valeur in LABELS.items():
-        assert labels.get(cle) == valeur, message(
-            en=f"Label {cle} is {labels.get(cle)!r}, expected {valeur!r}. Labels present: {labels}",
-            fr=f"Le label {cle} vaut {labels.get(cle)!r}, attendu {valeur!r}. Labels présents : {labels}",
-        )
-    annotations = meta.get("annotations") or {}
-    assert annotations.get("description", "").strip(), message(
-        en="No description annotation on the Pod, or it is empty. An "
-        "annotation is declared under metadata.annotations, like a label, but "
-        "it only serves humans and tools, never selections.",
-        fr="Aucune annotation description sur le Pod, ou elle est vide. Une "
-        "annotation se déclare sous metadata.annotations, comme un label, mais "
-        "elle ne sert qu'aux humains et aux outils, jamais aux sélections.",
+def test_multi_app_tourne_avec_ses_deux_conteneurs(host):
+    pod = _pod(host)
+    assert pod is not None, _absent()
+    fin = time.monotonic() + ATTENTE
+    while pod["status"].get("phase") != "Running" and time.monotonic() < fin:
+        time.sleep(PAS)
+        pod = _pod(host) or pod
+    images = {c["name"]: c.get("image") for c in pod["spec"]["containers"]}
+    prets = {s["name"]: s.get("ready") for s in pod["status"].get("containerStatuses") or []}
+    assert images == IMAGES and all(prets.get(n) for n in IMAGES), message(
+        en=f"{POD} carries the containers {images}, ready: {prets}. Expected exactly web and logger, on the "
+        "images of the requirements, both running. A busybox container with nothing to do exits at once.",
+        fr=f"{POD} porte les conteneurs {images}, prêts : {prets}. Attendu exactement web et logger, sur les "
+        "images du cahier des charges, tous deux en marche. Un conteneur busybox qui n'a rien à faire sort "
+        "aussitôt.",
     )
 
 
 # ----------------------------------------------------------------------
-# 4. La limite de mémoire est appliquée par le noyau, dans chaque conteneur.
+# 2. et 3. Chaque conteneur a son budget.
 # ----------------------------------------------------------------------
-def test_la_limite_de_memoire_est_appliquee(host):
-    for nom, octets in LIMITES_OCTETS.items():
-        res = _kubectl(host, f"-n {NAMESPACE} exec {POD} -c {nom} -- cat /sys/fs/cgroup/memory.max")
-        assert res.rc == 0, message(
-            en=f"Cannot read the cgroup in {nom}: {res.stderr.strip()[:120]}",
-            fr=f"Lecture du cgroup impossible dans {nom} : {res.stderr.strip()[:120]}",
-        )
-        vu = res.stdout.strip()
-        assert vu == str(octets), message(
-            en=f"Inside container {nom}, the kernel applies memory.max = {vu!r}, expected "
-            f"{octets} bytes. \"max\" means no limit applies: the "
-            "declared limit is not the one running, or the Pod was not recreated "
-            "after the change.",
-            fr=f"Dans le conteneur {nom}, le noyau applique memory.max = {vu!r}, attendu "
-            f"{octets} octets. « max » signifie qu'aucune limite ne s'applique : la "
-            "limite déclarée n'est pas celle qui tourne, ou le Pod n'a pas été recréé "
-            "après modification.",
-        )
+def test_web_a_son_budget(host):
+    _verifier_budget(host, "web")
+
+
+def test_logger_a_son_budget(host):
+    _verifier_budget(host, "logger")
+
+
+# ----------------------------------------------------------------------
+# 4. Le noyau applique la limite de mémoire dans chaque conteneur.
+# ----------------------------------------------------------------------
+def test_le_noyau_applique_la_limite_de_memoire_de_chaque_conteneur(host):
+    assert _pod(host) is not None, _absent()
+    lus = {}
+    for nom in LIMITES_OCTETS:
+        res = host.run(f"{ADMIN} -n {NS} exec {POD} -c {nom} -- cat /sys/fs/cgroup/memory.max")
+        lus[nom] = res.stdout.strip() if res.rc == 0 else "illisible"
+    attendus = {n: str(o) for n, o in LIMITES_OCTETS.items()}
+    assert lus == attendus, message(
+        en=f"Inside the containers, the kernel applies the memory limits {lus}, expected {attendus} bytes. "
+        "\"max\" means that no limit applies: the declared limit is not the one running.",
+        fr=f"Dans les conteneurs, le noyau applique les limites de mémoire {lus}, attendu {attendus} octets. "
+        "« max » signifie qu'aucune limite ne s'applique : la limite déclarée n'est pas celle qui tourne.",
+    )

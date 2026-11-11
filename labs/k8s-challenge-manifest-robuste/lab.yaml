@@ -1,0 +1,119 @@
+# Challenge du module « Déployer ses applications » (niveau 2), hébergé par la
+# leçon « Débugger une application » (KUBERN-06-12), section Mettre en
+# pratique (décisions P12 et D43). Il croise les gestes des labs guidés du
+# module sans en refaire un : une application livrée par Kustomize, avec init
+# container, sidecar natif, budgets et sondes, un CronJob, un Job, et un Pod en
+# panne à diagnostiquer avant de le réparer.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Dix
+# critères à poids égal, seuil 70, trois bloquants (décision de Stéphane du
+# 2026-11-11). Quatre indices à 2, 3, 5 et 5, annoncés dans le scénario avec
+# leur effet sur la note.
+id: k8s-challenge-manifest-robuste
+title: "Ship a robust manifest from a set of requirements"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Without guidance, ship an application from one Kustomize base into two
+  variants, with an init container, a native sidecar, budgets and probes,
+  schedule a CronJob, run a Job to completion, and repair a failing Pod after
+  recording its cause.
+skills:
+  - kustomize
+  - init-container
+  - native-sidecar
+  - probes
+  - requests-limits
+  - jobs-cronjobs
+  - troubleshooting
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les trois exigences qu'aucun total ne compense : l'application livrée sur
+  # son digest, ses sondes avec des Pods Ready sans redémarrage, et le
+  # diagnostic posé avant la réparation.
+  - test_prod_colis_a_ses_trois_replicas_disponibles_sur_le_digest
+  - test_trois_sondes_sur_le_port_80_et_pods_ready_sans_redemarrage
+  - test_la_cause_de_la_panne_est_consignee_avant_la_reparation
+estimated_time: 60m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: application-disponible
+    label: "prod-colis has its three replicas available, on the image referred to by digest"
+    tests:
+      - test_prod_colis_a_ses_trois_replicas_disponibles_sur_le_digest
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+  - id: init-et-sidecar
+    label: "An init container completes before the start, a native sidecar passes on the logs"
+    tests:
+      - test_init_container_et_sidecar_natif_relaient_les_journaux
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: requests-et-limits
+    label: "Every container declares requests and limits, with the requested memory limit"
+    tests:
+      - test_chaque_conteneur_declare_requests_et_limits
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: sondes-et-ready
+    label: "Three probes on port 80, every Pod Ready without restart"
+    tests:
+      - test_trois_sondes_sur_le_port_80_et_pods_ready_sans_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: cronjob-planifie
+    label: "The purge-colis CronJob is scheduled as requested"
+    tests:
+      - test_le_cronjob_purge_colis_est_planifie_comme_demande
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: job-termine
+    label: "The inventaire Job completed with three completions"
+    tests:
+      - test_le_job_inventaire_est_termine_avec_trois_completions
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: meme-base-kustomize
+    label: "dev and prod come from one and the same Kustomize base"
+    tests:
+      - test_dev_et_prod_viennent_d_une_meme_base
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+  - id: cluster-conforme
+    label: "The cluster matches the versioned folder"
+    tests:
+      - test_le_cluster_correspond_aux_overlays
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: cause-consignee
+    label: "The cause of the failure is recorded before the repair"
+    tests:
+      - test_la_cause_de_la_panne_est_consignee_avant_la_reparation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+  - id: repare-sans-recreer
+    label: "etiquettes runs, without having been recreated"
+    tests:
+      - test_etiquettes_tourne_sans_avoir_ete_recree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

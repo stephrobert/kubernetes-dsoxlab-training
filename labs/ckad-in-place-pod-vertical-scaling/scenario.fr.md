@@ -9,8 +9,6 @@ interrompre**. Il faut lui donner plus, maintenant, sans le recréer et sans
 que son conteneur redémarre.
 
 Le Pod a été livré avec une politique de redimensionnement qui l'autorise.
-Longtemps, changer les ressources d'un Pod signifiait le supprimer ; ce
-n'est plus vrai.
 
 ## Ce que vous devez obtenir
 

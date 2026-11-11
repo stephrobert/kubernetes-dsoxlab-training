@@ -1,5 +1,15 @@
-title: "Un Pod à deux conteneurs, avec budgets, labels et annotation"
+title: "Un Pod à deux conteneurs et ses budgets de ressources"
 description: |
   Écrire à la main un Pod à deux conteneurs, chacun avec ses requests et ses
-  limits, avec des labels et une annotation, et prouver depuis l'intérieur de
-  chaque conteneur que la limite de mémoire est celle que le noyau applique.
+  limits, et prouver depuis l'intérieur de chaque conteneur que la limite de
+  mémoire est celle que le noyau applique.
+
+criteria:
+  - id: deux-conteneurs-en-marche
+    label: "multi-app tourne avec ses deux conteneurs"
+  - id: budget-de-web
+    label: "web déclare ses requests et ses limits"
+  - id: budget-de-logger
+    label: "logger déclare ses requests et ses limits"
+  - id: limite-appliquee-par-le-noyau
+    label: "Le noyau applique la limite de mémoire de chaque conteneur"

@@ -11,3 +11,11 @@
         --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
+
+    - name: Retirer le relevé de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/broken-app"
+        - /var/lib/dsoxlab/troubleshoot-missing-configmap.json

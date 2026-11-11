@@ -1,14 +1,17 @@
 """test_functional.py : ckad-in-place-pod-vertical-scaling
 
-Ces tests lisent l'état du CLUSTER et du CONTENEUR, jamais les commandes
-tapées.
+Ces tests lisent la définition du Pod scaling-pod, son identité comparée à
+celle que le setup a mémorisée, les ressources que le kubelet rapporte avoir
+allouées, et la limite que le noyau applique, lue dans le cgroup. Un test
+vérifie un seul état demandé par l'énoncé.
 
-Trois affirmations. La première lit les ressources demandées ; la deuxième
-prouve que le Pod est le même objet, par sa date de création gardée en
-annotation par le setup, et que son conteneur n'a pas redémarré ; la
-troisième lit la limite dans le cgroup du conteneur, là où le noyau
-l'applique. Un Pod supprimé et recréé avec le bon budget aurait les bonnes
-ressources et une autre date : il ne passerait pas.
+Le test d'identité exige d'abord que le redimensionnement soit demandé : sans
+cette précondition, un Pod qu'on n'a pas touché passerait, puisqu'il n'est ni
+recréé ni redémarré.
+
+Tous échouent avant le travail : scaling-pod demande encore 100m et 128Mi.
+
+Les messages disent ce qui manque, jamais la commande qui le pose.
 """
 
 from __future__ import annotations
@@ -20,11 +23,15 @@ import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "lab"
+NS = "lab"
 POD = "scaling-pod"
-ANNOTATION = "lab.dsoxlab/cree-le"
-MEMOIRE_OCTETS = 256 * 1024 * 1024
-KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+MEMOIRE = "/var/lib/dsoxlab/in-place-pod-vertical-scaling.json"
+CPU = "200m"
+LIMITE = "256Mi"
+LIMITE_OCTETS = 256 * 1024 * 1024
+ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
+ATTENTE = 60
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -32,95 +39,81 @@ def host():
     return lab_host(lab_target_host("k8s-cp.lab"))
 
 
-def _kubectl(host, args: str):
-    return host.run(f"sudo {KUBECTL} {args}")
-
-
 def _pod(host) -> dict:
-    res = _kubectl(host, f"-n {NAMESPACE} get pod {POD} -o json")
-    assert res.rc == 0, message(
-        en=f"No Pod {POD} in {NAMESPACE}: it was not to be deleted.",
-        fr=f"Aucun Pod {POD} dans {NAMESPACE} : il ne fallait pas le supprimer.",
+    res = host.run(f"{ADMIN} -n {NS} get pod {POD} -o json")
+    assert res.rc == 0 and res.stdout.strip(), message(
+        en=f"No Pod {POD} in {NS}: it had to be resized, not deleted.",
+        fr=f"Aucun Pod {POD} dans {NS} : il fallait le redimensionner, pas le supprimer.",
     )
     return json.loads(res.stdout)
 
 
+def _demande(pod: dict) -> tuple:
+    res = pod["spec"]["containers"][0].get("resources") or {}
+    return (res.get("requests") or {}).get("cpu"), (res.get("limits") or {}).get("memory")
+
+
 # ----------------------------------------------------------------------
-# 1. Les ressources demandées sont les nouvelles.
+# 1. scaling-pod demande ses nouvelles ressources.
 # ----------------------------------------------------------------------
-def test_les_nouvelles_ressources_sont_demandees(host):
-    res = _pod(host)["spec"]["containers"][0].get("resources") or {}
-    cpu = (res.get("requests") or {}).get("cpu")
-    memoire = (res.get("limits") or {}).get("memory")
-    assert cpu == "200m", message(
-        en=f"requests.cpu is {cpu!r}, expected '200m'. kubectl edit refuses that field on "
-        "a Pod: it goes through the resize subresource, with kubectl patch.",
-        fr=f"requests.cpu vaut {cpu!r}, attendu '200m'. kubectl edit refuse ce champ sur "
-        "un Pod : il passe par la sous-ressource resize, avec kubectl patch.",
-    )
-    assert memoire == "256Mi", message(
-        en=f"limits.memory is {memoire!r}, expected '256Mi'.",
-        fr=f"limits.memory vaut {memoire!r}, attendu '256Mi'.",
+def test_scaling_pod_demande_ses_nouvelles_ressources(host):
+    cpu, memoire = _demande(_pod(host))
+    assert (cpu, memoire) == (CPU, LIMITE), message(
+        en=f"{POD} requests {cpu!r} of CPU and limits its memory to {memoire!r}, expected {CPU} and {LIMITE}.",
+        fr=f"{POD} demande {cpu!r} de CPU et limite sa mémoire à {memoire!r}, attendu {CPU} et {LIMITE}.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. Même Pod, même conteneur : rien n'a été recréé ni redémarré.
+# 2. Le redimensionnement s'est fait en place : même Pod, aucun redémarrage.
 # ----------------------------------------------------------------------
-def test_le_pod_n_a_ete_ni_recree_ni_redemarre(host):
+def test_le_redimensionnement_s_est_fait_sans_recreer_ni_redemarrer(host):
+    res = host.run(f"sudo cat {MEMOIRE}")
+    if res.rc != 0:
+        pytest.fail(message(
+            en="The memory of the initial state is missing: run dsoxlab reset ckad-in-place-pod-vertical-scaling.",
+            fr="La mémoire de l'état initial est absente : lancez dsoxlab reset ckad-in-place-pod-vertical-scaling.",
+        ))
+    uid_initial = json.loads(res.stdout)["uid"]
     pod = _pod(host)
-    creation = pod["metadata"].get("creationTimestamp")
-    notee = (pod["metadata"].get("annotations") or {}).get(ANNOTATION)
-    assert notee, message(
-        en=f"Annotation {ANNOTATION} is gone: the Pod was recreated from scratch. Setup "
-        "had placed it on the original Pod, and a recreated Pod no longer carries it.",
-        fr=f"L'annotation {ANNOTATION} a disparu : le Pod a été recréé de zéro. Le setup "
-        "l'avait posée sur le Pod d'origine, et un Pod recréé ne l'a plus.",
+    assert _demande(pod) == (CPU, LIMITE), message(
+        en=f"{POD} has not been resized yet: an untouched Pod proves nothing.",
+        fr=f"{POD} n'a pas encore été redimensionné : un Pod qu'on n'a pas touché ne prouve rien.",
     )
-    assert creation == notee, message(
-        en=f"The Pod was created at {creation}, but setup had placed a Pod created at "
-        f"{notee}: this is no longer the same object. Resizing in place means "
-        "modifying the running Pod, not putting another one in its place.",
-        fr=f"Le Pod a été créé le {creation}, mais le setup avait posé un Pod créé le "
-        f"{notee} : ce n'est plus le même objet. Redimensionner en place, c'est "
-        "modifier le Pod qui tourne, pas en poser un autre.",
-    )
-    statut = (pod["status"].get("containerStatuses") or [{}])[0]
-    assert statut.get("restartCount", 0) == 0, message(
-        en=f"The container restarted {statut.get('restartCount')} times. With a "
-        "resizePolicy of NotRequired, a resize does not restart the container.",
-        fr=f"Le conteneur a redémarré {statut.get('restartCount')} fois. Avec une "
-        "resizePolicy NotRequired, un redimensionnement ne redémarre pas le conteneur.",
-    )
-    # Le kubelet rapporte les ressources qu'il a réellement allouées : avant
-    # le travail, ce sont encore les anciennes, et ce test ne passe pas.
-    allouees = (statut.get("resources") or {}).get("limits") or {}
-    assert allouees.get("memory") == "256Mi", message(
-        en=f"The kubelet allocated {allouees.get('memory')!r} of memory as the limit, expected "
-        "256Mi: the Pod is indeed the same one, but it has not been resized yet, or "
-        "the kubelet refused. The Pod's status, resize field, says so.",
-        fr=f"Le kubelet a alloué {allouees.get('memory')!r} de mémoire en limite, attendu "
-        "256Mi : le Pod est bien le même, mais il n'a pas encore été redimensionné, ou "
-        "le kubelet a refusé. Le statut du Pod, champ resize, le dit.",
+    redemarrages = (pod["status"].get("containerStatuses") or [{}])[0].get("restartCount", 0)
+    meme = pod["metadata"]["uid"] == uid_initial
+    constat_fr = "est le même objet" if meme else "n'est plus l'objet que le lab a posé : il a été recréé"
+    assert meme and redemarrages == 0, message(
+        en=f"{POD} {'is the same object' if meme else 'is no longer the object the lab installed: it was recreated'}, "
+        f"and its container restarted {redemarrages} time(s). Resizing in place means changing the running "
+        "Pod, without recreating it and without restarting its container.",
+        fr=f"{POD} {constat_fr}, "
+        f"et son conteneur a redémarré {redemarrages} fois. Redimensionner en place, c'est modifier le Pod qui "
+        "tourne, sans le recréer et sans redémarrer son conteneur.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. La preuve : le noyau applique la nouvelle limite.
+# 3. La nouvelle limite est appliquée : par le kubelet, puis par le noyau.
 # ----------------------------------------------------------------------
-def test_le_noyau_applique_la_nouvelle_limite(host):
-    vu = ""
-    for _ in range(12):
-        res = _kubectl(host, f"-n {NAMESPACE} exec {POD} -- cat /sys/fs/cgroup/memory.max")
-        vu = res.stdout.strip()
-        if vu == str(MEMOIRE_OCTETS):
-            return
-        time.sleep(5)
-    assert vu == str(MEMOIRE_OCTETS), message(
-        en=f"Inside the container, memory.max is {vu!r}, expected {MEMOIRE_OCTETS} bytes, "
-        "that is 256Mi. The Pod asks for the new limit, but the kubelet has not "
-        "applied it: the Pod's status, resize field, says whether it is pending or refused.",
-        fr=f"Dans le conteneur, memory.max vaut {vu!r}, attendu {MEMOIRE_OCTETS} octets, "
-        "soit 256Mi. Le Pod demande la nouvelle limite, mais le kubelet ne l'a pas "
-        "appliquée : le statut du Pod, champ resize, dit s'il est en attente ou refusé.",
+def test_la_nouvelle_limite_est_appliquee_par_le_kubelet_et_le_noyau(host):
+    pod = _pod(host)
+    fin = time.monotonic() + ATTENTE
+    alloue = lu = None
+    while True:
+        statut = (pod["status"].get("containerStatuses") or [{}])[0]
+        alloue = ((statut.get("resources") or {}).get("limits") or {}).get("memory")
+        res = host.run(f"{ADMIN} -n {NS} exec {POD} -- cat /sys/fs/cgroup/memory.max")
+        lu = res.stdout.strip() if res.rc == 0 else "illisible"
+        if (alloue == LIMITE and lu == str(LIMITE_OCTETS)) or time.monotonic() >= fin:
+            break
+        time.sleep(PAS)
+        pod = _pod(host)
+    assert alloue == LIMITE and lu == str(LIMITE_OCTETS), message(
+        en=f"The kubelet reports {alloue!r} allocated as the memory limit, and the kernel applies {lu!r}. "
+        f"Expected {LIMITE}, that is {LIMITE_OCTETS} bytes. A resize can be accepted by the API and still "
+        "be pending or refused on the node: the Pod's conditions say so.",
+        fr=f"Le kubelet rapporte {alloue!r} alloué en limite de mémoire, et le noyau applique {lu!r}. Attendu "
+        f"{LIMITE}, soit {LIMITE_OCTETS} octets. Un redimensionnement peut être accepté par l'API et rester en "
+        "attente ou refusé sur le nœud : les conditions du Pod le disent.",
     )

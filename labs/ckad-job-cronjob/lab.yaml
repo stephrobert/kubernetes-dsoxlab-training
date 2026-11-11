@@ -15,9 +15,9 @@ skills:
   - parallelism
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 20m
 
 # Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
 # « Understand Jobs and CronJobs ».
@@ -34,3 +34,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: quatre-completions-deux-a-la-fois
+    label: "batch-job asks for four completions, two at a time"
+    tests:
+      - test_batch_job_demande_quatre_completions_deux_a_la_fois
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: job-termine
+    label: "batch-job completed successfully"
+    tests:
+      - test_batch_job_est_termine_avec_succes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: parallelisme-observe
+    label: "Two runs really overlapped in time"
+    tests:
+      - test_deux_executions_se_sont_chevauchees
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: cronjob-planifie
+    label: "log-cleanup runs every five minutes with a bounded history"
+    tests:
+      - test_log_cleanup_est_planifie_avec_un_historique_borne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: declenche-a-la-main
+    label: "A Job started by hand from log-cleanup succeeded"
+    tests:
+      - test_un_job_lance_a_la_main_depuis_log_cleanup_a_reussi
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/

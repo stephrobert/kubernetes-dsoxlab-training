@@ -3,7 +3,7 @@
 ## The situation
 
 The **`probed-app`** application in the **`lab`** namespace is a web server,
-image `nginx:1.27-alpine`, answering on port 80. It has two known defects: it
+image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`, answering on port 80. It has two known defects: it
 sometimes **takes a long time to start**, up to a minute, and it sometimes
 **freezes** without dying. With no probes, Kubernetes believes it healthy in
 both cases, and sends traffic to it.

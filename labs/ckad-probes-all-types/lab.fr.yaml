@@ -4,3 +4,15 @@ description: |
   sens : un démarrage lent toléré, une vivacité surveillée, un trafic
   qui n'arrive qu'une fois prête. Prouver que les sondes agissent : le Pod
   n'est Ready que parce qu'elles répondent.
+
+criteria:
+  - id: port-et-image
+    label: "probed-app déclare son port 80, sur l'image demandée"
+  - id: demarrage-tolerant
+    label: "La sonde de démarrage tolère une minute de démarrage lent"
+  - id: vivacite-http
+    label: "La sonde de vivacité interroge le port 80 en HTTP"
+  - id: disponibilite-http
+    label: "La sonde de disponibilité interroge le port 80 en HTTP"
+  - id: ready-sans-redemarrage
+    label: "probed-app est Ready, sans redémarrage"

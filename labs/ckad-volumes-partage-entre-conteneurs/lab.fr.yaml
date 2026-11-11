@@ -4,3 +4,11 @@ description: |
   partagé entre eux. Donnez-leur un volume dont la durée de vie est celle du
   Pod, et prouvez-le dans les deux sens : ce qui est écrit dans le volume passe,
   ce qui est écrit à côté ne passe pas.
+
+criteria:
+  - id: volume-ephemere-commun
+    label: "Un volume éphémère est monté au même chemin dans les deux conteneurs"
+  - id: le-lecteur-voit
+    label: "Le lecteur voit le fichier du producteur"
+  - id: le-reste-reste-invisible
+    label: "Ce qui est écrit hors du volume reste invisible au lecteur"
