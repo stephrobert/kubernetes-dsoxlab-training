@@ -87,13 +87,25 @@ def _forme(texte: str) -> str:
     return "-".join(sans.replace("_", " ").split())
 
 
-#: Qui a créé ou recréé un Pod : le contrôleur exact, le processus qui l'héberge,
-#: ou l'objet qui le porte, comme les leçons le disent (« le ReplicaSet recrée »).
-CREATEURS_DE_POD = ("replicaset-controller", "kube-controller-manager",
-                    "controller-manager", "replicaset", "replica-set")
-#: Qui a recréé un ReplicaSet : le contrôleur exact, son processus, ou le Deployment.
-CREATEURS_DE_REPLICASET = ("deployment-controller", "kube-controller-manager",
-                           "controller-manager", "deployment")
+#: L'objet de ce lab est la DISTINCTION entre deux contrôleurs : chaque champ doit
+#: nommer le sien. « replicaset » couvre replicaset-controller, ReplicaSet et
+#: « contrôleur des ReplicaSets » ; « deployment » couvre deployment-controller,
+#: Deployment et « contrôleur des Deployments ». Le kube-controller-manager seul
+#: est refusé : il héberge les deux contrôleurs, le nommer ne distingue rien.
+CONTROLEUR_DU_POD = ("replicaset", "replica-set")
+CONTROLEUR_DU_REPLICASET = ("deployment",)
+HOTE_DES_CONTROLEURS = ("controller-manager",)
+
+
+def _juge_controleur(valeur: str, attendu: tuple[str, ...], rival: tuple[str, ...]) -> str | None:
+    """Rend None si la valeur nomme le bon contrôleur, sinon la raison du refus."""
+    forme = _forme(valeur)
+    nomme = any(nom in forme for nom in attendu)
+    if not nomme and any(nom in forme for nom in HOTE_DES_CONTROLEURS):
+        return "hote"
+    if not nomme or any(nom in forme for nom in (*rival, "scheduler", "kubelet")):
+        return "faux"
+    return None
 
 
 # ----------------------------------------------------------------------
@@ -152,13 +164,19 @@ def test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande
 # ----------------------------------------------------------------------
 def test_le_controleur_qui_recree_le_pod_est_consigne(releve):
     valeur = _valeur(releve, "pod-recree-par")
-    forme = _forme(valeur)
-    assert any(nom in forme for nom in CREATEURS_DE_POD) and not any(
-        nom in forme for nom in ("deployment", "scheduler", "kubelet")), message(
+    refus = _juge_controleur(valeur, CONTROLEUR_DU_POD, CONTROLEUR_DU_REPLICASET)
+    assert refus != "hote", message(
+        en=f"pod-recree-par is {valeur!r}: the kube-controller-manager hosts every controller. "
+           "Name the controller itself, as shown in the From column of kubectl describe.",
+        fr=f"pod-recree-par vaut {valeur!r} : le kube-controller-manager héberge tous les "
+           "contrôleurs. Nommez le contrôleur lui-même, tel que l'affiche la colonne From de "
+           "kubectl describe.",
+    )
+    assert refus is None, message(
         en=f"pod-recree-par is {valeur!r}; it must name the controller that wrote the "
-           "SuccessfulCreate event of the new Pod.",
+           "SuccessfulCreate event of the new Pod, and only that one.",
         fr=f"pod-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "
-           "l'événement SuccessfulCreate du nouveau Pod.",
+           "l'événement SuccessfulCreate du nouveau Pod, et lui seul.",
     )
 
 
@@ -167,11 +185,23 @@ def test_le_controleur_qui_recree_le_pod_est_consigne(releve):
 # ----------------------------------------------------------------------
 def test_le_controleur_qui_recree_le_replicaset_est_consigne(releve):
     valeur = _valeur(releve, "replicaset-recree-par")
-    forme = _forme(valeur)
-    assert any(nom in forme for nom in CREATEURS_DE_REPLICASET) and not any(
-        nom in forme for nom in ("replicaset", "replica-set", "scheduler", "kubelet")), message(
+    refus = _juge_controleur(valeur, CONTROLEUR_DU_REPLICASET, CONTROLEUR_DU_POD)
+    assert refus != "hote", message(
+        en=f"replicaset-recree-par is {valeur!r}: the kube-controller-manager hosts every "
+           "controller. Name the controller itself, as shown in the From column of kubectl describe.",
+        fr=f"replicaset-recree-par vaut {valeur!r} : le kube-controller-manager héberge tous les "
+           "contrôleurs. Nommez le contrôleur lui-même, tel que l'affiche la colonne From de "
+           "kubectl describe.",
+    )
+    assert refus is None, message(
         en=f"replicaset-recree-par is {valeur!r}; it must name the controller that wrote the "
-           "ScalingReplicaSet event of the Deployment.",
+           "ScalingReplicaSet event of the Deployment, and only that one.",
         fr=f"replicaset-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "
-           "l'événement ScalingReplicaSet du Deployment.",
+           "l'événement ScalingReplicaSet du Deployment, et lui seul.",
+    )
+    assert _forme(valeur) != _forme(releve.get("pod-recree-par", "")), message(
+        en="replicaset-recree-par and pod-recree-par carry the same value: two different "
+           "controllers recreated the Pod and the ReplicaSet.",
+        fr="replicaset-recree-par et pod-recree-par portent la même valeur : ce sont deux "
+           "contrôleurs différents qui ont recréé le Pod et le ReplicaSet.",
     )

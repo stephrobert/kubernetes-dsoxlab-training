@@ -30,7 +30,7 @@ line.
    **`evenement-scheduled`** quotes the message of the event that proves it.
 
 5. For `file-attente`, **`cree-par`** names the component that created its
-   Pods, and **`n-agit-pas`** names the one component that does not act on
+   Pods, and **`n-agit-pas`** names the first link of the chain that does not act on
    them. Diagnose only: do not repair the Deployment. The From column of the
    Events section of `kubectl describe` gives the exact name of the component
    that acted.

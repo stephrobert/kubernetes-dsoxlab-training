@@ -31,7 +31,7 @@ ligne.
    **`evenement-scheduled`** cite le message de l'événement qui le prouve.
 
 5. Pour `file-attente`, **`cree-par`** nomme le composant qui a créé ses
-   Pods, et **`n-agit-pas`** nomme le seul composant qui n'agit pas sur eux.
+   Pods, et **`n-agit-pas`** nomme le premier maillon de la chaîne qui n'agit pas sur eux.
    Diagnostic seul : ne réparez pas le Deployment. La colonne From de la
    section Events de `kubectl describe` donne le nom exact du composant qui a
    agi.
