@@ -229,7 +229,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
 | 1 | [`cka-static-pod`](labs/cka-static-pod/) | Poser un Pod statique sur un worker, sans passer par l'API | cluster-architecture-installation-configuration | 10m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique) |
-| 2 | [`cka-daemonset-all-nodes`](labs/cka-daemonset-all-nodes/) | Un agent sur chaque nœud, control plane compris | workloads-scheduling | 10m | 2026-09-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/#mettre-en-pratique) |
+| 2 | [`cka-daemonset-all-nodes`](labs/cka-daemonset-all-nodes/) | Un agent sur chaque nœud, control plane compris | workloads-scheduling | 10m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/#mettre-en-pratique) |
 | 3 | [`cka-statefulset-identite-stable`](labs/cka-statefulset-identite-stable/) | Donner une identité stable à chaque réplica avec un StatefulSet | workloads | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/#mettre-en-pratique) |
 | 4 | [`k8s-challenge-choisir-le-bon-workload`](labs/k8s-challenge-choisir-le-bon-workload/) | Choisir et déployer le bon workload pour trois besoins | workloads | 50m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique) |
 | 5 | [`cka-rbac-serviceaccount`](labs/cka-rbac-serviceaccount/) | Donner une identité à une application : ServiceAccount, Role, RoleBinding | cluster-architecture-installation-configuration | 15m | 2026-09-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/) |
@@ -261,7 +261,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 
 Cinq domaines orientés application. « Application Environment, Configuration and Security » pèse 25 %, le plus lourd des cinq.
 
-37 lab(s).
+38 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -302,6 +302,7 @@ Cinq domaines orientés application. « Application Environment, Configuration a
 | 35 | [`k8s-gerer-les-images`](labs/k8s-gerer-les-images/) | Figer une image par digest et tirer d'un registre privé | application-deployment | 30m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/#mettre-en-pratique) |
 | 36 | [`k8s-challenge-manifest-robuste`](labs/k8s-challenge-manifest-robuste/) | Livrer un manifeste robuste à partir d'un cahier des charges | application-deployment | 60m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
 | 37 | [`ckad-crd-ressource-personnalisee`](labs/ckad-crd-ressource-personnalisee/) | Utiliser une ressource personnalisée, lire les refus de son schéma, la débloquer | workloads | 25m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique) |
+| 38 | [`k8s-epreuve-deployer-une-application`](labs/k8s-epreuve-deployer-une-application/) | Épreuve du niveau 2 : déployer une application qui garde ses données | workloads | 90m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/deployer-une-application/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -330,14 +331,6 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 17 | [`cks-ingress-tls`](labs/cks-ingress-tls/) | Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur | cluster-setup | 25m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Faire baisser le compte d'un audit CIS, et le prouver par un second audit | cluster-setup | 30m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-10-12 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
-
-### Pas encore dans un parcours
-
-Ces labs existent sur le disque, mais aucune section de `meta.yml` ne les déclare : ils n'ont donc de rang dans aucune progression. Ils sont listés ici plutôt qu'omis, parce qu'un lab qui n'apparaît nulle part est un lab que personne ne joue.
-
-| # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
-|---|---|---|---|---|---|---|
-| 1 | [`k8s-epreuve-deployer-une-application`](labs/k8s-epreuve-deployer-une-application/) | À remplir | l1 | 30m | non | [leçon](https://example.org/a-remplir) |
 
 Total : **94 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 

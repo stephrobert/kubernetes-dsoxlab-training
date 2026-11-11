@@ -33,33 +33,58 @@
  },
  "cka-daemonset-all-nodes": {
   "apres": {
-   "passed": 4,
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
    "score": 100,
-   "total": 4
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
   },
   "avant": {
+   "echecs": [
+    "test_chaque_agent_ecrit_heartbeat",
+    "test_le_daemonset_porte_l_image_demandee",
+    "test_le_taint_est_la_et_l_agent_le_tolere",
+    "test_les_pods_portent_le_label_app_monitor",
+    "test_un_pod_pret_sur_chaque_noeud"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 127,
+  "date": "2026-11-11",
+  "duree_s": 108,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-daemonset-all-nodes.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_chaque_agent_ecrit_heartbeat",
+    "test_le_daemonset_porte_l_image_demandee",
+    "test_le_taint_est_la_et_l_agent_le_tolere",
+    "test_les_pods_portent_le_label_app_monitor",
+    "test_un_pod_pret_sur_chaque_noeud"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
