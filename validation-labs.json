@@ -637,6 +637,65 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-statefulset-identite-stable": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_pod_se_resout_par_son_nom_stable",
+    "test_chaque_replica_a_sa_propre_revendication",
+    "test_la_donnee_du_replica_1_survit_a_son_pod",
+    "test_le_deployment_annuaire_a_laisse_la_place",
+    "test_le_service_annuaire_est_headless_et_gouverne_le_statefulset",
+    "test_le_statefulset_annuaire_a_trois_replicas_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 145,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 54 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-statefulset-identite-stable.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_pod_se_resout_par_son_nom_stable",
+    "test_chaque_replica_a_sa_propre_revendication",
+    "test_la_donnee_du_replica_1_survit_a_son_pod",
+    "test_le_deployment_annuaire_a_laisse_la_place",
+    "test_le_service_annuaire_est_headless_et_gouverne_le_statefulset",
+    "test_le_statefulset_annuaire_a_trois_replicas_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "cka-static-pod": {
   "apres": {
    "echecs": [],
@@ -1266,6 +1325,63 @@
    "skipped": 0,
    "status": "failed",
    "total": 14
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-crd-ressource-personnalisee": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_ancienne_est_debloquee_sans_toucher_a_la_crd",
+    "test_hebdomadaire_garde_trente_jours_sans_avoir_ete_recreee",
+    "test_la_sauvegarde_quotidienne_existe_avec_les_valeurs_demandees",
+    "test_le_groupe_et_la_version_de_l_api_sont_consignes",
+    "test_le_refus_d_une_retention_hors_bornes_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 80,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-crd-ressource-personnalisee.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_ancienne_est_debloquee_sans_toucher_a_la_crd",
+    "test_hebdomadaire_garde_trente_jours_sans_avoir_ete_recreee",
+    "test_la_sauvegarde_quotidienne_existe_avec_les_valeurs_demandees",
+    "test_le_groupe_et_la_version_de_l_api_sont_consignes",
+    "test_le_refus_d_une_retention_hors_bornes_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
@@ -2792,6 +2908,67 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-choisir-le-bon-workload": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_inventaire_a_trois_replicas_ordonnes_et_ready",
+    "test_la_collecte_journaux_est_conforme_et_sa_crd_established",
+    "test_la_donnee_du_replica_1_survit_a_son_pod",
+    "test_le_collecteur_est_pret_sur_chaque_noeud",
+    "test_le_taint_du_control_plane_est_present_et_tolere",
+    "test_les_noms_stables_se_resolvent_derriere_un_service_headless",
+    "test_une_retention_hors_bornes_est_refusee_en_dry_run_serveur"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 118,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-choisir-le-bon-workload.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_inventaire_a_trois_replicas_ordonnes_et_ready",
+    "test_la_collecte_journaux_est_conforme_et_sa_crd_established",
+    "test_la_donnee_du_replica_1_survit_a_son_pod",
+    "test_le_collecteur_est_pret_sur_chaque_noeud",
+    "test_le_taint_du_control_plane_est_present_et_tolere",
+    "test_les_noms_stables_se_resolvent_derriere_un_service_headless",
+    "test_une_retention_hors_bornes_est_refusee_en_dry_run_serveur"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-donnees-qui-survivent": {
   "apres": {
    "echecs": [],
@@ -3428,6 +3605,73 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-epreuve-deployer-une-application": {
+  "apres": {
+   "echecs": [],
+   "passed": 10,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 10
+  },
+  "avant": {
+   "echecs": [
+    "test_p01_livree_depuis_une_base_et_un_overlay_sans_ecart",
+    "test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage",
+    "test_p03_ressources_et_trois_sondes_declarees",
+    "test_p04_init_container_et_sidecar_relaient_le_volume_partage",
+    "test_p05_base_a_identite_stable_avec_une_revendication_par_replica",
+    "test_p06_la_donnee_du_correcteur_survit_a_son_pod",
+    "test_p07_volumes_crees_par_la_classe_en_retain",
+    "test_p08_sauvegarde_planifiee_et_lancee_a_la_main",
+    "test_p09_agent_sur_chaque_noeud_taint_garde",
+    "test_p10_ressource_personnalisee_conforme_et_borne_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 209,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-epreuve-deployer-une-application.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_p01_livree_depuis_une_base_et_un_overlay_sans_ecart",
+    "test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage",
+    "test_p03_ressources_et_trois_sondes_declarees",
+    "test_p04_init_container_et_sidecar_relaient_le_volume_partage",
+    "test_p05_base_a_identite_stable_avec_une_revendication_par_replica",
+    "test_p06_la_donnee_du_correcteur_survit_a_son_pod",
+    "test_p07_volumes_crees_par_la_classe_en_retain",
+    "test_p08_sauvegarde_planifiee_et_lancee_a_la_main",
+    "test_p09_agent_sur_chaque_noeud_taint_garde",
+    "test_p10_ressource_personnalisee_conforme_et_borne_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
   },
   "verdict": "VALIDE"
  },
