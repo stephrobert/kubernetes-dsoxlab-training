@@ -63,9 +63,22 @@ def host():
     return lab_host(lab_target_host("k8s-kind.lab"))
 
 
+#: testinfra se connecte avec `sudo=true` : ses commandes tournent en ROOT, et
+#: un `bash -ic` y lirait /root/.bashrc. Tout ce que l'apprenant voit (son
+#: PATH, son ~/.bashrc, son kubeconfig) se lit donc sous son compte, celui qui
+#: a ouvert la session SSH. Mesuré le 2026-11-11 : sans cela, la solution du
+#: formateur rendait 4/6, alias et complétion introuvables.
+APPRENANT = 'sudo -u "${SUDO_USER:-ansible}" -H'
+
+
+def _en_apprenant(host, commande: str):
+    """Joue `commande` sous le compte de l'apprenant, stdin fermé."""
+    return host.run(f"{APPRENANT} {commande} < /dev/null")
+
+
 def _shell_interactif(host, script: str):
-    """Joue `script` dans un bash interactif de l'utilisateur, stdin fermé."""
-    return host.run(f"bash -ic {shlex.quote(script)} < /dev/null")
+    """Joue `script` dans un nouveau bash interactif de l'apprenant."""
+    return _en_apprenant(host, f"bash -ic {shlex.quote(script)}")
 
 
 def _version_client(host) -> str | None:
@@ -200,7 +213,7 @@ def test_l_alias_k_lance_kubectl_et_se_complete(host):
 # 6. La connexion au serveur.
 # ----------------------------------------------------------------------
 def test_kubectl_atteint_le_serveur_du_cluster(host):
-    res = host.run(f"{BINAIRE} version -o json --request-timeout=15s")
+    res = _en_apprenant(host, f"{BINAIRE} version -o json --request-timeout=15s")
     try:
         serveur = json.loads(res.stdout).get("serverVersion", {}).get("gitVersion")
     except ValueError:
