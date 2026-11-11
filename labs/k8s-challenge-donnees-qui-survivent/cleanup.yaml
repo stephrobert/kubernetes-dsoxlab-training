@@ -1,0 +1,48 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace archives, les StorageClass
+# conserve et rapide, les volumes laissés par archives (reclaim policy Retain :
+# ils survivent à leur revendication, c'est l'objet du challenge), leurs
+# données sur le nœud, le dossier de l'apprenant et la mémoire. Le cluster
+# « lab » reste.
+- name: Nettoyer le challenge k8s-challenge-donnees-qui-survivent
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/lab.kubeconfig
+  tasks:
+    - name: Supprimer le namespace archives
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace archives
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les volumes qui revendiquaient dans archives
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get pv -o jsonpath='{range .items[?(@.spec.claimRef.namespace=="archives")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r {{ kubectl }} delete pv --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les StorageClass du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete storageclass conserve rapide --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Effacer les données des volumes d'archives sur le nœud
+      ansible.builtin.command: >-
+        docker exec lab-control-plane sh -c 'rm -rf /var/local-path-provisioner/*_archives_*'
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/archives"
+        - /var/lib/dsoxlab/challenge-donnees-qui-survivent.json

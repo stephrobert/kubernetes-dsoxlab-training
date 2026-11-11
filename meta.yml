@@ -172,6 +172,9 @@ sections:
       - cka-gateway-api-httproute
       - cka-pv-pvc-storageclass
       - cka-storageclass-provisionnement-dynamique
+      # Le challenge du module Stockage persistant, posé dans la leçon
+      # « StorageClass », sur le cluster kind « lab ».
+      - k8s-challenge-donnees-qui-survivent
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
       - cka-hpa-autoscaling
