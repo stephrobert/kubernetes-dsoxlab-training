@@ -14,7 +14,7 @@ supprimez, `dsoxlab reset ckad-expose-service` le remet.
 ## Ce que vous devez obtenir
 
 1. Un Deployment **`web`** dans `lab`, **trois replicas**, image
-   **`busybox:1.36`** (les tests lisent l'image des Pods en cours
+   **`busybox:1.38.0`** (les tests lisent l'image des Pods en cours
    d'exécution), dont chaque Pod sert **son propre nom d'hôte** en HTTP sur le
    port **8080**. Ses Pods portent le label **`app=web`**.
 

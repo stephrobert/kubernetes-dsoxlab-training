@@ -36,13 +36,23 @@ NAMESPACE = "lab"
 DEPLOYMENT = "web"
 SERVICE = "web-svc"
 CLIENT = "client"
-IMAGE = "busybox:1.36"
+IMAGE = "busybox:1.38.0"
 LABEL = "app=web"
 REPLICAS = 3
 PORT_SERVICE = 80
 PORT_CIBLE = 8080
 REQUETES = 10
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+
+
+def _image(reference: str) -> str:
+    """La référence d'image sans son digest.
+
+    ``nginx:1.30.6@sha256:...`` et ``nginx:1.30.6`` désignent la même image, et
+    la leçon jumelée épingle ses exemples par digest. Un apprenant qui copie ce
+    style demande bien l'image attendue.
+    """
+    return reference.split("@", 1)[0]
 
 
 @pytest.fixture(scope="module")
@@ -242,7 +252,7 @@ def test_les_pods_tournent_avec_l_image_demandee(host):
         f"{pod['metadata']['name']}: {conteneur.get('image')!r}"
         for pod in pods
         for conteneur in pod["spec"].get("containers") or []
-        if conteneur.get("image") != IMAGE
+        if _image(conteneur.get("image", "")) != IMAGE
     })
     assert not ecarts, message(
         en=f"The Pods of {DEPLOYMENT} must run image {IMAGE!r}. Found: {ecarts}. "

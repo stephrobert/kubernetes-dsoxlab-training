@@ -51,8 +51,8 @@ from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 DEPLOYMENT = "webapp"
-IMAGE = "nginx:1.27-alpine"
-IMAGE_AVANT = "nginx:1.26-alpine"
+IMAGE = "nginx:1.30.6"
+IMAGE_AVANT = "nginx:1.30.5"
 REPLICAS = 5
 REVISION = "deployment.kubernetes.io/revision"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -60,6 +60,16 @@ KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 #: Attente maximale d'un état transitoire : 18 essais de 5 s, soit 90 s.
 ESSAIS = 18
 PAUSE = 5
+
+
+def _image(reference: str) -> str:
+    """La référence d'image sans son digest.
+
+    ``nginx:1.30.6@sha256:...`` et ``nginx:1.30.6`` désignent la même image, et
+    la leçon jumelée épingle ses exemples par digest. Un apprenant qui copie ce
+    style demande bien l'image attendue.
+    """
+    return reference.split("@", 1)[0]
 
 
 @pytest.fixture(scope="module")
@@ -138,7 +148,7 @@ def _replicasets_rattaches(host) -> tuple[list[dict], list[str]]:
             continue
         rattaches.append({
             "nom": rs["metadata"]["name"],
-            "image": rs["spec"]["template"]["spec"]["containers"][0].get("image", ""),
+            "image": _image(rs["spec"]["template"]["spec"]["containers"][0].get("image", "")),
             "revision": int((rs["metadata"].get("annotations") or {}).get(REVISION, "0")),
             "voulus": rs["spec"].get("replicas", 0),
             "actuels": rs["status"].get("replicas", 0),
@@ -239,7 +249,7 @@ def test_maxunavailable_vaut_un(host):
 # 2. Le Deployment : son image, puis son état final complet.
 # ----------------------------------------------------------------------
 def test_l_image_est_la_nouvelle(host):
-    image = _deployment(host)["spec"]["template"]["spec"]["containers"][0].get("image")
+    image = _image(_deployment(host)["spec"]["template"]["spec"]["containers"][0].get("image", ""))
     assert image == IMAGE, message(
         en=f"The Deployment's image is {image!r}, expected {IMAGE!r}. The image of the Pod template "
         "is what a rolling update changes.",
@@ -256,8 +266,8 @@ def test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image(host):
     l'ancienne image sont prêts, et ils sont « à jour » au sens de Kubernetes,
     qui compare les Pods au template COURANT du Deployment sans savoir quelle
     image l'énoncé demande. Le test lit donc en plus l'image du ReplicaSet que
-    le Deployment déclare actif : au départ elle vaut 1.26, et seul le travail
-    l'amène sur 1.27. L'état mesuré reste un seul état, mais le travail est le
+    le Deployment déclare actif : au départ elle vaut 1.30.5, et seul le travail
+    l'amène sur 1.30.6. L'état mesuré reste un seul état, mais le travail est le
     seul chemin qui y mène.
 
     LA NON-RÉGRESSION DES CINQ REPLICAS EST ICI, et plus dans un test à elle.

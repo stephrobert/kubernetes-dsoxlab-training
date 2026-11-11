@@ -8,7 +8,7 @@ matin, avec une faute de frappe dans son nom. Depuis, `kubectl rollout
 status` ne rend pas la main : un Pod neuf n'arrive pas à tirer son image,
 les trois anciens tiennent le service, et le Deployment n'avance plus.
 
-L'image attendue est **`nginx:1.27-alpine`**. C'est son tag qui compte : un
+L'image attendue est **`nginx:1.30.6`**. C'est son tag qui compte : un
 digest ajouté à ce tag est accepté, un autre tag ne l'est pas.
 
 Vous êtes sur le control plane, avec `kubectl` configuré.
@@ -16,11 +16,11 @@ Vous êtes sur le control plane, avec `kubectl` configuré.
 ## Ce que vous devez obtenir
 
 1. **D'abord**, la version qui marchait, celle d'avant la mise à jour,
-   remise en service : `nginx:1.26-alpine`, en **révision 3** du Deployment.
+   remise en service : `nginx:1.30.5`, en **révision 3** du Deployment.
    Le déploiement bloqué doit être quitté avant de livrer quoi que ce soit
    d'autre.
 
-2. **Ensuite**, la bonne image livrée : `webapp` en `nginx:1.27-alpine`, en
+2. **Ensuite**, la bonne image livrée : `webapp` en `nginx:1.30.6`, en
    **révision 4** du Deployment, trois replicas demandés, trois replicas
    disponibles et à jour, et aucun Pod resté en erreur d'image.
 

@@ -15,7 +15,7 @@ skills:
   - selectors
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
 lab_type: lab
 estimated_time: 15m
 

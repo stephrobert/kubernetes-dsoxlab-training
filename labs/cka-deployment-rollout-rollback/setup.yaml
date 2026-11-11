@@ -1,6 +1,6 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session : webapp tourne en
-# nginx:1.26-alpine, puis une mise à jour vers une image qui n'existe pas
+# nginx:1.30.5, puis une mise à jour vers une image qui n'existe pas
 # est lancée et reste bloquée, un Pod en ImagePullBackOff, trois anciens qui
 # servent. C'est la situation de l'examen.
 #

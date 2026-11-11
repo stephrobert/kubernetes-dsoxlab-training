@@ -3,8 +3,8 @@
 ## La situation
 
 Dans le namespace **`lab`**, le Deployment **`webapp`** tourne en cinq
-replicas, image `nginx:1.26-alpine`. La prochaine mise à jour doit passer en
-`nginx:1.27-alpine`, et l'équipe a des contraintes : le cluster n'a pas de
+replicas, image `nginx:1.30.5`. La prochaine mise à jour doit passer en
+`nginx:1.30.6`, et l'équipe a des contraintes : le cluster n'a pas de
 place pour plus de **deux Pods en trop** pendant la bascule, et le service
 ne tolère pas plus d'**un Pod indisponible** à la fois.
 
@@ -23,7 +23,7 @@ service tombe donc pendant toute la bascule, et cette stratégie n'a ni
 
 3. Son `maxUnavailable` vaut **1**.
 
-4. Son image est passée à **`nginx:1.27-alpine`**.
+4. Son image est passée à **`nginx:1.30.6`**.
 
 5. Ses **cinq** replicas sont **prêts, à jour et sur la nouvelle image**.
    L'exercice change la stratégie et l'image, pas la taille du Deployment :
@@ -33,7 +33,7 @@ service tombe donc pendant toute la bascule, et cette stratégie n'a ni
    celle de la nouvelle image venant après celle de l'ancienne dans
    l'historique.
 
-7. Le ReplicaSet de `nginx:1.27-alpine` porte **cinq replicas prêts**.
+7. Le ReplicaSet de `nginx:1.30.6` porte **cinq replicas prêts**.
 
 8. Les anciens ReplicaSets sont **conservés à zéro**.
 
