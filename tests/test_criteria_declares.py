@@ -74,7 +74,6 @@ DETTE: set[str] = {
     "ckad-in-place-pod-vertical-scaling",
     "ckad-networkpolicy-ingress-egress",
     "ckad-pod-resources-labels",
-    "ckad-probes-all-types",
     "ckad-rbac-role-rolebinding",
     "ckad-security-context-hardened",
     "ckad-troubleshoot-crashloop",

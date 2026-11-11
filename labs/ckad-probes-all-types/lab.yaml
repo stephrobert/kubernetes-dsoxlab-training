@@ -16,9 +16,9 @@ skills:
   - health-check
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 20m
 
 # Compétence du blueprint CKAD, domaine Application Observability and
 # Maintenance (15 %) : « Implement probes and health checks ».
@@ -35,3 +35,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: port-et-image
+    label: "probed-app declares its port 80, on the requested image"
+    tests:
+      - test_probed_app_declare_son_port_sur_l_image_demandee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: demarrage-tolerant
+    label: "The startup probe tolerates a one-minute slow start"
+    tests:
+      - test_la_sonde_de_demarrage_tolere_une_minute
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: vivacite-http
+    label: "The liveness probe queries port 80 over HTTP"
+    tests:
+      - test_la_sonde_de_vivacite_interroge_le_port_80_en_http
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: disponibilite-http
+    label: "The readiness probe queries port 80 over HTTP"
+    tests:
+      - test_la_sonde_de_disponibilite_interroge_le_port_80_en_http
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: ready-sans-redemarrage
+    label: "probed-app is Ready, without any restart"
+    tests:
+      - test_probed_app_est_ready_sans_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/

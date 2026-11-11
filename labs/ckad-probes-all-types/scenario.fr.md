@@ -3,7 +3,7 @@
 ## La situation
 
 L'application **`probed-app`** du namespace **`lab`** est un serveur web,
-image `nginx:1.27-alpine`, qui répond sur le port 80. Elle a deux défauts
+image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`, qui répond sur le port 80. Elle a deux défauts
 connus : elle met parfois **longtemps à démarrer**, jusqu'à une minute, et
 il lui arrive de **se figer** sans mourir. Sans sondes, Kubernetes la croit
 en bonne santé dans les deux cas, et lui envoie du trafic.
