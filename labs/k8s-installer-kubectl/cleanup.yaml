@@ -1,0 +1,34 @@
+---
+# Joué par `dsoxlab clean` : retire la complétion et l'alias que l'apprenant a
+# posés, puis rend au nœud le kubectl du SOCLE, dont les labs suivants et la
+# photographie du validateur ont besoin. Le cluster « lab » reste : c'est le
+# socle partagé des labs kind.
+- name: Nettoyer le lab k8s-installer-kubectl
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer la complétion de kubectl et l'alias k
+      ansible.builtin.shell: |
+        set -o pipefail
+        maison="$(getent passwd "{{ ansible_user | default('ansible') }}" | cut -d: -f6)"
+        rm -f /etc/bash_completion.d/kubectl \
+          /usr/share/bash-completion/completions/kubectl \
+          "$maison/.local/share/bash-completion/completions/kubectl" \
+          "$maison/.local/bin/kubectl" "$maison/bin/kubectl"
+        for f in "$maison/.bashrc" "$maison/.bash_aliases" "$maison/.bash_profile" \
+          "$maison/.profile" /etc/bash.bashrc; do
+          [ -f "$f" ] && sed -i -e '/kubectl/d' -e '/^[[:space:]]*alias[[:space:]]\+k=/d' "$f"
+        done
+        true
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    # Le socle épingle kubectl ; on rejoue sa tâche d'installation à l'identique
+    # plutôt que de recopier la version ici. get_url compare l'empreinte et
+    # remplace le binaire de l'apprenant par celui du socle.
+    - name: Rendre au nœud le kubectl du socle
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_donner_kubeconfig: false

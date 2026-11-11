@@ -1,0 +1,82 @@
+# Lab guidé de la leçon « Installer et configurer kubectl » du module
+# Fondamentaux de la formation, placée avant « Créer votre premier cluster ».
+# Il reprend les gestes de la leçon : binaire officiel à version épinglée,
+# empreinte vérifiée contre le fichier .sha256 publié, installation dans
+# /usr/local/bin, complétion bash avec l'alias k, puis connexion au serveur.
+#
+# L'apprenant ne sait pas encore créer un cluster : le setup en prépare un
+# (« lab », le socle kind) et règle son kubeconfig, sans le lui demander. Il
+# retire ensuite kubectl et toute complétion du nœud. Le cleanup rend au nœud
+# le kubectl du socle, dont les labs suivants ont besoin.
+id: k8s-installer-kubectl
+title: "Install and configure kubectl"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  Download the official kubectl binary at a pinned 1.37 version, check its
+  fingerprint against the published one, install it in /usr/local/bin, turn on
+  bash completion with the alias k, and check that it reaches the cluster
+  already prepared for you.
+skills:
+  - kubectl-install
+  - sha256-verification
+  - bash-completion
+  - version-skew
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - kcna
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: installe-pour-tout-le-systeme
+    label: "kubectl is installed in /usr/local/bin, owned by root, and found first in the PATH"
+    tests:
+      - test_kubectl_est_installe_dans_usr_local_bin_et_appartient_a_root
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
+  - id: version-1-37
+    label: "The kubectl client is a 1.37 version"
+    tests:
+      - test_le_client_est_en_version_1_37
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
+  - id: empreinte-officielle
+    label: "The installed binary has the official fingerprint of its version"
+    tests:
+      - test_le_binaire_a_l_empreinte_officielle_de_sa_version
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
+  - id: completion-active
+    label: "kubectl bash completion is active in every new shell"
+    tests:
+      - test_la_completion_bash_de_kubectl_est_active
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
+  - id: alias-k
+    label: "The alias k runs kubectl and completes like it"
+    tests:
+      - test_l_alias_k_lance_kubectl_et_se_complete
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
+  - id: atteint-le-serveur
+    label: "kubectl reaches the server of the cluster"
+    tests:
+      - test_kubectl_atteint_le_serveur_du_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/

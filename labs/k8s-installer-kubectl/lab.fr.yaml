@@ -1,0 +1,20 @@
+title: "Installer et configurer kubectl"
+description: |
+  Téléchargez le binaire officiel de kubectl en version 1.37 épinglée, vérifiez
+  son empreinte contre celle qui est publiée, installez-le dans /usr/local/bin,
+  activez la complétion bash avec l'alias k, et vérifiez qu'il atteint le
+  cluster déjà préparé pour vous.
+
+criteria:
+  - id: installe-pour-tout-le-systeme
+    label: "kubectl est installé dans /usr/local/bin, appartient à root, et le PATH le trouve en premier"
+  - id: version-1-37
+    label: "Le client kubectl est en version 1.37"
+  - id: empreinte-officielle
+    label: "Le binaire installé a l'empreinte officielle de sa version"
+  - id: completion-active
+    label: "La complétion bash de kubectl est active dans chaque nouveau shell"
+  - id: alias-k
+    label: "L'alias k lance kubectl et se complète comme lui"
+  - id: atteint-le-serveur
+    label: "kubectl atteint le serveur du cluster"
