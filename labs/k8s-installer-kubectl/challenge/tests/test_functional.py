@@ -216,15 +216,32 @@ def test_l_alias_k_lance_kubectl_et_se_complete(host):
 # ----------------------------------------------------------------------
 # 6. La connexion au serveur.
 # ----------------------------------------------------------------------
+#: L'UID du namespace kube-system, lu DANS le nœud control plane du cluster avec
+#: le kubectl et le kubeconfig d'administration que kind y a posés. Il ne dépend
+#: d'aucun binaire que l'apprenant installe. Mesuré le 2026-11-11 : un faux
+#: kubectl qui affiche une serverVersion inventée satisfaisait la version
+#: précédente de ce test, qui croyait la réponse de `kubectl version`.
+UID_REFERENCE = (
+    "sudo docker exec lab-control-plane kubectl --kubeconfig /etc/kubernetes/admin.conf "
+    "get namespace kube-system -o jsonpath={.metadata.uid}"
+)
+
+
 def test_kubectl_atteint_le_serveur_du_cluster(host):
-    res = _en_apprenant(host, f"{BINAIRE} version -o json --request-timeout=15s")
-    try:
-        serveur = json.loads(res.stdout).get("serverVersion", {}).get("gitVersion")
-    except ValueError:
-        serveur = None
-    assert serveur, message(
-        en="kubectl version does not show the version of the server: your kubectl does not "
-        "reach the cluster prepared for you. Your kubeconfig is already in place.",
-        fr="kubectl version n'affiche pas la version du serveur : votre kubectl n'atteint pas "
-        "le cluster préparé pour vous. Votre kubeconfig est déjà en place.",
+    reference = host.run(UID_REFERENCE)
+    if reference.rc != 0 or not reference.stdout.strip():
+        pytest.fail(message(
+            en="The test could not read the cluster lab from its control plane node: the "
+            "cluster prepared by the lab is not running. Rerun dsoxlab run.",
+            fr="Le test n'a pas pu lire le cluster lab depuis son nœud control plane : le "
+            "cluster préparé par le lab ne tourne pas. Relancez dsoxlab run.",
+        ))
+    res = _en_apprenant(
+        host, f"{BINAIRE} get namespace kube-system -o jsonpath={{.metadata.uid}} --request-timeout=15s"
+    )
+    assert res.rc == 0 and res.stdout.strip() == reference.stdout.strip(), message(
+        en="Your kubectl does not reach the cluster prepared for you: it cannot read the "
+        "kube-system namespace of the cluster lab. Your kubeconfig is already in place.",
+        fr="Votre kubectl n'atteint pas le cluster préparé pour vous : il ne lit pas le "
+        "namespace kube-system du cluster lab. Votre kubeconfig est déjà en place.",
     )
