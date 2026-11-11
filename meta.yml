@@ -267,6 +267,9 @@ sections:
       # Lab guidé de la leçon « Operators et CRDs pour développeurs », module
       # Workloads avancés, sur le cluster kind « lab ».
       - ckad-crd-ressource-personnalisee
+      # L'épreuve de fin du niveau 2, qui suppose les modules 4 à 6 joués, sur
+      # le cluster kind « multi ».
+      - k8s-epreuve-deployer-une-application
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

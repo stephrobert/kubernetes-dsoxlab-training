@@ -1,0 +1,67 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace magasin, les volumes que ses
+# revendications avaient obtenus (la reclaim policy demandée les garde après
+# leur revendication), les StorageClass créées pour lui, la CRD Sauvegarde, et
+# le dossier de l'apprenant. Le taint du control plane est reposé s'il a été
+# retiré. Le cluster « multi » reste.
+- name: Nettoyer l'épreuve k8s-epreuve-deployer-une-application
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/multi.kubeconfig
+  tasks:
+    - name: Supprimer le namespace magasin
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace magasin
+        --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les volumes qui revendiquaient dans magasin
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get pv -o jsonpath='{range .items[?(@.spec.claimRef.namespace=="magasin")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r {{ kubectl }} delete pv --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les StorageClass autres que celle du socle
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get storageclass -o name | grep -v '^storageclass.storage.k8s.io/standard$' \
+          | xargs -r {{ kubectl }} delete
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Effacer les données des volumes de magasin sur les nœuds
+      ansible.builtin.shell: |
+        for n in $(docker ps --format '{{ '{{' }}.Names{{ '}}' }}' | grep '^multi-'); do
+          docker exec "$n" sh -c 'rm -rf /var/local-path-provisioner/*_magasin_*'
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la CRD Sauvegarde
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd sauvegardes.atelier.formation.k8s
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Reposer le taint du control plane
+      ansible.builtin.command: >-
+        {{ kubectl }} taint nodes multi-control-plane
+        node-role.kubernetes.io/control-plane:NoSchedule --overwrite
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/boutique"
+        state: absent

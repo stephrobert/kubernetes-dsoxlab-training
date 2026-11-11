@@ -1,0 +1,37 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab avec le
+# cluster « multi » (un control plane et deux workers), le même que le
+# challenge du module Workloads avancés, puis pose la situation de l'épreuve.
+#
+# Plusieurs nœuds sont nécessaires : l'agent de collecte doit tourner sur
+# chacun, control plane compris, sans retirer son taint.
+- name: Préparer l'épreuve k8s-epreuve-deployer-une-application
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind à trois nœuds
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: multi
+        kind_workers: 2
+        kind_event_ttl: 24h
+
+    - name: Créer le répertoire de travail du lab sur l'hôte
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab
+        state: directory
+        mode: "0755"
+
+    - name: Déposer la CRD Sauvegarde
+      ansible.builtin.copy:
+        src: fixtures/sauvegarde-crd.yaml
+        dest: /var/lib/dsoxlab/sauvegarde-crd.yaml
+        mode: "0644"
+
+    - name: Poser la situation de l'épreuve
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/multi.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

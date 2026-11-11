@@ -1,0 +1,29 @@
+title: "Épreuve du niveau 2 : déployer une application qui garde ses données"
+description: |
+  À partir d'un cahier des charges qui ne nomme aucun objet Kubernetes,
+  déployez la boutique avec ses données : une vitrine fiable livrée depuis une
+  base Kustomize, une base de données dont les réplicas gardent leur identité et
+  leur volume, une sauvegarde planifiée, un agent sur chaque nœud, et la
+  ressource personnalisée demandée.
+
+criteria:
+  - id: p01-kustomize-sans-ecart
+    label: "P01 (critique) : la vitrine est livrée depuis une base et un overlay Kustomize, sans écart avec le cluster"
+  - id: p02-vitrine-disponible
+    label: "P02 (critique) : la vitrine a tous ses réplicas disponibles sur l'image par digest, et aucun Pod n'a redémarré"
+  - id: p03-ressources-et-sondes
+    label: "P03 : chaque conteneur de la vitrine est budgété, et les trois sondes sont sur son port"
+  - id: p04-init-et-sidecar
+    label: "P04 : un conteneur de préparation se termine, et un sidecar natif relaie les lignes du volume partagé"
+  - id: p05-identite-stable
+    label: "P05 (critique) : la base a une identité stable, des Pods ordonnés tous Ready, une revendication Bound chacun"
+  - id: p06-donnee-survit
+    label: "P06 (critique) : une donnée écrite par le correcteur survit à la suppression de son Pod"
+  - id: p07-volumes-retain
+    label: "P07 (critique) : les revendications sont liées à des volumes créés par la StorageClass, en reclaim policy Retain"
+  - id: p08-sauvegarde
+    label: "P08 : la sauvegarde est planifiée, et un lancement à la main s'est terminé en écrivant sur son volume"
+  - id: p09-agent-partout
+    label: "P09 : l'agent tourne sur chaque nœud, control plane compris, taint gardé"
+  - id: p10-ressource-personnalisee
+    label: "P10 : la ressource personnalisée demandée existe avec ses valeurs, et une valeur hors bornes est refusée"
