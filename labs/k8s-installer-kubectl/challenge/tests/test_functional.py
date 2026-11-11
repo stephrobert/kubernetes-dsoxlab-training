@@ -38,9 +38,13 @@ OFFICIEL = "https://dl.k8s.io/release/{version}/bin/linux/amd64/kubectl.sha256"
 #:
 #: Le chargement paresseux de bash-completion est d'abord déclenché : une
 #: complétion posée dans un fichier de complétion plutôt que dans ~/.bashrc
-#: n'est chargée qu'à la première tabulation d'un shell réel.
+#: n'est chargée qu'à la première tabulation d'un shell réel. Le chargeur
+#: n'est appelé que si rien n'est déclaré : mesuré le 2026-11-11, sur un mot
+#: sans fichier de complétion (l'alias k), le chargeur de repli de
+#: bash-completion 2.16 REMPLACE `-F __start_kubectl` par
+#: `_comp_complete_minimal`, et la solution juste tombait.
 COMPLETER = r"""
-_comp_load {mot} >/dev/null 2>&1 || _completion_loader {mot} >/dev/null 2>&1
+complete -p {mot} >/dev/null 2>&1 || _comp_load {mot} >/dev/null 2>&1 || _completion_loader {mot} >/dev/null 2>&1
 spec="$(complete -p {mot} 2>/dev/null)" || {{ echo SANS-COMPLETION; exit 0; }}
 fn="$(sed -n 's/.*-F \([^ ]*\).*/\1/p' <<< "$spec")"
 [ -n "$fn" ] || {{ echo SANS-FONCTION; exit 0; }}
