@@ -255,12 +255,12 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 
 Five application-facing domains. « Application Environment, Configuration and Security » weighs 25 %, the heaviest of the five.
 
-26 lab(s).
+30 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
 | 1 | [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/) | A two-container Pod, with budgets, labels and an annotation | application-design | 10m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
-| 2 | [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/) | Inject configuration and secrets into a Pod | application-environment | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique) |
+| 2 | [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/) | Inject configuration and secrets into a Pod | application-environment | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique) |
 | 3 | [`ckad-secret-injection-protection`](labs/ckad-secret-injection-protection/) | Take a password out of a manifest, without the application noticing | application-environment | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique) |
 | 4 | [`ckad-probes-all-types`](labs/ckad-probes-all-types/) | Three probes on one Pod: startup, liveness, readiness | application-observability | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/) |
 | 5 | [`ckad-init-container`](labs/ckad-init-container/) | Wait for a dependency with an init container | application-design | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/) |
@@ -283,8 +283,12 @@ Five application-facing domains. « Application Environment, Configuration and S
 | 22 | [`k8s-diagnostiquer-un-pod`](labs/k8s-diagnostiquer-un-pod/) | Diagnose two failing Pods | application-observability | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/#mettre-en-pratique) |
 | 23 | [`k8s-lire-les-replicasets`](labs/k8s-lire-les-replicasets/) | Trace a Pod back to its Deployment | application-deployment | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/#mettre-en-pratique) |
 | 24 | [`k8s-labels-et-selecteurs`](labs/k8s-labels-et-selecteurs/) | Label and select Pods | application-design | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/#mettre-en-pratique) |
-| 25 | [`k8s-challenge-relier-config-et-service`](labs/k8s-challenge-relier-config-et-service/) | Wire a ConfigMap, a Secret and a Service to a Deployment | application-environment | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique) |
-| 26 | [`k8s-epreuve-livrer-et-mettre-a-jour`](labs/k8s-epreuve-livrer-et-mettre-a-jour/) | Level 1 test: ship and update an application | application-deployment | 45m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 25 | [`k8s-atteindre-une-application`](labs/k8s-atteindre-une-application/) | Reach an application: expose and port-forward | services-networking | 15m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/#mettre-en-pratique) |
+| 26 | [`k8s-configurer-par-configmap`](labs/k8s-configurer-par-configmap/) | Configure an application through ConfigMaps | application-environment | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique) |
+| 27 | [`k8s-isoler-par-namespace`](labs/k8s-isoler-par-namespace/) | Isolate an application in a namespace | application-design | 15m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique) |
+| 28 | [`k8s-extraire-avec-kubectl`](labs/k8s-extraire-avec-kubectl/) | Extract fields with JSONPath and custom-columns | application-observability | 15m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/#mettre-en-pratique) |
+| 29 | [`k8s-challenge-relier-config-et-service`](labs/k8s-challenge-relier-config-et-service/) | Wire a ConfigMap, a Secret and a Service to a Deployment | application-environment | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique) |
+| 30 | [`k8s-epreuve-livrer-et-mettre-a-jour`](labs/k8s-epreuve-livrer-et-mettre-a-jour/) | Level 1 test: ship and update an application | application-deployment | 45m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 
@@ -314,7 +318,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **75 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **79 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0, v1.37.1, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
