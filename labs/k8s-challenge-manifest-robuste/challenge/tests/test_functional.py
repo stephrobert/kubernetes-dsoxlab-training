@@ -32,7 +32,7 @@ ADMIN = "sudo kubectl --kubeconfig /etc/kind/lab.kubeconfig"
 NS = "expedition"
 APP = "colis"
 PROD, DEV = f"prod-{APP}", f"dev-{APP}"
-IMAGE = "nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703"
+IMAGE = "nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
 LIMITE_MEMOIRE = "128Mi"
 MEMOIRE = "/var/lib/dsoxlab/challenge-manifest-robuste.json"
 CRONJOB, JOB, CASSE, CONFIG = "purge-colis", "inventaire", "etiquettes", "etiquettes-config"
@@ -88,7 +88,7 @@ def _est_l_image(image: str | None) -> bool:
     nom, digest = image.split("@", 1)
     nom = nom.removeprefix("docker.io/library/")
     return digest == IMAGE.split("@")[1] and nom.split(":")[0] == "nginx" \
-        and (":" not in nom or nom.split(":")[1] == "1.30.6")
+        and (":" not in nom or nom.split(":")[1] == "1.30.5")
 
 
 def _sidecars(spec: dict) -> list[dict]:
@@ -259,7 +259,10 @@ def test_dev_et_prod_viennent_d_une_meme_base(host):
     identiques = False
     if dev and prod:
         a, b = dev["spec"]["template"], prod["spec"]["template"]
-        identiques = _sans_env(a) == _sans_env(b) and a["metadata"].get("labels", {}).get("env") == "dev" \
+        # Un nom d'objet qui ne diffère que par le préfixe (une ConfigMap de la
+        # base, par exemple) est une différence que le cahier des charges autorise.
+        identiques = json.dumps(_sans_env(a), sort_keys=True) \
+            == json.dumps(_sans_env(b), sort_keys=True).replace('"prod-', '"dev-') and a["metadata"].get("labels", {}).get("env") == "dev" \
             and b["metadata"].get("labels", {}).get("env") == "prod" and dev["spec"].get("replicas") == 1
     assert bases[0] & bases[1] and identiques, message(
         en="dev and prod do not come from one and the same base, or differ by more than their replicas, their name "
