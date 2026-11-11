@@ -36,6 +36,11 @@ MESSAGE = "Bienvenue"
 MOT_DE_PASSE = "Boutique-2026"
 SEUIL = "10"
 REVISION = "deployment.kubernetes.io/revision"
+#: Ce qui dit qu'une chose manque, dans un diagnostic : l'état affiché par
+#: Kubernetes, le message du kubelet, ou une phrase en français ou en anglais.
+DIT_LE_MANQUE = ("createcontainerconfigerror", "couldntfind", "couldnotfind", "notfound",
+                 "manque", "manquant", "absent", "introuvable", "inexistant", "missing",
+                 "nexistepas", "trouvepas", "pasdecle")
 ATTENTE = 90
 PAS = 3
 
@@ -228,12 +233,18 @@ def test_c4_une_revision_de_retour_sur_la_version_1(host):
         fr="La vitrine ne garde aucune révision précédente : elle a été livrée directement dans "
         "sa version finale, ou recréée. Livrez d'abord la version 1, puis mettez-la à jour.",
     )
-    image = _sans_registre(precedents[-1][1]["spec"]["template"]["spec"]["containers"][0].get("image", ""))
-    assert image.split("@", 1)[0] == V1, message(
-        en=f"The previous revision of the storefront runs {image!r}, expected version 1 ({V1}): "
-        "a rollback would not bring version 1 back.",
-        fr=f"La révision précédente de la vitrine porte {image!r}, attendu la version 1 ({V1}) : "
-        "un retour arrière ne ramènerait pas la version 1.",
+    # Toute révision conservée en version 1 suffit : `rollout undo --to-revision`
+    # ramène n'importe laquelle, pas seulement la précédente. Livrer la v1, puis
+    # la v2, puis ajouter le mot de passe (une troisième révision, toujours en
+    # v2) garde un retour possible vers la révision 1.
+    images = {num: _sans_registre(rs["spec"]["template"]["spec"]["containers"][0].get("image", ""))
+              for num, rs in precedents}
+    en_v1 = sorted(num for num, image in images.items() if image.split("@", 1)[0] == V1)
+    assert en_v1, message(
+        en=f"No revision kept by the storefront runs version 1 ({V1}): the kept revisions run "
+        f"{images}. No rollback could bring version 1 back.",
+        fr=f"Aucune révision conservée par la vitrine ne porte la version 1 ({V1}) : les "
+        f"révisions conservées portent {images}. Aucun retour arrière ne ramènerait la version 1.",
     )
 
 
@@ -288,8 +299,12 @@ def test_c6_l_application_vit_dans_son_propre_espace(host):
         en=f"Part of the application is not in the {NS} space: {absents}.",
         fr=f"Une partie de l'application n'est pas dans l'espace {NS} : {absents}.",
     )
-    egares = [k for k in ("deployment", "service")
+    # Rien d'elle dans default : ni la vitrine ni son adresse sous leur nom, ni
+    # une copie de la configuration ou du mot de passe qu'elle lit.
+    egares = [f"{k}/vitrine" for k in ("deployment", "service")
               if host.run(f"{ADMIN} -n default get {k} vitrine").rc == 0]
+    egares += [f"{k}/{n}" for k, n in sorted(references)
+               if host.run(f"{ADMIN} -n default get {k} {n}").rc == 0]
     assert not egares, message(
         en=f"Something named vitrine is left in the default space: {egares}.",
         fr=f"Quelque chose nommé vitrine traîne dans l'espace par défaut : {egares}.",
@@ -308,31 +323,42 @@ def test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant(host):
         fr="~/epreuve/cause-stock.txt est absent : la cause de la panne se consigne avant la "
         "réparation.",
     )
+    # Un diagnostic se juge sur le fond : il nomme ce que stock cherche (la clé
+    # SEUIL) et dit que cela manque, que ce soit par l'état affiché par
+    # Kubernetes ou par une phrase.
     lue = _compact(cause.content_string)
-    assert "createcontainerconfigerror" in lue and "seuil" in lue, message(
-        en="cause-stock.txt must name why the stock container does not start and what it looks "
-        "for without finding it: the waiting reason, and the missing key.",
-        fr="cause-stock.txt doit nommer pourquoi le conteneur de stock ne démarre pas et ce qu'il "
-        "cherche sans le trouver : la raison d'attente, et la clé manquante.",
+    dit_le_manque = any(m in lue for m in DIT_LE_MANQUE)
+    assert "seuil" in lue and dit_le_manque, message(
+        en="cause-stock.txt must say what the stock container looks for without finding it, and "
+        "that it is missing: the waiting reason Kubernetes shows, or a sentence that says it.",
+        fr="cause-stock.txt doit dire ce que le conteneur de stock cherche sans le trouver, et que "
+        "cela manque : la raison d'attente qu'affiche Kubernetes, ou une phrase qui le dit.",
     )
     dep = _json(host, ENTREPOT, "get deployment stock")
     assert dep is not None, message(
         en=f"No Deployment stock in the {ENTREPOT} space any more: it is repaired, not removed.",
         fr=f"Plus de Deployment stock dans l'espace {ENTREPOT} : il se répare, il ne se retire pas.",
     )
+    # stock doit lire son seuil dans une configuration gérée à part : la clé
+    # manquante ajoutée au ConfigMap d'origine, ou un ConfigMap versionné vers
+    # lequel le Deployment est repointé (la pratique de la leçon ConfigMaps),
+    # sont acceptés. Retirer la variable, ou l'écrire en dur, ne l'est pas.
     ref = next((((e.get("valueFrom") or {}).get("configMapKeyRef") or {})
                 for e in _conteneur(dep).get("env") or [] if e.get("name") == "STOCK_SEUIL"), {})
-    assert ref.get("name") == "stock-config" and ref.get("key") == "SEUIL", message(
-        en="stock no longer reads STOCK_SEUIL from the key SEUIL of stock-config: the repair "
-        "gives the configuration what is missing, it does not remove what the application reads.",
-        fr="stock ne lit plus STOCK_SEUIL dans la clé SEUIL de stock-config : la réparation donne "
-        "à la configuration ce qui lui manque, elle ne retire pas ce que l'application lit.",
+    assert ref.get("name") and ref.get("key"), message(
+        en="stock no longer reads STOCK_SEUIL from a configuration managed apart: the repair "
+        "gives the configuration what is missing, it does not remove what the component reads, "
+        "nor write it in its description.",
+        fr="stock ne lit plus STOCK_SEUIL dans une configuration gérée à part : la réparation "
+        "donne à la configuration ce qui lui manque, elle ne retire pas ce que le composant lit, "
+        "et ne l'écrit pas dans sa description.",
     )
-    seuil = ((_json(host, ENTREPOT, "get configmap stock-config") or {}).get("data") or {}).get("SEUIL")
+    seuil = ((_json(host, ENTREPOT, f"get configmap {ref['name']}") or {}).get("data") or {}).get(ref["key"])
     assert seuil == SEUIL, message(
-        en=f"The key SEUIL of stock-config is {seuil!r}, expected {SEUIL!r} as the requirements say.",
-        fr=f"La clé SEUIL de stock-config vaut {seuil!r}, attendu {SEUIL!r} comme le dit le cahier "
-        "des charges.",
+        en=f"The threshold stock reads (key {ref['key']} of {ref['name']}) is {seuil!r}, expected "
+        f"{SEUIL!r} as the requirements say.",
+        fr=f"Le seuil que lit stock (clé {ref['key']} de {ref['name']}) vaut {seuil!r}, attendu "
+        f"{SEUIL!r} comme le dit le cahier des charges.",
     )
     # La configuration est juste : le kubelet redémarre le conteneur, on l'attend.
     fin = time.monotonic() + ATTENTE

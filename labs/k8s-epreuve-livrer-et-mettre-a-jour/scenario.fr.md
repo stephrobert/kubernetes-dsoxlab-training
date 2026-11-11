@@ -31,10 +31,13 @@ version 2 : nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f
 - Elle passe ensuite en **version 2**, sans qu'aucun exemplaire ne manque
   pendant la bascule, et en gardant la possibilité de **revenir à la
   version 1**.
-- Le composant **`stock`** tourne de nouveau. Son seuil vaut **`10`**. Avant
-  toute réparation, écrivez dans **`~/epreuve/cause-stock.txt`** pourquoi il ne
-  démarre pas et ce qu'il cherche sans le trouver, puis n'y touchez plus. Ce qu'il
-  lit aujourd'hui, il doit le lire encore après la réparation.
+- **Avant toute réparation**, écrivez dans **`~/epreuve/cause-stock.txt`**
+  pourquoi le composant **`stock`** ne démarre pas : ce qu'il cherche sans le
+  trouver, et que cela manque, que ce soit par l'état qu'affiche Kubernetes ou
+  par une phrase. Ensuite, n'y touchez plus.
+- Le composant **`stock`** tourne de nouveau. Il lit toujours son seuil, dans la
+  variable **`STOCK_SEUIL`**, depuis une configuration gérée **à part** de sa
+  description, et ce seuil vaut **`10`**.
 
 ## Comment vous serez noté
 
@@ -47,7 +50,10 @@ configuration et le mot de passe hors de l'image, le retour à la version 1
 resté possible, et le composant `stock` réparé après que sa cause a été
 consignée.
 
-Aucune procédure n'est donnée : les leçons du niveau 1 ont tout enseigné.
+Réussir les cinq critères critiques suffit donc à réussir l'épreuve ; les deux
+autres comptent dans la note sans changer le verdict. Aucune procédure n'est
+donnée, et l'épreuve ne propose **aucun indice** : les leçons du niveau 1 ont
+tout enseigné.
 
 ```bash
 dsoxlab check  k8s-epreuve-livrer-et-mettre-a-jour

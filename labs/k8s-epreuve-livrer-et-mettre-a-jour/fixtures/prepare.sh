@@ -23,7 +23,8 @@ BUSYBOX="busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59
 # --ignore-not-found plutôt qu'un get préalable : un namespace encore en
 # Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
 kubectl delete namespace livraison entrepot boutique --ignore-not-found --wait=true --timeout=180s
-kubectl -n default delete deployment/vitrine service/vitrine --ignore-not-found
+kubectl -n default delete deployment/vitrine service/vitrine configmap/vitrine-config \
+  secret/vitrine-secret --ignore-not-found
 kubectl create namespace entrepot
 kubectl -n entrepot create configmap stock-config --from-literal=UNITE=pieces
 kubectl -n entrepot apply -f - <<EOF

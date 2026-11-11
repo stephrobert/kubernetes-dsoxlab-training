@@ -30,10 +30,13 @@ version 2: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f7
   password **never appears in clear** in its description.
 - It then moves to **version 2**, with no copy missing during the switch, and
   keeping the possibility to **go back to version 1**.
-- The **`stock`** component runs again. Its threshold is **`10`**. Before any
-  repair, write in **`~/epreuve/cause-stock.txt`** why it does not start and
-  what it looks for without finding it, then leave that file untouched. What it
-  reads today, it must still read after the repair.
+- **Before any repair**, write in **`~/epreuve/cause-stock.txt`** why the
+  **`stock`** component does not start: what it looks for without finding it,
+  and that it is missing, either through the state Kubernetes shows or in a
+  sentence. Then leave that file untouched.
+- The **`stock`** component runs again. It still reads its threshold, in the
+  variable **`STOCK_SEUIL`**, from a configuration managed **apart** from its
+  description, and that threshold is **`10`**.
 
 ## How you will be graded
 
@@ -45,7 +48,10 @@ with three copies, the address that answers, the configuration and the
 password outside the image, the way back to version 1 kept open, and the
 `stock` component repaired after its cause was recorded.
 
-No procedure is given: the lessons of level 1 have taught everything.
+Passing the five critical criteria is therefore enough to pass the test; the
+other two count in the score without changing the verdict. No procedure is
+given, and the test offers **no hint**: the lessons of level 1 have taught
+everything.
 
 ```bash
 dsoxlab check  k8s-epreuve-livrer-et-mettre-a-jour
