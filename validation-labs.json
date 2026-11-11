@@ -2934,7 +2934,7 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-11",
-  "duree_s": 138,
+  "duree_s": 144,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
