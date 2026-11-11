@@ -8,7 +8,12 @@
 #   - les fichiers de complétion kubectl, système et utilisateur ;
 #   - dans les fichiers de démarrage de bash, les lignes qui chargent la
 #     complétion de kubectl ou définissent l'alias k, laissées par un passage
-#     précédent dans ce lab.
+#     précédent dans ce lab ;
+#   - le paquet bash-completion, dont la complétion de kubectl a besoin :
+#     la leçon le fait installer, et le test joue une vraie complétion.
+#     Son état d'origine est mémorisé au PREMIER passage dans
+#     /var/lib/dsoxlab/k8s-installer-kubectl.json, que cleanup.yaml relit
+#     pour le rétablir, puis efface.
 #
 # Le cluster « lab » et ~/.kube/config ne sont pas touchés : l'apprenant s'en
 # sert pour vérifier la connexion. Rejouable.
@@ -40,6 +45,20 @@ for fichier in "${LAB_HOME}/.bashrc" "${LAB_HOME}/.bash_aliases" "${LAB_HOME}/.b
   "${LAB_HOME}/.profile" /etc/bash.bashrc; do
   if [ -f "$fichier" ]; then sed -i -e '/kubectl/d' -e '/^[[:space:]]*alias[[:space:]]\+k=/d' "$fichier"; fi
 done
+
+# bash-completion : état d'origine mémorisé une seule fois, pour qu'un setup
+# rejoué après un passage de l'apprenant ne prenne pas son installation pour
+# l'état de l'image.
+MEMOIRE=/var/lib/dsoxlab/k8s-installer-kubectl.json
+install -d -m 0755 /var/lib/dsoxlab
+if [ ! -f "$MEMOIRE" ]; then
+  if dpkg-query -W -f='${Status}' bash-completion 2>/dev/null | grep -q 'install ok installed'; then
+    echo '{"bash_completion": true}' > "$MEMOIRE"
+  else
+    echo '{"bash_completion": false}' > "$MEMOIRE"
+  fi
+fi
+DEBIAN_FRONTEND=noninteractive apt-get purge -y bash-completion < /dev/null
 
 if command -v kubectl; then
   echo "kubectl est encore trouvé par le PATH de root" >&2

@@ -28,13 +28,34 @@ VERSION_ATTENDUE = re.compile(r"^v1\.37\.\d+$")
 EMPREINTE = re.compile(r"^[0-9a-f]{64}$")
 OFFICIEL = "https://dl.k8s.io/release/{version}/bin/linux/amd64/kubectl.sha256"
 
-#: Charge ce qu'un nouveau shell interactif charge (~/.bashrc), puis demande à
-#: bash-completion de charger la complétion paresseuse de kubectl si elle vit
-#: dans un fichier de complétion plutôt que dans ~/.bashrc : un shell réel la
-#: chargerait à la première tabulation.
-CHARGER = (
-    "_comp_load kubectl >/dev/null 2>&1 || _completion_loader kubectl >/dev/null 2>&1; "
-)
+#: Joue une VRAIE complétion dans un nouveau shell interactif (~/.bashrc lu) :
+#: la fonction enregistrée pour `mot` est appelée comme bash l'appelle sur une
+#: tabulation après « mot ver », et doit proposer `version`. Vérifier seulement
+#: `complete -p` ne suffit pas : mesuré le 2026-11-11 sur Debian 13 sans le
+#: paquet bash-completion, `complete -p kubectl` répond, mais __start_kubectl
+#: meurt sur `_get_comp_words_by_ref: command not found` et la tabulation ne
+#: complète que des noms de fichiers.
+#:
+#: Le chargement paresseux de bash-completion est d'abord déclenché : une
+#: complétion posée dans un fichier de complétion plutôt que dans ~/.bashrc
+#: n'est chargée qu'à la première tabulation d'un shell réel.
+COMPLETER = r"""
+_comp_load {mot} >/dev/null 2>&1 || _completion_loader {mot} >/dev/null 2>&1
+spec="$(complete -p {mot} 2>/dev/null)" || {{ echo SANS-COMPLETION; exit 0; }}
+fn="$(sed -n 's/.*-F \([^ ]*\).*/\1/p' <<< "$spec")"
+[ -n "$fn" ] || {{ echo SANS-FONCTION; exit 0; }}
+COMP_WORDS=({mot} ver); COMP_CWORD=1; COMP_LINE="{mot} ver"; COMP_POINT=${{#COMP_LINE}}
+COMP_TYPE=9; COMP_KEY=9; COMPREPLY=()
+"$fn" {mot} ver {mot} >/dev/null 2>&1
+printf 'PROPOSE:%s\n' "${{COMPREPLY[@]}}"
+"""
+
+
+def _propositions(host, mot: str) -> list[str]:
+    """Ce que la tabulation propose après « mot ver » dans un nouveau shell."""
+    res = _shell_interactif(host, COMPLETER.format(mot=mot))
+    return [ligne[len("PROPOSE:"):].strip() for ligne in res.stdout.splitlines()
+            if ligne.startswith("PROPOSE:")]
 
 
 @pytest.fixture(scope="module")
@@ -144,14 +165,14 @@ def test_le_binaire_a_l_empreinte_officielle_de_sa_version(host):
 # 4. La complétion bash de kubectl.
 # ----------------------------------------------------------------------
 def test_la_completion_bash_de_kubectl_est_active(host):
-    res = _shell_interactif(host, CHARGER + "complete -p kubectl; declare -F __start_kubectl")
-    assert "__start_kubectl" in res.stdout and "complete" in res.stdout, message(
-        en="In a new interactive shell, kubectl has no bash completion: Tab completes "
-        "nothing after kubectl. It must be active in every new session, not only in the "
-        "current one.",
-        fr="Dans un nouveau shell interactif, kubectl n'a pas de complétion bash : la "
-        "tabulation ne complète rien après kubectl. Elle doit être active dans chaque "
-        "nouvelle session, pas seulement dans la session en cours.",
+    propositions = _propositions(host, "kubectl")
+    assert "version" in propositions, message(
+        en="In a new interactive shell, Tab does not complete kubectl ver into kubectl version. "
+        "The completion must work, not only be declared, and be active in every new session, "
+        "not only in the current one.",
+        fr="Dans un nouveau shell interactif, la tabulation ne complète pas kubectl ver en "
+        "kubectl version. La complétion doit fonctionner, pas seulement être déclarée, et être "
+        "active dans chaque nouvelle session, pas seulement dans la session en cours.",
     )
 
 
@@ -166,12 +187,12 @@ def test_l_alias_k_lance_kubectl_et_se_complete(host):
         fr=f"Dans un nouveau shell interactif, k n'est pas un alias de kubectl "
         f"({alias or 'aucun alias k'}).",
     )
-    res = _shell_interactif(host, CHARGER + "complete -p k")
-    assert "__start_kubectl" in res.stdout, message(
-        en="The alias k exists, but Tab completes nothing after k: an alias does not inherit "
-        "the completion of the command it stands for.",
-        fr="L'alias k existe, mais la tabulation ne complète rien après k : un alias n'hérite "
-        "pas de la complétion de la commande qu'il remplace.",
+    propositions = _propositions(host, "k")
+    assert "version" in propositions, message(
+        en="The alias k exists, but Tab does not complete k ver into k version: an alias does "
+        "not inherit the completion of the command it stands for.",
+        fr="L'alias k existe, mais la tabulation ne complète pas k ver en k version : un alias "
+        "n'hérite pas de la complétion de la commande qu'il remplace.",
     )
 
 

@@ -38,7 +38,8 @@ file you received is the one the project published.
 
 What you type in your shell disappears when it closes. A completion or an alias
 meant for tomorrow is written in a file that bash reads at every start. To
-check, open a **new** shell.
+check, open a **new** shell. On Debian, kubectl completion needs a package
+that the lesson names: without it, Tab only offers file names.
 
 `kubectl version` shows two versions, the client's and the server's. If the
 second is missing, kubectl did not reach the cluster. `kubectl cluster-info`

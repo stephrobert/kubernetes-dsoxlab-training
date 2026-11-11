@@ -39,7 +39,9 @@ le fichier reçu est bien celui que le projet a publié.
 
 Ce que vous tapez dans votre shell disparaît à sa fermeture. Une complétion ou
 un alias qui doit servir demain s'écrit dans un fichier que bash lit à chaque
-démarrage. Pour vérifier, ouvrez un **nouveau** shell.
+démarrage. Pour vérifier, ouvrez un **nouveau** shell. Sous Debian, la
+complétion de kubectl a besoin d'un paquet que la leçon nomme : sans lui,
+la tabulation ne propose que des noms de fichiers.
 
 `kubectl version` affiche deux versions, celle du client et celle du serveur.
 Si la seconde manque, kubectl n'a pas atteint le cluster.

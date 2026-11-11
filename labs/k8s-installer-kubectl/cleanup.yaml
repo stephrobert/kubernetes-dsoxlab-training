@@ -24,6 +24,25 @@
         executable: /bin/bash
       changed_when: true
 
+    # Le setup a retiré bash-completion après avoir noté s'il était installé.
+    # On rend cet état d'origine : réinstallé s'il l'était, retiré sinon (c'est
+    # alors l'apprenant qui l'a posé). Sans mémoire, rien n'est touché.
+    - name: Rendre à bash-completion son état d'origine
+      ansible.builtin.shell: |
+        set -o pipefail
+        memoire=/var/lib/dsoxlab/k8s-installer-kubectl.json
+        [ -f "$memoire" ] || exit 0
+        export DEBIAN_FRONTEND=noninteractive
+        if grep -q '"bash_completion": true' "$memoire"; then
+          apt-get install -y bash-completion < /dev/null
+        else
+          apt-get purge -y bash-completion < /dev/null
+        fi
+        rm -f "$memoire"
+      args:
+        executable: /bin/bash
+      changed_when: true
+
     # Le socle épingle kubectl ; on rejoue sa tâche d'installation à l'identique
     # plutôt que de recopier la version ici. get_url compare l'empreinte et
     # remplace le binaire de l'apprenant par celui du socle.
