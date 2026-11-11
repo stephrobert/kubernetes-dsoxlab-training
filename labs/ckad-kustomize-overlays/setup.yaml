@@ -1,9 +1,7 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session : il pose les deux
-# namespaces, vides. Écrire la base et les overlays, c'est le travail.
-#
-# Transposé de K8sExamLab, où le lab n'avait pas de setup. kubectl embarque
-# Kustomize, rien à installer. Confronté à Kubernetes 1.37 le 2026-09-15.
+# namespaces, vides, et ~/kustomize/, vide. Écrire la base et les overlays,
+# c'est le travail. kubectl embarque Kustomize, rien à installer.
 - name: Préparer le lab ckad-kustomize-overlays
   hosts: lab_target
   become: true
@@ -17,3 +15,4 @@
         executable: /bin/bash
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

@@ -74,7 +74,6 @@ DETTE: set[str] = {
     "ckad-in-place-pod-vertical-scaling",
     "ckad-init-container",
     "ckad-job-cronjob",
-    "ckad-kustomize-overlays",
     "ckad-multi-container-sidecar",
     "ckad-networkpolicy-ingress-egress",
     "ckad-pod-resources-labels",
