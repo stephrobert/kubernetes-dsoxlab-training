@@ -16,7 +16,7 @@ skills:
   - maxunavailable
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/#mettre-en-pratique
 lab_type: lab
 estimated_time: 15m
 
@@ -56,7 +56,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: l-image-est-la-nouvelle
-    label: "The Deployment's image moved to nginx:1.27-alpine"
+    label: "The Deployment's image moved to nginx:1.30.6"
     tests:
       - test_l_image_est_la_nouvelle
     lessons:

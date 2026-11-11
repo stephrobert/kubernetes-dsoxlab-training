@@ -1,0 +1,21 @@
+title: "Relier un ConfigMap, un Secret et un Service à un Deployment"
+description: |
+  Dans un namespace dédié, faire tourner la vitrine à trois réplicas, lui
+  donner une valeur de configuration depuis un ConfigMap et un mot de passe
+  depuis un Secret sans écrire le mot de passe dans le Deployment, l'exposer
+  par un Service qui répond, puis mettre à jour son image en gardant
+  l'ancien ReplicaSet.
+
+criteria:
+  - id: tout-est-dans-le-namespace-magasin
+    label: "Les objets de la vitrine sont dans le namespace magasin, aucun dans default"
+  - id: la-vitrine-a-trois-replicas-disponibles
+    label: "Le Deployment vitrine a trois réplicas disponibles"
+  - id: la-configuration-vient-du-configmap
+    label: "MESSAGE_ACCUEIL vient du ConfigMap, lu depuis l'intérieur du Pod"
+  - id: le-mot-de-passe-vient-du-secret
+    label: "DB_PASSWORD vient du Secret, lu depuis l'intérieur du Pod, jamais en clair dans le Deployment"
+  - id: le-service-repond
+    label: "Le Service vitrine compte trois endpoints prêts et répond en HTTP depuis un Pod client"
+  - id: la-mise-a-jour-garde-l-ancien-replicaset
+    label: "Après la mise à jour, trois réplicas tournent sur la nouvelle image et l'ancien ReplicaSet est gardé à zéro"

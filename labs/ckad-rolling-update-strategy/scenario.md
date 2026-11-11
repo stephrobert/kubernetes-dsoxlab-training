@@ -3,8 +3,8 @@
 ## The situation
 
 In the **`lab`** namespace, the Deployment **`webapp`** runs five replicas,
-image `nginx:1.26-alpine`. The next update must move to
-`nginx:1.27-alpine`, and the team has constraints: the cluster has no room
+image `nginx:1.30.5`. The next update must move to
+`nginx:1.30.6`, and the team has constraints: the cluster has no room
 for more than **two extra Pods** during the switch, and the service
 tolerates no more than **one unavailable Pod** at a time.
 
@@ -22,7 +22,7 @@ and it has no `maxSurge` nor `maxUnavailable` to tune.
 
 3. Its `maxUnavailable` is **1**.
 
-4. Its image has moved to **`nginx:1.27-alpine`**.
+4. Its image has moved to **`nginx:1.30.6`**.
 
 5. Its **five** replicas are **ready, up to date, and running the new
    image**. The exercise changes the strategy and the image, not the size of
@@ -31,7 +31,7 @@ and it has no `maxSurge` nor `maxUnavailable` to tune.
 6. **Two revisions of `webapp` exist**, produced by this Deployment, the new
    image's one coming after the old image's one in the history.
 
-7. The ReplicaSet of `nginx:1.27-alpine` carries **five ready replicas**.
+7. The ReplicaSet of `nginx:1.30.6` carries **five ready replicas**.
 
 8. The old ReplicaSets are **kept at zero**.
 

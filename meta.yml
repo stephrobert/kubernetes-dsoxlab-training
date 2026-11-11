@@ -219,6 +219,17 @@ sections:
       # lab de la leçon « Lire l'état du cluster ». Le challenge du module est
       # rangé en kcna depuis le 2026-11-10.
       - k8s-lire-l-etat-d-un-pod-en-erreur
+      # Labs guidés du module « Les ressources de base », un par leçon de
+      # pratique, sur le cluster kind « boutique », chacun dans son namespace :
+      # Pods, ReplicaSets, puis labels et annotations.
+      - k8s-diagnostiquer-un-pod
+      - k8s-lire-les-replicasets
+      - k8s-labels-et-selecteurs
+      # Servent le module « Les ressources de base », sur le cluster kind
+      # « boutique », chacun dans son namespace : le challenge du module, puis
+      # l'épreuve de fin du niveau 1, qui suppose le module entier joué.
+      - k8s-challenge-relier-config-et-service
+      - k8s-epreuve-livrer-et-mettre-a-jour
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

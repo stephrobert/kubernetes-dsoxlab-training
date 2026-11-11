@@ -19,7 +19,7 @@ The namespace exists. Everything else is up to you.
 2. A Secret **`db-credentials`** in `lab`, with the keys **`DB_HOST`**, set to
    `db.internal.svc`, and **`DB_PASSWORD`**, whose value you choose.
 
-3. A Pod **`app`** in `lab`, image `nginx:1.27-alpine`, which receives **all**
+3. A Pod **`app`** in `lab`, image `nginx:1.30.6`, which receives **all**
    the keys of `app-settings` as environment variables, which receives
    `DB_HOST` and `DB_PASSWORD` from the Secret, and which mounts
    `app-settings` under **`/etc/app-config`**.

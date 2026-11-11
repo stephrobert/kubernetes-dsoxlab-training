@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace magasin et tout objet de la
+# vitrine créé par erreur dans default. Le cluster kind reste : il est le socle
+# partagé de la boutique, et les namespaces des autres labs n'y sont pas touchés.
+- name: Nettoyer le challenge k8s-challenge-relier-config-et-service
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        magasin --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer de default les objets de la vitrine créés par erreur
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig -n default delete
+        deployment/vitrine service/vitrine configmap/vitrine-config secret/vitrine-secret
+        --ignore-not-found
+      changed_when: true
+      failed_when: false

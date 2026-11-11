@@ -17,7 +17,7 @@ criteria:
   - id: le-secret-porte-db-password
     label: "Le Secret db-credentials porte un DB_PASSWORD non vide"
   - id: le-pod-tourne-avec-la-bonne-image
-    label: "Le Pod app tourne avec l'image nginx:1.27-alpine"
+    label: "Le Pod app tourne avec l'image nginx:1.30.6"
   - id: le-pod-recoit-les-cles-du-configmap-en-variables
     label: "Le Pod reçoit les clés de app-settings en variables d'environnement"
   - id: le-pod-recoit-db-host-du-secret

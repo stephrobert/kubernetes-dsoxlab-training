@@ -53,9 +53,9 @@ from conftest import lab_host, lab_target_host, message
 NAMESPACE = "lab"
 DEPLOYMENT = "webapp"
 CONTENEUR = "nginx"
-IMAGE_AVANT = "nginx:1.26-alpine"
-IMAGE_FAUTIVE = "nginx:1.27-alpin"
-IMAGE = "nginx:1.27-alpine"
+IMAGE_AVANT = "nginx:1.30.5"
+IMAGE_FAUTIVE = "nginx:1.30.66"
+IMAGE = "nginx:1.30.6"
 REPLICAS = 3
 
 #: Les révisions attendues à la fin, telles que l'énoncé les demande.
@@ -97,7 +97,7 @@ def _json(host, args: str) -> dict:
 def _image(reference: str) -> str:
     """La référence d'image sans son digest.
 
-    ``nginx:1.27-alpine@sha256:...`` et ``nginx:1.27-alpine`` désignent la
+    ``nginx:1.30.6@sha256:...`` et ``nginx:1.30.6`` désignent la
     même image, et la leçon jumelée épingle son exemple par digest. Un
     apprenant qui copie ce style demande bien l'image attendue.
     """

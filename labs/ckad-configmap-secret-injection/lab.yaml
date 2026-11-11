@@ -15,7 +15,7 @@ skills:
   - volume-mount
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique
 lab_type: lab
 estimated_time: 15m
 
@@ -69,7 +69,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-pod-tourne-avec-la-bonne-image
-    label: "The Pod app runs nginx:1.27-alpine"
+    label: "The Pod app runs nginx:1.30.6"
     tests:
       - test_le_pod_tourne_avec_la_bonne_image
     lessons:

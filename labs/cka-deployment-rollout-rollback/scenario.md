@@ -8,7 +8,7 @@ typo in its name. Since then, `kubectl rollout status` never returns: a new Pod
 cannot pull its image, the three old ones keep the service up, and the
 Deployment is going nowhere.
 
-The expected image is **`nginx:1.27-alpine`**. Its tag is what counts: a digest
+The expected image is **`nginx:1.30.6`**. Its tag is what counts: a digest
 appended to that tag is accepted, any other tag is not.
 
 You are on the control plane, with `kubectl` configured.
@@ -16,10 +16,10 @@ You are on the control plane, with `kubectl` configured.
 ## What you must achieve
 
 1. **First**, the version that worked, the one before the update, back in
-   service: `nginx:1.26-alpine`, as the Deployment's **revision 3**. The stuck
+   service: `nginx:1.30.5`, as the Deployment's **revision 3**. The stuck
    rollout must be left before anything else is shipped.
 
-2. **Then**, the right image shipped: `webapp` on `nginx:1.27-alpine`, as the
+2. **Then**, the right image shipped: `webapp` on `nginx:1.30.6`, as the
    Deployment's **revision 4**, three replicas asked for, three replicas
    available and up to date, and no Pod left in image error.
 

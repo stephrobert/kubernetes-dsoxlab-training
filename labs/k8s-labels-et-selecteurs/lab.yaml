@@ -1,0 +1,63 @@
+# Lab guidé de la leçon « kubectl label et annotate » du module « Les
+# ressources de base » de la formation. Il reprend les gestes de la
+# démonstration : un label durable s'écrit dans le modèle de Pod du Deployment,
+# pas sur les Pods, qui sont remplacés ; une annotation décrit, elle ne
+# sélectionne pas ; un sélecteur à négation retient aussi les objets qui n'ont
+# pas la clé.
+#
+# Il tourne sur le cluster kind « boutique », partagé avec le module
+# Fondamentaux, dans son propre namespace (etiquettes).
+id: k8s-labels-et-selecteurs
+title: "Label and select Pods"
+level: application-design
+section: ckad
+difficulty: beginner
+description: |
+  In the etiquettes namespace, give every Pod of the web Deployment the label
+  env=prod in a way that survives their replacement, describe web with an
+  annotation, then record a selector with a negation that returns exactly the
+  Pods of api.
+skills:
+  - kubectl-label
+  - kubectl-annotate
+  - label-selectors
+  - pod-template
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-label-est-dans-le-modele
+    label: "env=prod is in the Pod template of web, so on all its Pods"
+    tests:
+      - test_env_prod_est_dans_le_modele_de_pod_de_web
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
+  - id: l-annotation-decrit-web
+    label: "The web Deployment carries a description annotation"
+    tests:
+      - test_une_annotation_description_est_posee_sur_web
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
+  - id: la-selection-rend-les-pods-de-api
+    label: "The recorded selector, with a negation, returns exactly the Pods of api"
+    tests:
+      - test_le_selecteur_consigne_rend_exactement_les_pods_de_api
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/

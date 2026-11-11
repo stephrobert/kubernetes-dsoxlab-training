@@ -1,0 +1,70 @@
+# Lab guidé de la leçon « ReplicaSets » du module « Les ressources de base » de
+# la formation. Il reprend les deux temps de la démonstration : un Deployment
+# mis à jour une fois garde deux ReplicaSets, l'actif et l'ancien à zéro ; un
+# second Deployment ne crée aucun Pod, et c'est son ReplicaSet qui dit
+# pourquoi, dans un événement FailedCreate (ServiceAccount absent).
+#
+# Il tourne sur le cluster kind « boutique », partagé avec le module
+# Fondamentaux, dans son propre namespace (replicasets).
+id: k8s-lire-les-replicasets
+title: "Trace a Pod back to its Deployment"
+level: application-deployment
+section: ckad
+difficulty: beginner
+description: |
+  In the replicasets namespace, a Deployment updated once keeps two
+  ReplicaSets, and a second Deployment creates no Pod at all. Record which
+  ReplicaSet is active and which one is kept at zero, read why the second one
+  is stuck in the events of its ReplicaSet, then repair it until its replicas
+  are available.
+skills:
+  - replicaset
+  - owner-references
+  - pod-template-hash
+  - kubectl-describe
+  - failedcreate
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-replicaset-actif-est-consigne
+    label: "The active ReplicaSet of api is recorded"
+    tests:
+      - test_le_replicaset_actif_de_api_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
+  - id: l-ancien-replicaset-est-consigne
+    label: "The previous ReplicaSet of api, kept at zero, is recorded"
+    tests:
+      - test_l_ancien_replicaset_de_api_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
+  - id: la-cause-du-failedcreate-est-consignee
+    label: "The cause of the FailedCreate of compte-absent is recorded"
+    tests:
+      - test_la_cause_du_failedcreate_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
+  - id: le-deployment-bloque-est-repare
+    label: "compte-absent, repaired without being recreated, has its two replicas available"
+    tests:
+      - test_compte_absent_repare_a_ses_deux_replicas_disponibles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/

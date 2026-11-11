@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Pose la situation : webapp en 1.26-alpine, révision 1, saine ; puis la
-# mise à jour vers nginx:1.27-alpin, une image qui n'existe pas, révision 2,
+# Pose la situation : webapp en nginx 1.30.5, révision 1, saine ; puis la
+# mise à jour vers nginx:1.30.66, une image qui n'existe pas, révision 2,
 # qui reste bloquée. progressDeadlineSeconds est court pour que describe
 # dise ProgressDeadlineExceeded sans attendre dix minutes.
 #
@@ -38,14 +38,14 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:1.26-alpine
+          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
           ports:
             - containerPort: 80
 EOF
 kubectl -n lab rollout status deployment/webapp --timeout=180s
 
 # La mise à jour fautive : révision 2, un Pod qui ne trouvera jamais son image.
-kubectl -n lab set image deployment/webapp nginx=nginx:1.27-alpin
+kubectl -n lab set image deployment/webapp nginx=nginx:1.30.66
 
 for essai in $(seq 1 40); do
   if kubectl -n lab get pods -l app=webapp -o jsonpath='{.items[*].status.containerStatuses[*].state.waiting.reason}' | grep -q -E 'ImagePullBackOff|ErrImagePull'; then

@@ -13,7 +13,7 @@ criteria:
   - id: maxunavailable-vaut-un
     label: "maxUnavailable vaut 1 : au plus un Pod indisponible à la fois"
   - id: l-image-est-la-nouvelle
-    label: "L'image du Deployment est passée à nginx:1.27-alpine"
+    label: "L'image du Deployment est passée à nginx:1.30.6"
   - id: les-cinq-replicas-sont-prets-sur-la-nouvelle-image
     label: "Les cinq replicas sont prêts, à jour et sur la nouvelle image"
   - id: deux-revisions-existent

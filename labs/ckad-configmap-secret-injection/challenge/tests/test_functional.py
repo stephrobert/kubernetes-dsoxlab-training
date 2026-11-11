@@ -21,11 +21,21 @@ from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
 POD = "app"
-IMAGE = "nginx:1.27-alpine"
+IMAGE = "nginx:1.30.6"
 CONFIGMAP = "app-settings"
 SECRET = "db-credentials"  # noqa: S105 - nom d'un Secret, pas un mot de passe
 MONTAGE = "/etc/app-config"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
+
+
+def _image(reference: str) -> str:
+    """La référence d'image sans son digest.
+
+    ``nginx:1.30.6@sha256:...`` et ``nginx:1.30.6`` désignent la même image, et
+    la leçon jumelée épingle ses exemples par digest. Un apprenant qui copie ce
+    style demande bien l'image attendue.
+    """
+    return reference.split("@", 1)[0]
 
 
 @pytest.fixture(scope="module")
@@ -172,7 +182,7 @@ def test_le_pod_tourne_avec_la_bonne_image(host):
         "un volume qui nomme un objet inexistant bloque le Pod en "
         "CreateContainerConfigError : ses events le disent.",
     )
-    image = pod["spec"]["containers"][0].get("image")
+    image = _image(pod["spec"]["containers"][0].get("image", ""))
     assert image == IMAGE, message(
         en=f"Pod {POD} runs image {image!r}, expected {IMAGE!r}.",
         fr=f"Le Pod {POD} utilise l'image {image!r}, attendu {IMAGE!r}.",

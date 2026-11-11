@@ -14,7 +14,7 @@ it, `dsoxlab reset ckad-expose-service` puts it back.
 ## What you must achieve
 
 1. A Deployment **`web`** in `lab`, **three replicas**, image
-   **`busybox:1.36`** (the tests read the image of the running Pods), where
+   **`busybox:1.38.0`** (the tests read the image of the running Pods), where
    each Pod serves **its own hostname** over HTTP on port **8080**. Its Pods
    carry the label **`app=web`**.
 

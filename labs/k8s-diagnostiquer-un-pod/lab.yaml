@@ -1,0 +1,71 @@
+# Lab guidé de la leçon « Pods » du module « Les ressources de base » de la
+# formation. Il reprend les deux pannes de la démonstration : une image
+# introuvable (ErrImagePull, ImagePullBackOff) et un conteneur qui sort en
+# erreur. L'apprenant lit chaque cause dans le cluster, la consigne, puis
+# répare chaque Pod du geste juste : l'image d'un Pod se corrige en place, sa
+# commande non, il faut le recréer sous le même nom.
+#
+# Il tourne sur le cluster kind « boutique », partagé avec le module
+# Fondamentaux, dans son propre namespace (pods-en-panne).
+id: k8s-diagnostiquer-un-pod
+title: "Diagnose two failing Pods"
+level: application-observability
+section: ckad
+difficulty: beginner
+description: |
+  Two Pods fail in the pods-en-panne namespace: one cannot pull its image, the
+  other's container exits with an error. Read each cause in the cluster and
+  record it, then repair each Pod with the right gesture: the image in place,
+  the command by recreating the Pod under the same name.
+skills:
+  - kubectl-describe
+  - kubectl-logs
+  - pod-phase
+  - imagepullbackoff
+  - crashloopbackoff
+  - kubectl-apply
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: la-raison-d-attente-est-consignee
+    label: "The waiting reason of image-fausse is recorded"
+    tests:
+      - test_la_raison_d_attente_de_image_fausse_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+  - id: le-code-de-sortie-est-consigne
+    label: "The exit code of plante's container is recorded"
+    tests:
+      - test_le_code_de_sortie_de_plante_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+  - id: l-image-est-corrigee-en-place
+    label: "image-fausse runs, its image corrected in place on the same Pod"
+    tests:
+      - test_image_fausse_tourne_avec_son_image_corrigee_en_place
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+  - id: la-commande-est-corrigee
+    label: "plante runs without restarting, same name and same image, its command corrected"
+    tests:
+      - test_plante_tourne_avec_sa_commande_corrigee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/

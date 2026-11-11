@@ -1,0 +1,20 @@
+title: "Épreuve du niveau 1 : livrer et mettre à jour une application"
+description: |
+  D'après un cahier des charges qui ne nomme aucun objet Kubernetes, livrer la
+  vitrine de la boutique en trois exemplaires joignables dans le cluster,
+  nourrie par une configuration et un secret gérés à part, puis la passer à
+  la version suivante sans coupure en gardant un retour arrière.
+
+criteria:
+  - id: p01-trois-replicas-en-version-2
+    label: "P01 (critique) : trois réplicas disponibles de la vitrine, tous sur la version 2 par digest"
+  - id: p02-le-service-repond
+    label: "P02 (critique) : le Service vitrine compte trois endpoints prêts et répond en HTTP"
+  - id: p03-configuration-et-secret
+    label: "P03 (critique) : la configuration vient d'un ConfigMap et le mot de passe d'un Secret, rien en clair"
+  - id: p04-retour-arriere-possible
+    label: "P04 (critique) : la révision précédente du Deployment porte la version 1"
+  - id: p05-mise-a-jour-sans-coupure
+    label: "P05 : la stratégie de mise à jour est RollingUpdate avec maxUnavailable à 0"
+  - id: p06-aucun-pod-en-erreur
+    label: "P06 : la vitrine tourne et aucun Pod du namespace n'est en erreur"

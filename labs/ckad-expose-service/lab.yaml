@@ -14,7 +14,7 @@ skills:
   - dns
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
 lab_type: lab
 estimated_time: 10m
 
@@ -56,7 +56,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-pods-tournent-avec-l-image-demandee
-    label: "The Pods of web run busybox:1.36"
+    label: "The Pods of web run busybox:1.38.0"
     tests:
       - test_les_pods_tournent_avec_l_image_demandee
     lessons:

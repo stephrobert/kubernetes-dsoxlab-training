@@ -21,7 +21,7 @@ Le namespace existe. Tout le reste est à faire.
    valant `db.internal.svc`, et **`DB_PASSWORD`**, dont vous choisissez la
    valeur.
 
-3. Un Pod **`app`** dans `lab`, image `nginx:1.27-alpine`, qui reçoit
+3. Un Pod **`app`** dans `lab`, image `nginx:1.30.6`, qui reçoit
    **toutes** les clés de `app-settings` en variables d'environnement, qui
    reçoit `DB_HOST` et `DB_PASSWORD` depuis le Secret, et qui monte
    `app-settings` sous **`/etc/app-config`**.

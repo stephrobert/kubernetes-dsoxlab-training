@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace du lab, le relevé et la
+# mémoire de l'état initial. Le cluster kind reste, il est le socle partagé de
+# la boutique.
+- name: Nettoyer le lab k8s-lire-les-replicasets
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        replicasets --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le relevé et la mémoire de l'état initial
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/replicasets"
+        - /var/lib/dsoxlab/lire-les-replicasets.json

@@ -38,7 +38,7 @@ from conftest import lab_host, lab_target_host, message
 NAMESPACE = "lab"
 SERVICE = "app-prod"
 CLIENT = "client"
-CLIENT_IMAGE = "busybox:1.37"
+CLIENT_IMAGE = "busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"
 APPLICATION = "myapp"
 PORT = 8080
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
@@ -242,7 +242,10 @@ def _labels_de_version(host, couleur: str) -> None:
 
 def _sert_sa_version(host, couleur: str) -> None:
     reponses = _reponses_des_pods(host, couleur)
-    fin = time.monotonic() + ATTENTE
+    # Sans Deployment, rien ne convergera : on n'attend pas. Sinon un état de
+    # départ vide épuisait la minute d'attente de chaque version, et le check
+    # entier dépassait son délai avant d'avoir rendu le moindre verdict.
+    fin = time.monotonic() + (ATTENTE if _deployment(host, couleur) is not None else 0)
     while time.monotonic() < fin:
         if reponses and all(r == couleur for r in reponses.values()):
             break
@@ -297,6 +300,10 @@ def test_green_sert_sa_version(host, client):
 # ----------------------------------------------------------------------
 # 3. Le Service : son port, son selector, ses endpoints.
 # ----------------------------------------------------------------------
+def _service_existe(host) -> bool:
+    return _kubectl(host, f"-n {NAMESPACE} get service {SERVICE} -o name").rc == 0
+
+
 def _service(host) -> dict:
     return _json(host, f"-n {NAMESPACE} get service {SERVICE}", message(
         en=f"No Service {SERVICE} in {NAMESPACE}.",
@@ -352,7 +359,8 @@ def test_les_endpoints_sont_exactement_les_pods_green(host):
         blue = _adresses(host, "blue")
         if adresses and adresses == green and not (adresses & blue):
             break
-        if time.monotonic() >= fin:
+        # Sans Service, aucun endpoint n'apparaîtra : inutile d'attendre.
+        if time.monotonic() >= fin or not _service_existe(host):
             break
         time.sleep(PAS)
     assert adresses, message(
