@@ -1,24 +1,17 @@
-# Un Pod à deux conteneurs, avec budgets, labels et annotation
+# Un Pod à deux conteneurs et ses budgets de ressources
 
-Lab **CKAD**, domaine *Application Design and Build* (20 % de l'épreuve),
-compétences « Define, build and modify container images » et « Understand
-multi-container Pod design patterns ».
-
-Le geste de base du CKAD, écrit à la main : deux conteneurs, leurs
-`resources`, des labels, une annotation. Le dernier test lit la limite de
-mémoire dans le cgroup du conteneur, là où le noyau l'applique.
+Lab de la leçon **Requests et Limits** du module « Déployer ses applications »
+de la formation Kubernetes, et compétence **CKAD** du domaine *Application
+Design and Build* : deux conteneurs, leurs `resources`, et la limite de mémoire
+lue dans le cgroup du conteneur, là où le noyau l'applique.
 
 | | |
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 10 minutes |
-| Leçon jumelée | [Requests et Limits](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| Durée | environ 15 minutes |
+| Page associée | [Requests et Limits, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   ckad-pod-resources-labels
 dsoxlab check ckad-pod-resources-labels
 ```
-
-Transposé de K8sExamLab le 2026-09-15, puis validé par
-`scripts/valider-labs.py` : 0 avant le travail, 100 après la solution du
-formateur, rejouable et sans trace.

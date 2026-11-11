@@ -1,25 +1,26 @@
 id: ckad-pod-resources-labels
-title: "A two-container Pod, with budgets, labels and an annotation"
+title: "A two-container Pod with its resource budgets"
 level: application-design
 section: ckad
 difficulty: beginner
 description: |
   Write by hand a Pod with two containers, each with its own requests and
-  limits, with labels and an annotation, and prove from inside each container
-  that the memory limit is the one the kernel enforces.
+  limits, and prove from inside each container that the memory limit is the
+  one the kernel enforces.
 skills:
   - pods
   - resources
-  - labels
-  - annotations
+  - cgroup
   - multi-container
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique
 lab_type: lab
-estimated_time: 10m
+estimated_time: 15m
 
-# Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
+# Lab de la leçon « Requests et Limits » (KUBERN-06-11) du module « Déployer
+# ses applications ». Compétence du blueprint CKAD, domaine Application Design
+# and Build (20 %) :
 # « Understand multi-container Pod design patterns », et Application
 # Environment : « Understand requests, limits, quotas ».
 certification_tags:
@@ -35,3 +36,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: deux-conteneurs-en-marche
+    label: "multi-app runs with its two containers"
+    tests:
+      - test_multi_app_tourne_avec_ses_deux_conteneurs
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: budget-de-web
+    label: "web declares its requests and limits"
+    tests:
+      - test_web_a_son_budget
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: budget-de-logger
+    label: "logger declares its requests and limits"
+    tests:
+      - test_logger_a_son_budget
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: limite-appliquee-par-le-noyau
+    label: "The kernel enforces the memory limit of each container"
+    tests:
+      - test_le_noyau_applique_la_limite_de_memoire_de_chaque_conteneur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
