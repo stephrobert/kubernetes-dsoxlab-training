@@ -3,3 +3,11 @@ description: |
   Augmenter le CPU et la mémoire d'un Pod qui tourne, sans le recréer ni
   redémarrer son conteneur, par la sous-ressource resize. Prouver que le
   noyau applique la nouvelle limite et que le conteneur est resté le même.
+
+criteria:
+  - id: nouvelles-ressources-demandees
+    label: "scaling-pod demande ses nouvelles ressources"
+  - id: redimensionne-en-place
+    label: "Le redimensionnement s'est fait en place, sans recréer ni redémarrer"
+  - id: limite-appliquee
+    label: "La nouvelle limite est appliquée par le kubelet et le noyau"

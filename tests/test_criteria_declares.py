@@ -71,7 +71,6 @@ DETTE: set[str] = {
     "cka-troubleshoot-networking",
     "ckad-capstone-boutique",
     "ckad-helm-install-upgrade",
-    "ckad-in-place-pod-vertical-scaling",
     "ckad-networkpolicy-ingress-egress",
     "ckad-rbac-role-rolebinding",
     "ckad-security-context-hardened",

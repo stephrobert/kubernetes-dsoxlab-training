@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Pose la situation : un Pod au budget trop juste, avec une politique de
-# redimensionnement sans redémarrage, et sa date de création gardée dans une
-# annotation : un Pod recréé aurait une autre date.
+# redimensionnement sans redémarrage, et son uid mémorisé dans
+# /var/lib/dsoxlab : un Pod recréé aurait un autre uid.
 #
 # Rejouable : le namespace est attendu s'il se termine, et le Pod est
 # supprimé puis recréé avec son budget initial.
@@ -28,7 +28,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: nginx:1.27-alpine
+      image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
       resources:
         requests:
           cpu: 100m
@@ -44,6 +44,8 @@ spec:
 EOF
 kubectl -n lab wait --for=condition=Ready pod/scaling-pod --timeout=180s
 creation=$(kubectl -n lab get pod scaling-pod -o jsonpath='{.metadata.creationTimestamp}')
-kubectl -n lab annotate pod scaling-pod "lab.dsoxlab/cree-le=${creation}" --overwrite
+install -d -m 0755 /var/lib/dsoxlab
+printf '{"uid": "%s"}\n' "$(kubectl -n lab get pod scaling-pod -o jsonpath='{.metadata.uid}')" \
+  > /var/lib/dsoxlab/in-place-pod-vertical-scaling.json
 
 echo "Situation posée : scaling-pod tourne avec 100m et 128Mi, créé le ${creation}."

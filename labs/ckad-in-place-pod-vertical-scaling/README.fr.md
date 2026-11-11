@@ -3,15 +3,14 @@
 Lab **CKAD**, domaine *Application Environment, Configuration and Security*
 (25 % de l'épreuve), compétence « Understand requests, limits, quotas ».
 
-Le redimensionnement en place est activé par défaut depuis la 1.33. Le lab
-prouve les deux choses qui comptent : le Pod est resté le même objet, et le
+Le lab prouve les deux choses qui comptent : le Pod est resté le même objet, et le
 noyau applique la nouvelle limite.
 
 | | |
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
 | Durée | environ 10 minutes |
-| Leçon jumelée | [Requests et Limits](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
+| Leçon jumelée | [Requests et Limits](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   ckad-in-place-pod-vertical-scaling

@@ -8,8 +8,7 @@ memory as its limit. It holds a long session that must **not be interrupted**.
 It needs more, now, without being recreated and without its container
 restarting.
 
-The Pod was shipped with a resize policy that allows it. For a long time,
-changing the resources of a Pod meant deleting it; that is no longer true.
+The Pod was shipped with a resize policy that allows it.
 
 ## What you must achieve
 
