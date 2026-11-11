@@ -58,7 +58,6 @@ DETTE: set[str] = {
     "cka-hpa-autoscaling",
     "cka-ingress-path-routing",
     "cka-kubeadm-upgrade",
-    "cka-kubectl-debug",
     "cka-node-affinity",
     "cka-node-drain-cordon",
     "cka-rbac-serviceaccount",

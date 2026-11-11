@@ -4,8 +4,7 @@
 #
 # Transposé de K8sExamLab, où le lab n'avait pas de setup : l'apprenant
 # créait lui-même le Pod à déboguer. Ici le Pod est posé, comme à l'examen,
-# et seuls les gestes de débogage sont mesurés. Confronté à Kubernetes 1.37
-# le 2026-09-14 : conteneurs éphémères et `kubectl debug node/` inchangés.
+# et seuls les gestes de débogage sont mesurés. Confronté à Kubernetes 1.37.
 - name: Préparer le lab cka-kubectl-debug
   hosts: lab_target
   become: true
