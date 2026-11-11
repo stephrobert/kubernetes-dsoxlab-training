@@ -1399,33 +1399,66 @@
  },
  "ckad-kustomize-overlays": {
   "apres": {
-   "passed": 3,
+   "echecs": [],
+   "passed": 9,
+   "recorded": true,
    "score": 100,
-   "total": 3
+   "skipped": 0,
+   "status": "passed",
+   "total": 9
   },
   "avant": {
+   "echecs": [
+    "test_chaque_service_trouve_ses_pods",
+    "test_dev_a_un_replica_disponible",
+    "test_dev_passe_a_la_version_2_par_son_overlay",
+    "test_la_configuration_vient_d_une_configmap_generee",
+    "test_le_cluster_correspond_aux_overlays",
+    "test_les_deux_environnements_ont_la_meme_structure",
+    "test_les_overlays_derivent_d_une_meme_base",
+    "test_les_pods_portent_le_label_de_leur_environnement",
+    "test_prod_a_trois_replicas_disponibles"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 9
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 83,
+  "date": "2026-11-11",
+  "duree_s": 485,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/9",
+   "après la solution : 9/9",
+   "après clean et run : 0/9",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-kustomize-overlays.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_chaque_service_trouve_ses_pods",
+    "test_dev_a_un_replica_disponible",
+    "test_dev_passe_a_la_version_2_par_son_overlay",
+    "test_la_configuration_vient_d_une_configmap_generee",
+    "test_le_cluster_correspond_aux_overlays",
+    "test_les_deux_environnements_ont_la_meme_structure",
+    "test_les_overlays_derivent_d_une_meme_base",
+    "test_les_pods_portent_le_label_de_leur_environnement",
+    "test_prod_a_trois_replicas_disponibles"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 9
   },
   "verdict": "VALIDE"
  },
