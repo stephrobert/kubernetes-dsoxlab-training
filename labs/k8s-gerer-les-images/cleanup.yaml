@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab clean` : retire les namespaces galerie et registre-galerie,
+# le relevé de l'apprenant et la mémoire de l'état initial. Le cluster « lab »
+# reste ; l'image httpd tirée par Docker sur la VM aussi, elle sert au setup.
+- name: Nettoyer le lab k8s-gerer-les-images
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces galerie et registre-galerie
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace galerie registre-galerie
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/galerie"
+        - /var/lib/dsoxlab/gerer-les-images.json

@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab, avec le
+# cluster « lab » et le kubeconfig de l'apprenant, puis pose le registre privé,
+# l'image qu'il sert et le namespace galerie.
+- name: Préparer le lab k8s-gerer-les-images
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Poser le registre privé et le namespace galerie
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
