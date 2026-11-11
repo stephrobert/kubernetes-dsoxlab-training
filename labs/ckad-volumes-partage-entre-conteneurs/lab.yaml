@@ -15,7 +15,7 @@ skills:
   - sidecar
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/#mettre-en-pratique
 lab_type: lab
 estimated_time: 20m
 
@@ -38,3 +38,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: volume-ephemere-commun
+    label: "An ephemeral volume is mounted at the same path in both containers"
+    tests:
+      - test_un_volume_ephemere_est_monte_dans_les_deux_conteneurs
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: le-lecteur-voit
+    label: "The reader sees the producer's file"
+    tests:
+      - test_le_lecteur_voit_le_fichier_du_producteur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: le-reste-reste-invisible
+    label: "What is written outside the volume stays invisible to the reader"
+    tests:
+      - test_ce_qui_est_ecrit_hors_du_volume_reste_invisible_au_lecteur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/

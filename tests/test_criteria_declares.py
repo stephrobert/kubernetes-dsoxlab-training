@@ -79,7 +79,6 @@ DETTE: set[str] = {
     "ckad-security-context-hardened",
     "ckad-troubleshoot-crashloop",
     "ckad-troubleshoot-missing-configmap",
-    "ckad-volumes-partage-entre-conteneurs",
     "cks-api-server-hardening",
     "cks-apparmor-confiner-un-pod",
     "cks-capstone-enclave",
