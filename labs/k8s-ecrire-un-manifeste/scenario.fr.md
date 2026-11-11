@@ -37,8 +37,8 @@ serveur avant de l'appliquer : la validation côté client ne voit pas tout.
 Un manifeste qui ne nomme pas son namespace atterrit là où pointe le contexte
 courant. Un fichier peut porter plusieurs objets, séparés par `---`.
 
-Un objet existant se corrige sans être recréé : la leçon montre trois façons de
-le faire.
+Un objet existant se corrige sans être recréé : la leçon montre plusieurs façons
+de le faire.
 
 ## Comment vous saurez que c'est bon
 

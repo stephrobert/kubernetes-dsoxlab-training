@@ -37,7 +37,7 @@ before applying it: client-side validation does not see everything.
 A manifest that does not name its namespace lands wherever the current context
 points. One file can hold several objects, separated by `---`.
 
-An existing object is corrected without being recreated: the lesson shows three
+An existing object is corrected without being recreated: the lesson shows several
 ways to do it.
 
 ## How you will know it works
