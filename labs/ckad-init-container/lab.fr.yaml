@@ -3,3 +3,13 @@ description: |
   Empêcher une application de démarrer avant que le Service dont elle dépend
   ne réponde, avec un init container qui attend. Observer le Pod bloqué en
   Init, poser la dépendance, et voir l'application partir toute seule.
+
+criteria:
+  - id: gardien-qui-attend-le-service
+    label: "app a un init container qui attend config-svc, puis son conteneur principal"
+  - id: dependance-derriere-le-service
+    label: "config-server répond derrière config-svc"
+  - id: init-termine-avec-succes
+    label: "L'init container s'est terminé avec succès"
+  - id: running-seul-quand-la-dependance-repond
+    label: "app est passé seul en Running quand la dépendance a répondu"

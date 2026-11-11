@@ -72,7 +72,6 @@ DETTE: set[str] = {
     "ckad-capstone-boutique",
     "ckad-helm-install-upgrade",
     "ckad-in-place-pod-vertical-scaling",
-    "ckad-init-container",
     "ckad-job-cronjob",
     "ckad-multi-container-sidecar",
     "ckad-networkpolicy-ingress-egress",
