@@ -1,0 +1,76 @@
+# Lab guidé de la leçon « Écrire des Manifests » (KUBERN-06-02) du module
+# « Déployer ses applications ». Il fait suivre le workflow de la leçon :
+# générer, compléter, valider côté serveur, appliquer, sur un fichier
+# multi-documents qui nomme son namespace, puis corriger en place un Deployment
+# existant, sans le recréer.
+id: k8s-ecrire-un-manifeste
+title: "Write and validate a manifest"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Write in one multi-document file a ConfigMap, a Deployment and a Service that
+  name their namespace, have the API server validate it, apply it, then correct
+  an existing faulty Deployment in place, without recreating it.
+skills:
+  - kubernetes-manifest
+  - dry-run-server
+  - multi-document-yaml
+  - kubectl-patch
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: fichier-multi-documents
+    label: "api.yaml holds the three objects and the API server accepts it"
+    tests:
+      - test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+  - id: namespace-dans-le-fichier
+    label: "The file names its namespace and nothing landed in default"
+    tests:
+      - test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+  - id: deployment-disponible
+    label: "api has two available replicas on the requested image"
+    tests:
+      - test_api_a_deux_replicas_disponibles_sur_l_image_demandee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+  - id: service-relie
+    label: "The api Service finds the two Pods"
+    tests:
+      - test_le_service_api_trouve_les_deux_pods
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+  - id: configuration-par-configmap
+    label: "The container receives its configuration from api-config"
+    tests:
+      - test_le_conteneur_recoit_sa_configuration_de_api_config
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+  - id: corrige-sans-recreer
+    label: "rapport is corrected in place, without being recreated"
+    tests:
+      - test_rapport_est_corrige_sans_avoir_ete_recree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/

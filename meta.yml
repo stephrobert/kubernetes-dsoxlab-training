@@ -245,8 +245,10 @@ sections:
       - k8s-challenge-relier-config-et-service
       - k8s-epreuve-livrer-et-mettre-a-jour
       # Labs guidés du module « Déployer ses applications » (niveau 2), sur le
-      # cluster kind « lab », un par leçon technique : explorer l'API.
+      # cluster kind « lab », un par leçon technique : explorer l'API, écrire un
+      # manifeste.
       - k8s-explorer-l-api
+      - k8s-ecrire-un-manifeste
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

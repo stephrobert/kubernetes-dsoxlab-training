@@ -1,0 +1,29 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace commandes, les objets api créés
+# par erreur dans default, le manifeste de l'apprenant et la mémoire de l'état
+# initial. Le cluster « lab » reste : c'est le socle partagé des labs kind.
+- name: Nettoyer le lab k8s-ecrire-un-manifeste
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace commandes
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace commandes
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer de default les objets api créés par erreur
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig -n default delete
+        deployment/api service/api configmap/api-config --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/commandes"
+        - /var/lib/dsoxlab/ecrire-un-manifeste.json
