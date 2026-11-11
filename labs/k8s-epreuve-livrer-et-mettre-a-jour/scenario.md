@@ -2,10 +2,11 @@
 
 ## The situation
 
-The shop asks you to ship its storefront on the kind cluster **`boutique`**,
-which your `kubectl` already points at. The **`boutique`** namespace is
-reserved for you, and it is empty. The requirements say what the storefront
-must do, not how: choosing the resources is up to you.
+The shop hands you its storefront, on the kind cluster **`boutique`** that your
+`kubectl` already targets. The requirements say what to obtain, not how: it is
+up to you to choose the resources. At the same time, the warehouse team tells
+you that its **`stock`** component, in the **`entrepot`** space, no longer
+starts.
 
 The two versions of the storefront:
 
@@ -16,28 +17,35 @@ version 2: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f7
 
 ## The requirements
 
-- The storefront runs as **three copies**, which replace themselves if one of
-  them disappears. It is shipped first as **version 1**.
-- It answers HTTP at **`http://vitrine.boutique`** from any Pod of the
-  cluster.
-- It receives its welcome message, `Bienvenue`, in the **`MESSAGE_ACCUEIL`**
-  variable, and its database password, `Boutique-2026`, in the
-  **`DB_PASSWORD`** variable. The configuration and the password are managed
-  **apart** from the application, and the password **never appears in clear**
-  in its description.
-- It then moves to **version 2**, without any copy missing during the switch,
-  and keeping the ability to **go back to version 1**.
-- At the end, **nothing is in error** in the namespace.
+- The storefront lives in the space of its team, **`livraison`**, which you
+  create, and **nothing** of it is left in the default space.
+- It runs as **three copies**, which replace themselves if one disappears. It
+  is shipped first as **version 1**.
+- It answers HTTP at the address **`http://vitrine.livraison`** from any Pod of
+  the cluster.
+- It receives its welcome message, `Bienvenue`, in the variable
+  **`MESSAGE_ACCUEIL`**, and the password of its database, `Boutique-2026`, in
+  the variable **`DB_PASSWORD`**. The configuration and the password live
+  **outside the image** and are managed **apart** from the storefront; the
+  password **never appears in clear** in its description.
+- It then moves to **version 2**, with no copy missing during the switch, and
+  keeping the possibility to **go back to version 1**.
+- The **`stock`** component runs again. Its threshold is **`10`**. Before any
+  repair, write in **`~/epreuve/cause-stock.txt`** why it does not start and
+  what it looks for without finding it, then leave that file untouched. What it
+  reads today, it must still read after the repair.
 
-## How you are graded
+## How you will be graded
 
-The test is graded on the **final state of the cluster**, never on the
-commands typed or on your files. The pass mark is **70 out of 100**, and four
-requirements are **critical**: they must all succeed, whatever the total. They
-are the storefront on version 2 with three copies, the address that answers,
-the configuration and password managed apart, and the way back to version 1.
+The test is graded on the **final state of the cluster** and on the cause
+file, never on the commands typed. It has **seven criteria**, all of equal
+weight. The pass mark is **70 out of 100**, and **five criteria are critical**:
+they must all pass, whatever the total. They are the storefront on version 2
+with three copies, the address that answers, the configuration and the
+password outside the image, the way back to version 1 kept open, and the
+`stock` component repaired after its cause was recorded.
 
-No procedure is given: the level 1 lessons taught everything.
+No procedure is given: the lessons of level 1 have taught everything.
 
 ```bash
 dsoxlab check  k8s-epreuve-livrer-et-mettre-a-jour

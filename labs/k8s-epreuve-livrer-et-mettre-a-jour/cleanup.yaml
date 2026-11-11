@@ -1,14 +1,26 @@
 ---
-# Joué par `dsoxlab clean` : retire le namespace boutique de l'épreuve. Le
-# cluster kind reste : il est le socle partagé de la boutique, et les
-# namespaces des autres labs n'y sont pas touchés.
+# Joué par `dsoxlab clean` : retire les namespaces de l'épreuve, les objets de
+# la vitrine créés par erreur dans default, et le répertoire de l'apprenant. Le
+# cluster kind reste, il est le socle partagé de la boutique.
 - name: Nettoyer l'épreuve k8s-epreuve-livrer-et-mettre-a-jour
   hosts: lab_target
   become: true
   tasks:
-    - name: Supprimer le namespace de l'épreuve
+    - name: Supprimer les namespaces de l'épreuve
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
-        boutique --ignore-not-found --wait=false
+        livraison entrepot --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
+
+    - name: Retirer de default les objets de la vitrine créés par erreur
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig -n default delete
+        deployment/vitrine service/vitrine --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/epreuve"
+        state: absent
