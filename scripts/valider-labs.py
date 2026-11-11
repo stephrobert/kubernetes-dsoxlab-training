@@ -254,6 +254,18 @@ def photographier(hote: str, journal) -> dict:
     return json.loads(lignes[-1])
 
 
+def version_photographiee(photo: dict) -> str:
+    """La version de Kubernetes que porte la photographie, ou « aucun cluster ».
+
+    Un hôte kind peut n'en porter aucun : k8s-creer-un-cluster-kind supprime
+    les clusters du catalogue pour que l'apprenant crée le sien, et son
+    amorçage laisse donc /etc/kind vide. La photographie vide est alors l'état
+    de départ ET l'état attendu à l'arrivée, pas une panne du banc.
+    """
+    noeud = next(iter(photo["noeuds"].values()), None)
+    return noeud["version"] if noeud else "aucun cluster"
+
+
 def stable(photo: dict) -> bool:
     """Plus rien en Terminating, et kube-system a tous ses replicas prêts."""
     if photo["terminating"]:
@@ -457,7 +469,7 @@ def valider(lab: Path, rejeu: bool, amorcage: bool = True) -> dict:
                 amorcer(ident, journal, dire)
                 dire("socle amorcé, le lab a été joué puis nettoyé une fois")
             avant_photo = attendre_stabilite(hote, journal)
-            resultat["kubernetes"] = next(iter(avant_photo["noeuds"].values()))["version"]
+            resultat["kubernetes"] = version_photographiee(avant_photo)
             dire(f"cluster photographié, {resultat['kubernetes']}, {len(avant_photo['objets'])} objets hors kube-system")
 
             res = dsoxlab(["run", ident], journal, 900)

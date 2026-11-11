@@ -1,0 +1,29 @@
+---
+# Joué par `dsoxlab clean` : retire le cluster atelier de l'apprenant et son
+# répertoire de travail. Les clusters des autres labs ne sont pas recréés ici :
+# chaque lab recrée le sien par son propre setup.
+- name: Nettoyer le lab k8s-creer-un-cluster-kind
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le cluster atelier et son contexte
+      ansible.builtin.shell: |
+        set -o pipefail
+        cfg="/home/{{ ansible_user | default('ansible') }}/.kube/config"
+        if kind get clusters 2>/dev/null | grep -qx atelier; then
+          if [ -f "$cfg" ]; then
+            kind delete cluster --name atelier --kubeconfig "$cfg"
+            chown "{{ ansible_user | default('ansible') }}:" "$cfg"
+          else
+            kind delete cluster --name atelier
+          fi
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de travail
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/atelier"
+        state: absent

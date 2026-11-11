@@ -231,6 +231,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: photo-sans-cluster
+        name: une photographie sans aucun cluster ne fait pas tomber le validateur
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_photo_sans_cluster.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: outillage-coherent
         name: les vérificateurs de catalogue sont présents et câblés
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_outillage_coherent.py -q

@@ -1,0 +1,29 @@
+---
+# Joué par `dsoxlab clean` : rend à l'apprenant le kubeconfig du cluster
+# « boutique », tel que le socle le pose, et retire les fichiers du lab. Les
+# clusters restent : ce sont des socles partagés du catalogue.
+- name: Nettoyer le lab k8s-changer-de-contexte
+  hosts: lab_target
+  become: true
+  vars:
+    maison: "/home/{{ ansible_user | default('ansible') }}"
+  tasks:
+    - name: Retirer les fichiers du lab
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ maison }}/Downloads/kubeconfig-recette.yaml"
+        - "{{ maison }}/.kube/configs/recette.yaml"
+        - "{{ maison }}/.kube/config.backup"
+        - "{{ maison }}/.kube/config.merged"
+
+    - name: Rendre le kubeconfig du cluster boutique
+      ansible.builtin.copy:
+        src: /etc/kind/boutique.kubeconfig
+        dest: "{{ maison }}/.kube/config"
+        remote_src: true
+        owner: "{{ ansible_user | default('ansible') }}"
+        group: "{{ ansible_user | default('ansible') }}"
+        mode: "0600"
+      failed_when: false

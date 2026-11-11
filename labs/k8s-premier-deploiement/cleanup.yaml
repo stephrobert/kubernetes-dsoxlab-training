@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace demo-app et le répertoire de
+# l'apprenant. Le cluster kind reste, il est le socle partagé de la boutique.
+- name: Nettoyer le lab k8s-premier-deploiement
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        demo-app --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/demo-app"
+        state: absent
