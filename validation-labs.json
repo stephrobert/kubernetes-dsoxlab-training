@@ -2908,39 +2908,40 @@
  "k8s-epreuve-livrer-et-mettre-a-jour": {
   "apres": {
    "echecs": [],
-   "passed": 6,
+   "passed": 7,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 6
+   "total": 7
   },
   "avant": {
    "echecs": [
-    "test_p01_trois_replicas_sur_la_version_2",
-    "test_p02_le_service_repond_avec_trois_endpoints",
-    "test_p03_configuration_et_secret_sans_valeur_en_clair",
-    "test_p04_la_revision_precedente_porte_la_version_1",
-    "test_p05_strategie_sans_indisponibilite",
-    "test_p06_aucun_pod_en_erreur"
+    "test_c1_trois_exemplaires_disponibles_en_version_2",
+    "test_c2_une_adresse_stable_servie_par_les_trois_exemplaires",
+    "test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste",
+    "test_c4_une_revision_de_retour_sur_la_version_1",
+    "test_c5_une_mise_a_jour_ne_prive_d_aucun_exemplaire",
+    "test_c6_l_application_vit_dans_son_propre_espace",
+    "test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 6
+   "total": 7
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-10",
-  "duree_s": 79,
+  "date": "2026-11-11",
+  "duree_s": 138,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.0, 40 objets hors kube-system",
-   "avant le travail : 0/6",
-   "après la solution : 6/6",
-   "après clean et run : 0/6",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-epreuve-livrer-et-mettre-a-jour.log",
@@ -2948,19 +2949,20 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_p01_trois_replicas_sur_la_version_2",
-    "test_p02_le_service_repond_avec_trois_endpoints",
-    "test_p03_configuration_et_secret_sans_valeur_en_clair",
-    "test_p04_la_revision_precedente_porte_la_version_1",
-    "test_p05_strategie_sans_indisponibilite",
-    "test_p06_aucun_pod_en_erreur"
+    "test_c1_trois_exemplaires_disponibles_en_version_2",
+    "test_c2_une_adresse_stable_servie_par_les_trois_exemplaires",
+    "test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste",
+    "test_c4_une_revision_de_retour_sur_la_version_1",
+    "test_c5_une_mise_a_jour_ne_prive_d_aucun_exemplaire",
+    "test_c6_l_application_vit_dans_son_propre_espace",
+    "test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 6
+   "total": 7
   },
   "verdict": "VALIDE"
  },
