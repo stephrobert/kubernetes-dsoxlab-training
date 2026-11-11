@@ -1,0 +1,63 @@
+# Lab guidé de la leçon « kubectl diff et wait » (KUBERN-06-04) du module
+# « Déployer ses applications ». Il fait prévoir avant d'appliquer, attendre
+# après, et écrire un script de déploiement qui s'arrête au bon moment.
+id: k8s-verifier-et-attendre
+title: "Preview with diff, wait with wait"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Move an application to its version 2 and run its migration Job, previewing
+  each change with kubectl diff and waiting for the real end of the rollout,
+  then write a deployment script that exits cleanly when nothing differs and
+  stops before applying when kubectl diff fails.
+skills:
+  - kubectl-diff
+  - kubectl-wait
+  - rollout-status
+  - deployment-script
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: etat-conforme-au-dossier
+    label: "The cluster matches the ~/deploiement/ folder"
+    tests:
+      - test_le_cluster_correspond_au_dossier
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: codes-de-diff
+    label: "The record gives the three exit codes of kubectl diff"
+    tests:
+      - test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: nouvelle-version-en-place
+    label: "Every Pod runs version 2 and the migration is complete"
+    tests:
+      - test_la_version_2_tourne_et_la_migration_est_terminee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: script-qui-sait-s-arreter
+    label: "deployer.sh exits in 0 without differences, and stops on error before applying"
+    tests:
+      - test_deployer_sh_sait_s_arreter
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/

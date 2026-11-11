@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace paiements et le dossier de
+# l'apprenant. Le cluster « lab » reste.
+- name: Nettoyer le lab k8s-verifier-et-attendre
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace paiements
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace paiements
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/deploiement"
+        state: absent

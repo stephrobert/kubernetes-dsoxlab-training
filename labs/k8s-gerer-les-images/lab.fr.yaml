@@ -1,0 +1,14 @@
+title: "Figer une image par digest et tirer d'un registre privé"
+description: |
+  Figez par son digest l'image qu'un Deployment fait tourner sur un tag
+  mutable, consignez pourquoi un Pod reste en ImagePullBackOff avant toute
+  réparation, puis laissez-le tirer d'un registre privé grâce à un Secret
+  docker-registry porté par son ServiceAccount.
+
+criteria:
+  - id: image-par-digest
+    label: "affiche est figée par le digest de l'image qu'elle faisait tourner"
+  - id: cause-du-pull-consignee
+    label: "La cause du pull refusé est consignée avant la réparation"
+  - id: registre-prive-par-serviceaccount
+    label: "vignettes tire son image privée grâce à son ServiceAccount"

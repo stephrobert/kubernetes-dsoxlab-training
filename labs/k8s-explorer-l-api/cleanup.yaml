@@ -1,0 +1,26 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace archives, la CRD Sauvegarde
+# (et avec elle tous ses objets) et le relevé de l'apprenant. Le cluster
+# « lab » reste : c'est le socle partagé des labs kind.
+- name: Nettoyer le lab k8s-explorer-l-api
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace archives
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace archives
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la CRD Sauvegarde
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete crd
+        sauvegardes.sauvegarde.formation.k8s --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/archives"
+        state: absent

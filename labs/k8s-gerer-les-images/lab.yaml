@@ -1,0 +1,60 @@
+# Lab guidé de la leçon « Gérer les images conteneurs » (KUBERN-06-06) du
+# module « Déployer ses applications ». Il fait figer par digest une image qui
+# tournait sur un tag mutable, diagnostiquer un ImagePullBackOff dû à un
+# registre privé, puis le réparer par un Secret docker-registry porté par le
+# ServiceAccount. Le registre est local au cluster : containerd le tire en
+# localhost:30500 sans configuration du nœud (mesuré le 2026-11-11).
+id: k8s-gerer-les-images
+title: "Pin an image by digest and pull from a private registry"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Pin by its digest the image a Deployment runs on a mutable tag, record why a
+  Pod stays in ImagePullBackOff before repairing anything, then let it pull from
+  a private registry through a docker-registry Secret carried by its
+  ServiceAccount.
+skills:
+  - image-digest
+  - imagepullbackoff
+  - docker-registry-secret
+  - serviceaccount
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: image-par-digest
+    label: "affiche is pinned by the digest of the image it was running"
+    tests:
+      - test_affiche_est_figee_par_le_digest_qu_elle_faisait_tourner
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+  - id: cause-du-pull-consignee
+    label: "The cause of the refused pull is recorded before the repair"
+    tests:
+      - test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+  - id: registre-prive-par-serviceaccount
+    label: "vignettes pulls its private image thanks to its ServiceAccount"
+    tests:
+      - test_vignettes_tire_son_image_grace_a_son_serviceaccount
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/

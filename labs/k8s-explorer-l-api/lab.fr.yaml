@@ -1,0 +1,16 @@
+title: "Explorer l'API avec api-resources et explain"
+description: |
+  Trouvez avec api-resources l'apiVersion et le kind d'une CRD que vous n'avez
+  jamais vue, créez un objet de ce type avec les champs que seul explain
+  révèle, ajoutez une sonde de disponibilité HTTP trouvée champ par champ, et
+  dressez l'inventaire complet d'un namespace, au-delà de kubectl get all.
+
+criteria:
+  - id: groupe-et-kind
+    label: "Le relevé donne l'apiVersion et le kind de la CRD installée"
+  - id: objet-de-la-crd
+    label: "La sauvegarde commandes-nuit existe, avec les champs que le schéma exige"
+  - id: sonde-trouvee-par-explain
+    label: "catalogue porte une sonde de disponibilité HTTP et ses Pods sont Ready"
+  - id: inventaire-complet
+    label: "Le relevé nomme chaque type d'objet présent dans le namespace"

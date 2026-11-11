@@ -1,0 +1,21 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace livraisons, le dossier de
+# l'apprenant et la mémoire de l'état initial. Le cluster « lab » reste.
+- name: Nettoyer le lab k8s-creer-ou-appliquer
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace livraisons
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace livraisons
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/livraisons"
+        - /var/lib/dsoxlab/creer-ou-appliquer.json

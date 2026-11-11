@@ -1,0 +1,16 @@
+title: "Prévisualiser avec diff, attendre avec wait"
+description: |
+  Passez une application en version 2 et jouez son Job de migration, en
+  prévisualisant chaque changement avec kubectl diff et en attendant la vraie
+  fin du déploiement, puis écrivez un script de déploiement qui sort proprement
+  quand rien ne diffère et s'arrête avant d'appliquer quand kubectl diff échoue.
+
+criteria:
+  - id: etat-conforme-au-dossier
+    label: "Le cluster correspond au dossier ~/deploiement/"
+  - id: codes-de-diff
+    label: "Le relevé donne les trois codes de sortie de kubectl diff"
+  - id: nouvelle-version-en-place
+    label: "Tous les Pods tournent en version 2 et la migration est terminée"
+  - id: script-qui-sait-s-arreter
+    label: "deployer.sh sort en 0 sans différence, et s'arrête en erreur avant d'appliquer"

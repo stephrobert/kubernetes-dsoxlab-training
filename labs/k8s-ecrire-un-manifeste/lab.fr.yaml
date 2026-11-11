@@ -1,0 +1,20 @@
+title: "Écrire et valider un manifeste"
+description: |
+  Écrivez dans un même fichier multi-documents une ConfigMap, un Deployment et
+  un Service qui nomment leur namespace, faites-le valider par le serveur
+  d'API, appliquez-le, puis corrigez en place un Deployment existant et fautif,
+  sans le recréer.
+
+criteria:
+  - id: fichier-multi-documents
+    label: "api.yaml porte les trois objets et le serveur d'API l'accepte"
+  - id: namespace-dans-le-fichier
+    label: "Le fichier nomme son namespace et rien n'a atterri dans default"
+  - id: deployment-disponible
+    label: "api a deux réplicas disponibles sur l'image demandée"
+  - id: service-relie
+    label: "Le Service api trouve les deux Pods"
+  - id: configuration-par-configmap
+    label: "Le conteneur reçoit sa configuration de api-config"
+  - id: corrige-sans-recreer
+    label: "rapport est corrigé en place, sans avoir été recréé"

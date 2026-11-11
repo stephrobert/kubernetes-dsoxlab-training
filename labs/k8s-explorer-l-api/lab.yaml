@@ -1,0 +1,66 @@
+# Lab guidé de la leçon « kubectl api-resources et explain » (KUBERN-06-01) du
+# module « Déployer ses applications ». Il fait pratiquer la recette de la
+# leçon sur un type que l'apprenant n'a jamais vu : une CRD inventée,
+# Sauvegarde, en v1beta1, dont l'apiVersion ne se devine pas et dont les champs
+# requis ne se lisent qu'avec explain. Il fait aussi écrire une sonde trouvée
+# par explain, et dresser l'inventaire que kubectl get all ne donne pas.
+id: k8s-explorer-l-api
+title: "Explore the API with api-resources and explain"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Find with api-resources the apiVersion and the kind of a CRD you have never
+  seen, create an object of that type with the fields only explain reveals,
+  add an HTTP readiness probe found field by field, and draw up the full
+  inventory of a namespace, beyond kubectl get all.
+skills:
+  - kubectl-api-resources
+  - kubectl-explain
+  - crd
+  - readiness-probe
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: groupe-et-kind
+    label: "The record gives the apiVersion and the kind of the installed CRD"
+    tests:
+      - test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+  - id: objet-de-la-crd
+    label: "The commandes-nuit backup exists, with the fields the schema requires"
+    tests:
+      - test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+  - id: sonde-trouvee-par-explain
+    label: "catalogue carries an HTTP readiness probe and its Pods are Ready"
+    tests:
+      - test_catalogue_porte_une_sonde_de_disponibilite_http
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+  - id: inventaire-complet
+    label: "The record names every type of object present in the namespace"
+    tests:
+      - test_le_releve_dresse_l_inventaire_complet_du_namespace
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
