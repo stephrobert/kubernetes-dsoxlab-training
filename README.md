@@ -211,7 +211,7 @@ Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster 
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
-| 1 | [`k8s-installer-kubectl`](labs/k8s-installer-kubectl/) | Install and configure kubectl | kubernetes-fundamentals | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique) |
+| 1 | [`k8s-installer-kubectl`](labs/k8s-installer-kubectl/) | Install and configure kubectl | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique) |
 | 2 | [`k8s-creer-un-cluster-kind`](labs/k8s-creer-un-cluster-kind/) | Create a multi-node kind cluster | kubernetes-fundamentals | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique) |
 | 3 | [`k8s-changer-de-contexte`](labs/k8s-changer-de-contexte/) | Merge a kubeconfig and switch context | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
 | 4 | [`k8s-premier-deploiement`](labs/k8s-premier-deploiement/) | Deploy, expose and scale a first application | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique) |
