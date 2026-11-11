@@ -1,20 +1,24 @@
 title: "Épreuve du niveau 1 : livrer et mettre à jour une application"
 description: |
-  D'après un cahier des charges qui ne nomme aucun objet Kubernetes, livrer la
-  vitrine de la boutique en trois exemplaires joignables dans le cluster,
-  nourrie par une configuration et un secret gérés à part, puis la passer à
-  la version suivante sans coupure en gardant un retour arrière.
+  D'après un cahier des charges qui ne nomme aucun objet Kubernetes, livrez la
+  vitrine de la boutique dans l'espace propre à son équipe, en trois
+  exemplaires joignables à une adresse stable, nourrie d'une configuration et
+  d'un mot de passe tenus hors de l'image, passez-la à la version suivante
+  sans coupure en gardant un retour, et réparez un composant en panne après
+  avoir consigné pourquoi il tombait.
 
 criteria:
-  - id: p01-trois-replicas-en-version-2
-    label: "P01 (critique) : trois réplicas disponibles de la vitrine, tous sur la version 2 par digest"
-  - id: p02-le-service-repond
-    label: "P02 (critique) : le Service vitrine compte trois endpoints prêts et répond en HTTP"
-  - id: p03-configuration-et-secret
-    label: "P03 (critique) : la configuration vient d'un ConfigMap et le mot de passe d'un Secret, rien en clair"
-  - id: p04-retour-arriere-possible
-    label: "P04 (critique) : la révision précédente du Deployment porte la version 1"
-  - id: p05-mise-a-jour-sans-coupure
-    label: "P05 : la stratégie de mise à jour est RollingUpdate avec maxUnavailable à 0"
-  - id: p06-aucun-pod-en-erreur
-    label: "P06 : la vitrine tourne et aucun Pod du namespace n'est en erreur"
+  - id: c1-trois-exemplaires-en-version-2
+    label: "C1 (critique) : la vitrine tourne en trois exemplaires disponibles, tous en version 2"
+  - id: c2-une-adresse-stable
+    label: "C2 (critique) : la vitrine répond à une adresse stable dans le cluster, servie par ses trois exemplaires"
+  - id: c3-configuration-hors-de-l-image
+    label: "C3 (critique) : la configuration et le mot de passe vivent hors de l'image et hors du manifeste de la vitrine"
+  - id: c4-une-revision-de-retour
+    label: "C4 (critique) : une mise à jour garde un retour possible vers la version 1"
+  - id: c5-aucune-coupure
+    label: "C5 : une mise à jour ne prive jamais la vitrine d'un exemplaire disponible"
+  - id: c6-son-propre-espace
+    label: "C6 : l'application vit dans son propre espace, et rien d'elle ne traîne dans l'espace par défaut"
+  - id: c7-stock-repare-cause-consignee
+    label: "C7 (critique) : le composant stock tourne de nouveau, et la cause de sa panne a été consignée avant la réparation"

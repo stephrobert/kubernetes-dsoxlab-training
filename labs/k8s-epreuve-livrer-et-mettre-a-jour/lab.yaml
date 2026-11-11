@@ -1,17 +1,25 @@
-# Épreuve de fin du niveau 1 de la formation Kubernetes (fiche KUBERN-EPREUVE-N1).
+# Épreuve de fin du niveau 1 de la formation Kubernetes (fiche KUBERN-EPREUVE-N1),
+# réécrite selon D33 et D34 (2026-11-11), grille validée en D35.
+#
+# D33 : l'épreuve croise TOUT le niveau 1, et non plus le seul challenge du
+# module 3 : la livraison d'une application avec sa configuration et son mot
+# de passe hors de l'image, une mise à jour sans coupure qui garde un retour, un
+# composant en panne à diagnostiquer puis réparer, un espace dédié. L'accès par
+# un tunnel, d'abord prévu, a été retiré (D35) : il ne prouvait que la valeur
+# lue, et k8s-atteindre-une-application le prouve déjà.
+#
+# D34 : les critères disent le RÉSULTAT attendu, sans nommer la ressource à
+# choisir. Le cahier des charges ne nomme aucun type d'objet : les tests
+# retrouvent sur le cluster ce que l'apprenant a choisi.
 #
 # `lab_type: challenge` comme les épreuves du catalogue containers : capstone
-# est réservé aux certifications. Le cahier des charges ne nomme aucun objet
-# Kubernetes : l'apprenant choisit lui-même ses ressources, et les tests les
-# retrouvent sur le cluster (le Deployment qui porte la vitrine, le Service
-# vitrine que l'adresse demandée impose).
+# est réservé aux certifications. Seuil 70 (D06). Cinq critères critiques,
+# qu'aucune moyenne ne compense (D35) : C1, C2, C3, C4 et C7. dsoxlab note par
+# test, à poids égal : sept critères, environ 14,3 points chacun.
 #
-# Seuil 70 sur 100 (décision D06), et quatre contrôles critiques, P01 à P04,
-# qu'aucune moyenne ne compense : la vitrine en version 2, joignable, nourrie
-# par un ConfigMap et un Secret, avec un retour arrière possible.
-#
-# Il tourne sur le cluster kind « boutique », le fil rouge, dans son namespace
-# boutique : aucun nœud de plus sur l'hôte kind.
+# Il tourne sur le cluster kind « boutique », dans deux namespaces : livraison,
+# que l'apprenant crée, et entrepot, que le setup pose avec le composant en
+# panne.
 id: k8s-epreuve-livrer-et-mettre-a-jour
 title: "Level 1 test: ship and update an application"
 level: application-deployment
@@ -19,31 +27,35 @@ section: ckad
 difficulty: intermediate
 description: |
   From requirements that name no Kubernetes object, ship the shop's storefront
-  with three copies reachable inside the cluster, fed by a configuration and a
-  secret managed apart, then move it to the next version without downtime
-  while keeping a way back.
+  in its team's own space, with three copies reachable at a stable address,
+  fed by a configuration and a password kept outside the image, move it to the
+  next version without downtime while keeping a way back, and repair a
+  failing component after recording why it failed.
 skills:
   - deployment
   - service
   - configmap
   - secret
   - rolling-update
-  - rollout-history
+  - namespaces
+  - troubleshooting
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-et-mettre-a-jour/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
-  # P01 à P04 : les contrôles critiques de la fiche, sans compensation.
-  - test_p01_trois_replicas_sur_la_version_2
-  - test_p02_le_service_repond_avec_trois_endpoints
-  - test_p03_configuration_et_secret_sans_valeur_en_clair
-  - test_p04_la_revision_precedente_porte_la_version_1
-estimated_time: 45m
+  # Les cinq critères critiques de la grille (D35), sans compensation.
+  - test_c1_trois_exemplaires_disponibles_en_version_2
+  - test_c2_une_adresse_stable_servie_par_les_trois_exemplaires
+  - test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste
+  - test_c4_une_revision_de_retour_sur_la_version_1
+  - test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant
+estimated_time: 60m
 
 certification_tags:
   - ckad
+  - kcna
 
 runtime:
   type: vm
@@ -57,40 +69,47 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: p01-trois-replicas-en-version-2
-    label: "P01 (critical): three available replicas of the storefront, all on version 2 by digest"
+  - id: c1-trois-exemplaires-en-version-2
+    label: "C1 (critical): the storefront runs three available copies, all on version 2"
     tests:
-      - test_p01_trois_replicas_sur_la_version_2
+      - test_c1_trois_exemplaires_disponibles_en_version_2
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: p02-le-service-repond
-    label: "P02 (critical): the vitrine Service has three ready endpoints and answers HTTP"
+  - id: c2-une-adresse-stable
+    label: "C2 (critical): the storefront answers at a stable address in the cluster, served by its three copies"
     tests:
-      - test_p02_le_service_repond_avec_trois_endpoints
+      - test_c2_une_adresse_stable_servie_par_les_trois_exemplaires
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: p03-configuration-et-secret
-    label: "P03 (critical): the configuration comes from a ConfigMap and the password from a Secret, none in clear"
+  - id: c3-configuration-hors-de-l-image
+    label: "C3 (critical): the configuration and the password live outside the image and outside the storefront's manifest"
     tests:
-      - test_p03_configuration_et_secret_sans_valeur_en_clair
+      - test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
-  - id: p04-retour-arriere-possible
-    label: "P04 (critical): the previous revision of the Deployment runs version 1"
+  - id: c4-une-revision-de-retour
+    label: "C4 (critical): an update keeps a way back to version 1"
     tests:
-      - test_p04_la_revision_precedente_porte_la_version_1
+      - test_c4_une_revision_de_retour_sur_la_version_1
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-  - id: p05-mise-a-jour-sans-coupure
-    label: "P05: the update strategy is RollingUpdate with maxUnavailable 0"
+  - id: c5-aucune-coupure
+    label: "C5: an update never leaves the storefront short of an available copy"
     tests:
-      - test_p05_strategie_sans_indisponibilite
+      - test_c5_une_mise_a_jour_ne_prive_d_aucun_exemplaire
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-  - id: p06-aucun-pod-en-erreur
-    label: "P06: the storefront runs and no Pod of the namespace is in error"
+  - id: c6-son-propre-espace
+    label: "C6: the application lives in its own space, and nothing of it is left in the default one"
     tests:
-      - test_p06_aucun_pod_en_erreur
+      - test_c6_l_application_vit_dans_son_propre_espace
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+  - id: c7-stock-repare-cause-consignee
+    label: "C7 (critical): the stock component runs again, and the cause of its failure was recorded before the repair"
+    tests:
+      - test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/

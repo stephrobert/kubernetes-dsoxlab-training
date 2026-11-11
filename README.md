@@ -291,7 +291,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 | 27 | [`k8s-isoler-par-namespace`](labs/k8s-isoler-par-namespace/) | Isolate an application in a namespace | application-design | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique) |
 | 28 | [`k8s-extraire-avec-kubectl`](labs/k8s-extraire-avec-kubectl/) | Extract fields with JSONPath and custom-columns | application-observability | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/#mettre-en-pratique) |
 | 29 | [`k8s-challenge-relier-config-et-service`](labs/k8s-challenge-relier-config-et-service/) | Wire a ConfigMap, a Secret and a Service to a Deployment | application-environment | 30m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique) |
-| 30 | [`k8s-epreuve-livrer-et-mettre-a-jour`](labs/k8s-epreuve-livrer-et-mettre-a-jour/) | Level 1 test: ship and update an application | application-deployment | 45m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 30 | [`k8s-epreuve-livrer-et-mettre-a-jour`](labs/k8s-epreuve-livrer-et-mettre-a-jour/) | Level 1 test: ship and update an application | application-deployment | 60m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-et-mettre-a-jour/) |
 
 ### CKS, Certified Kubernetes Security Specialist
 

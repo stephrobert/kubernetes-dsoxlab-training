@@ -17,3 +17,4 @@
         executable: /bin/bash
       environment:
         KUBECONFIG: /etc/kind/boutique.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
