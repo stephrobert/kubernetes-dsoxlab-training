@@ -511,8 +511,8 @@
    "total": 11
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-10",
-  "duree_s": 175,
+  "date": "2026-11-11",
+  "duree_s": 167,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -669,33 +669,58 @@
  },
  "cka-storageclass-provisionnement-dynamique": {
   "apres": {
-   "passed": 2,
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
    "score": 100,
-   "total": 2
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
   },
   "avant": {
+   "echecs": [
+    "test_la_revendication_designe_la_classe_local_path",
+    "test_le_volume_lie_a_ete_cree_pour_elle",
+    "test_le_volume_porte_la_reclaim_policy_de_la_classe",
+    "test_registre_a_ecrit_le_temoin",
+    "test_registre_monte_la_revendication_sur_data"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 402,
+  "date": "2026-11-11",
+  "duree_s": 205,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-storageclass-provisionnement-dynamique.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_la_revendication_designe_la_classe_local_path",
+    "test_le_volume_lie_a_ete_cree_pour_elle",
+    "test_le_volume_porte_la_reclaim_policy_de_la_classe",
+    "test_registre_a_ecrit_le_temoin",
+    "test_registre_monte_la_revendication_sur_data"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
