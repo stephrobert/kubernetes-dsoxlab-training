@@ -12,7 +12,7 @@ pas comment.
 Les images :
 
 ```text
-application : nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+application : nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 outillage   : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
 ```
 
@@ -38,7 +38,9 @@ outillage   : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60
    sans redémarrage**.
 6. Un CronJob **`purge-colis`** tourne **chaque jour à 3 h**, garde **deux** Jobs
    réussis et **un** échoué, et n'exécute **jamais deux purges en même temps**.
-7. Un Job **`inventaire`** est **terminé** avec **trois complétions**.
+7. Un Job **`inventaire`** est **terminé** avec **trois complétions**. Le
+   CronJob et le Job **ne font pas partie des variantes** : appliquez-les à
+   part, sous ces noms exacts.
 8. **Le cluster correspond au dossier** : comparer chaque overlay au cluster ne
    trouve aucune différence.
 9. **Avant toute réparation**, écrivez dans **`~/expedition/cause.txt`**

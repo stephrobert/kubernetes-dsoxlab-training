@@ -12,7 +12,7 @@ how.
 The images:
 
 ```text
-application: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+application: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 tooling    : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
 ```
 
@@ -35,7 +35,9 @@ tooling    : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a
    HTTP on its **port 80**, and every Pod is **Ready without restart**.
 6. A CronJob **`purge-colis`** runs **every day at 3:00**, keeps **two**
    successful Jobs and **one** failed, and **never runs two purges at once**.
-7. A Job **`inventaire`** is **complete** with **three completions**.
+7. A Job **`inventaire`** is **complete** with **three completions**. The
+   CronJob and the Job **are not part of the variants**: apply them separately,
+   under these exact names.
 8. **The cluster matches the folder**: comparing each overlay with the cluster
    finds no difference.
 9. **Before any repair**, write in **`~/expedition/cause.txt`** why
