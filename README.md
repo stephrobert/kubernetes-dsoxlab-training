@@ -263,7 +263,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
-| 1 | [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/) | A two-container Pod with its resource budgets | application-design | 15m | 2026-09-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
+| 1 | [`ckad-pod-resources-labels`](labs/ckad-pod-resources-labels/) | A two-container Pod with its resource budgets | application-design | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
 | 2 | [`ckad-configmap-secret-injection`](labs/ckad-configmap-secret-injection/) | Inject configuration and secrets into a Pod | application-environment | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique) |
 | 3 | [`ckad-secret-injection-protection`](labs/ckad-secret-injection-protection/) | Take a password out of a manifest, without the application noticing | application-environment | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique) |
 | 4 | [`ckad-probes-all-types`](labs/ckad-probes-all-types/) | Three probes on one Pod: startup, liveness, readiness | application-observability | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/#mettre-en-pratique) |
