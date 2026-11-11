@@ -1,0 +1,69 @@
+# Lab guidé de la leçon « Créer votre premier cluster » du module Fondamentaux
+# de la formation. Il reprend le geste multi-nœuds de la démonstration : un
+# fichier de configuration kind, une image de nœud épinglée par digest, et
+# kind create cluster --config.
+#
+# C'est le seul lab du catalogue qui fait créer un cluster à l'apprenant. La
+# VM kind n'a pas la mémoire de porter son cluster à côté de ceux des autres
+# labs : le setup supprime ces clusters, désignés par leur nom (lab, boutique,
+# architecture), et chaque lab recrée le sien par son propre setup. Un cluster
+# que l'apprenant aurait créé sous un autre nom n'est pas touché.
+id: k8s-creer-un-cluster-kind
+title: "Create a multi-node kind cluster"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  Write a kind configuration file for one control plane and two workers, then
+  create from it the atelier cluster, on the pinned Kubernetes 1.37.0 node
+  image, and check that its three nodes are Ready with the right roles.
+skills:
+  - kind
+  - kind-config
+  - kubectl-get-nodes
+  - node-image-digest
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - kcna
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-fichier-decrit-la-topologie
+    label: "The configuration file describes one control plane and two workers"
+    tests:
+      - test_le_fichier_de_configuration_decrit_un_control_plane_et_deux_workers
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+  - id: le-cluster-porte-son-nom
+    label: "A kind cluster named atelier exists"
+    tests:
+      - test_le_cluster_porte_le_nom_atelier
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+  - id: les-noeuds-sont-prets-a-la-bonne-version
+    label: "The three nodes of atelier are Ready, on Kubernetes v1.37.0"
+    tests:
+      - test_les_trois_noeuds_sont_ready_en_v1_37_0
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+  - id: les-roles-sont-les-bons
+    label: "atelier has one control-plane node and two workers"
+    tests:
+      - test_les_noeuds_ont_un_control_plane_et_deux_workers
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/

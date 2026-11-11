@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab (Docker,
+# kind, kubectl), puis libère la VM des clusters des autres labs pour que
+# l'apprenant ait la mémoire de créer le sien.
+#
+# Le socle crée toujours un cluster : on lui donne celui du catalogue le plus
+# léger, « lab », à un nœud, que fixtures/prepare.sh supprime aussitôt avec les
+# autres. Le kubeconfig de l'apprenant n'est pas réglé par le socle : c'est kind
+# qui le réglera sur atelier.
+- name: Préparer le lab k8s-creer-un-cluster-kind
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_donner_kubeconfig: false
+
+    - name: Libérer la VM et poser le répertoire de travail
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

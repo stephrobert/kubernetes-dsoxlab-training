@@ -1,0 +1,68 @@
+# Lab guidé de la leçon « Déployer votre première application » du module
+# Fondamentaux de la formation. Il reprend les gestes de la démonstration : un
+# namespace dédié, un Deployment nginx sur l'image épinglée, un Service
+# ClusterIP, la mise à l'échelle, puis la réponse HTTP lue depuis un Pod client.
+#
+# Il tourne sur le cluster kind « boutique », dans le namespace de la leçon,
+# demo-app. Il complète le challenge du module sans le refaire : le challenge
+# évalue sans guidage une vitrine dans un autre namespace.
+id: k8s-premier-deploiement
+title: "Deploy, expose and scale a first application"
+level: kubernetes-fundamentals
+section: kcna
+difficulty: beginner
+description: |
+  In a dedicated demo-app namespace, deploy nginx on the pinned image with one
+  replica, expose it through a ClusterIP Service, scale it to three available
+  replicas, then record the HTTP answer read from a client Pod.
+skills:
+  - kubectl-create-namespace
+  - kubectl-create-deployment
+  - kubectl-expose
+  - kubectl-scale
+  - endpointslices
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - kcna
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-deployment-tourne-sur-l-image-epinglee
+    label: "The nginx Deployment of demo-app runs the image pinned by digest"
+    tests:
+      - test_le_deployment_nginx_tourne_sur_l_image_epinglee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: la-mise-a-l-echelle-donne-trois-replicas
+    label: "nginx was scaled after its creation and has three available replicas"
+    tests:
+      - test_nginx_a_ete_mis_a_l_echelle_a_trois_replicas_disponibles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: le-service-compte-trois-endpoints
+    label: "The nginx Service counts three ready endpoints"
+    tests:
+      - test_le_service_nginx_compte_trois_endpoints_prets
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+  - id: la-reponse-est-consignee
+    label: "The recorded HTTP answer is the page nginx really serves"
+    tests:
+      - test_la_reponse_consignee_est_la_page_que_sert_nginx
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/

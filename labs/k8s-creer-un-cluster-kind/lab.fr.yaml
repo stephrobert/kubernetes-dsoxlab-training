@@ -1,0 +1,16 @@
+title: "Créer un cluster kind multi-nœuds"
+description: |
+  Écrivez un fichier de configuration kind pour un control plane et deux
+  workers, puis créez depuis ce fichier le cluster atelier, sur l'image de nœud
+  Kubernetes 1.37.0 épinglée, et vérifiez que ses trois nœuds sont Ready avec
+  les bons rôles.
+
+criteria:
+  - id: le-fichier-decrit-la-topologie
+    label: "Le fichier de configuration décrit un control plane et deux workers"
+  - id: le-cluster-porte-son-nom
+    label: "Un cluster kind nommé atelier existe"
+  - id: les-noeuds-sont-prets-a-la-bonne-version
+    label: "Les trois nœuds de atelier sont Ready, en Kubernetes v1.37.0"
+  - id: les-roles-sont-les-bons
+    label: "atelier a un nœud control-plane et deux workers"

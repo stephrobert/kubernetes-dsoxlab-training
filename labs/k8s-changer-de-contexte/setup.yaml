@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab avec deux
+# clusters du catalogue, « boutique », sur lequel le socle règle le kubeconfig
+# de l'apprenant, et « lab », dont le kubeconfig devient le fichier reçu.
+- name: Préparer le lab k8s-changer-de-contexte
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster du kubeconfig reçu
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_donner_kubeconfig: false
+
+    - name: Installer le socle, le cluster de départ de l'apprenant
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: boutique
+
+    - name: Poser le kubeconfig reçu
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

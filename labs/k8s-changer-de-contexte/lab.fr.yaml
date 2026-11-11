@@ -1,0 +1,19 @@
+title: "Fusionner un kubeconfig et changer de contexte"
+description: |
+  Le kubeconfig d'un second cluster attend dans ~/Downloads. Rangez-le et
+  restreignez-le, fusionnez-le dans votre kubeconfig sans perdre votre contexte
+  actuel, renommez son contexte en recette, faites-en le contexte actif avec
+  kube-system pour namespace par défaut, et gardez votre kubeconfig lisible par
+  vous seul.
+
+criteria:
+  - id: le-kubeconfig-recu-est-range
+    label: "Le kubeconfig reçu est rangé dans ~/.kube/configs/recette.yaml, lisible par son propriétaire seul, et n'est plus dans ~/Downloads"
+  - id: le-contexte-recette-est-fusionne
+    label: "~/.kube/config porte le contexte recette, qui vise le cluster reçu, à côté de kind-boutique"
+  - id: le-contexte-actif-est-recette
+    label: "Le contexte actif est recette"
+  - id: le-namespace-par-defaut-est-kube-system
+    label: "Le namespace par défaut du contexte recette est kube-system"
+  - id: le-kubeconfig-est-protege
+    label: "~/.kube/config n'est lisible que par son propriétaire"
