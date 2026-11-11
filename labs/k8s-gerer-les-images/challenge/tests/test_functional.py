@@ -128,13 +128,11 @@ def test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation(host):
         fr="~/galerie/releve.txt ne dit pas, sur une ligne cause:, pourquoi vignettes ne tire pas son "
         "image : ce que le registre attend et ne reçoit pas.",
     )
-    sa = _json(host, f"-n {NS} get serviceaccount vignettes") or {}
-    noms = [s.get("name") for s in sa.get("imagePullSecrets") or []]
-    dates = []
-    for nom in noms:
-        secret = _json(host, f"-n {NS} get secret {nom}")
-        if secret:
-            dates.append(datetime.fromisoformat(secret["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp())
+    # Toute réparation passe par un Secret docker-registry, où qu'on le rattache
+    # ensuite (ServiceAccount ou template) : c'est sa date qui marque la réparation.
+    secrets = (_json(host, f"-n {NS} get secrets") or {}).get("items", [])
+    dates = [datetime.fromisoformat(s["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp()
+             for s in secrets if s.get("type") == "kubernetes.io/dockerconfigjson"]
     ecrit = int(host.check_output(f"stat -c %Y {chemin}"))
     assert not dates or ecrit <= min(dates), message(
         en="The cause was written, or rewritten, after the repair: ~/galerie/releve.txt is more recent "
