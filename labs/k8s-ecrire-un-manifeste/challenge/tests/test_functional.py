@@ -188,7 +188,11 @@ def test_rapport_est_corrige_sans_avoir_ete_recree(host):
             fr="La mémoire de l'état initial est absente : lancez dsoxlab reset k8s-ecrire-un-manifeste.",
         ))
     uid_initial = json.loads(res.stdout)["rapport_uid"]
-    d = _attendre(host, f"-n {NS} get deployment rapport", lambda o: _disponible(o, 3))
+    d = _json(host, f"-n {NS} get deployment rapport")
+    # On n'attend que si la correction est posée : avant le travail, rapport
+    # existe déjà, en panne, et attendre sa disponibilité ne servirait à rien.
+    if d is not None and d["spec"]["template"]["spec"]["containers"][0].get("image") == IMAGE:
+        d = _attendre(host, f"-n {NS} get deployment rapport", lambda o: _disponible(o, 3))
     assert d is not None and d["metadata"]["uid"] == uid_initial, message(
         en="The rapport Deployment is not the one the lab installed: it was deleted, or deleted "
         "then recreated. It had to be corrected in place.",
