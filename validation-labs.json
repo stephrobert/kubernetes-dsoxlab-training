@@ -2453,6 +2453,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-atteindre-une-application": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
+    "test_le_service_echo_compte_deux_endpoints_prets",
+    "test_le_service_echo_expose_80_vers_8080"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 85,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-atteindre-une-application.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
+    "test_le_service_echo_compte_deux_endpoints_prets",
+    "test_le_service_echo_expose_80_vers_8080"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-lire-un-cluster": {
   "apres": {
    "echecs": [],
@@ -2598,12 +2651,12 @@
    "total": 6
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-10",
-  "duree_s": 111,
+  "date": "2026-11-11",
+  "duree_s": 107,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
    "avant le travail : 0/6",
    "après la solution : 6/6",
    "après clean et run : 0/6",
@@ -2627,6 +2680,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-configurer-par-configmap": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment",
+    "test_le_fichier_monte_depuis_app_fichier_est_a_jour",
+    "test_le_rollout_restart_a_rafraichi_les_variables",
+    "test_les_variables_viennent_du_configmap_app_config"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 109,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-configurer-par-configmap.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment",
+    "test_le_fichier_monte_depuis_app_fichier_est_a_jour",
+    "test_le_rollout_restart_a_rafraichi_les_variables",
+    "test_les_variables_viennent_du_configmap_app_config"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -2741,6 +2849,112 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-extraire-avec-kubectl": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_l_image_du_modele_de_web_est_consignee",
+    "test_la_liste_custom_columns_donne_chaque_pod_et_son_noeud",
+    "test_la_liste_jsonpath_donne_chaque_pod_et_son_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 91,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-extraire-avec-kubectl.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_image_du_modele_de_web_est_consignee",
+    "test_la_liste_custom_columns_donne_chaque_pod_et_son_noeud",
+    "test_la_liste_jsonpath_donne_chaque_pod_et_son_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-isoler-par-namespace": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_api_est_dans_equipe_api_et_rien_dans_default",
+    "test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne",
+    "test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 93,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-isoler-par-namespace.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_api_est_dans_equipe_api_et_rien_dans_default",
+    "test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne",
+    "test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
