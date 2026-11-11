@@ -1639,32 +1639,55 @@
  },
  "ckad-pod-resources-labels": {
   "apres": {
+   "echecs": [],
    "passed": 4,
+   "recorded": true,
    "score": 100,
+   "skipped": 0,
+   "status": "passed",
    "total": 4
   },
   "avant": {
+   "echecs": [
+    "test_le_noyau_applique_la_limite_de_memoire_de_chaque_conteneur",
+    "test_logger_a_son_budget",
+    "test_multi_app_tourne_avec_ses_deux_conteneurs",
+    "test_web_a_son_budget"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 135,
+  "date": "2026-11-11",
+  "duree_s": 311,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-pod-resources-labels.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_le_noyau_applique_la_limite_de_memoire_de_chaque_conteneur",
+    "test_logger_a_son_budget",
+    "test_multi_app_tourne_avec_ses_deux_conteneurs",
+    "test_web_a_son_budget"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 4
   },
   "verdict": "VALIDE"
