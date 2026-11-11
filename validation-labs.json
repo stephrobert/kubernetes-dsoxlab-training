@@ -65,33 +65,64 @@
  },
  "cka-deployment-rollout-rollback": {
   "apres": {
-   "passed": 4,
+   "echecs": [],
+   "passed": 8,
+   "recorded": true,
    "score": 100,
-   "total": 4
+   "skipped": 0,
+   "status": "passed",
+   "total": 8
   },
   "avant": {
+   "echecs": [
+    "test_aucun_pod_n_est_en_erreur_d_image",
+    "test_l_historique_du_deploiement_est_intact",
+    "test_la_revision_finale_est_celle_de_la_bonne_image",
+    "test_la_version_fautive_est_conservee_a_zero",
+    "test_le_deploiement_demande_la_bonne_image",
+    "test_le_deploiement_porte_la_cause_de_changement",
+    "test_le_retour_arriere_a_ete_fait_avant_la_livraison",
+    "test_les_trois_replicas_sont_disponibles_et_a_jour"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 278,
+  "date": "2026-11-11",
+  "duree_s": 327,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/8",
+   "après la solution : 8/8",
+   "après clean et run : 0/8",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-deployment-rollout-rollback.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_aucun_pod_n_est_en_erreur_d_image",
+    "test_l_historique_du_deploiement_est_intact",
+    "test_la_revision_finale_est_celle_de_la_bonne_image",
+    "test_la_version_fautive_est_conservee_a_zero",
+    "test_le_deploiement_demande_la_bonne_image",
+    "test_le_deploiement_porte_la_cause_de_changement",
+    "test_le_retour_arriere_a_ete_fait_avant_la_livraison",
+    "test_les_trois_replicas_sont_disponibles_et_a_jour"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "verdict": "VALIDE"
  },
@@ -997,33 +1028,68 @@
  },
  "ckad-blue-green-deployment": {
   "apres": {
-   "passed": 3,
+   "echecs": [],
+   "passed": 10,
+   "recorded": true,
    "score": 100,
-   "total": 3
+   "skipped": 0,
+   "status": "passed",
+   "total": 10
   },
   "avant": {
+   "echecs": [
+    "test_blue_porte_les_labels_de_version",
+    "test_blue_sert_sa_version",
+    "test_blue_tourne_en_deux_replicas",
+    "test_green_porte_les_labels_de_version",
+    "test_green_sert_sa_version",
+    "test_green_tourne_en_deux_replicas",
+    "test_le_selector_vise_la_version_green",
+    "test_le_service_ecoute_sur_8080",
+    "test_les_endpoints_sont_exactement_les_pods_green",
+    "test_toutes_les_requetes_atteignent_green"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 203,
+  "date": "2026-11-11",
+  "duree_s": 487,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-blue-green-deployment.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_blue_porte_les_labels_de_version",
+    "test_blue_sert_sa_version",
+    "test_blue_tourne_en_deux_replicas",
+    "test_green_porte_les_labels_de_version",
+    "test_green_sert_sa_version",
+    "test_green_tourne_en_deux_replicas",
+    "test_le_selector_vise_la_version_green",
+    "test_le_service_ecoute_sur_8080",
+    "test_les_endpoints_sont_exactement_les_pods_green",
+    "test_toutes_les_requetes_atteignent_green"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
   },
   "verdict": "VALIDE"
  },
@@ -1061,65 +1127,145 @@
  },
  "ckad-configmap-secret-injection": {
   "apres": {
-   "passed": 4,
+   "echecs": [],
+   "passed": 14,
+   "recorded": true,
    "score": 100,
-   "total": 4
+   "skipped": 0,
+   "status": "passed",
+   "total": 14
   },
   "avant": {
+   "echecs": [
+    "test_aucun_mot_de_passe_n_est_ecrit_en_clair_dans_le_pod",
+    "test_dans_le_conteneur_app_mode_vaut_production",
+    "test_dans_le_conteneur_db_password_est_defini",
+    "test_dans_le_conteneur_le_fichier_config_yaml_contient_le_port",
+    "test_le_configmap_est_monte_sous_etc_app_config",
+    "test_le_configmap_porte_app_mode",
+    "test_le_configmap_porte_le_fichier_config_yaml",
+    "test_le_configmap_porte_log_level",
+    "test_le_pod_recoit_db_host_du_secret",
+    "test_le_pod_recoit_db_password_du_secret",
+    "test_le_pod_recoit_les_cles_du_configmap_en_variables",
+    "test_le_pod_tourne_avec_la_bonne_image",
+    "test_le_secret_porte_db_host",
+    "test_le_secret_porte_db_password"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 14
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 81,
+  "date": "2026-11-11",
+  "duree_s": 133,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/14",
+   "après la solution : 14/14",
+   "après clean et run : 0/14",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-configmap-secret-injection.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_aucun_mot_de_passe_n_est_ecrit_en_clair_dans_le_pod",
+    "test_dans_le_conteneur_app_mode_vaut_production",
+    "test_dans_le_conteneur_db_password_est_defini",
+    "test_dans_le_conteneur_le_fichier_config_yaml_contient_le_port",
+    "test_le_configmap_est_monte_sous_etc_app_config",
+    "test_le_configmap_porte_app_mode",
+    "test_le_configmap_porte_le_fichier_config_yaml",
+    "test_le_configmap_porte_log_level",
+    "test_le_pod_recoit_db_host_du_secret",
+    "test_le_pod_recoit_db_password_du_secret",
+    "test_le_pod_recoit_les_cles_du_configmap_en_variables",
+    "test_le_pod_tourne_avec_la_bonne_image",
+    "test_le_secret_porte_db_host",
+    "test_le_secret_porte_db_password"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 14
   },
   "verdict": "VALIDE"
  },
  "ckad-expose-service": {
   "apres": {
-   "passed": 3,
+   "echecs": [],
+   "passed": 11,
+   "recorded": true,
    "score": 100,
-   "total": 3
+   "skipped": 0,
+   "status": "passed",
+   "total": 11
   },
   "avant": {
+   "echecs": [
+    "test_chaque_pod_repond_son_propre_nom",
+    "test_le_deployment_demande_trois_replicas",
+    "test_le_service_a_trois_endpoints_prets",
+    "test_le_service_ecoute_sur_80_vers_8080",
+    "test_le_service_est_de_type_clusterip",
+    "test_le_service_repartit_entre_plusieurs_pods",
+    "test_le_service_repond_sous_son_nom_depuis_le_client",
+    "test_le_service_selectionne_app_web",
+    "test_les_pods_portent_le_label_app_web",
+    "test_les_pods_tournent_avec_l_image_demandee",
+    "test_les_trois_replicas_sont_disponibles"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 11
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 189,
+  "date": "2026-11-11",
+  "duree_s": 523,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/11",
+   "après la solution : 11/11",
+   "après clean et run : 0/11",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-expose-service.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_chaque_pod_repond_son_propre_nom",
+    "test_le_deployment_demande_trois_replicas",
+    "test_le_service_a_trois_endpoints_prets",
+    "test_le_service_ecoute_sur_80_vers_8080",
+    "test_le_service_est_de_type_clusterip",
+    "test_le_service_repartit_entre_plusieurs_pods",
+    "test_le_service_repond_sous_son_nom_depuis_le_client",
+    "test_le_service_selectionne_app_web",
+    "test_les_pods_portent_le_label_app_web",
+    "test_les_pods_tournent_avec_l_image_demandee",
+    "test_les_trois_replicas_sont_disponibles"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 11
   },
   "verdict": "VALIDE"
  },
@@ -1445,65 +1591,129 @@
  },
  "ckad-rolling-update-strategy": {
   "apres": {
-   "passed": 3,
+   "echecs": [],
+   "passed": 8,
+   "recorded": true,
    "score": 100,
-   "total": 3
+   "skipped": 0,
+   "status": "passed",
+   "total": 8
   },
   "avant": {
+   "echecs": [
+    "test_deux_revisions_existent",
+    "test_l_image_est_la_nouvelle",
+    "test_la_strategie_est_rollingupdate",
+    "test_le_nouveau_replicaset_porte_cinq_replicas",
+    "test_les_anciens_replicasets_sont_a_zero",
+    "test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image",
+    "test_maxsurge_vaut_deux",
+    "test_maxunavailable_vaut_un"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 81,
+  "date": "2026-11-11",
+  "duree_s": 681,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/8",
+   "après la solution : 8/8",
+   "après clean et run : 0/8",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-rolling-update-strategy.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_deux_revisions_existent",
+    "test_l_image_est_la_nouvelle",
+    "test_la_strategie_est_rollingupdate",
+    "test_le_nouveau_replicaset_porte_cinq_replicas",
+    "test_les_anciens_replicasets_sont_a_zero",
+    "test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image",
+    "test_maxsurge_vaut_deux",
+    "test_maxunavailable_vaut_un"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 3
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "verdict": "VALIDE"
  },
  "ckad-secret-injection-protection": {
   "apres": {
-   "passed": 2,
+   "echecs": [],
+   "passed": 9,
+   "recorded": true,
    "score": 100,
-   "total": 2
+   "skipped": 0,
+   "status": "passed",
+   "total": 9
   },
   "avant": {
+   "echecs": [
+    "test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur",
+    "test_dans_le_conteneur_le_fichier_porte_la_valeur",
+    "test_db_password_vient_du_secret_par_reference",
+    "test_le_deployment_a_ete_modifie_pas_remplace",
+    "test_le_mot_de_passe_a_quitte_le_manifeste",
+    "test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs",
+    "test_le_secret_est_monte_sous_etc_passerelle",
+    "test_le_secret_porte_le_mot_de_passe",
+    "test_un_pod_a_jour_porte_la_projection_du_secret"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 9
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 157,
+  "date": "2026-11-11",
+  "duree_s": 233,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/9",
+   "après la solution : 9/9",
+   "après clean et run : 0/9",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-secret-injection-protection.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur",
+    "test_dans_le_conteneur_le_fichier_porte_la_valeur",
+    "test_db_password_vient_du_secret_par_reference",
+    "test_le_deployment_a_ete_modifie_pas_remplace",
+    "test_le_mot_de_passe_a_quitte_le_manifeste",
+    "test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs",
+    "test_le_secret_est_monte_sous_etc_passerelle",
+    "test_le_secret_porte_le_mot_de_passe",
+    "test_un_pod_a_jour_porte_la_projection_du_secret"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 9
   },
   "verdict": "VALIDE"
  },
@@ -2361,6 +2571,232 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-relier-config-et-service": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_la_configuration_arrive_depuis_le_configmap",
+    "test_la_mise_a_jour_garde_l_ancien_replicaset_a_zero",
+    "test_la_vitrine_a_trois_replicas_disponibles",
+    "test_le_mot_de_passe_arrive_depuis_le_secret_sans_etre_en_clair",
+    "test_le_service_compte_trois_endpoints_et_repond",
+    "test_les_objets_sont_dans_magasin_et_aucun_dans_default"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 111,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-relier-config-et-service.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_configuration_arrive_depuis_le_configmap",
+    "test_la_mise_a_jour_garde_l_ancien_replicaset_a_zero",
+    "test_la_vitrine_a_trois_replicas_disponibles",
+    "test_le_mot_de_passe_arrive_depuis_le_secret_sans_etre_en_clair",
+    "test_le_service_compte_trois_endpoints_et_repond",
+    "test_les_objets_sont_dans_magasin_et_aucun_dans_default"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-diagnostiquer-un-pod": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_image_fausse_tourne_avec_son_image_corrigee_en_place",
+    "test_la_raison_d_attente_de_image_fausse_est_consignee",
+    "test_le_code_de_sortie_de_plante_est_consigne",
+    "test_plante_tourne_avec_sa_commande_corrigee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 166,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-diagnostiquer-un-pod.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_image_fausse_tourne_avec_son_image_corrigee_en_place",
+    "test_la_raison_d_attente_de_image_fausse_est_consignee",
+    "test_le_code_de_sortie_de_plante_est_consigne",
+    "test_plante_tourne_avec_sa_commande_corrigee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-epreuve-livrer-et-mettre-a-jour": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_p01_trois_replicas_sur_la_version_2",
+    "test_p02_le_service_repond_avec_trois_endpoints",
+    "test_p03_configuration_et_secret_sans_valeur_en_clair",
+    "test_p04_la_revision_precedente_porte_la_version_1",
+    "test_p05_strategie_sans_indisponibilite",
+    "test_p06_aucun_pod_en_erreur"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-10",
+  "duree_s": 79,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-epreuve-livrer-et-mettre-a-jour.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_p01_trois_replicas_sur_la_version_2",
+    "test_p02_le_service_repond_avec_trois_endpoints",
+    "test_p03_configuration_et_secret_sans_valeur_en_clair",
+    "test_p04_la_revision_precedente_porte_la_version_1",
+    "test_p05_strategie_sans_indisponibilite",
+    "test_p06_aucun_pod_en_erreur"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-labels-et-selecteurs": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_env_prod_est_dans_le_modele_de_pod_de_web",
+    "test_le_selecteur_consigne_rend_exactement_les_pods_de_api",
+    "test_une_annotation_description_est_posee_sur_web"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 81,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-labels-et-selecteurs.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_env_prod_est_dans_le_modele_de_pod_de_web",
+    "test_le_selecteur_consigne_rend_exactement_les_pods_de_api",
+    "test_une_annotation_description_est_posee_sur_web"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-lire-l-etat-d-un-pod-en-erreur": {
   "apres": {
    "echecs": [],
@@ -2415,6 +2851,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-lire-les-replicasets": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_compte_absent_repare_a_ses_deux_replicas_disponibles",
+    "test_l_ancien_replicaset_de_api_est_consigne",
+    "test_la_cause_du_failedcreate_est_consignee",
+    "test_le_replicaset_actif_de_api_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 88,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-lire-les-replicasets.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_compte_absent_repare_a_ses_deux_replicas_disponibles",
+    "test_l_ancien_replicaset_de_api_est_consigne",
+    "test_la_cause_du_failedcreate_est_consignee",
+    "test_le_replicaset_actif_de_api_est_consigne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
