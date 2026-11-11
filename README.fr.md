@@ -210,14 +210,14 @@ Quatre domaines. Kubernetes Fundamentals pèse 44 %, le plus lourd : de quoi un 
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
-| 1 | [`k8s-creer-un-cluster-kind`](labs/k8s-creer-un-cluster-kind/) | Créer un cluster kind multi-nœuds | kubernetes-fundamentals | 15m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique) |
-| 2 | [`k8s-changer-de-contexte`](labs/k8s-changer-de-contexte/) | Fusionner un kubeconfig et changer de contexte | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
-| 3 | [`k8s-premier-deploiement`](labs/k8s-premier-deploiement/) | Déployer, exposer et mettre à l'échelle une première application | kubernetes-fundamentals | 20m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique) |
+| 1 | [`k8s-creer-un-cluster-kind`](labs/k8s-creer-un-cluster-kind/) | Créer un cluster kind multi-nœuds | kubernetes-fundamentals | 15m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique) |
+| 2 | [`k8s-changer-de-contexte`](labs/k8s-changer-de-contexte/) | Fusionner un kubeconfig et changer de contexte | kubernetes-fundamentals | 20m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
+| 3 | [`k8s-premier-deploiement`](labs/k8s-premier-deploiement/) | Déployer, exposer et mettre à l'échelle une première application | kubernetes-fundamentals | 20m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique) |
 | 4 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Livrer la vitrine et remettre le stock en marche | kubernetes-fundamentals | 30m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
 | 5 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Suivre un Pod de kubectl au conteneur | kubernetes-fundamentals | 20m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
-| 6 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Observer la réconciliation du control plane | kubernetes-fundamentals | 20m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
+| 6 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Observer la réconciliation du control plane | kubernetes-fundamentals | 20m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
 | 7 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Lire ce que déclare un Node worker | kubernetes-fundamentals | 15m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
-| 8 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Lire un cluster : quel composant fait quoi | kubernetes-fundamentals | 30m | 2026-11-10 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 8 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Lire un cluster : quel composant fait quoi | kubernetes-fundamentals | 30m | 2026-11-11 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
 
 ### CKA, Certified Kubernetes Administrator
 
@@ -322,7 +322,7 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 
 Total : **82 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
-**Runtime validé : Kubernetes v1.37.0, v1.37.1, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
+**Runtime validé : Kubernetes aucun cluster, v1.37.0, v1.37.1, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 
 <!-- LABS:END -->
 
