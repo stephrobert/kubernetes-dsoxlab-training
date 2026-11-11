@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace du lab et les fichiers de
+# l'apprenant. Le cluster kind reste, il est le socle partagé de la boutique.
+- name: Nettoyer le lab k8s-extraire-avec-kubectl
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
+        extraction --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/extraction"
+        state: absent

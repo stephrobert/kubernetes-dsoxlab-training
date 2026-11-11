@@ -1,0 +1,63 @@
+# Lab guidé de l'aide-mémoire kubectl du module « Les ressources de base » de
+# la formation. Il reprend la section « Comment extraire un champ précis avec
+# JSONPath ? » : l'image du modèle d'un Deployment, puis une liste de Pods avec
+# un champ chacun, en JSONPath (range ... end) et en custom-columns.
+#
+# Le Deployment web est mis en pause, puis son image change : son modèle dit
+# 1.30.6 alors que ses Pods tournent encore en 1.30.5. Lire l'image d'un Pod au
+# lieu du modèle donne donc la mauvaise réponse.
+#
+# Il tourne sur le cluster kind « boutique », dans son propre namespace
+# (extraction).
+id: k8s-extraire-avec-kubectl
+title: "Extract fields with JSONPath and custom-columns"
+level: application-observability
+section: ckad
+difficulty: beginner
+description: |
+  In the extraction namespace, record the image that the Pod template of the
+  web Deployment asks for, then write the list of the web Pods with the node
+  each one runs on, once with JSONPath and once with custom-columns.
+skills:
+  - kubectl-jsonpath
+  - kubectl-custom-columns
+  - pod-template
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: l-image-du-modele-est-consignee
+    label: "The image asked for by the Pod template of web is recorded"
+    tests:
+      - test_l_image_du_modele_de_web_est_consignee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/
+  - id: la-liste-jsonpath-est-juste
+    label: "pods-jsonpath.txt lists each web Pod with its node, one per line, without header"
+    tests:
+      - test_la_liste_jsonpath_donne_chaque_pod_et_son_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/
+  - id: la-liste-custom-columns-est-juste
+    label: "pods-colonnes.txt lists each web Pod with its node, under a header line"
+    tests:
+      - test_la_liste_custom_columns_donne_chaque_pod_et_son_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/

@@ -1,0 +1,64 @@
+# Lab guidé de la leçon « Namespaces » du module « Les ressources de base » de
+# la formation. Il reprend la démonstration : une application rangée dans son
+# namespace, rien dans default, puis le réseau qui n'est PAS isolé, un client
+# d'un autre namespace qui joint le Service par <service>.<namespace>, et le nom
+# court qui échoue depuis cet autre namespace (geste enseigné par la leçon
+# Services, qui précède).
+#
+# Il tourne sur le cluster kind « boutique », dans deux namespaces à lui
+# (equipe-api et equipe-front).
+id: k8s-isoler-par-namespace
+title: "Isolate an application in a namespace"
+level: application-design
+section: ckad
+difficulty: beginner
+description: |
+  Put the api application and its Service in their own equipe-api namespace,
+  nothing in default, then from a client Pod in equipe-front reach the Service
+  by its namespace-qualified name and record the answer, and record what the
+  short name gives from there.
+skills:
+  - namespaces
+  - kubectl-create-namespace
+  - service-dns
+  - kubectl-exec
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: l-application-est-dans-son-namespace
+    label: "The api Deployment and Service are in equipe-api, and nothing named api in default"
+    tests:
+      - test_api_est_dans_equipe_api_et_rien_dans_default
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+  - id: le-nom-qualifie-repond
+    label: "A client Pod in equipe-front reaches api by its namespace-qualified name, answer recorded"
+    tests:
+      - test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: le-nom-court-echoue
+    label: "From equipe-front, the short name api fails, and the observation is recorded"
+    tests:
+      - test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/

@@ -1,0 +1,61 @@
+# Lab guidé de la leçon « Accéder à une application : expose, port-forward,
+# proxy » du module « Les ressources de base » de la formation. Il reprend la
+# démonstration : un Service créé par kubectl expose sur le bon port et le bon
+# targetPort, ses endpoints, puis un tunnel kubectl port-forward vers le Service,
+# qui s'attache à un seul Pod.
+#
+# Il tourne sur le cluster kind « boutique », dans son propre namespace (acces).
+id: k8s-atteindre-une-application
+title: "Reach an application: expose and port-forward"
+level: services-networking
+section: ckad
+difficulty: beginner
+description: |
+  In the acces namespace, expose the echo Deployment through a Service on port
+  80 towards the port 8080 of its Pods, check that it counts its endpoints, then
+  open a kubectl port-forward tunnel to the Service and record which Pod
+  answers through it.
+skills:
+  - kubectl-expose
+  - kubectl-port-forward
+  - endpointslices
+  - target-port
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/#mettre-en-pratique
+lab_type: lab
+estimated_time: 15m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: le-service-a-les-bons-ports
+    label: "The echo Service exposes port 80 towards the port 8080 of the echo Pods"
+    tests:
+      - test_le_service_echo_expose_80_vers_8080
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+  - id: le-service-compte-ses-endpoints
+    label: "The echo Service counts the two ready echo Pods as endpoints"
+    tests:
+      - test_le_service_echo_compte_deux_endpoints_prets
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+  - id: la-reponse-du-tunnel-est-consignee
+    label: "The Pod that answered through the port-forward tunnel is recorded"
+    tests:
+      - test_le_pod_qui_repond_par_le_tunnel_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/

@@ -1,0 +1,14 @@
+title: "Atteindre une application : expose et port-forward"
+description: |
+  Dans le namespace acces, exposez le Deployment echo par un Service sur le
+  port 80 vers le port 8080 de ses Pods, vérifiez qu'il compte ses endpoints,
+  puis ouvrez un tunnel kubectl port-forward vers le Service et consignez le
+  Pod qui répond à travers lui.
+
+criteria:
+  - id: le-service-a-les-bons-ports
+    label: "Le Service echo expose le port 80 vers le port 8080 des Pods echo"
+  - id: le-service-compte-ses-endpoints
+    label: "Le Service echo compte les deux Pods echo prêts comme endpoints"
+  - id: la-reponse-du-tunnel-est-consignee
+    label: "Le Pod qui a répondu par le tunnel port-forward est consigné"

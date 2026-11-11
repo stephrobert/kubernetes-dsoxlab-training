@@ -225,6 +225,12 @@ sections:
       - k8s-diagnostiquer-un-pod
       - k8s-lire-les-replicasets
       - k8s-labels-et-selecteurs
+      # Lot 3b du même module : expose et port-forward, ConfigMaps,
+      # Namespaces, puis l'aide-mémoire kubectl (extraction JSONPath).
+      - k8s-atteindre-une-application
+      - k8s-configurer-par-configmap
+      - k8s-isoler-par-namespace
+      - k8s-extraire-avec-kubectl
       # Servent le module « Les ressources de base », sur le cluster kind
       # « boutique », chacun dans son namespace : le challenge du module, puis
       # l'épreuve de fin du niveau 1, qui suppose le module entier joué.

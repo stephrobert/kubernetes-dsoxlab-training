@@ -1,0 +1,13 @@
+title: "Extraire des champs avec JSONPath et custom-columns"
+description: |
+  Dans le namespace extraction, consignez l'image que demande le modèle de Pod
+  du Deployment web, puis écrivez la liste des Pods de web avec le nœud de
+  chacun, une fois en JSONPath et une fois en custom-columns.
+
+criteria:
+  - id: l-image-du-modele-est-consignee
+    label: "L'image demandée par le modèle de Pod de web est consignée"
+  - id: la-liste-jsonpath-est-juste
+    label: "pods-jsonpath.txt liste chaque Pod de web avec son nœud, un par ligne, sans en-tête"
+  - id: la-liste-custom-columns-est-juste
+    label: "pods-colonnes.txt liste chaque Pod de web avec son nœud, sous une ligne d'en-tête"
