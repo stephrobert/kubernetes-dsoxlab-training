@@ -2828,6 +2828,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-creer-ou-appliquer": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_image_de_tarifs_appartient_au_gestionnaire_equipe_tarifs",
+    "test_le_dossier_est_applique_sous_dossiers_compris",
+    "test_prune_retire_suivi_ancien_et_epargne_journal",
+    "test_reappliquer_suivi_laisse_les_replicas_de_l_autoscaler"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 102,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-creer-ou-appliquer.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_image_de_tarifs_appartient_au_gestionnaire_equipe_tarifs",
+    "test_le_dossier_est_applique_sous_dossiers_compris",
+    "test_prune_retire_suivi_ancien_et_epargne_journal",
+    "test_reappliquer_suivi_laisse_les_replicas_de_l_autoscaler"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-creer-un-cluster-kind": {
   "apres": {
    "echecs": [],
@@ -2938,6 +2993,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-ecrire-un-manifeste": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_api_a_deux_replicas_disponibles_sur_l_image_demandee",
+    "test_le_conteneur_recoit_sa_configuration_de_api_config",
+    "test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default",
+    "test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte",
+    "test_le_service_api_trouve_les_deux_pods",
+    "test_rapport_est_corrige_sans_avoir_ete_recree"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 298,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-ecrire-un-manifeste.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_api_a_deux_replicas_disponibles_sur_l_image_demandee",
+    "test_le_conteneur_recoit_sa_configuration_de_api_config",
+    "test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default",
+    "test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte",
+    "test_le_service_api_trouve_les_deux_pods",
+    "test_rapport_est_corrige_sans_avoir_ete_recree"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-epreuve-livrer-et-mettre-a-jour": {
   "apres": {
    "echecs": [],
@@ -2999,6 +3113,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-explorer-l-api": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_catalogue_porte_une_sonde_de_disponibilite_http",
+    "test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes",
+    "test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd",
+    "test_le_releve_dresse_l_inventaire_complet_du_namespace"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 89,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-explorer-l-api.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_catalogue_porte_une_sonde_de_disponibilite_http",
+    "test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes",
+    "test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd",
+    "test_le_releve_dresse_l_inventaire_complet_du_namespace"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-extraire-avec-kubectl": {
   "apres": {
    "echecs": [],
@@ -3042,6 +3211,59 @@
     "test_l_image_du_modele_de_web_est_consignee",
     "test_la_liste_custom_columns_donne_chaque_pod_et_son_noeud",
     "test_la_liste_jsonpath_donne_chaque_pod_et_son_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-gerer-les-images": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_affiche_est_figee_par_le_digest_qu_elle_faisait_tourner",
+    "test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation",
+    "test_vignettes_tire_son_image_grace_a_son_serviceaccount"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 147,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-gerer-les-images.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_affiche_est_figee_par_le_digest_qu_elle_faisait_tourner",
+    "test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation",
+    "test_vignettes_tire_son_image_grace_a_son_serviceaccount"
    ],
    "passed": 0,
    "recorded": true,
@@ -3539,6 +3761,61 @@
     "test_le_deployment_suivi_a_un_replica_disponible",
     "test_le_kubelet_qui_agit_est_celui_du_node_du_pod",
     "test_les_etapes_du_conteneur_sont_attribuees_au_kubelet"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-verifier-et-attendre": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_deployer_sh_sait_s_arreter",
+    "test_la_version_2_tourne_et_la_migration_est_terminee",
+    "test_le_cluster_correspond_au_dossier",
+    "test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 103,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-verifier-et-attendre.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_deployer_sh_sait_s_arreter",
+    "test_la_version_2_tourne_et_la_migration_est_terminee",
+    "test_le_cluster_correspond_au_dossier",
+    "test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff"
    ],
    "passed": 0,
    "recorded": true,
