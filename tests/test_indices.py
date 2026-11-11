@@ -55,10 +55,29 @@ def test_le_catalogue_a_des_indices() -> None:
     )
 
 
+#: Les épreuves qui ne portent AUCUN indice, par décision nominative. D36
+#: (2026-11-11) : dsoxlab retire le coût des indices du barème (base = max_score
+#: moins le coût des indices pris). Sur l'épreuve du niveau 1, sept critères à
+#: poids égal, un seul indice de 5 points faisait tomber les cinq critères
+#: critiques réussis à 68, sous le seuil de 70, et la règle « les cinq critiques
+#: suffisent » devenait fausse. Une épreuve se passe donc sans aide.
+SANS_INDICE = {"k8s-epreuve-livrer-et-mettre-a-jour": "D36, épreuve du niveau 1 sans indice"}
+
+
 @pytest.mark.parametrize("fichier", HINTS, ids=lambda p: p.parent.parent.name)
 def test_les_indices_sont_encodes_et_bilingues(fichier: Path) -> None:
     document = _document(fichier)
     indices = document.get("hints") or []
+
+    lab = fichier.parent.parent.name
+    if lab in SANS_INDICE:
+        assert not indices, (
+            f"{fichier.relative_to(RACINE)} porte {len(indices)} indice(s), alors que "
+            f"{lab} doit n'en porter aucun ({SANS_INDICE[lab]}) : un indice pris "
+            "abaisse le barème sous le seuil, et réussir les critères critiques ne "
+            "suffit plus."
+        )
+        return
 
     assert indices, f"{fichier.relative_to(RACINE)} ne contient aucun indice."
 
