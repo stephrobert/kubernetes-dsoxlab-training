@@ -1,0 +1,39 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab avec le
+# cluster « multi » (un control plane et deux workers, étiquetés zone-a et
+# zone-b), puis pose le namespace entrepot et la CRD à installer.
+#
+# Plusieurs nœuds sont nécessaires : l'agent doit tourner sur chacun, control
+# plane compris, et kind ne pose le taint du control plane que si un worker
+# existe. kind_event_ttl à 24h : la preuve que le Pod du réplica 1 a été recréé
+# se lit dans les événements du StatefulSet.
+- name: Préparer le challenge k8s-challenge-choisir-le-bon-workload
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind à trois nœuds
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: multi
+        kind_workers: 2
+        kind_event_ttl: 24h
+
+    - name: Créer le répertoire de travail du lab sur l'hôte
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab
+        state: directory
+        mode: "0755"
+
+    - name: Déposer la CRD à installer
+      ansible.builtin.copy:
+        src: fixtures/collecte-crd.yaml
+        dest: /var/lib/dsoxlab/collecte-crd.yaml
+        mode: "0644"
+
+    - name: Poser le namespace entrepot
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/multi.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

@@ -160,6 +160,11 @@ sections:
     labs:
       - cka-static-pod
       - cka-daemonset-all-nodes
+      # Lab guidé de la leçon « Les StatefulSets », module Workloads avancés.
+      - cka-statefulset-identite-stable
+      # Le challenge du module Workloads avancés, posé dans la leçon
+      # « Operators et CRDs pour développeurs », sur le cluster kind « multi ».
+      - k8s-challenge-choisir-le-bon-workload
       - cka-rbac-serviceaccount
       - cka-taints-tolerations-placement
       - cka-node-affinity
@@ -259,6 +264,9 @@ sections:
       # Le challenge du module, posé dans la leçon « Débugger une application »
       # (P12, D43), sur le cluster kind « lab ».
       - k8s-challenge-manifest-robuste
+      # Lab guidé de la leçon « Operators et CRDs pour développeurs », module
+      # Workloads avancés, sur le cluster kind « lab ».
+      - ckad-crd-ressource-personnalisee
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

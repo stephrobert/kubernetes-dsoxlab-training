@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab, avec le
+# cluster « lab » et le kubeconfig de l'apprenant, puis pose l'annuaire en
+# Deployment dans le namespace identites.
+#
+# kind_event_ttl à 24h : la preuve que le Pod du réplica 1 a été recréé se lit
+# dans les événements du StatefulSet, qui disparaîtraient au bout d'une heure.
+- name: Préparer le lab cka-statefulset-identite-stable
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_event_ttl: 24h
+
+    - name: Poser l'annuaire en Deployment
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
