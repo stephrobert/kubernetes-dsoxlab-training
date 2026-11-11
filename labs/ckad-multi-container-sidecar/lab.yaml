@@ -15,13 +15,13 @@ skills:
   - emptydir
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 20m
 
 # Compétence du blueprint CKAD, domaine Application Design and Build (20 %) :
-# « Understand multi-container Pod design patterns (sidecar, init) ». Le
-# sidecar natif est stable depuis la 1.33 ; en 1.37, c'est la forme attendue.
+# « Understand multi-container Pod design patterns (sidecar, init) ». Lab de
+# la leçon « Init containers et sidecars » (KUBERN-06-07).
 certification_tags:
   - ckad
 
@@ -35,3 +35,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: sidecar-natif
+    label: "log-shipper is a native sidecar"
+    tests:
+      - test_log_shipper_est_un_sidecar_natif
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: volume-partage
+    label: "The logs volume is shared by both containers"
+    tests:
+      - test_le_volume_logs_est_partage_par_les_deux_conteneurs
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: application-ecrit
+    label: "app writes into the shared file"
+    tests:
+      - test_app_ecrit_dans_le_fichier_partage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: sidecar-transmet
+    label: "The sidecar passes on the lines of the application"
+    tests:
+      - test_le_sidecar_transmet_les_lignes_de_l_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/

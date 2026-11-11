@@ -9,8 +9,8 @@ shows nothing, and the operations team wants those lines where everyone
 reads them.
 
 Rather than modify the application, you attach a **sidecar** to it that
-tails the file and copies it to its own standard output. Since Kubernetes
-1.33, a sidecar is declared in a specific way, which guarantees that it
+tails the file and copies it to its own standard output. A sidecar is
+declared in a specific way, which guarantees that it
 starts before the application and stops after it.
 
 ## What you must achieve
@@ -18,11 +18,11 @@ starts before the application and stops after it.
 1. A Pod **`app-with-sidecar`** in `lab`, with a volume **`logs`** of type
    `emptyDir`.
 
-2. A main container **`app`**, image `busybox:1.36`, that writes one line per
+2. A main container **`app`**, image `busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4`, that writes one line per
    second into `/var/log/app/output.log`, on that volume.
 
 3. A **native sidecar** named **`log-shipper`**, same image, declared the way
-   it should be since 1.33, that tails that file continuously and copies it
+   it should be, that tails that file continuously and copies it
    to its standard output.
 
 4. The Pod is running, the file fills up, and `kubectl logs` on the sidecar

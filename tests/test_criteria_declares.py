@@ -73,7 +73,6 @@ DETTE: set[str] = {
     "ckad-helm-install-upgrade",
     "ckad-in-place-pod-vertical-scaling",
     "ckad-job-cronjob",
-    "ckad-multi-container-sidecar",
     "ckad-networkpolicy-ingress-egress",
     "ckad-pod-resources-labels",
     "ckad-probes-all-types",

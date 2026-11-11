@@ -4,7 +4,7 @@
 #
 # Transposé de K8sExamLab, où le lab n'avait pas de setup. Confronté à
 # Kubernetes 1.37 le 2026-09-15 : le sidecar natif, initContainer avec
-# restartPolicy Always, est la forme stable depuis la 1.33.
+# restartPolicy Always, est la forme attendue.
 - name: Préparer le lab ckad-multi-container-sidecar
   hosts: lab_target
   become: true
