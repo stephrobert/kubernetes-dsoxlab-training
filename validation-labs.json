@@ -3019,6 +3019,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-installer-kubectl": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_kubectl_atteint_le_serveur_du_cluster",
+    "test_kubectl_est_installe_dans_usr_local_bin_et_appartient_a_root",
+    "test_l_alias_k_lance_kubectl_et_se_complete",
+    "test_la_completion_bash_de_kubectl_est_active",
+    "test_le_binaire_a_l_empreinte_officielle_de_sa_version",
+    "test_le_client_est_en_version_1_37"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-11",
+  "duree_s": 94,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-installer-kubectl.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_kubectl_atteint_le_serveur_du_cluster",
+    "test_kubectl_est_installe_dans_usr_local_bin_et_appartient_a_root",
+    "test_l_alias_k_lance_kubectl_et_se_complete",
+    "test_la_completion_bash_de_kubectl_est_active",
+    "test_le_binaire_a_l_empreinte_officielle_de_sa_version",
+    "test_le_client_est_en_version_1_37"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-isoler-par-namespace": {
   "apres": {
    "echecs": [],
