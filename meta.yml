@@ -132,9 +132,10 @@ sections:
       multi-node cluster.
     labs:
       # Labs guidés du module Fondamentaux, un par leçon de pratique, avant son
-      # challenge : premier cluster (supprime les clusters des autres labs,
-      # recréés par leur setup), contextes kubeconfig, premier déploiement sur
-      # « boutique ».
+      # challenge : installer kubectl (sur un cluster préparé par le setup),
+      # premier cluster (supprime les clusters des autres labs, recréés par leur
+      # setup), contextes kubeconfig, premier déploiement sur « boutique ».
+      - k8s-installer-kubectl
       - k8s-creer-un-cluster-kind
       - k8s-changer-de-contexte
       - k8s-premier-deploiement

@@ -207,18 +207,19 @@ One table per exam, in the order `meta.yml` declares. That order is a teaching p
 
 Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster is made of and which component does what, read on a live multi-node cluster.
 
-8 lab(s).
+9 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
-| 1 | [`k8s-creer-un-cluster-kind`](labs/k8s-creer-un-cluster-kind/) | Create a multi-node kind cluster | kubernetes-fundamentals | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique) |
-| 2 | [`k8s-changer-de-contexte`](labs/k8s-changer-de-contexte/) | Merge a kubeconfig and switch context | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
-| 3 | [`k8s-premier-deploiement`](labs/k8s-premier-deploiement/) | Deploy, expose and scale a first application | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique) |
-| 4 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Ship the storefront and bring the stock service back | kubernetes-fundamentals | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
-| 5 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Follow a Pod from kubectl to the container | kubernetes-fundamentals | 20m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
-| 6 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Watch the control plane reconcile | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
-| 7 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Read what a worker Node declares | kubernetes-fundamentals | 15m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
-| 8 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Read a cluster: which component does what | kubernetes-fundamentals | 30m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 1 | [`k8s-installer-kubectl`](labs/k8s-installer-kubectl/) | Install and configure kubectl | kubernetes-fundamentals | 20m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique) |
+| 2 | [`k8s-creer-un-cluster-kind`](labs/k8s-creer-un-cluster-kind/) | Create a multi-node kind cluster | kubernetes-fundamentals | 15m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique) |
+| 3 | [`k8s-changer-de-contexte`](labs/k8s-changer-de-contexte/) | Merge a kubeconfig and switch context | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
+| 4 | [`k8s-premier-deploiement`](labs/k8s-premier-deploiement/) | Deploy, expose and scale a first application | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique) |
+| 5 | [`k8s-challenge-premier-deploiement`](labs/k8s-challenge-premier-deploiement/) | Ship the storefront and bring the stock service back | kubernetes-fundamentals | 30m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) |
+| 6 | [`k8s-suivre-un-pod-de-kubectl-au-conteneur`](labs/k8s-suivre-un-pod-de-kubectl-au-conteneur/) | Follow a Pod from kubectl to the container | kubernetes-fundamentals | 20m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) |
+| 7 | [`k8s-observer-la-reconciliation`](labs/k8s-observer-la-reconciliation/) | Watch the control plane reconcile | kubernetes-fundamentals | 20m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) |
+| 8 | [`k8s-lire-un-node`](labs/k8s-lire-un-node/) | Read what a worker Node declares | kubernetes-fundamentals | 15m | 2026-11-10 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
+| 9 | [`k8s-challenge-lire-un-cluster`](labs/k8s-challenge-lire-un-cluster/) | Read a cluster: which component does what | kubernetes-fundamentals | 30m | 2026-11-11 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) |
 
 ### CKA, Certified Kubernetes Administrator
 
@@ -321,7 +322,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 18 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 19 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-10-12 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **82 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **83 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.1, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

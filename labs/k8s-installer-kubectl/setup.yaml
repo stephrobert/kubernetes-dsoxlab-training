@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab (Docker,
+# kind, kubectl, le cluster « lab » et le kubeconfig de l'apprenant), puis
+# retire kubectl et toute complétion du nœud. L'apprenant trouve un cluster qui
+# l'attend et un kubeconfig en place : il ne lui manque que l'outil.
+#
+# Le socle a besoin de kubectl pour attendre ses nœuds : le retrait vient donc
+# APRÈS lui, dans fixtures/prepare.sh.
+- name: Préparer le lab k8s-installer-kubectl
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind, avec le kubeconfig de l'apprenant
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Retirer kubectl et sa complétion du nœud
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
