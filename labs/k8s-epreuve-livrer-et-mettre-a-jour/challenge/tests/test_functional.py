@@ -30,6 +30,7 @@ ADMIN = "sudo kubectl --kubeconfig /etc/kind/boutique.kubeconfig"
 NS = "livraison"
 ENTREPOT = "entrepot"
 V1 = "nginx:1.30.5"
+V1_DIGEST = "nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
 V2 = "nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703"
 BUSYBOX = "busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"
 MESSAGE = "Bienvenue"
@@ -75,7 +76,7 @@ def _vitrine(host) -> dict:
     """Le Deployment nginx de livraison : la vitrine, quel que soit son nom."""
     items = (_json(host, NS, "get deployments") or {}).get("items") or []
     nginx = [d for d in items
-             if _sans_registre(d["spec"]["template"]["spec"]["containers"][0].get("image", "")).startswith("nginx:")]
+             if _sans_registre(d["spec"]["template"]["spec"]["containers"][0].get("image", "")).startswith(("nginx:", "nginx@"))]
     assert len(nginx) == 1, message(
         en=f"Expected exactly one nginx Deployment, the storefront, in the {NS} space; found "
         f"{[d['metadata']['name'] for d in nginx]}. The storefront runs as copies that replace "
@@ -96,6 +97,28 @@ def _pods_vivants(host, ns: str, selecteur: str) -> list[dict]:
     pods = (_json(host, ns, f"get pods -l {selecteur}") or {}).get("items") or []
     return [p for p in pods if not p["metadata"].get("deletionTimestamp")
             and (p.get("status") or {}).get("phase") == "Running"]
+
+
+def _version(reference: str) -> int | None:
+    """La version de la vitrine que désigne une référence d'image : 1, 2 ou None.
+
+    Même dépôt et même digest que la version du cahier des charges, le tag étant
+    facultatif : nginx:1.30.6@sha256:… et nginx@sha256:… désignent la même image.
+    Sans digest, seul le tag désigne la version (C4 l'accepte pour la version 1 ;
+    C1 exige le digest pour la version 2)."""
+    nom, _, digest = _sans_registre(reference).partition("@")
+    depot, _, tag = nom.partition(":")
+    for numero, attendue in ((1, V1_DIGEST), (2, V2)):
+        a_nom, _, a_digest = attendue.partition("@")
+        a_tag = a_nom.partition(":")[2]
+        if depot == "nginx" and (digest == a_digest if digest else tag == a_tag) \
+                and (not tag or tag == a_tag):
+            return numero
+    return None
+
+
+def _par_digest_en_v2(reference: str) -> bool:
+    return "@" in reference and _version(reference) == 2
 
 
 def _conteneur(dep: dict) -> dict:
@@ -121,7 +144,7 @@ def test_c1_trois_exemplaires_disponibles_en_version_2(host):
     dep = _vitrine(host)
     demandes = dep["spec"].get("replicas", 1)
     modele = _sans_registre(_conteneur(dep).get("image", ""))
-    assert demandes == 3 and modele == V2, message(
+    assert demandes == 3 and _par_digest_en_v2(modele), message(
         en=f"The storefront asks for {demandes} copy(ies) of {modele!r}, expected 3 of version 2, "
         f"referenced by digest: {V2}.",
         fr=f"La vitrine demande {demandes} exemplaire(s) de {modele!r}, attendu 3 de la version 2, "
@@ -135,10 +158,11 @@ def test_c1_trois_exemplaires_disponibles_en_version_2(host):
         images = sorted({_sans_registre(c.get("image", ""))
                          for p in _pods_vivants(host, NS, _selecteur(dep))
                          for c in p["spec"].get("containers") or []})
-        if (disponibles == 3 and images == [V2]) or time.monotonic() >= fin:
+        en_v2 = bool(images) and all(_par_digest_en_v2(i) for i in images)
+        if (disponibles == 3 and en_v2) or time.monotonic() >= fin:
             break
         time.sleep(PAS)
-    assert disponibles == 3 and images == [V2], message(
+    assert disponibles == 3 and en_v2, message(
         en=f"The storefront has {disponibles} available copy(ies), running {images}; expected 3, "
         "all on version 2.",
         fr=f"La vitrine a {disponibles} exemplaire(s) disponible(s), qui tournent sur {images} ; "
@@ -243,7 +267,7 @@ def test_c4_une_revision_de_retour_sur_la_version_1(host):
     # v2) garde un retour possible vers la révision 1.
     images = {num: _sans_registre(rs["spec"]["template"]["spec"]["containers"][0].get("image", ""))
               for num, rs in precedents}
-    en_v1 = sorted(num for num, image in images.items() if image.split("@", 1)[0] == V1)
+    en_v1 = sorted(num for num, image in images.items() if _version(image) == 1)
     assert en_v1, message(
         en=f"No revision kept by the storefront runs version 1 ({V1}): the kept revisions run "
         f"{images}. No rollback could bring version 1 back.",
@@ -329,9 +353,11 @@ def test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant(host):
     )
     # Un diagnostic se juge sur le fond : il nomme ce que stock cherche (le
     # seuil, la clé SEUIL ou la variable STOCK_SEUIL) et dit que cela manque. La
-    # raison d'attente seule (CreateContainerConfigError) ne nomme rien.
+    # raison d'attente seule (CreateContainerConfigError) ne nomme rien. Le
+    # scénario anglais dit « threshold » : une cause écrite en anglais le nomme
+    # ainsi. _compact passe tout en minuscules.
     lue = _compact(cause.content_string)
-    nomme = "seuil" in lue
+    nomme = "seuil" in lue or "threshold" in lue
     dit_le_manque = any(m in lue for m in DIT_LE_MANQUE)
     manque_en = [] if nomme else ["what is missing (the threshold, its key or its variable)"]
     manque_en += [] if dit_le_manque else ["that it is missing"]
