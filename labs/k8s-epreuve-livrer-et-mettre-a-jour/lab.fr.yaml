@@ -13,7 +13,7 @@ criteria:
   - id: c2-une-adresse-stable
     label: "C2 (critique) : la vitrine répond à une adresse stable dans le cluster, servie par ses trois exemplaires"
   - id: c3-configuration-hors-de-l-image
-    label: "C3 (critique) : la configuration et le mot de passe vivent hors de l'image et hors du manifeste de la vitrine"
+    label: "C3 (critique) : la configuration et le mot de passe vivent hors de l'image et hors de la description de la vitrine, le mot de passe géré comme une donnée sensible"
   - id: c4-une-revision-de-retour
     label: "C4 (critique) : une mise à jour garde un retour possible vers la version 1"
   - id: c5-aucune-coupure

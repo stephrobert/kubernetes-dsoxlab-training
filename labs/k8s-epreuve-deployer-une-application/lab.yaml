@@ -71,7 +71,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: p02-vitrine-disponible
-    label: "P02 (critical): the storefront has all its replicas available on the image by digest, and no Pod restarted"
+    label: "P02 (critical): the storefront has all its replicas available on the image by digest, and no Pod of the magasin space restarted"
     tests:
       - test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage
     lessons:
@@ -84,13 +84,13 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: p04-init-et-sidecar
-    label: "P04: a preparation container completes, and a native sidecar passes on the lines of the shared volume"
+    label: "P04: a preparation step completes, and a companion ready before the server, active next to it for the whole life of the Pod, passes on the lines of the shared volume"
     tests:
       - test_p04_init_container_et_sidecar_relaient_le_volume_partage
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: p05-identite-stable
-    label: "P05 (critical): the database has a stable identity, ordered Pods all Ready, one Bound claim each"
+    label: "P05 (critical): the database has a stable identity, its replicas are created in order and all ready, each with its own reserved volume"
     tests:
       - test_p05_base_a_identite_stable_avec_une_revendication_par_replica
     lessons:
@@ -103,7 +103,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: p07-volumes-retain
-    label: "P07 (critical): the claims are bound to volumes created by the StorageClass, with the reclaim policy Retain"
+    label: "P07 (critical): the database volumes are created on demand by the storage class, and kept when their claim goes away"
     tests:
       - test_p07_volumes_crees_par_la_classe_en_retain
     lessons:

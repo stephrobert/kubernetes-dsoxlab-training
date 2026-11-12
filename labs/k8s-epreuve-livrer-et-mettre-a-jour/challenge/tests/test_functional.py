@@ -38,9 +38,13 @@ SEUIL = "10"
 REVISION = "deployment.kubernetes.io/revision"
 #: Ce qui dit qu'une chose manque, dans un diagnostic : l'état affiché par
 #: Kubernetes, le message du kubelet, ou une phrase en français ou en anglais.
+#: Les formes sont compactées (sans accent, espace ni apostrophe) : « manqu »
+#: couvre manque, manquant, manquante ; « pasdefini » couvre « n'est pas
+#: définie ». « vide » n'y est pas : la clé n'existe pas, elle n'est pas vide.
 DIT_LE_MANQUE = ("createcontainerconfigerror", "couldntfind", "couldnotfind", "notfound",
-                 "manque", "manquant", "absent", "introuvable", "inexistant", "missing",
-                 "nexistepas", "trouvepas", "pasdecle")
+                 "manqu", "absent", "introuvable", "inexistant", "missing", "nexiste",
+                 "trouvepas", "pasdecle", "pasdefini", "nondefini", "indefini", "undefined",
+                 "notdefined", "notset", "pasrenseign", "incomplet")
 ATTENTE = 90
 PAS = 3
 
@@ -191,8 +195,8 @@ def test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste(host):
         "la description de la vitrine ne compte pas.",
     )
     assert _vient_de(conteneur, "DB_PASSWORD", "secretKeyRef", "secretRef"), message(
-        en="DB_PASSWORD is not taken from an object made to hold a password.",
-        fr="DB_PASSWORD ne vient pas d'un objet fait pour garder un mot de passe.",
+        en="DB_PASSWORD is not handled as sensitive data, apart from the ordinary configuration.",
+        fr="DB_PASSWORD n'est pas géré comme une donnée sensible, à part de la configuration ordinaire.",
     )
     assert MOT_DE_PASSE not in json.dumps(dep), message(
         en="The password appears in clear in the storefront's description.",
