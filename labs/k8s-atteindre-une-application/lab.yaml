@@ -53,8 +53,14 @@ criteria:
       - test_le_service_echo_compte_deux_endpoints_prets
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+  - id: le-tunnel-repond
+    label: "A port-forward tunnel to the echo Service answers on local port 18080 during the check"
+    tests:
+      - test_un_tunnel_vers_le_service_repond_sur_18080
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
   - id: la-reponse-du-tunnel-est-consignee
-    label: "The Pod that answered through the port-forward tunnel is recorded"
+    label: "The Pod answering through that tunnel is recorded"
     tests:
       - test_le_pod_qui_repond_par_le_tunnel_est_consigne
     lessons:

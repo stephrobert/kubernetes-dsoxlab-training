@@ -16,8 +16,11 @@ The record **`~/acces/releve.txt`** waits for what you read through the tunnel.
 
 2. The Service counts the **two Pods** as ready endpoints.
 
-3. **`pod-du-tunnel`** gives the name of the Pod that answered you through a
-   **`kubectl port-forward` tunnel to the Service**.
+3. A **`kubectl port-forward` tunnel to the Service** `echo` listens on local
+   port **`18080`**, and it is **still open** when you run the check.
+
+4. **`pod-du-tunnel`** gives the name of the Pod answering you through **that**
+   tunnel.
 
 ## Useful landmarks
 
@@ -28,13 +31,16 @@ write.
 
 A `kubectl port-forward` tunnel is a process, not an object: it lives as long
 as the command runs. Start it in the background with its output in a log,
-query it from the machine, then stop it. Ports read "local, then remote".
+query it from the machine, and leave it running until the check: the grader
+goes through it itself. Ports read "local, then remote".
 Towards a Service, the tunnel attaches to a single Pod, chosen at launch.
 
 ## How you will know it is right
 
-The tests read the Service and its EndpointSlices, then compare your record
-with the echo Pods that exist.
+The tests read the Service and its EndpointSlices, look for your tunnel among
+the machine's processes, make a request through port 18080, and compare your
+record with the Pod answering there. A name copied from `kubectl get pods` is not
+enough.
 
 ```bash
 dsoxlab check k8s-atteindre-une-application

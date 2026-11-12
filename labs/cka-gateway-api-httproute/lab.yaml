@@ -1,5 +1,5 @@
 id: cka-gateway-api-httproute
-title: "Route with the Gateway API, and watch the Gateway report itself programmed"
+title: "Route with the Gateway API, and repair a route the cluster refuses"
 level: services-networking
 section: cka
 difficulty: advanced
@@ -7,7 +7,8 @@ description: |
   Same two applications, same single hostname, and the successor to Ingress.
   Declare a Gateway, attach a route to it, and prove the routing: each path
   answers with its own application's name, an undeclared path answers with
-  neither.
+  neither. Then repair a route set up before you, which the cluster refuses
+  without saying so anywhere but in its status.
 skills:
   - gateway-api
   - httproute
@@ -17,7 +18,7 @@ distros:
   - ubuntu24
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/#mettre-en-pratique
 lab_type: lab
-estimated_time: 25m
+estimated_time: 35m
 
 # Compétence du blueprint CKA, domaine Services and Networking (20 %) :
 # « Use the Gateway API to manage Ingress traffic », entrée ajoutée au
@@ -62,6 +63,18 @@ criteria:
     label: "An undeclared path reaches neither application"
     tests:
       - test_un_chemin_non_declare_n_atteint_aucune_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: route-catalogue-resolue
+    label: "The route catalogue is Accepted and its references Resolved, up to date with its generation"
+    tests:
+      - test_la_route_catalogue_est_acceptee_et_resolue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: catalogue-servi
+    label: "catalogue.local reaches the catalogue of the boutique namespace"
+    tests:
+      - test_catalogue_local_atteint_le_catalogue
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
 

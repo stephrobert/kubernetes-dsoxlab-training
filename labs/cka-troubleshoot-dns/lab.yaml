@@ -5,8 +5,9 @@ section: cka
 difficulty: intermediate
 description: |
   No Pod resolves a service name any more. Find out why the cluster DNS has
-  stopped answering, put it back in service, and prove that a client Pod
-  resolves and reaches a Service by its name again.
+  stopped answering, put it back in service, then find why it still answers
+  NXDOMAIN once Running and Ready, and prove that a client Pod resolves and
+  reaches a Service by its name again.
 skills:
   - troubleshooting
   - dns
@@ -16,7 +17,7 @@ distros:
   - ubuntu24
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/#mettre-en-pratique
 lab_type: lab
-estimated_time: 10m
+estimated_time: 20m
 
 # Compétence du blueprint CKA, domaine Troubleshooting (30 %), le plus lourd
 # des trois examens : « Troubleshoot cluster components » et « Troubleshoot
@@ -40,6 +41,12 @@ criteria:
     label: "CoreDNS runs again as kubeadm sets it up, two replicas ready"
     tests:
       - test_coredns_tourne_comme_kubeadm_le_pose
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: corefile-zone
+    label: "The CoreDNS configuration serves the cluster's zone, cluster.local"
+    tests:
+      - test_le_corefile_sert_la_zone_du_cluster
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: client-resout

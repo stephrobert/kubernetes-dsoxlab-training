@@ -1,14 +1,28 @@
 ---
-# Joué par `dsoxlab clean` : rend à l'apprenant le kubeconfig du cluster
-# « boutique », tel que le socle le pose, et retire les fichiers du lab. Les
-# clusters restent : ce sont des socles partagés du catalogue.
+# Joué par `dsoxlab clean` : retire la ConfigMap preuve des deux clusters, puis
+# rend à l'apprenant le kubeconfig du seul cluster boutique. Les clusters
+# restent.
 - name: Nettoyer le lab k8s-changer-de-contexte
   hosts: lab_target
   become: true
   vars:
     maison: "/home/{{ ansible_user | default('ansible') }}"
   tasks:
-    - name: Retirer les fichiers du lab
+    - name: Retirer la ConfigMap preuve des deux clusters
+      ansible.builtin.shell: |
+        for cluster in lab boutique; do
+          K="kubectl --kubeconfig /etc/kind/${cluster}.kubeconfig"
+          for ns in $($K get configmap -A --field-selector metadata.name=preuve \
+              -o jsonpath='{range .items[*]}{.metadata.namespace}{" "}{end}' 2>/dev/null); do
+            $K -n "$ns" delete configmap preuve --ignore-not-found
+          done
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers d'une version précédente du lab
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent

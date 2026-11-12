@@ -1,0 +1,72 @@
+# Lab guidé de la leçon « Services » : réparer un Service NodePort et le prouver
+# par une vraie requête vers chaque nœud. Le voisin ckad-expose-service porte
+# sur ClusterIP ; LoadBalancer reste hors lab, faute de fournisseur d'adresse
+# externe sur ce cluster.
+id: ckad-service-nodeport-reparer
+title: "Repair a NodePort Service"
+level: services-networking
+section: ckad
+difficulty: beginner
+description: |
+  The accueil application runs, but the NodePort Service meant to publish it
+  leads nowhere: its selector targets no Pod, its targetPort is wrong, and its
+  port was drawn at random. Repair it, and prove that every node answers.
+skills:
+  - service
+  - nodeport
+  - endpoints
+  - troubleshooting
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+# Compétence du blueprint CKAD, domaine Services and Networking : « Use
+# ClusterIP, NodePort, LoadBalancer service types and endpoints ».
+certification_tags:
+  - ckad
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le lab interroge le NodePort du worker : `roles` est le champ que le
+      # contrat prévoit pour les hôtes utilisés simultanément.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: nodeport-30091
+    label: "The Service accueil is of type NodePort, on port 30091"
+    tests:
+      - test_le_service_est_nodeport_sur_30091
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: endpoints-accueil
+    label: "Its endpoints are the Pods of accueil, on their container's port"
+    tests:
+      - test_les_endpoints_sont_les_pods_d_accueil
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: control-plane-repond
+    label: "The control plane answers accueil on port 30091"
+    tests:
+      - test_le_control_plane_sert_accueil_sur_30091
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: worker-repond
+    label: "The worker answers accueil on port 30091"
+    tests:
+      - test_le_worker_sert_accueil_sur_30091
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+
+feedback: full

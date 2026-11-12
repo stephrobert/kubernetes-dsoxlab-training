@@ -64,6 +64,17 @@ EOF
 kubectl wait --for=condition=ready pod/web -n app --timeout=180s
 kubectl wait --for=condition=ready pod/client -n app --timeout=180s
 
+# Le Corefile d'origine est gardé sur le nœud. Un passage précédent non nettoyé
+# a pu laisser la zone cassée : on la restaure d'abord, et on redémarre CoreDNS
+# pour qu'il la relise tout de suite.
+SAUVEGARDE=/var/lib/dsoxlab/coredns-corefile.orig
+install -d -m 0755 /var/lib/dsoxlab
+if [[ -f "$SAUVEGARDE" ]]; then
+  kubectl -n kube-system create configmap coredns --from-file=Corefile="$SAUVEGARDE" \
+    --dry-run=client -o yaml | kubectl replace -f -
+  kubectl -n kube-system rollout restart deployment/coredns
+fi
+
 # Le DNS doit marcher AVANT qu'on le casse, sinon le lab mesurerait une autre
 # panne que la sienne. On remet donc CoreDNS à l'état que kubeadm pose, et on
 # constate une résolution qui réussit.
@@ -80,8 +91,21 @@ for essai in $(seq 1 15); do
   sleep 3
 done
 
-# La panne : CoreDNS à zéro replica. Le Service kube-dns reste, sans endpoint.
+# Seconde panne, qui ne se voit qu'une fois la première réparée : une zone
+# fausse dans le Corefile. La configuration reste VALIDE, CoreDNS la charge sans
+# erreur et reste Running et Ready, mais les noms en cluster.local ne relèvent
+# plus du plugin kubernetes : ils partent vers le DNS amont, qui répond NXDOMAIN.
+CORE="$(kubectl -n kube-system get configmap coredns -o jsonpath='{.data.Corefile}')"
+grep -q 'kubernetes cluster.local in-addr.arpa' <<< "$CORE"
+[[ -f "$SAUVEGARDE" ]] || printf '%s\n' "$CORE" > "$SAUVEGARDE"
+sed 's/kubernetes cluster.local in-addr.arpa/kubernetes cluster.locale in-addr.arpa/' "$SAUVEGARDE" > /tmp/dsoxlab-corefile-casse
+kubectl -n kube-system create configmap coredns --from-file=Corefile=/tmp/dsoxlab-corefile-casse \
+  --dry-run=client -o yaml | kubectl replace -f -
+rm -f /tmp/dsoxlab-corefile-casse
+
+# La première panne : CoreDNS à zéro replica. Le Service kube-dns reste, sans
+# endpoint. Les Pods qui reviendront chargeront la zone fausse.
 kubectl -n kube-system scale deployment coredns --replicas=0
 kubectl -n kube-system wait --for=delete pod -l k8s-app=kube-dns --timeout=90s || true
 
-echo "Situation posée : CoreDNS est à zéro replica, le client ne résout plus rien."
+echo "Situation posée : CoreDNS à zéro replica, et une zone fausse qui attend son retour."

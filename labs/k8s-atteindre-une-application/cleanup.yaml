@@ -12,6 +12,11 @@
       changed_when: true
       failed_when: false
 
+    - name: Arrêter le tunnel laissé ouvert pour la vérification
+      ansible.builtin.command: pkill -f "port-forwar[d].*18080:"
+      changed_when: true
+      failed_when: false
+
     - name: Retirer le relevé
       ansible.builtin.file:
         path: "/home/{{ ansible_user | default('ansible') }}/acces"

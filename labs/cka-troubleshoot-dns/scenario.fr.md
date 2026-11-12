@@ -23,6 +23,9 @@ pas l'application qui est cassée, c'est **quelque chose dans le cluster**.
    le Pod `client` ne compte pas : c'est le cluster qu'on vous demande de
    réparer.
 
+4. Sa **configuration** sert la zone du cluster, **`cluster.local`**, comme à
+   l'origine.
+
 ## Les repères utiles
 
 La résolution de noms dans Kubernetes n'est pas assurée par les Pods
@@ -32,6 +35,11 @@ tous les autres, ne répond que si des Pods se tiennent derrière lui.
 
 Commencez par constater la panne depuis le Pod `client`, puis remontez : le
 Service, ses endpoints, et ce qui devrait les fournir.
+
+Un composant **Running et Ready** n'est pas forcément un composant juste. S'il
+répond, mais répond que le nom n'existe pas, c'est sa **configuration** qu'il faut
+lire : elle vit dans une ConfigMap du même namespace, et il la relit de lui-même
+après une modification, au bout d'une à deux minutes.
 
 ## Comment vous saurez que c'est bon
 

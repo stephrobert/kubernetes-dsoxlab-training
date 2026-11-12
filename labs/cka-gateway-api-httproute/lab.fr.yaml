@@ -1,9 +1,10 @@
-title: "Router avec la Gateway API, et voir la Gateway se déclarer programmée"
+title: "Router avec la Gateway API, et réparer une route que le cluster refuse"
 description: |
   Les deux mêmes applications, le même nom d'hôte unique, et le successeur de
   l'Ingress. Déclarez une Gateway, attachez-lui une route, et prouvez le
   routage : chaque chemin répond le nom de son application, un chemin non
-  déclaré ne répond ni l'une ni l'autre.
+  déclaré ne répond ni l'une ni l'autre. Réparez enfin une route posée avant
+  vous, que le cluster refuse sans le dire ailleurs que dans son statut.
 
 criteria:
   - id: gateway-programmee
@@ -14,3 +15,7 @@ criteria:
     label: "Le chemin /web atteint svc-web"
   - id: chemin-non-declare
     label: "Un chemin non déclaré n'atteint aucune des deux applications"
+  - id: route-catalogue-resolue
+    label: "La route catalogue est acceptée et ses références résolues, à jour de sa génération"
+  - id: catalogue-servi
+    label: "catalogue.local atteint le catalogue du namespace boutique"

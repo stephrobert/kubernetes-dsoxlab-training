@@ -17,14 +17,25 @@ sans ambiguïté laquelle a répondu.
 
 Pour l'hôte `app.local` :
 
-1. Un point d'entrée HTTP existe, et le cluster le déclare **programmé**. Un
-   point d'entrée accepté mais non programmé ne route rien.
+1. Un point d'entrée HTTP nommé **`entree`** existe, et le cluster le déclare
+   **programmé**. Un point d'entrée accepté mais non programmé ne route rien.
 
 2. Les requêtes dont le chemin commence par **`/api`** atteignent `svc-api`.
 
 3. Les requêtes dont le chemin commence par **`/web`** atteignent `svc-web`.
 
 4. Un chemin que vous n'avez pas déclaré n'atteint **ni l'une ni l'autre**.
+
+Une autre équipe, **`boutique`**, sert son catalogue dans son propre namespace,
+derrière `svc-catalogue`. Une route **`catalogue`** existe déjà dans `lab` pour
+l'hôte **`catalogue.local`**, et elle désigne `entree` comme parent. Elle ne sert
+rien.
+
+5. La route `catalogue` est **acceptée** par `entree` et ses **références sont
+   résolues**, d'après son propre statut, à jour de sa dernière version. Son
+   backend reste le Service de `boutique` : il appartient à cette équipe.
+
+6. `catalogue.local` **répond le catalogue**.
 
 Le contrôleur et sa classe sont déjà en place, ne les touchez pas. L'entrée
 HTTP est exposée sur le port **30080** du nœud.
@@ -50,6 +61,11 @@ arrive.
 Un champ décide qui a le droit de s'attacher au point d'entrée. Les deux objets
 vivant ici dans le même namespace, la valeur la plus restrictive suffit.
 
+Une route se lit comme la Gateway : par son **statut**, sous `status.parents`,
+une entrée par parent avec ses conditions. Leur `reason` dit ce qui ne va pas,
+et leur `observedGeneration` dit si elles décrivent la version actuelle de la
+route.
+
 Les requêtes se font en indiquant à `curl` où joindre l'hôte :
 
 ```bash
@@ -59,8 +75,9 @@ curl -s --resolve app.local:30080:127.0.0.1 http://app.local:30080/api
 ## Comment vous saurez que c'est bon
 
 Le premier test lit les **conditions** du point d'entrée, et non sa seule
-existence. Le dernier interroge les **trois** chemins, le troisième servant de
-contrôle.
+existence. Les trois suivants interrogent les **trois** chemins, le troisième
+servant de contrôle. Le cinquième lit le **statut** de la route `catalogue`, le
+sixième fait une vraie requête vers `catalogue.local`.
 
 ```bash
 dsoxlab check cka-gateway-api-httproute

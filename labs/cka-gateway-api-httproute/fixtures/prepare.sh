@@ -21,6 +21,7 @@ if [[ "$(kubectl get namespace lab -o jsonpath='{.status.phase}' 2>/dev/null)" =
   kubectl wait --for=delete namespace/lab --timeout=180s
 fi
 kubectl get namespace lab >/dev/null 2>&1 || kubectl create namespace lab
+# Seule la route que le candidat ecrit est retiree ; catalogue est reposee plus bas.
 kubectl -n lab delete httproute --all --ignore-not-found 2>/dev/null || true
 
 kubectl apply -f - <<'YAML'
@@ -92,6 +93,71 @@ spec:
     - port: 80
       targetPort: 5678
 YAML
+
+# La panne a reparer : l'equipe boutique sert son catalogue dans SON namespace,
+# et une HTTPRoute de lab l'y envoie sans que boutique l'ait autorise. Le
+# controleur refuse la reference (ResolvedRefs=False, RefNotPermitted) : la
+# route existe, est acceptee, et ne sert rien. Toute autorisation d'un passage
+# precedent est retiree.
+if [[ "$(kubectl get namespace boutique -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
+  kubectl wait --for=delete namespace/boutique --timeout=180s
+fi
+kubectl get namespace boutique >/dev/null 2>&1 || kubectl create namespace boutique
+kubectl -n boutique delete referencegrant --all --ignore-not-found
+kubectl -n lab delete referencegrant --all --ignore-not-found
+
+kubectl apply -f - <<'YAML'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+  namespace: boutique
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalogue
+  template:
+    metadata:
+      labels:
+        app: catalogue
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo:1.0.0@sha256:fcb75f691c8b0414d670ae570240cbf95502cc18a9ba57e982ecac589760a186
+          args: ["-text=catalogue", "-listen=:5678"]
+          ports:
+            - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-catalogue
+  namespace: boutique
+spec:
+  selector:
+    app: catalogue
+  ports:
+    - port: 80
+      targetPort: 5678
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: catalogue
+  namespace: lab
+spec:
+  parentRefs:
+    - name: entree
+  hostnames:
+    - catalogue.local
+  rules:
+    - backendRefs:
+        - name: svc-catalogue
+          namespace: boutique
+          port: 80
+YAML
+kubectl -n boutique rollout status deployment/catalogue --timeout=240s
 
 kubectl -n lab rollout status deployment/api-app --timeout=240s
 kubectl -n lab rollout status deployment/web-app --timeout=240s

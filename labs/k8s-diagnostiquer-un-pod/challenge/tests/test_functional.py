@@ -150,12 +150,13 @@ def test_image_fausse_tourne_avec_son_image_corrigee_en_place(host, memoire):
         "en place, sans le supprimer. Lancez dsoxlab reset k8s-diagnostiquer-un-pod pour repartir.",
     )
     assert pod["metadata"]["uid"] == memoire["image-fausse"], message(
-        en="image-fausse is a new Pod, recreated under the same name. Its image could have been "
-        "corrected in place: it is the only field of a Pod that changes on a running Pod. "
-        "Run dsoxlab reset k8s-diagnostiquer-un-pod and correct the image without deleting the Pod.",
-        fr="image-fausse est un nouveau Pod, recréé sous le même nom. Son image pouvait se "
-        "corriger en place : c'est le seul champ d'un Pod qui se modifie sur un Pod existant. "
-        "Lancez dsoxlab reset k8s-diagnostiquer-un-pod et corrigez l'image sans supprimer le Pod.",
+        en="image-fausse is a new Pod, recreated under the same name. A container's image is one "
+        "of the few fields Kubernetes allows to change on an existing Pod. In this lab, fix it "
+        "without deleting the Pod. Run dsoxlab reset k8s-diagnostiquer-un-pod to start over.",
+        fr="image-fausse est un nouveau Pod, recréé sous le même nom. L'image d'un conteneur fait "
+        "partie des rares champs que Kubernetes autorise à modifier sur un Pod existant. Dans ce "
+        "lab, corrigez-la sans supprimer le Pod. Lancez dsoxlab reset k8s-diagnostiquer-un-pod "
+        "pour repartir.",
     )
     image = _image(pod["spec"]["containers"][0].get("image", ""))
     assert image == IMAGE_CORRIGEE, message(

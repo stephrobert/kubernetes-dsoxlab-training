@@ -8,10 +8,17 @@ Broken DNS is the classic exam question: there is nothing wrong with the
 application, and it is a cluster component that has to be found and put back
 in service.
 
+**Two failures, the second only visible after the first.** CoreDNS is at zero
+replicas, and its Corefile serves the zone `cluster.locale` instead of
+`cluster.local`. Back at two replicas, CoreDNS is Running and Ready, loads a
+valid configuration, and answers NXDOMAIN: the ConfigMap must then be read and
+restored. The setup keeps the original Corefile on the node, and the
+`cleanup.yaml` puts it back.
+
 | | |
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
-| Duration | about 10 minutes |
+| Duration | about 20 minutes |
 | Companion lesson | [CoreDNS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 
 ```bash

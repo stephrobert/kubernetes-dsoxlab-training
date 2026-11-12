@@ -1,0 +1,16 @@
+title: "Réparer un Service NodePort"
+description: |
+  L'application accueil tourne, mais le Service NodePort qui devait la publier
+  ne mène nulle part : son sélecteur ne vise aucun Pod, son targetPort est faux,
+  et son port a été tiré au hasard. Réparez-le, et prouvez que chaque nœud
+  répond.
+
+criteria:
+  - id: nodeport-30091
+    label: "Le Service accueil est de type NodePort, sur le port 30091"
+  - id: endpoints-accueil
+    label: "Ses endpoints sont les Pods d'accueil, sur le port de leur conteneur"
+  - id: control-plane-repond
+    label: "Le control plane répond accueil sur le port 30091"
+  - id: worker-repond
+    label: "Le worker répond accueil sur le port 30091"

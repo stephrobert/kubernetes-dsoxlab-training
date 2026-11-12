@@ -1,47 +1,42 @@
-# Fusionner un kubeconfig et changer de contexte
+# Changer de contexte et fixer le namespace par défaut
 
 ## La situation
 
 Votre `kubectl` vise le cluster kind **`boutique`** par le contexte
-**`kind-boutique`**, écrit dans `~/.kube/config`, un fichier aujourd'hui
-lisible par tous les comptes de la machine. Une collègue vous a envoyé
-l'accès à un second cluster : le fichier
-**`~/Downloads/kubeconfig-recette.yaml`**, posé là comme un téléchargement,
-lisible par tous. Son contexte s'appelle `kind-recette`.
+**`kind-boutique`**. Votre fichier `~/.kube/config` connaît pourtant un second
+cluster : le contexte **`recette`** y est déjà, à côté du premier. Aucun
+namespace par défaut n'est réglé.
+
+L'équipe vous demande de travailler désormais sur la recette, dans le namespace
+**`kube-system`**, sans avoir à le répéter à chaque commande.
 
 ## Ce que vous devez obtenir
 
-1. Le fichier reçu est **rangé** dans **`~/.kube/configs/recette.yaml`**,
-   lisible par vous seul, et il **n'est plus** dans `~/Downloads`.
+1. Le **contexte actif** est **`recette`**.
 
-2. `~/.kube/config` porte un contexte **`recette`** qui vise le cluster reçu,
-   **à côté** de `kind-boutique`, qui doit survivre à l'opération.
+2. Le **namespace par défaut** du contexte `recette` est **`kube-system`**.
 
-3. Le **contexte actif** est `recette`.
-
-4. Le **namespace par défaut** du contexte `recette` est **`kube-system`**.
-
-5. `~/.kube/config` n'est **lisible que par vous**.
+3. Une ConfigMap **`preuve`** existe, créée par une commande qui ne nomme **ni
+   contexte ni namespace** : ni `--context`, ni `-n`. Elle doit se trouver dans
+   `kube-system` du cluster de recette, et nulle part dans le cluster
+   `boutique`.
 
 ## Les repères utiles
 
-Lisez toujours un kubeconfig reçu avant de vous en servir : à quelle adresse il
-envoie vos commandes, sous quel nom de contexte, avec quelle identité. La
-variable `KUBECONFIG`, posée devant une commande, ne vaut que pour elle.
+`kubectl config` lit et modifie votre kubeconfig : il sait lister les contextes,
+dire lequel est actif, basculer de l'un à l'autre, et régler le namespace par
+défaut du contexte courant. Il ne vérifie pas que ce namespace existe : relisez
+ce que vous avez écrit.
 
-Fusionner n'est pas copier. Copier le fichier reçu par-dessus le vôtre vous
-ferait perdre `kind-boutique`. La leçon montre comment lister les deux fichiers
-dans `KUBECONFIG` et en tirer un seul fichier aplati, après une sauvegarde,
-sans oublier de défaire `KUBECONFIG` ensuite.
-
-Un fichier écrit par une redirection prend les droits par défaut : vérifiez-les
-avec `ls -l`, et restreignez-les. `kubectl config` sait renommer un contexte,
-basculer, et régler le namespace par défaut du contexte courant ; il ne vérifie
-pas que le namespace existe, relisez donc ce que vous avez écrit.
+La bascule est écrite dans le fichier, sous `current-context` : elle vaut pour
+tous vos terminaux, et pour tous vos scripts. Une ConfigMap se crée en une
+ligne, avec une valeur littérale.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent vos fichiers kubeconfig et leurs droits.
+Les tests lisent votre `~/.kube/config`, puis cherchent la ConfigMap `preuve`
+dans les deux clusters. Elle n'atterrit au bon endroit que si la bascule et le
+namespace par défaut sont justes.
 
 ```bash
 dsoxlab check k8s-changer-de-contexte
