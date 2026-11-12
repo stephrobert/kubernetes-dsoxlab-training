@@ -10,5 +10,7 @@ criteria:
     label: "Le Service echo expose le port 80 vers le port 8080 des Pods echo"
   - id: le-service-compte-ses-endpoints
     label: "Le Service echo compte les deux Pods echo prêts comme endpoints"
+  - id: le-tunnel-repond
+    label: "Un tunnel port-forward vers le Service echo répond sur le port local 18080 pendant la vérification"
   - id: la-reponse-du-tunnel-est-consignee
-    label: "Le Pod qui a répondu par le tunnel port-forward est consigné"
+    label: "Le Pod qui répond par ce tunnel est consigné"

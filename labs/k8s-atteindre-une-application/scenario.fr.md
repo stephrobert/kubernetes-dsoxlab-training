@@ -16,8 +16,12 @@ Le relevé **`~/acces/releve.txt`** attend ce que vous lirez à travers le tunne
 
 2. Le Service compte les **deux Pods** comme endpoints prêts.
 
-3. **`pod-du-tunnel`** donne le nom du Pod qui vous a répondu à travers un
-   tunnel **`kubectl port-forward` vers le Service**.
+3. Un tunnel **`kubectl port-forward` vers le Service** `echo` écoute sur le
+   port local **`18080`**, et il est **toujours ouvert** quand vous lancez la
+   vérification.
+
+4. **`pod-du-tunnel`** donne le nom du Pod qui vous répond à travers **ce**
+   tunnel.
 
 ## Les repères utiles
 
@@ -27,14 +31,17 @@ d'abord le manifeste sans rien créer pour vérifier ce qu'il va écrire.
 
 Un tunnel `kubectl port-forward` est un processus, pas un objet : il vit tant
 que la commande tourne. Lancez-le en arrière-plan avec sa sortie dans un
-journal, interrogez-le depuis la machine, puis arrêtez-le. Les ports se lisent
+journal, interrogez-le depuis la machine, et laissez-le tourner jusqu'à la
+vérification : le correcteur passe lui-même par lui. Les ports se lisent
 « local, puis distant ». Vers un Service, le tunnel s'attache à un seul Pod,
 choisi au lancement.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent le Service et ses EndpointSlices, puis comparent votre relevé
-aux Pods echo qui existent.
+Les tests lisent le Service et ses EndpointSlices, cherchent votre tunnel parmi
+les processus de la machine, font une requête par le port 18080, et comparent
+votre relevé au Pod qui y répond. Un nom recopié depuis `kubectl get pods` ne
+suffit pas.
 
 ```bash
 dsoxlab check k8s-atteindre-une-application
