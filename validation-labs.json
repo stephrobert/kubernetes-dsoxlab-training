@@ -1254,7 +1254,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 308,
+  "duree_s": 314,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
