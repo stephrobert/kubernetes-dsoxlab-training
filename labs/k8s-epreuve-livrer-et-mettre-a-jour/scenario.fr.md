@@ -33,9 +33,11 @@ version 2 : nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f
   pendant la bascule, et en gardant la possibilité de **revenir à la
   version 1**.
 - **Avant toute réparation**, écrivez dans **`~/epreuve/cause-stock.txt`**
-  pourquoi le composant **`stock`** ne démarre pas : ce qu'il cherche sans le
-  trouver, et que cela manque, que ce soit par l'état qu'affiche Kubernetes ou
-  par une phrase. Ensuite, n'y touchez plus.
+  pourquoi le composant **`stock`** ne démarre pas. Le fichier **nomme ce qui
+  manque** (le seuil, sa clé ou sa variable) et dit que cela manque. La raison
+  d'attente qu'affiche Kubernetes, seule, ne suffit pas : elle dit que le
+  démarrage échoue, pas ce qui manque. Ensuite, n'y touchez plus : sa date est
+  comparée au démarrage du composant réparé.
 - Le composant **`stock`** tourne de nouveau. Il lit toujours son seuil, dans la
   variable **`STOCK_SEUIL`**, depuis une configuration gérée **à part** de sa
   description, et ce seuil vaut **`10`**.

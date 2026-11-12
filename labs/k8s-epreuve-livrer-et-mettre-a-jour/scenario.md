@@ -32,9 +32,11 @@ version 2: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f7
 - It then moves to **version 2**, with no copy missing during the switch, and
   keeping the possibility to **go back to version 1**.
 - **Before any repair**, write in **`~/epreuve/cause-stock.txt`** why the
-  **`stock`** component does not start: what it looks for without finding it,
-  and that it is missing, either through the state Kubernetes shows or in a
-  sentence. Then leave that file untouched.
+  **`stock`** component does not start. The file **names what is missing** (the
+  threshold, its key or its variable) and says that it is missing. The waiting
+  reason Kubernetes shows is not enough on its own: it says that the start
+  fails, not what is missing. Then leave that file untouched: its date is
+  compared with the start of the repaired component.
 - The **`stock`** component runs again. It still reads its threshold, in the
   variable **`STOCK_SEUIL`**, from a configuration managed **apart** from its
   description, and that threshold is **`10`**.

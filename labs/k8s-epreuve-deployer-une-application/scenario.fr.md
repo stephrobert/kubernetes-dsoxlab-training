@@ -19,12 +19,14 @@ tout le reste : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca
 
 **La vitrine**
 
-- Elle tourne en **trois exemplaires interchangeables**, nommés d'après
-  **`vitrine`**, sur l'image de la vitrine **référencée par digest**.
+- Elle tourne en **trois exemplaires interchangeables**, sur l'image de la
+  vitrine **référencée par digest**. Dans le cluster, elle s'appelle
+  **exactement `vitrine`**, sans préfixe ni suffixe, même livrée par l'overlay.
 - Sa description vit dans une **base** Kustomize, **`~/boutique/base/`**, et
   elle est livrée par un **overlay** **`~/boutique/overlays/prod/`** construit
   sur cette base. Le cluster correspond exactement à cet overlay.
-- **Chaque conteneur** de la vitrine déclare ce qu'il demande et sa limite. Le
+- **Chaque conteneur** de la vitrine, étape de préparation et compagnon compris,
+  déclare ce qu'il demande et sa limite. Le
   serveur est sondé au **démarrage**, en **vivacité** et en **disponibilité**,
   sur son **port 80**.
 - Une **étape de préparation** écrit la page d'accueil et se termine avant le
@@ -46,6 +48,7 @@ tout le reste : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca
 
 **La sauvegarde**
 
+- La tâche planifiée s'appelle **exactement `sauvegarde`**.
 - Elle tourne **chaque jour à 2 h 30** et écrit un fichier dont le nom commence
   par **`sauvegarde`** à la racine d'un volume persistant revendiqué sous le nom
   **`archives`**.
@@ -54,6 +57,7 @@ tout le reste : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca
 
 **L'agent `collecteur`**
 
+- Il s'appelle **exactement `collecteur`** dans le cluster.
 - Il tourne en **un exemplaire Ready sur chaque nœud**, control plane compris,
   et le control plane **garde son taint**.
 

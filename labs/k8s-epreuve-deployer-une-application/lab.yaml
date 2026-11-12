@@ -77,7 +77,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
   - id: p03-ressources-et-sondes
-    label: "P03: every container of the storefront is budgeted, and the three probes are on its port"
+    label: "P03: every container of the storefront, preparation step and companion included, is budgeted, and the three probes are on its port"
     tests:
       - test_p03_ressources_et_trois_sondes_declarees
     lessons:

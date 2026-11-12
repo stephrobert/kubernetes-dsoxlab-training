@@ -19,13 +19,14 @@ everything else : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389
 
 **The storefront**
 
-- It runs **three interchangeable copies**, named after **`vitrine`**, on the
-  storefront image **referred to by digest**.
+- It runs **three interchangeable copies**, on the storefront image **referred
+  to by digest**. In the cluster, it is named **exactly `vitrine`**, with no
+  prefix or suffix, even when shipped by the overlay.
 - Its description lives in a Kustomize **base**, **`~/boutique/base/`**, and it
   is shipped by an **overlay** **`~/boutique/overlays/prod/`** built on that
   base. The cluster matches this overlay exactly.
-- **Every container** of the storefront declares what it requests and its
-  limit. The server is probed at **startup**, for **liveness** and for
+- **Every container** of the storefront, preparation step and companion
+  included, declares what it requests and its limit. The server is probed at **startup**, for **liveness** and for
   **readiness**, on its **port 80**.
 - A **preparation step** writes the home page and finishes before the server
   starts. A **companion** repeats in its logs, line by line, the accesses the
@@ -46,6 +47,7 @@ everything else : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389
 
 **The backup**
 
+- The scheduled task is named **exactly `sauvegarde`**.
 - It runs **every day at 2:30** and writes a file whose name starts with
   **`sauvegarde`** at the root of a persistent volume claimed under the name
   **`archives`**.
@@ -53,6 +55,7 @@ everything else : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389
 
 **The agent `collecteur`**
 
+- It is named **exactly `collecteur`** in the cluster.
 - It runs **one Ready copy on each node**, control plane included, and the
   control plane **keeps its taint**.
 
