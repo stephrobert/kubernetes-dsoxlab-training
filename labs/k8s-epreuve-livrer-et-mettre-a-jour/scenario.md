@@ -27,7 +27,8 @@ version 2: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f7
   **`MESSAGE_ACCUEIL`**, and the password of its database, `Boutique-2026`, in
   the variable **`DB_PASSWORD`**. The configuration and the password live
   **outside the image** and are managed **apart** from the storefront; the
-  password **never appears in clear** in its description.
+  password **never appears in clear** in its description. The password is
+  handled as **sensitive data**, apart from the ordinary configuration.
 - It then moves to **version 2**, with no copy missing during the switch, and
   keeping the possibility to **go back to version 1**.
 - **Before any repair**, write in **`~/epreuve/cause-stock.txt`** why the
@@ -49,7 +50,13 @@ password outside the image, the way back to version 1 kept open, and the
 `stock` component repaired after its cause was recorded.
 
 Passing the five critical criteria is therefore enough to pass the test; the
-other two count in the score without changing the verdict. No procedure is
+other two count in the score without changing the verdict.
+
+You can run `dsoxlab check` as often as you like, but each check acts on the
+cluster: it starts a short-lived Pod, `sonde-epreuve`, in the `livraison`
+space to call the storefront, then removes it.
+
+No procedure is
 given, and the test offers **no hint**: the lessons of level 1 have taught
 everything.
 

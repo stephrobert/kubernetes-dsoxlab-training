@@ -51,6 +51,12 @@ def _maison(host) -> str:
     return host.check_output('getent passwd "${SUDO_USER:-ansible}" | cut -d: -f6').strip()
 
 
+def _planification(expression: str | None) -> list[str]:
+    """Les cinq champs d'une planification cron, zéros de tête retirés : « 30 02 * * * »
+    et « 30 2 * * * » disent la même heure."""
+    return [(c.lstrip("0") or "0") if c.isdigit() else c for c in (expression or "").split()]
+
+
 def _json(host, args: str) -> dict | None:
     res = host.run(f"{ADMIN} {args} -o json")
     if res.rc != 0 or not res.stdout.strip():
@@ -211,11 +217,22 @@ def test_p04_init_container_et_sidecar_relaient_le_volume_partage(host):
     sidecars = [c["name"] for c in spec.get("initContainers") or [] if c.get("restartPolicy") == "Always"]
     pods = [p for p in _pods(host, d["spec"]["selector"].get("matchLabels", {}))
             if p["status"].get("phase") == "Running"]
+    # Un compagnon déclaré comme un second conteneur ordinaire démarre EN MÊME
+    # TEMPS que le serveur et peut s'arrêter avant lui : il perd des lignes. Le
+    # cahier des charges demande un compagnon prêt avant le serveur et arrêté
+    # après lui, ce que seul un sidecar natif garantit.
+    voisins = [c["name"] for c in spec.get("containers") or []][1:]
+    assert sidecars or not voisins, message(
+        en=f"In {VITRINE}, the companion {voisins} starts at the same time as the server: it is not ready before "
+        "the server, so the first lines can be lost.",
+        fr=f"Dans {VITRINE}, le compagnon {voisins} démarre en même temps que le serveur : il n'est pas prêt avant "
+        "lui, et les premières lignes peuvent se perdre.",
+    )
     assert ordinaires and sidecars and pods, message(
-        en=f"{VITRINE} needs a preparation container that finishes before the start and a companion that runs "
-        f"alongside it (found: {ordinaires or 'none'}, {sidecars or 'none'}), and a running Pod.",
-        fr=f"{VITRINE} doit porter un conteneur de préparation qui finit avant le démarrage et un compagnon qui "
-        f"tourne à côté (trouvé : {ordinaires or 'aucun'}, {sidecars or 'aucun'}), et un Pod en marche.",
+        en=f"{VITRINE} needs a preparation container that finishes before the start and a companion ready "
+        f"before the server (found:{ordinaires or 'none'}, {sidecars or 'none'}), and a running Pod.",
+        fr=f"{VITRINE} doit porter un conteneur de préparation qui finit avant le démarrage et un compagnon prêt "
+        f"avant le serveur (trouvé : {ordinaires or 'aucun'}, {sidecars or 'aucun'}), et un Pod en marche.",
     )
     pod = pods[0]
     etats = {s["name"]: s.get("state") or {} for s in pod["status"].get("initContainerStatuses") or []}
@@ -313,7 +330,7 @@ def test_p07_volumes_crees_par_la_classe_en_retain(host):
 # ----------------------------------------------------------------------
 def test_p08_sauvegarde_planifiee_et_lancee_a_la_main(host):
     cj = _json(host, f"-n {NS} get cronjob {SAUVEGARDE}")
-    assert cj is not None and cj["spec"].get("schedule") == PLANNING, message(
+    assert cj is not None and _planification(cj["spec"].get("schedule")) == _planification(PLANNING), message(
         en=f"{SAUVEGARDE} is not scheduled every day at 2:30 (found: {(cj or {}).get('spec', {}).get('schedule')!r}).",
         fr=f"{SAUVEGARDE} n'est pas planifiée chaque jour à 2 h 30 (trouvé : "
         f"{(cj or {}).get('spec', {}).get('schedule')!r}).",

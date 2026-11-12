@@ -28,9 +28,10 @@ everything else : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389
   limit. The server is probed at **startup**, for **liveness** and for
   **readiness**, on its **port 80**.
 - A **preparation step** writes the home page and finishes before the server
-  starts. A **companion** runs next to the server and repeats in its logs, line
-  by line, the accesses the server writes in `/var/log/nginx/access.log`,
-  through a shared volume.
+  starts. A **companion** repeats in its logs, line by line, the accesses the
+  server writes in `/var/log/nginx/access.log`, through a shared volume. The
+  companion is **ready before the server** and stays active next to it for the
+  whole life of the Pod, so that no line is lost.
 - **No Pod** of the `magasin` space restarts.
 
 **The database `catalogue`**
@@ -72,6 +73,10 @@ delivery from Kustomize with no difference (P01), the storefront available on
 its digest without restart (P02), the database with a stable identity and one
 volume per replica (P05), the grader's data that survives its Pod (P06), and the
 volumes created by the class and kept (P07).
+
+You can run `dsoxlab check` as often as you like, but each check acts on the
+cluster: it writes data in `catalogue-0`, deletes that Pod and waits for it to
+come back, and sends one request to the storefront.
 
 Seven criteria give 70, the five critical ones among them. No procedure is
 given, and the test offers **no hint**: the lessons of level 2 taught

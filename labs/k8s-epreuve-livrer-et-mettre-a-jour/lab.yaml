@@ -82,7 +82,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: c3-configuration-hors-de-l-image
-    label: "C3 (critical): the configuration and the password live outside the image and outside the storefront's manifest"
+    label: "C3 (critical): the configuration and the password live outside the image and outside the storefront's description, the password handled as sensitive data"
     tests:
       - test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste
     lessons:

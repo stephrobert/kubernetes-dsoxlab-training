@@ -28,9 +28,10 @@ tout le reste : busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca
   serveur est sondé au **démarrage**, en **vivacité** et en **disponibilité**,
   sur son **port 80**.
 - Une **étape de préparation** écrit la page d'accueil et se termine avant le
-  démarrage du serveur. Un **compagnon** tourne à côté du serveur et reprend dans
-  ses journaux, ligne à ligne, les accès que le serveur écrit dans
-  `/var/log/nginx/access.log`, par un volume partagé.
+  démarrage du serveur. Un **compagnon** reprend dans ses journaux, ligne à
+  ligne, les accès que le serveur écrit dans `/var/log/nginx/access.log`, par un
+  volume partagé. Le compagnon est **prêt avant le serveur** et reste actif à
+  côté de lui pendant toute la vie du Pod, pour ne perdre aucune ligne.
 - **Aucun Pod** de l'espace `magasin` ne redémarre.
 
 **La base de données `catalogue`**
@@ -73,6 +74,10 @@ sont la livraison depuis Kustomize sans écart (P01), la vitrine disponible sur
 son digest sans redémarrage (P02), la base à identité stable avec un volume par
 réplica (P05), la donnée du correcteur qui survit à son Pod (P06), et les
 volumes créés par la classe et gardés (P07).
+
+Vous pouvez lancer `dsoxlab check` autant que vous voulez, mais chaque check agit
+sur le cluster : il écrit une donnée dans `catalogue-0`, supprime ce Pod et
+attend son retour, et envoie une requête à la vitrine.
 
 Sept critères donnent 70, dont les cinq critiques. Aucune procédure n'est
 donnée, et l'épreuve ne propose **aucun indice** : les leçons du niveau 2 ont

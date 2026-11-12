@@ -14,13 +14,13 @@ criteria:
   - id: p03-ressources-et-sondes
     label: "P03 : chaque conteneur de la vitrine est budgété, et les trois sondes sont sur son port"
   - id: p04-init-et-sidecar
-    label: "P04 : un conteneur de préparation se termine, et un sidecar natif relaie les lignes du volume partagé"
+    label: "P04 : une étape de préparation se termine, et un compagnon prêt avant le serveur, actif à côté de lui toute la vie du Pod, relaie les lignes du volume partagé"
   - id: p05-identite-stable
-    label: "P05 (critique) : la base a une identité stable, des Pods ordonnés tous Ready, une revendication Bound chacun"
+    label: "P05 (critique) : la base a une identité stable, ses réplicas sont créés dans l'ordre et tous prêts, chacun avec son volume réservé"
   - id: p06-donnee-survit
     label: "P06 (critique) : une donnée écrite par le correcteur survit à la suppression de son Pod"
   - id: p07-volumes-retain
-    label: "P07 (critique) : les revendications sont liées à des volumes créés par la StorageClass, en reclaim policy Retain"
+    label: "P07 (critique) : les volumes de la base sont créés à la demande par la classe de stockage, et gardés quand leur revendication disparaît"
   - id: p08-sauvegarde
     label: "P08 : la sauvegarde est planifiée, et un lancement à la main s'est terminé en écrivant sur son volume"
   - id: p09-agent-partout

@@ -27,7 +27,8 @@ version 2 : nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f
   **`MESSAGE_ACCUEIL`**, et le mot de passe de sa base, `Boutique-2026`, dans
   la variable **`DB_PASSWORD`**. Configuration et mot de passe vivent **hors de
   l'image** et sont gérés **à part** de la vitrine ; le mot de passe n'apparaît
-  **jamais en clair** dans sa description.
+  **jamais en clair** dans sa description. Le mot de passe est géré comme une
+  **donnée sensible**, à part de la configuration ordinaire.
 - Elle passe ensuite en **version 2**, sans qu'aucun exemplaire ne manque
   pendant la bascule, et en gardant la possibilité de **revenir à la
   version 1**.
@@ -51,7 +52,13 @@ resté possible, et le composant `stock` réparé après que sa cause a été
 consignée.
 
 Réussir les cinq critères critiques suffit donc à réussir l'épreuve ; les deux
-autres comptent dans la note sans changer le verdict. Aucune procédure n'est
+autres comptent dans la note sans changer le verdict.
+
+Vous pouvez lancer `dsoxlab check` autant que vous voulez, mais chaque check agit
+sur le cluster : il lance un Pod éphémère, `sonde-epreuve`, dans l'espace
+`livraison` pour appeler la vitrine, puis le retire.
+
+Aucune procédure n'est
 donnée, et l'épreuve ne propose **aucun indice** : les leçons du niveau 1 ont
 tout enseigné.
 
