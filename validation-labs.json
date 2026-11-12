@@ -3218,36 +3218,37 @@
  "k8s-atteindre-une-application": {
   "apres": {
    "echecs": [],
-   "passed": 3,
+   "passed": 4,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 3
+   "total": 4
   },
   "avant": {
    "echecs": [
     "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
     "test_le_service_echo_compte_deux_endpoints_prets",
-    "test_le_service_echo_expose_80_vers_8080"
+    "test_le_service_echo_expose_80_vers_8080",
+    "test_un_tunnel_vers_le_service_repond_sur_18080"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 3
+   "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 85,
+  "date": "2026-11-12",
+  "duree_s": 115,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.0, 20 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-atteindre-une-application.log",
@@ -3257,14 +3258,15 @@
    "echecs": [
     "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
     "test_le_service_echo_compte_deux_endpoints_prets",
-    "test_le_service_echo_expose_80_vers_8080"
+    "test_le_service_echo_expose_80_vers_8080",
+    "test_un_tunnel_vers_le_service_repond_sur_18080"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 3
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -3940,8 +3942,8 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 166,
+  "date": "2026-11-12",
+  "duree_s": 151,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
