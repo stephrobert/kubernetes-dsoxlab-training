@@ -21,6 +21,10 @@ L'équipe vous demande de travailler désormais sur la recette, dans le namespac
    `kube-system` du cluster de recette, et nulle part dans le cluster
    `boutique`.
 
+4. Votre **`~/.kube/config`** n'est lisible et modifiable que **par vous** : il
+   contient la clé qui vous ouvre les deux clusters. Il est aujourd'hui lisible
+   par tous les comptes de la machine.
+
 ## Les repères utiles
 
 `kubectl config` lit et modifie votre kubeconfig : il sait lister les contextes,
@@ -34,8 +38,8 @@ ligne, avec une valeur littérale.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent votre `~/.kube/config`, puis cherchent la ConfigMap `preuve`
-dans les deux clusters. Elle n'atterrit au bon endroit que si la bascule et le
+Les tests lisent votre `~/.kube/config` et ses droits, puis cherchent la
+ConfigMap `preuve` dans les deux clusters. Elle n'atterrit au bon endroit que si la bascule et le
 namespace par défaut sont justes.
 
 ```bash

@@ -20,6 +20,10 @@ The team asks you to work on the recette cluster from now on, in the
    context nor a namespace**: no `--context`, no `-n`. It must be in
    `kube-system` of the recette cluster, and nowhere in the `boutique` cluster.
 
+4. Your **`~/.kube/config`** is readable and writable **by you only**: it holds
+   the key that opens both clusters to you. Today it is readable by every
+   account on the machine.
+
 ## Useful landmarks
 
 `kubectl config` reads and changes your kubeconfig: it can list the contexts,
@@ -33,8 +37,8 @@ literal value.
 
 ## How you will know it is right
 
-The tests read your `~/.kube/config`, then look for the ConfigMap `preuve` in
-both clusters. It only lands in the right place if the switch and the default
+The tests read your `~/.kube/config` and its permissions, then look for the
+ConfigMap `preuve` in both clusters. It only lands in the right place if the switch and the default
 namespace are right.
 
 ```bash

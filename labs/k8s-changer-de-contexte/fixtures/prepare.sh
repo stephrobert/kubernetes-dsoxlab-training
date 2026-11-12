@@ -29,7 +29,9 @@ sed 's/kind-lab/recette/g' /etc/kind/lab.kubeconfig > "${TMP}/recette.yaml"
 KUBECONFIG="/etc/kind/boutique.kubeconfig:${TMP}/recette.yaml" kubectl config view --flatten > "${TMP}/config"
 KUBECONFIG="${TMP}/config" kubectl config use-context kind-boutique
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0700 "${LAB_HOME}/.kube"
-install -o "$LAB_USER" -g "$LAB_USER" -m 0600 "${TMP}/config" "$CONF"
+# Lisible par tous au départ, comme après une copie faite sans précaution :
+# le protéger fait partie du travail.
+install -o "$LAB_USER" -g "$LAB_USER" -m 0644 "${TMP}/config" "$CONF"
 rm -f "${TMP}/recette.yaml" "${TMP}/config"
 rmdir "$TMP"
 
