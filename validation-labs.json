@@ -183,6 +183,93 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-examen-blanc": {
+  "apres": {
+   "echecs": [],
+   "passed": 20,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 20
+  },
+  "avant": {
+   "echecs": [
+    "test_t01_la_classe_rapide",
+    "test_t02_la_revendication_donnees_sert_ecrivain",
+    "test_t03a_le_worker_est_ready",
+    "test_t03b_le_kubelet_du_worker_demarre_au_boot",
+    "test_t04_facture_tourne_sans_redemarrer",
+    "test_t05a_l_annuaire_a_ses_endpoints",
+    "test_t05b_le_client_joint_l_annuaire_par_son_nom",
+    "test_t06_les_erreurs_du_journal_sont_consignees",
+    "test_t07_vitrine_est_revenue_en_1305",
+    "test_t08_api_lit_sa_configuration_et_son_secret",
+    "test_t09_rapport_tourne_seulement_sur_le_worker",
+    "test_t10a_lecteur_peut_lister_les_pods",
+    "test_t10b_lecteur_ne_peut_rien_de_plus",
+    "test_t11_le_snapshot_etcd_est_valide",
+    "test_t12_la_sauvegarde_quotidienne_existe",
+    "test_t13_l_overlay_prod_est_applique",
+    "test_t14_seul_front_joint_la_base",
+    "test_t15_l_ingress_boutique_route_l_api",
+    "test_t16_la_route_du_magasin_sert_le_web",
+    "test_t17_accueil_repond_sur_son_nodeport"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-12",
+  "duree_s": 603,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/20",
+   "après la solution : 20/20",
+   "après clean et run : 0/20",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-examen-blanc.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_t01_la_classe_rapide",
+    "test_t02_la_revendication_donnees_sert_ecrivain",
+    "test_t03a_le_worker_est_ready",
+    "test_t03b_le_kubelet_du_worker_demarre_au_boot",
+    "test_t04_facture_tourne_sans_redemarrer",
+    "test_t05a_l_annuaire_a_ses_endpoints",
+    "test_t05b_le_client_joint_l_annuaire_par_son_nom",
+    "test_t06_les_erreurs_du_journal_sont_consignees",
+    "test_t07_vitrine_est_revenue_en_1305",
+    "test_t08_api_lit_sa_configuration_et_son_secret",
+    "test_t09_rapport_tourne_seulement_sur_le_worker",
+    "test_t10a_lecteur_peut_lister_les_pods",
+    "test_t10b_lecteur_ne_peut_rien_de_plus",
+    "test_t11_le_snapshot_etcd_est_valide",
+    "test_t12_la_sauvegarde_quotidienne_existe",
+    "test_t13_l_overlay_prod_est_applique",
+    "test_t14_seul_front_joint_la_base",
+    "test_t15_l_ingress_boutique_route_l_api",
+    "test_t16_la_route_du_magasin_sert_le_web",
+    "test_t17_accueil_repond_sur_son_nodeport"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
+  },
+  "verdict": "VALIDE"
+ },
  "cka-gateway-api-httproute": {
   "apres": {
    "echecs": [],
@@ -1574,6 +1661,93 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "ckad-examen-blanc": {
+  "apres": {
+   "echecs": [],
+   "passed": 20,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 20
+  },
+  "avant": {
+   "echecs": [
+    "test_d01_le_cronjob_purge",
+    "test_d02a_le_sidecar_partage_le_volume_du_journal",
+    "test_d02b_le_sidecar_relit_le_journal_de_l_application",
+    "test_d03_le_pod_stockage_ecrit_dans_cache",
+    "test_d04a_la_vitrine_sert_la_version_verte",
+    "test_d04b_le_deploiement_vert_tourne_en_1306",
+    "test_d05_catalogue_est_mis_a_jour_sans_perte",
+    "test_d06_l_overlay_de_la_boutique_est_applique",
+    "test_d07_les_sondes_de_api",
+    "test_d08_le_pdb_est_reecrit_en_policy_v1",
+    "test_d09_outil_tourne_sur_son_image",
+    "test_d10_la_configuration_arrive_en_fichier",
+    "test_d11_le_jeton_arrive_depuis_le_secret",
+    "test_d12_le_pod_durci",
+    "test_d13_le_quota_et_le_pod_qui_y_tient",
+    "test_d14_le_compte_deployeur_sans_jeton_monte",
+    "test_d15_seul_front_joint_interne",
+    "test_d16a_le_service_stock_a_ses_endpoints",
+    "test_d16b_front_joint_stock_par_son_nom",
+    "test_d17_l_ingress_infos_route"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-12",
+  "duree_s": 399,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/20",
+   "après la solution : 20/20",
+   "après clean et run : 0/20",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-examen-blanc.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_d01_le_cronjob_purge",
+    "test_d02a_le_sidecar_partage_le_volume_du_journal",
+    "test_d02b_le_sidecar_relit_le_journal_de_l_application",
+    "test_d03_le_pod_stockage_ecrit_dans_cache",
+    "test_d04a_la_vitrine_sert_la_version_verte",
+    "test_d04b_le_deploiement_vert_tourne_en_1306",
+    "test_d05_catalogue_est_mis_a_jour_sans_perte",
+    "test_d06_l_overlay_de_la_boutique_est_applique",
+    "test_d07_les_sondes_de_api",
+    "test_d08_le_pdb_est_reecrit_en_policy_v1",
+    "test_d09_outil_tourne_sur_son_image",
+    "test_d10_la_configuration_arrive_en_fichier",
+    "test_d11_le_jeton_arrive_depuis_le_secret",
+    "test_d12_le_pod_durci",
+    "test_d13_le_quota_et_le_pod_qui_y_tient",
+    "test_d14_le_compte_deployeur_sans_jeton_monte",
+    "test_d15_seul_front_joint_interne",
+    "test_d16a_le_service_stock_a_ses_endpoints",
+    "test_d16b_front_joint_stock_par_son_nom",
+    "test_d17_l_ingress_infos_route"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
   },
   "verdict": "VALIDE"
  },
@@ -3698,17 +3872,18 @@
  "k8s-changer-de-contexte": {
   "apres": {
    "echecs": [],
-   "passed": 3,
+   "passed": 4,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 3
+   "total": 4
   },
   "avant": {
    "echecs": [
     "test_la_preuve_est_dans_kube_system_du_cluster_recette",
     "test_le_contexte_actif_est_recette",
+    "test_le_kubeconfig_n_est_accessible_qu_a_son_proprietaire",
     "test_le_namespace_par_defaut_de_recette_est_kube_system"
    ],
    "passed": 0,
@@ -3716,18 +3891,18 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 3
+   "total": 4
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-12",
-  "duree_s": 95,
+  "duree_s": 86,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 40 objets hors kube-system",
-   "avant le travail : 0/3",
-   "après la solution : 3/3",
-   "après clean et run : 0/3",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-changer-de-contexte.log",
@@ -3737,6 +3912,7 @@
    "echecs": [
     "test_la_preuve_est_dans_kube_system_du_cluster_recette",
     "test_le_contexte_actif_est_recette",
+    "test_le_kubeconfig_n_est_accessible_qu_a_son_proprietaire",
     "test_le_namespace_par_defaut_de_recette_est_kube_system"
    ],
    "passed": 0,
@@ -3744,7 +3920,7 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 3
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -4058,12 +4234,12 @@
    "total": 10
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 209,
+  "date": "2026-11-12",
+  "duree_s": 240,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/10",
    "après la solution : 10/10",
    "après clean et run : 0/10",

@@ -1,8 +1,9 @@
 """test_functional.py : k8s-changer-de-contexte
 
-Trois tests, un par état demandé : le contexte actif, le namespace par défaut
-de ce contexte, et une commande lancée sans préciser ni contexte ni namespace,
-dont le résultat doit atterrir au bon endroit.
+Quatre tests, un par état demandé : le contexte actif, le namespace par défaut
+de ce contexte, une commande lancée sans préciser ni contexte ni namespace, dont
+le résultat doit atterrir au bon endroit, et les droits du kubeconfig, qui ne
+doit être accessible qu'à son propriétaire.
 
 La préparation a déjà réuni les deux clusters dans ~/.kube/config. Le contexte
 recette est reconnu à ce qu'il désigne : son cluster doit avoir l'adresse du
@@ -118,4 +119,21 @@ def test_la_preuve_est_dans_kube_system_du_cluster_recette(host):
         fr=f"La ConfigMap preuve existe dans le(s) namespace(s) {recette or 'aucun'} du cluster de recette, et "
         f"{boutique or 'aucun'} du cluster boutique. Attendu {NAMESPACE} du cluster de recette seulement : créée "
         "sans -n ni --context, elle atterrit là où l'envoient le contexte actif et son namespace par défaut.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 4. Le kubeconfig n'est accessible qu'à son propriétaire.
+# ----------------------------------------------------------------------
+def test_le_kubeconfig_n_est_accessible_qu_a_son_proprietaire(host):
+    fichier = host.file(f"{_maison(host)}/.kube/config")
+    utilisateur = host.check_output('echo "${SUDO_USER:-ansible}"').strip()
+    mode = fichier.mode if fichier.exists else None
+    assert fichier.exists and mode == 0o600 and fichier.user == utilisateur, message(
+        en=f"~/.kube/config has mode {oct(mode) if mode is not None else 'absent'} and belongs to "
+        f"{fichier.user if fichier.exists else 'nobody'}. Expected 600, owned by {utilisateur}: the file holds a "
+        "client key, which nobody else may read, and kubectl itself must still be able to read and write it.",
+        fr=f"~/.kube/config a les droits {oct(mode) if mode is not None else 'absent'} et appartient à "
+        f"{fichier.user if fichier.exists else 'personne'}. Attendu 600, à {utilisateur} : le fichier contient une "
+        "clé client, que personne d'autre ne doit lire, et kubectl doit toujours pouvoir le lire et l'écrire.",
     )

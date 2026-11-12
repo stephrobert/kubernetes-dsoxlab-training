@@ -7,13 +7,15 @@ crée.
 
 La préparation réunit déjà les deux clusters dans `~/.kube/config` : la fusion de
 deux kubeconfigs est un approfondissement facultatif de la leçon, et ce lab ne
-la note pas. La ConfigMap `preuve` sert de contrôle : elle doit se trouver dans
+la note pas. Le lab vérifie aussi que le kubeconfig, posé lisible par tous, est
+ramené aux seuls droits de son propriétaire (600). La ConfigMap `preuve` sert de
+contrôle : elle doit se trouver dans
 `kube-system` du cluster de recette, et nulle part dans `boutique`.
 
 | | |
 |---|---|
 | Cible | `k8s-kind.lab`, clusters kind `boutique` (contexte de départ) et `lab` (le contexte `recette`) |
-| Durée | environ 15 minutes |
+| Durée | environ 20 minutes |
 | Page associée | [Kubeconfig et contextes, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
 
 ```bash

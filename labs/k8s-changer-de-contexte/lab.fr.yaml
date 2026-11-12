@@ -2,7 +2,8 @@ title: "Changer de contexte et fixer le namespace par défaut"
 description: |
   Votre kubeconfig contient déjà deux contextes. Basculez sur recette, donnez-lui
   kube-system pour namespace par défaut, et prouvez-le par une ConfigMap créée
-  sans nommer ni contexte ni namespace, qui doit atterrir au bon endroit.
+  sans nommer ni contexte ni namespace, qui doit atterrir au bon endroit. Rendez
+  enfin votre kubeconfig lisible par vous seul.
 
 criteria:
   - id: le-contexte-actif-est-recette
@@ -11,3 +12,5 @@ criteria:
     label: "Le namespace par défaut du contexte recette est kube-system"
   - id: la-preuve-est-au-bon-endroit
     label: "La ConfigMap preuve, créée sans -n ni --context, est dans kube-system du cluster de recette seulement"
+  - id: le-kubeconfig-est-protege
+    label: "~/.kube/config n'est lisible et modifiable que par son propriétaire (600)"

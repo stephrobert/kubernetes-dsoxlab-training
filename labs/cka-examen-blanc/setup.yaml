@@ -1,0 +1,75 @@
+---
+# Joué par `dsoxlab run` : l'examen blanc CKA sur le cluster kubeadm du catalogue.
+# Ordre voulu : le worker reçoit son taint (tâche 9) avant la pose des charges,
+# qui tournent donc toutes sur le control plane ; il n'est mis hors service
+# (tâche 3) qu'à la fin, quand plus rien ne doit s'y placer.
+- name: Préparer l'examen blanc CKA
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Installer Traefik, avec la Gateway API
+      ansible.builtin.include_tasks: ../../shared/traefik.yml
+      vars:
+        traefik_gateway_api: true
+
+    - name: Créer le répertoire des fichiers de l'examen sur le nœud
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/cka-examen
+        state: directory
+        mode: "0755"
+
+    - name: Copier les fichiers de l'examen
+      ansible.builtin.copy:
+        src: "fixtures/{{ item }}"
+        dest: "/var/lib/dsoxlab/cka-examen/{{ item }}"
+        mode: "0644"
+      loop:
+        - local-path-storage.yaml
+        - crd-sauvegarde.yaml
+        - kustomize/
+
+    - name: Installer le provisionneur de stockage local
+      ansible.builtin.command: >-
+        {{ kubectl }} apply -f /var/lib/dsoxlab/cka-examen/local-path-storage.yaml
+      changed_when: true
+
+    - name: Poser le label et le taint du worker (tâche 9)
+      ansible.builtin.shell: |
+        {{ kubectl }} label node k8s-w1.lab role-examen=rapports --overwrite
+        {{ kubectl }} taint node k8s-w1.lab examen=reserve:NoSchedule --overwrite
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Poser l'état de départ de chaque tâche
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
+
+    - name: Mettre le kubelet du worker hors service (tâche 3)
+      ansible.builtin.systemd:
+        name: kubelet
+        state: stopped
+        enabled: false
+      delegate_to: k8s-w1.lab
+
+    - name: Attendre que le worker ne soit plus Ready
+      # Un kubelet arrêté ne rend plus compte : le contrôleur de nœuds passe la
+      # condition Ready à Unknown, pas à False. On attend donc qu'elle ne vaille
+      # plus True.
+      ansible.builtin.command: >-
+        {{ kubectl }} get node k8s-w1.lab
+        '-o=jsonpath={.status.conditions[?(@.type=="Ready")].status}'
+      register: pret
+      until: pret.stdout != "True"
+      retries: 40
+      delay: 5
+      changed_when: false

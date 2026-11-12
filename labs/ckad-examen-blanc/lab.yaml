@@ -1,0 +1,177 @@
+# Examen blanc CKAD, capstone de certification (règle 16), hébergé par la page
+# d'exercices CKAD. Décision de Stéphane du 2026-11-12 : 15 à 17 tâches, 120
+# minutes, aucun indice. Dix-sept tâches, vingt états à 5 points : dsoxlab note
+# la part de tests réussis, et une tâche de 10 points porte donc deux états. Les
+# poids suivent ceux des domaines du programme officiel CKAD v1.37 : Application
+# Design and Build 20, Application Deployment 20, Application Observability and
+# Maintenance 15, Application Environment, Configuration and Security 25,
+# Services and Networking 20. Helm et la construction d'images, hors parcours
+# dans le référentiel, n'y figurent pas.
+#
+# Seuil 66, celui de l'examen réel : « For the CKAD Exam, a score of 66% or
+# above must be earned to pass » (FAQ CKA, CKAD et CKS de la Linux Foundation,
+# lue le 2026-11-12). Il faut 14 états sur 20. Aucun critère bloquant.
+id: ckad-examen-blanc
+title: "CKAD mock exam: 17 tasks in 120 minutes"
+level: certification
+section: ckad
+difficulty: advanced
+description: |
+  A timed mock exam in the CKAD format: seventeen tasks spread like the official
+  domains, on one kubeadm cluster with several contexts, graded on the cluster's
+  final state, no hint. Plan for 120 minutes.
+skills:
+  - workloads
+  - deployment-strategies
+  - probes
+  - configuration
+  - security-context
+  - networking
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+lab_type: capstone
+exam_passing_score: 66
+estimated_time: 120m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le cleanup efface les données des volumes sur k8s-w1.lab : `roles` est
+      # le champ que le contrat prévoit pour les hôtes utilisés en même temps.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: d01-cronjob-purge
+    label: "Task 1: the CronJob purge runs every ten minutes, two successes kept, no overlap"
+    tests:
+      - test_d01_le_cronjob_purge
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: d02a-sidecar-partage
+    label: "Task 2: the sidecar lecteur shares an emptyDir with app"
+    tests:
+      - test_d02a_le_sidecar_partage_le_volume_du_journal
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: d02b-sidecar-relit
+    label: "Task 2: the sidecar replays the log written by app"
+    tests:
+      - test_d02b_le_sidecar_relit_le_journal_de_l_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: d03-pvc-cache
+    label: "Task 3: the Pod stockage writes into the claim cache"
+    tests:
+      - test_d03_le_pod_stockage_ecrit_dans_cache
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: d04a-bascule-verte
+    label: "Task 4: the Service vitrine sends to the green Pods only"
+    tests:
+      - test_d04a_la_vitrine_sert_la_version_verte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: d04b-vert-en-1306
+    label: "Task 4: vitrine-vert runs three replicas on 1.30.6"
+    tests:
+      - test_d04b_le_deploiement_vert_tourne_en_1306
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+  - id: d05-rolling-update
+    label: "Task 5: catalogue is rolled out to 1.30.6 with maxSurge 1 and maxUnavailable 0"
+    tests:
+      - test_d05_catalogue_est_mis_a_jour_sans_perte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+  - id: d06-overlay-boutique
+    label: "Task 6: the boutique overlay is applied"
+    tests:
+      - test_d06_l_overlay_de_la_boutique_est_applique
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+  - id: d07-sondes-api
+    label: "Task 7: api carries its readiness and liveness probes, its Pods ready"
+    tests:
+      - test_d07_les_sondes_de_api
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+  - id: d08-pdb-policy-v1
+    label: "Task 8: the PodDisruptionBudget is rewritten in policy/v1 and applied"
+    tests:
+      - test_d08_le_pdb_est_reecrit_en_policy_v1
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: d09-image-outil
+    label: "Task 9: the Pod outil runs on its image"
+    tests:
+      - test_d09_outil_tourne_sur_son_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+  - id: d10-configmap-fichier
+    label: "Task 10: the configuration arrives as a file from a ConfigMap"
+    tests:
+      - test_d10_la_configuration_arrive_en_fichier
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+  - id: d11-secret-variable
+    label: "Task 11: the token arrives as a variable from a Secret"
+    tests:
+      - test_d11_le_jeton_arrive_depuis_le_secret
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: d12-pod-durci
+    label: "Task 12: the Pod durci runs unprivileged, read-only, without capabilities"
+    tests:
+      - test_d12_le_pod_durci
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: d13-quota
+    label: "Task 13: the quota plafond is set and the Pod mesure fits in it"
+    tests:
+      - test_d13_le_quota_et_le_pod_qui_y_tient
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: d14-serviceaccount
+    label: "Task 14: the Pod outil-sa runs as deployeur, with no token mounted"
+    tests:
+      - test_d14_le_compte_deployeur_sans_jeton_monte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: d15-networkpolicy
+    label: "Task 15: only front reaches interne"
+    tests:
+      - test_d15_seul_front_joint_interne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: d16a-endpoints-stock
+    label: "Task 16: the Service stock has the stock Pods as endpoints, on the right port"
+    tests:
+      - test_d16a_le_service_stock_a_ses_endpoints
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: d16b-front-joint-stock
+    label: "Task 16: front reaches stock by its name"
+    tests:
+      - test_d16b_front_joint_stock_par_son_nom
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: d17-ingress-infos
+    label: "Task 17: the Ingress infos routes /infos"
+    tests:
+      - test_d17_l_ingress_infos_route
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/

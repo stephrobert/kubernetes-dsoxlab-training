@@ -1,0 +1,43 @@
+---
+# Joué par `dsoxlab run` : l'examen blanc CKAD sur le cluster kubeadm du
+# catalogue, avec Traefik pour l'Ingress et local-path pour les volumes.
+- name: Préparer l'examen blanc CKAD
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Installer Traefik
+      ansible.builtin.include_tasks: ../../shared/traefik.yml
+
+    - name: Créer le répertoire des fichiers de l'examen sur le nœud
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/ckad-examen
+        state: directory
+        mode: "0755"
+
+    - name: Copier les fichiers de l'examen
+      ansible.builtin.copy:
+        src: "fixtures/{{ item }}"
+        dest: "/var/lib/dsoxlab/ckad-examen/{{ item }}"
+        mode: "0644"
+      loop:
+        - local-path-storage.yaml
+        - pdb-ancien.yaml
+        - kustomize/
+
+    - name: Installer le provisionneur de stockage local
+      ansible.builtin.command: >-
+        {{ kubectl }} apply -f /var/lib/dsoxlab/ckad-examen/local-path-storage.yaml
+      changed_when: true
+
+    - name: Poser l'état de départ de chaque tâche
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

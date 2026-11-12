@@ -17,6 +17,7 @@ description: |
   Your kubeconfig already holds two contexts. Switch to recette, give it
   kube-system as its default namespace, and prove it with a ConfigMap created
   without naming any context or namespace, which must land in the right place.
+  Then make your kubeconfig readable by you alone.
 skills:
   - kubeconfig
   - kubectl-config
@@ -26,7 +27,7 @@ distros:
   - debian13
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 20m
 
 certification_tags:
   - kcna
@@ -59,5 +60,11 @@ criteria:
     label: "The ConfigMap preuve, created without -n nor --context, is in kube-system of the recette cluster only"
     tests:
       - test_la_preuve_est_dans_kube_system_du_cluster_recette
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+  - id: le-kubeconfig-est-protege
+    label: "~/.kube/config is readable and writable by its owner only (600)"
+    tests:
+      - test_le_kubeconfig_n_est_accessible_qu_a_son_proprietaire
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/

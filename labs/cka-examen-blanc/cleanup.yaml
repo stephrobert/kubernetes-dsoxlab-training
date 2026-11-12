@@ -1,0 +1,100 @@
+---
+# Joué par `dsoxlab clean` : remet le worker en service, retire son taint et son
+# label, puis tout ce que l'examen a posé ou que l'apprenant a créé, y compris
+# les objets du cluster entier (classe, volumes gardés, CRD, contrôleur).
+- name: Nettoyer l'examen blanc CKA
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    maison: "/home/{{ ansible_user | default('ansible') }}"
+  tasks:
+    - name: Remettre le kubelet du worker en service
+      ansible.builtin.systemd:
+        name: kubelet
+        state: started
+        enabled: true
+      delegate_to: k8s-w1.lab
+
+    - name: Attendre que le worker soit Ready
+      ansible.builtin.command: >-
+        {{ kubectl }} wait node/k8s-w1.lab --for=condition=Ready --timeout=180s
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer le taint et le label du worker
+      ansible.builtin.shell: |
+        {{ kubectl }} taint node k8s-w1.lab examen=reserve:NoSchedule- || true
+        {{ kubectl }} label node k8s-w1.lab role-examen- || true
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Supprimer les namespaces de l'examen
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace appli reseau prod
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les volumes gardés par la classe rapide
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get pv -o jsonpath='{range .items[?(@.spec.storageClassName=="rapide")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r {{ kubectl }} delete pv --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la classe, la CRD et les Gateway de l'examen
+      ansible.builtin.shell: |
+        {{ kubectl }} delete storageclass rapide --ignore-not-found
+        {{ kubectl }} delete crd sauvegardes.examen.formation.k8s --ignore-not-found --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le provisionneur de stockage
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /var/lib/dsoxlab/cka-examen/local-path-storage.yaml
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le contrôleur, les CRD de la Gateway API et la politique d'admission
+      ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
+
+    - name: Effacer les données du provisionneur sur le control plane
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+
+    - name: Effacer les données du provisionneur sur le worker
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Retirer le snapshot etcd de l'examen
+      ansible.builtin.file:
+        path: /var/lib/etcd/sauvegarde-examen.db
+        state: absent
+
+    - name: Retirer les contextes de l'examen du kubeconfig de l'apprenant
+      ansible.builtin.shell: |
+        for ctx in cka-infra cka-appli cka-reseau; do
+          kubectl --kubeconfig {{ maison }}/.kube/config config delete-context "$ctx" || true
+        done
+        kubectl --kubeconfig {{ maison }}/.kube/config config use-context kubernetes-admin@kubernetes
+      args:
+        executable: /bin/bash
+      become_user: "{{ ansible_user | default('ansible') }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de l'examen
+      ansible.builtin.file:
+        path: "{{ maison }}/examen"
+        state: absent

@@ -1,0 +1,54 @@
+---
+# Joué par `dsoxlab clean` : retire tout ce que l'examen a posé ou que
+# l'apprenant a créé, y compris les objets du cluster entier.
+- name: Nettoyer l'examen blanc CKAD
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    maison: "/home/{{ ansible_user | default('ansible') }}"
+  tasks:
+    - name: Supprimer les namespaces de l'examen
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace atelier boutique securite
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le provisionneur de stockage
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /var/lib/dsoxlab/ckad-examen/local-path-storage.yaml
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le contrôleur et ses CRD
+      ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
+
+    - name: Effacer les données du provisionneur sur le control plane
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+
+    - name: Effacer les données du provisionneur sur le worker
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Retirer les contextes de l'examen du kubeconfig de l'apprenant
+      ansible.builtin.shell: |
+        for ctx in ckad-atelier ckad-boutique ckad-securite; do
+          kubectl --kubeconfig {{ maison }}/.kube/config config delete-context "$ctx" || true
+        done
+        kubectl --kubeconfig {{ maison }}/.kube/config config use-context kubernetes-admin@kubernetes
+      args:
+        executable: /bin/bash
+      become_user: "{{ ansible_user | default('ansible') }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de l'examen
+      ansible.builtin.file:
+        path: "{{ maison }}/examen"
+        state: absent

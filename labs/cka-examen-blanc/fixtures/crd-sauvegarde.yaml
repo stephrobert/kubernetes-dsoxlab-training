@@ -1,0 +1,33 @@
+# Définition fournie à l'apprenant : à installer telle quelle (tâche 12).
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: sauvegardes.examen.formation.k8s
+spec:
+  group: examen.formation.k8s
+  scope: Namespaced
+  names:
+    plural: sauvegardes
+    singular: sauvegarde
+    kind: Sauvegarde
+    shortNames:
+      - sauv
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - source
+              properties:
+                source:
+                  type: string
+                retentionJours:
+                  type: integer
+                  minimum: 1
+                  maximum: 365

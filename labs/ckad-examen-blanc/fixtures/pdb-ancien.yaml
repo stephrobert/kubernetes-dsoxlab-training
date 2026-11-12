@@ -1,0 +1,11 @@
+# Manifeste hérité (tâche 8) : son API a été retirée de Kubernetes.
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: atelier
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api

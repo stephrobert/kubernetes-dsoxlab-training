@@ -73,13 +73,9 @@ its digest without restart (P02), the database with a stable identity and one
 volume per replica (P05), the grader's data that survives its Pod (P06), and the
 volumes created by the class and kept (P07).
 
-Four **paid hints** are offered, and each one takes points off the scale before
-the grade is computed: 2, 3, 5 then 5, 15 at most. Without a hint, seven
-criteria give 70. From the first hint on, seven criteria are no longer enough
-(69): eight are needed. With all four, eight criteria give 68, and nine are
-needed (76).
-
-No procedure is given: the lessons of level 2 taught everything.
+Seven criteria give 70, the five critical ones among them. No procedure is
+given, and the test offers **no hint**: the lessons of level 2 taught
+everything.
 
 ```bash
 dsoxlab check  k8s-epreuve-deployer-une-application

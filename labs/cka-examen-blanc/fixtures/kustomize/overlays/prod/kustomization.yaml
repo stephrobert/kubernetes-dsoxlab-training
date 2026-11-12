@@ -1,0 +1,3 @@
+# Overlay de production, à compléter (tâche 13).
+resources:
+  - ../../base

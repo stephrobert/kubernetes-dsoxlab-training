@@ -61,7 +61,12 @@ def test_le_catalogue_a_des_indices() -> None:
 #: poids égal, un seul indice de 5 points faisait tomber les cinq critères
 #: critiques réussis à 68, sous le seuil de 70, et la règle « les cinq critiques
 #: suffisent » devenait fausse. Une épreuve se passe donc sans aide.
-SANS_INDICE = {"k8s-epreuve-livrer-et-mettre-a-jour": "D36, épreuve du niveau 1 sans indice"}
+SANS_INDICE = {
+    "k8s-epreuve-livrer-et-mettre-a-jour": "D36, épreuve du niveau 1 sans indice",
+    "k8s-epreuve-deployer-une-application": "D36, épreuve du niveau 2 sans indice",
+    "cka-examen-blanc": "examen blanc CKA sans indice, décision du 2026-11-12",
+    "ckad-examen-blanc": "examen blanc CKAD sans indice, décision du 2026-11-12",
+}
 
 
 @pytest.mark.parametrize("fichier", HINTS, ids=lambda p: p.parent.parent.name)
