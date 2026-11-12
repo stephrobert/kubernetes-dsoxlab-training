@@ -2637,23 +2637,19 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 316,
-  "ecarts": [
-   "kube-system pod-statique/kube-controller-manager-k8s-cp.lab : 'Running' devenu 'Pending'"
-  ],
+  "duree_s": 471,
+  "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.2, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
-   "1 écart(s) après clean"
+   "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-cis-benchmark-remediate.log",
   "kubernetes": "v1.37.2",
-  "raisons": [
-   "le cluster n'est pas rendu intact"
-  ],
+  "raisons": [],
   "rejeu": {
    "echecs": [
     "test_l_audit_rejoue_compte_moins_d_echecs",
@@ -2666,7 +2662,7 @@
    "status": "failed",
    "total": 2
   },
-  "verdict": "ROUGE"
+  "verdict": "VALIDE"
  },
  "cks-cosign-verify-image": {
   "apres": {
