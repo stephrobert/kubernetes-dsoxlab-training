@@ -3972,32 +3972,51 @@
  },
  "cks-validating-admission-policy": {
   "apres": {
+   "echecs": [],
    "passed": 2,
+   "recorded": true,
    "score": 100,
+   "skipped": 0,
+   "status": "passed",
    "total": 2
   },
   "avant": {
+   "echecs": [
+    "test_une_image_par_tag_est_refusee_et_une_image_epinglee_passe",
+    "test_une_politique_est_liee_en_mode_refus"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 339,
+  "date": "2026-11-12",
+  "duree_s": 410,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 13 objets hors kube-system",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
    "avant le travail : 0/2",
    "après la solution : 2/2",
    "après clean et run : 0/2",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-validating-admission-policy.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_une_image_par_tag_est_refusee_et_une_image_epinglee_passe",
+    "test_une_politique_est_liee_en_mode_refus"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 2
   },
   "verdict": "VALIDE"
