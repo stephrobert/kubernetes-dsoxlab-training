@@ -182,10 +182,11 @@ def test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage(host):
         and len(pods) == REPLICAS_VITRINE and not redemarres, message(
         en=f"{VITRINE}: {s.get('availableReplicas', 0)} available out of {d['spec'].get('replicas')}, image "
         f"{voulue!r} (run: {sorted(i for i in images if i)}), restarted Pods: {redemarres}. Expected "
-        f"{REPLICAS_VITRINE} available on the image referred to by digest, and no Pod restarted.",
+        f"{REPLICAS_VITRINE} available on the image referred to by digest, and no Pod of the {NS} space restarted.",
         fr=f"{VITRINE} : {s.get('availableReplicas', 0)} disponible(s) sur {d['spec'].get('replicas')}, image "
         f"{voulue!r} (en marche : {sorted(i for i in images if i)}), Pods redémarrés : {redemarres}. Attendu "
-        f"{REPLICAS_VITRINE} disponibles sur l'image référencée par digest, et aucun Pod redémarré.",
+        f"{REPLICAS_VITRINE} disponibles sur l'image référencée par digest, et aucun Pod de l'espace {NS} "
+        "redémarré.",
     )
 
 

@@ -71,7 +71,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: p02-vitrine-disponible
-    label: "P02 (critical): the storefront has all its replicas available on the image by digest, and no Pod restarted"
+    label: "P02 (critical): the storefront has all its replicas available on the image by digest, and no Pod of the magasin space restarted"
     tests:
       - test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage
     lessons:
