@@ -37,8 +37,9 @@ curl -s --resolve app.local:30080:127.0.0.1 http://app.local:30080/api
 L'objet qui décrit ces règles vit dans le **même namespace** que les Services
 qu'il route. Ce n'est pas un détail : il ne peut pas en désigner un autre.
 
-Un tel objet qui ne désigne aucune **classe** n'est servi par aucun
-contrôleur, sauf si une classe par défaut existe.
+Nommez sa **classe**. Selon le contrôleur et ses réglages, un objet sans
+classe peut être servi quand même, ou ignoré : nommer la classe rend le choix
+du contrôleur explicite, et ne dépend d'aucun de ces réglages.
 
 Le **type de chemin** compte : celui qui compare un préfixe accepte `/api`
 comme `/api/v1`, tandis que celui qui compare exactement n'accepterait que

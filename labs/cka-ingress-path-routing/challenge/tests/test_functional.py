@@ -59,7 +59,7 @@ def _demander(host, chemin: str) -> tuple[str, str]:
 def test_une_regle_de_routage_existe_pour_l_hote(host):
     """Ce test ne prouve rien à lui seul, et c'est voulu : il est là pour que
     l'échec du test suivant soit diagnosticable. Un Ingress peut exister, être
-    parfaitement valide, et n'être servi par aucun contrôleur faute de classe."""
+    parfaitement valide, et ne pas dire quel contrôleur doit le servir."""
     rc, sortie, diagnostic = _kubectl(host, f"-n {NAMESPACE} get ingress -o json")
     assert rc == 0, message(
         en=f"Cannot read the Ingresses of {NAMESPACE}. {diagnostic}",
@@ -99,12 +99,14 @@ def test_une_regle_de_routage_existe_pour_l_hote(host):
         and "kubernetes.io/ingress.class" not in o["metadata"].get("annotations", {})
     ]
     assert not sans_classe, message(
-        en=f"Ingress {sans_classe} names no class. An Ingress without a "
-        "class is served by no controller, unless a default class exists: "
-        "the IngressClasses of the cluster name the one to use.",
-        fr=f"L'Ingress {sans_classe} ne désigne aucune classe. Un Ingress sans "
-        "classe n'est servi par aucun contrôleur, sauf si une classe par "
-        "défaut existe : les IngressClass du cluster nomment celle à employer.",
+        en=f"Ingress {sans_classe} names no class. Whether an Ingress "
+        "without a class is served depends on each controller's settings; "
+        "naming the class makes the choice explicit. The IngressClasses of "
+        "the cluster name the one to use.",
+        fr=f"L'Ingress {sans_classe} ne désigne aucune classe. Qu'un Ingress "
+        "sans classe soit servi dépend des réglages de chaque contrôleur ; "
+        "nommer la classe rend le choix explicite. Les IngressClass du "
+        "cluster nomment celle à employer.",
     )
 
 

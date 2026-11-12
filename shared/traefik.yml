@@ -92,11 +92,24 @@
   # un Ingress pris en charge resterait sans adresse, ce qui ressemble à un
   # Ingress ignoré (mesuré le 2026-11-12). On publie donc l'adresse du nœud, où
   # le NodePort répond.
+  #
+  # LE TYPE DU SERVICE se règle par service.spec.type : le chart 41.6.0 ignore
+  # service.type, et laissait le Service en LoadBalancer jamais servi (mesuré
+  # le 2026-11-12). Les NodePort existaient quand même, d'où l'erreur restée
+  # invisible.
+  #
+  # PAS DE CLASSE PAR DÉFAUT. Le chart marque son IngressClass par défaut, et
+  # Kubernetes remplit alors lui-même ingressClassName sur tout Ingress qui
+  # n'en nomme aucune : le contrôle des labs ne verrait plus si l'apprenant
+  # l'a écrite. Ce réglage ne change PAS ce que Traefik sert : avec
+  # providers.kubernetesIngress.ingressClass laissé vide, Traefik traite aussi
+  # les Ingress sans classe (mesuré le 2026-11-12, classe par défaut ôtée).
   ansible.builtin.command:
     cmd: >-
       /usr/local/bin/helm upgrade --install traefik traefik/traefik
       --namespace traefik --create-namespace --version 41.6.0
-      --set service.type=NodePort
+      --set service.spec.type=NodePort
+      --set ingressClass.isDefaultClass=false
       --set ports.web.nodePort=30080
       --set ports.web.port=80
       --set ports.websecure.nodePort=30443
