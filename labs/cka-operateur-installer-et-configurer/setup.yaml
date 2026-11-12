@@ -1,0 +1,50 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis le stockage
+# dont le replica set aura besoin. Ce cluster n'a aucune StorageClass : sans
+# elle, les deux revendications que l'opérateur pose resteraient Pending et la
+# ressource ne serait jamais Running, pour une raison étrangère au lab.
+#
+# L'opérateur lui-même n'est PAS installé : c'est le geste du lab.
+- name: Préparer le lab cka-operateur-installer-et-configurer
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Créer le répertoire de travail du lab sur le nœud
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab
+        state: directory
+        mode: "0755"
+
+    - name: Copier le manifeste du provisionneur de stockage local
+      # local-path-provisioner de Rancher v0.0.37, images épinglées par digest,
+      # le même que le lab cka-storageclass-provisionnement-dynamique.
+      ansible.builtin.copy:
+        src: fixtures/local-path-storage.yaml
+        dest: /var/lib/dsoxlab/local-path-storage.yaml
+        mode: "0644"
+
+    - name: Installer le provisionneur de stockage local
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
+          /var/lib/dsoxlab/local-path-storage.yaml
+      changed_when: true
+
+    - name: En faire la classe par défaut
+      # Les revendications que l'opérateur crée ne nomment aucune classe :
+      # elles prennent celle par défaut.
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf annotate storageclass
+          local-path storageclass.kubernetes.io/is-default-class=true --overwrite
+      changed_when: true
+
+    - name: Attendre que le provisionneur réponde
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf -n local-path-storage
+          rollout status deployment/local-path-provisioner --timeout=300s
+      changed_when: false

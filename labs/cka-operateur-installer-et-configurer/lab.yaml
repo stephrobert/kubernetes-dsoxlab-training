@@ -1,0 +1,86 @@
+# Lab guidé de la leçon « Opérateurs » (KUBERN-09-03), module Workloads avancés.
+# Le geste : installer un opérateur tiers par ses manifestes versionnés, lui
+# confier une ressource, puis changer un réglage en ne touchant QU'À la
+# ressource. L'opérateur retenu est MongoDB Controllers for Kubernetes 1.15.0,
+# dont la matrice officielle couvre Kubernetes 1.35, 1.36 et 1.37 (lue le
+# 2026-11-12). Licences : Apache 2.0 pour l'opérateur piloté sur MongoDB
+# Community, SSPL v1 pour le serveur MongoDB.
+#
+# Sur le cluster kubeadm du catalogue. Le setup y installe local-path comme
+# classe par défaut : sans elle, les revendications du replica set resteraient
+# Pending.
+id: cka-operateur-installer-et-configurer
+title: "Install an operator and configure what it runs"
+level: workloads
+section: cka
+difficulty: intermediate
+description: |
+  Install the MongoDB operator from its versioned manifests with pinned images,
+  hand it a one-member replica set, then change a mongod setting by editing
+  only the resource, and check that the operator applied it.
+skills:
+  - operator
+  - customresourcedefinition
+  - ownerreferences
+  - image-pinning
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/#mettre-en-pratique
+lab_type: lab
+estimated_time: 40m
+
+# Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
+# Configuration : « Understand CRDs, install and configure operators ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: crd-etablie
+    label: "The MongoDBCommunity CRD is Established"
+    tests:
+      - test_la_crd_mongodbcommunity_est_etablie
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+  - id: operateur-disponible
+    label: "The operator is available, on its image pinned by digest"
+    tests:
+      - test_l_operateur_est_disponible_sur_son_image_epinglee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+  - id: ressource-running
+    label: "The resource registre is in phase Running"
+    tests:
+      - test_registre_est_running
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+  - id: objets-possedes
+    label: "The StatefulSet and the Service belong to registre"
+    tests:
+      - test_le_statefulset_et_le_service_appartiennent_a_registre
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+  - id: serveur-epingle
+    label: "mongod runs on the server image pinned by digest"
+    tests:
+      - test_mongod_tourne_sur_le_serveur_epingle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+  - id: reglage-applique
+    label: "mongod starts with the 250 ms threshold set through the resource"
+    tests:
+      - test_mongod_demarre_avec_un_seuil_de_250_ms
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+
+feedback: full

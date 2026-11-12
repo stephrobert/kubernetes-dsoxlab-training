@@ -162,6 +162,9 @@ sections:
       - cka-daemonset-all-nodes
       # Lab guidé de la leçon « Les StatefulSets », module Workloads avancés.
       - cka-statefulset-identite-stable
+      # Lab guidé de la leçon « Opérateurs », module Workloads avancés : installer
+      # un opérateur tiers et ne configurer que sa ressource.
+      - cka-operateur-installer-et-configurer
       # Le challenge du module Workloads avancés, posé dans la leçon
       # « Operators et CRDs pour développeurs », sur le cluster kind « multi ».
       - k8s-challenge-choisir-le-bon-workload
