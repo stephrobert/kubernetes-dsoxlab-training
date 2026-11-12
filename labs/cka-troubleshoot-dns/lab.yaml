@@ -14,7 +14,7 @@ skills:
   - networking
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/#mettre-en-pratique
 lab_type: lab
 estimated_time: 10m
 
@@ -34,3 +34,25 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: coredns-retabli
+    label: "CoreDNS runs again as kubeadm sets it up, two replicas ready"
+    tests:
+      - test_coredns_tourne_comme_kubeadm_le_pose
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: client-resout
+    label: "The client Pod resolves web-svc.app.svc.cluster.local"
+    tests:
+      - test_le_client_resout_le_service
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: client-joint-en-http
+    label: "The client Pod reaches web-svc over HTTP by that name"
+    tests:
+      - test_le_client_joint_le_service_en_http
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+
+feedback: full

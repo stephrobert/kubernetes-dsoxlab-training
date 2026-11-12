@@ -35,3 +35,32 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: endpoints
+    label: "web-svc has endpoints, the Pods of web-app"
+    tests:
+      - test_le_service_a_des_endpoints
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: bon-port
+    label: "web-svc forwards to the port nginx listens on"
+    tests:
+      - test_le_service_vise_le_bon_port
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: politique-web
+    label: "allow-web-ingress reopens port 80 of the web Pods, and block-all stays"
+    tests:
+      - test_la_politique_rouvre_le_web_sans_retirer_block_all
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: client-joint
+    label: "From the client Pod, http://web-svc/ answers"
+    tests:
+      - test_le_client_joint_le_service
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+
+feedback: full

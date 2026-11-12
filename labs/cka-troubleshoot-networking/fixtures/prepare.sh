@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:1.27-alpine
+          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
           ports:
             - containerPort: 80
 ---
@@ -72,7 +72,7 @@ metadata:
 spec:
   containers:
     - name: client
-      image: busybox:1.36
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sh", "-c", "sleep 3600"]
 EOF
 

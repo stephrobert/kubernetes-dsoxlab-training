@@ -175,6 +175,9 @@ sections:
       # API sépare, et ce qu'elle ne change pas.
       - cka-ingress-path-routing
       - cka-gateway-api-httproute
+      # Le challenge du module Réseau et exposition, posé dans la leçon
+      # « Network Policies », sur le cluster kubeadm (Calico, Traefik).
+      - k8s-challenge-exposer-et-isoler
       - cka-pv-pvc-storageclass
       - cka-storageclass-provisionnement-dynamique
       # Le challenge du module Stockage persistant, posé dans la leçon

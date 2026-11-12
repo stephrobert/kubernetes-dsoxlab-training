@@ -4,3 +4,17 @@ description: |
   dans les deux sens, DNS compris, et interdire tout le reste. Prouver
   chaque règle par une vraie connexion, celle qui passe et celle qui est
   bloquée.
+
+criteria:
+  - id: backend-policy
+    label: "backend-policy vise tier=backend, en entrée et en sortie"
+  - id: database-policy
+    label: "database-policy vise tier=database, en entrée et en sortie"
+  - id: backend-entree
+    label: "backend n'accepte que frontend"
+  - id: backend-sortie
+    label: "backend joint database et résout les noms"
+  - id: base-entree
+    label: "database refuse intrus"
+  - id: base-sans-sortie
+    label: "database ne joint rien, pas même le DNS"

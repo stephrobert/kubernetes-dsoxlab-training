@@ -4,3 +4,13 @@ description: |
   l'Ingress. Déclarez une Gateway, attachez-lui une route, et prouvez le
   routage : chaque chemin répond le nom de son application, un chemin non
   déclaré ne répond ni l'une ni l'autre.
+
+criteria:
+  - id: gateway-programmee
+    label: "Une Gateway existe et le cluster la déclare programmée"
+  - id: chemin-api
+    label: "Le chemin /api atteint svc-api"
+  - id: chemin-web
+    label: "Le chemin /web atteint svc-web"
+  - id: chemin-non-declare
+    label: "Un chemin non déclaré n'atteint aucune des deux applications"

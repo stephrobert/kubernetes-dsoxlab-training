@@ -101,72 +101,72 @@ def test_une_regle_de_routage_existe_pour_l_hote(host):
     assert not sans_classe, message(
         en=f"Ingress {sans_classe} names no class. An Ingress without a "
         "class is served by no controller, unless a default class exists: "
-        "`kubectl get ingressclass` tells you the cluster's.",
+        "the IngressClasses of the cluster name the one to use.",
         fr=f"L'Ingress {sans_classe} ne désigne aucune classe. Un Ingress sans "
         "classe n'est servi par aucun contrôleur, sauf si une classe par "
-        "défaut existe : `kubectl get ingressclass` dit celle du cluster.",
+        "défaut existe : les IngressClass du cluster nomment celle à employer.",
     )
 
 
-# ----------------------------------------------------------------------
-# 2. LE test : chaque chemin atteint SON application, et pas l'autre.
-# ----------------------------------------------------------------------
-def test_chaque_chemin_atteint_son_application(host):
-    """La preuve, exercée sur les trois chemins.
+def _route(host) -> bool:
+    """Une route vise-t-elle l'hôte ? Sans elle, rien n'est à attendre."""
+    rc, sortie, _ = _kubectl(host, f"-n {NAMESPACE} get ingress -o json")
+    objets = json.loads(sortie).get("items", []) if rc == 0 and sortie else []
+    return any(r.get("host") == HOTE for o in objets for r in o.get("spec", {}).get("rules", []))
 
-    Les deux applications répondent leur nom : un routage inversé serait donc
-    détecté, là où deux backends identiques l'auraient laissé passer.
 
-    Le troisième chemin est le contrôle. Une règle qui enverrait tout vers une
-    seule application passerait les deux premières mesures sans router quoi que
-    ce soit.
-
-    Mesuré le 2026-09-16 : /api rend « api », /web rend « web », et /autre rend
-    404.
-    """
-    fin = time.monotonic() + BUDGET_S
-    corps_api, code_api = "", ""
-    while time.monotonic() < fin:
-        corps_api, code_api = _demander(host, "/api")
-        if corps_api == "api":
-            break
+def _attendre(host, chemin: str, attendu: str) -> tuple[str, str]:
+    corps, code = _demander(host, chemin)
+    fin = time.monotonic() + (BUDGET_S if _route(host) else 0)
+    while corps != attendu and time.monotonic() < fin:
         time.sleep(PAS_S)
+        corps, code = _demander(host, chemin)
+    return corps, code
 
-    assert corps_api == "api", message(
-        en=f"Path /api answers \"{corps_api or 'nothing'}\" (HTTP "
-        f"{code_api or 'none'}) after {BUDGET_S} seconds, instead of \"api\". "
-        "The application meant to serve it answers with its own name: if you "
-        "read \"web\", the two services are swapped; if you read a 404, no rule "
-        "takes that path.",
-        fr=f"Le chemin /api répond « {corps_api or 'rien'} » (HTTP "
-        f"{code_api or 'aucun'}) après {BUDGET_S} secondes, au lieu de « api ». "
-        "L'application qui doit le servir répond son propre nom : si vous "
-        "lisez « web », les deux services sont intervertis ; si vous lisez un "
-        "404, aucune règle ne prend ce chemin.",
+
+def _route_requise(host) -> None:
+    if not _route(host):
+        pytest.fail(message(
+            en=f"No Ingress rule targets {HOTE} in {NAMESPACE}.",
+            fr=f"Aucun Ingress ne vise {HOTE} dans {NAMESPACE}.",
+        ))
+
+
+# ----------------------------------------------------------------------
+# Chaque chemin atteint SON application. Les deux applications répondent leur
+# nom : un routage inversé se voit. Mesuré le 2026-09-16 : /api rend « api »,
+# /web rend « web », /autre rend 404.
+# ----------------------------------------------------------------------
+def test_le_chemin_api_atteint_svc_api(host):
+    _route_requise(host)
+    corps, code = _attendre(host, "/api", "api")
+    assert corps == "api", message(
+        en=f"Path /api answers {corps or 'nothing'!r} (HTTP {code or 'none'}) instead of \"api\". If you read "
+        "\"web\", the two services are swapped; a 404 means no rule takes that path.",
+        fr=f"Le chemin /api répond {corps or 'rien'!r} (HTTP {code or 'aucun'}) au lieu de « api ». Si vous lisez "
+        "« web », les deux services sont intervertis ; un 404 dit qu'aucune règle ne prend ce chemin.",
     )
 
-    corps_web, code_web = _demander(host, "/web")
-    assert corps_web == "web", message(
-        en=f"Path /web answers \"{corps_web or 'nothing'}\" (HTTP "
-        f"{code_web or 'none'}) instead of \"web\", while /api is already "
-        "correct. Only one of the two rules was written, or both point at the "
-        "same service.",
-        fr=f"Le chemin /web répond « {corps_web or 'rien'} » (HTTP "
-        f"{code_web or 'aucun'}) au lieu de « web », alors que /api est déjà "
-        "correct. Une seule des deux règles a été posée, ou les deux visent le "
-        "même service.",
+
+def test_le_chemin_web_atteint_svc_web(host):
+    _route_requise(host)
+    corps, code = _attendre(host, "/web", "web")
+    assert corps == "web", message(
+        en=f"Path /web answers {corps or 'nothing'!r} (HTTP {code or 'none'}) instead of \"web\": its rule is "
+        "missing, or points at the other service.",
+        fr=f"Le chemin /web répond {corps or 'rien'!r} (HTTP {code or 'aucun'}) au lieu de « web » : sa règle "
+        "manque, ou vise l'autre service.",
     )
 
-    corps_autre, code_autre = _demander(host, "/autre")
-    assert corps_autre not in ("api", "web"), message(
-        en=f"A path you never declared, /autre, is served by "
-        f"\"{corps_autre}\". So the routing sends everything to one application, "
-        "and the two previous measurements proved nothing: they would have "
-        "been green with a rule that routes nothing. Check that your paths "
-        f"are each declared separately. Code received: {code_autre}.",
-        fr=f"Un chemin que vous n'avez pas déclaré, /autre, est servi par "
-        f"« {corps_autre} ». Le routage envoie donc tout vers une application, "
-        "et les deux mesures précédentes ne prouvaient rien : elles auraient "
-        "été vertes avec une règle qui ne route pas. Vérifiez que vos chemins "
-        f"sont bien déclarés séparément. Code obtenu : {code_autre}.",
+
+def test_un_chemin_non_declare_n_atteint_aucune_application(host):
+    """Le contrôle : une règle qui enverrait tout vers une seule application
+    passerait les deux tests précédents sans router quoi que ce soit."""
+    _route_requise(host)
+    corps, code = _demander(host, "/autre")
+    assert corps not in ("api", "web"), message(
+        en=f"A path you never declared, /autre, is served by {corps!r} (HTTP {code}): the routing sends "
+        "everything to one application. Each path must be declared on its own.",
+        fr=f"Un chemin que vous n'avez pas déclaré, /autre, est servi par {corps!r} (HTTP {code}) : le routage "
+        "envoie tout vers une application. Chaque chemin se déclare à part.",
     )

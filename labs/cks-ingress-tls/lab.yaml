@@ -14,7 +14,7 @@ skills:
   - certificat
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/#mettre-en-pratique
 lab_type: lab
 estimated_time: 25m
 
@@ -36,3 +36,31 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: secret-tls
+    label: "The certificate is stored in a Secret of type kubernetes.io/tls"
+    tests:
+      - test_le_certificat_est_depose_dans_un_secret_tls
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: ingress-declare-tls
+    label: "The Ingress declares TLS for vitrine.lab with that Secret"
+    tests:
+      - test_l_ingress_declare_le_tls_de_l_hote_avec_ce_secret
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: certificat-de-l-hote
+    label: "The server presents a certificate that names vitrine.lab"
+    tests:
+      - test_le_serveur_presente_un_certificat_qui_nomme_l_hote
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: https-verifie
+    label: "The site answers over HTTPS verified against that certificate"
+    tests:
+      - test_le_site_repond_en_https_verifie
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+
+feedback: full

@@ -49,9 +49,9 @@ quelques secondes.
 
 ## Comment vous saurez que c'est bon
 
-Le dernier test interroge les **trois** chemins. Le troisième est le contrôle :
-une règle unique qui enverrait tout vers un seul service passerait les deux
-premières mesures sans router quoi que ce soit.
+Un test lit la règle, puis un test par chemin interroge les **trois** chemins.
+Le chemin non déclaré est le contrôle : une règle unique qui enverrait tout vers
+un seul service passerait les deux autres mesures sans router quoi que ce soit.
 
 ```bash
 dsoxlab check cka-ingress-path-routing

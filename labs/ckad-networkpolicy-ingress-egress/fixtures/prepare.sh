@@ -29,7 +29,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: busybox:1.36
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sh", "-c", "sleep 3600"]
 ---
 apiVersion: v1
@@ -42,7 +42,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: busybox:1.36
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sh", "-c", "mkdir -p /www && echo backend > /www/index.html && exec httpd -f -p 80 -h /www"]
       ports:
         - containerPort: 80
@@ -57,7 +57,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: busybox:1.36
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sh", "-c", "mkdir -p /www && echo database > /www/index.html && exec httpd -f -p 80 -h /www"]
       ports:
         - containerPort: 80
@@ -70,8 +70,13 @@ metadata:
 spec:
   containers:
     - name: app
-      image: busybox:1.36
-      command: ["sh", "-c", "sleep 3600"]
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+      # L'intrus sert aussi son nom : c'est la destination que la sortie du
+      # backend doit refuser, faute de quoi aucun test ne verrait une sortie
+      # restée grande ouverte.
+      command: ["sh", "-c", "mkdir -p /www && echo intrus > /www/index.html && exec httpd -f -p 80 -h /www"]
+      ports:
+        - containerPort: 80
 EOF
 kubectl -n lab wait --for=condition=Ready pod/frontend pod/backend pod/database pod/intrus --timeout=180s
 

@@ -4,3 +4,13 @@ description: |
   politique réseau qui ferme tout. Remettre le Service d'aplomb, rouvrir
   exactement ce qu'il faut sans retirer la politique de sécurité, et prouver
   qu'un client joint le Service par son nom.
+
+criteria:
+  - id: endpoints
+    label: "web-svc a des endpoints, les Pods de web-app"
+  - id: bon-port
+    label: "web-svc transmet sur le port où nginx écoute"
+  - id: politique-web
+    label: "allow-web-ingress rouvre le port 80 des Pods web, et block-all reste"
+  - id: client-joint
+    label: "Depuis le Pod client, http://web-svc/ répond"

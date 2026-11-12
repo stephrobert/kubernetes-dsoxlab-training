@@ -48,9 +48,9 @@ seconds.
 
 ## How you will know it works
 
-The last test queries all **three** paths. The third is the control: a single
-rule sending everything to one service would pass the first two measurements
-without routing anything.
+One test reads the rule, then one test per path queries all **three** paths.
+The undeclared path is the control: a single rule sending everything to one
+service would pass the other two measurements without routing anything.
 
 ```bash
 dsoxlab check cka-ingress-path-routing

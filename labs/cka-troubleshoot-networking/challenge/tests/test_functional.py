@@ -61,10 +61,10 @@ def test_le_service_a_des_endpoints(host):
     assert prets, message(
         en=f"Service {SERVICE} has no ready endpoint. Its selector is "
         f"{service['spec'].get('selector')}: no Pod carries those labels. "
-        "Compare kubectl describe service with kubectl get pods --show-labels.",
+        "Compare the selector of the Service with the labels of the Pods.",
         fr=f"Le Service {SERVICE} n'a aucun endpoint prêt. Son selector est "
         f"{service['spec'].get('selector')} : aucun Pod ne porte ces labels. "
-        "Comparez kubectl describe service et kubectl get pods --show-labels.",
+        "Comparez le selector du Service aux labels des Pods.",
     )
 
 
