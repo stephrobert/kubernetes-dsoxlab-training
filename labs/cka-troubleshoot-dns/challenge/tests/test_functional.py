@@ -3,9 +3,15 @@
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées. Le candidat
 arrive au résultat par le chemin qu'il veut, et seul le résultat compte.
 
-Trois affirmations. La première regarde le composant DNS ; les deux autres
-regardent son EFFET depuis le Pod client, et ce sont elles qui prouvent
-quelque chose : un CoreDNS « Running » qui ne répondrait pas ne passerait pas.
+Quatre affirmations. Les deux premières regardent le composant DNS : ses
+réplicas, puis la zone que sa configuration sert. Les deux autres regardent son
+EFFET depuis le Pod client, et ce sont elles qui prouvent quelque chose : un
+CoreDNS « Running » qui ne répondrait pas ne passerait pas.
+
+La préparation pose DEUX pannes. CoreDNS est à zéro réplica, et son Corefile
+déclare la zone cluster.locale au lieu de cluster.local. La seconde ne se voit
+qu'une fois la première réparée : CoreDNS revient Running et Ready, charge une
+configuration valide, et la résolution échoue quand même.
 `nslookup` interroge le serveur DNS du cluster et ignore `/etc/hosts` : une
 rustine dans le Pod client ne ferait passer aucun test.
 
@@ -31,6 +37,9 @@ NAMESPACE = "app"
 CLIENT = "client"
 NOM = "web-svc.app.svc.cluster.local"
 ATTENTE = 120
+# La relecture du Corefile a son propre budget : les deux attentes tiennent
+# ensemble sous les 300 s que dsoxlab accorde à la suite.
+ATTENTE_RELECTURE = 90
 PAS = 5
 
 
@@ -101,7 +110,31 @@ def test_coredns_tourne_comme_kubeadm_le_pose(host):
 
 
 # ----------------------------------------------------------------------
-# 2. La preuve qui compte : le client résout le nom.
+# 2. La configuration de CoreDNS sert la zone du cluster.
+# ----------------------------------------------------------------------
+def _zones_du_plugin_kubernetes(host) -> list[str]:
+    rc, corefile, _ = _kubectl(host, "-n kube-system get configmap coredns -o jsonpath='{.data.Corefile}'")
+    for ligne in corefile.splitlines() if rc == 0 else []:
+        mots = ligne.split()
+        if mots and mots[0] == "kubernetes":
+            return [m for m in mots[1:] if m != "{"]
+    return []
+
+
+def test_le_corefile_sert_la_zone_du_cluster(host):
+    zones = _zones_du_plugin_kubernetes(host)
+    assert "cluster.local" in zones, message(
+        en=f"In the coredns ConfigMap, the kubernetes plugin serves the zones {zones or 'none'}. Expected "
+        "cluster.local, the cluster's domain: names outside the zones it serves go to the upstream DNS, which "
+        "does not know them.",
+        fr=f"Dans la ConfigMap coredns, le plugin kubernetes sert les zones {zones or 'aucune'}. Attendu "
+        "cluster.local, le domaine du cluster : les noms hors des zones qu'il sert partent vers le DNS amont, qui "
+        "ne les connaît pas.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 3. La preuve qui compte : le client résout le nom.
 # ----------------------------------------------------------------------
 def test_le_client_resout_le_service(host):
     """Un CoreDNS présent mais muet ne passerait pas ce test.
@@ -111,20 +144,26 @@ def test_le_client_resout_le_service(host):
     main dans le Pod ne ferait pas passer ce test.
     """
     rc, _, diagnostic = _dans_le_client(host, f"nslookup {NOM}")
+    # CoreDNS relit sa ConfigMap de lui-même, mais pas tout de suite : le temps
+    # que le kubelet la propage, puis que le plugin reload la recharge. On
+    # n'attend que si la configuration est déjà juste.
+    if rc != 0 and "cluster.local" in _zones_du_plugin_kubernetes(host):
+        fin = time.monotonic() + ATTENTE_RELECTURE
+        while rc != 0 and time.monotonic() < fin:
+            time.sleep(PAS)
+            rc, _, diagnostic = _dans_le_client(host, f"nslookup {NOM}")
     assert rc == 0, message(
-        en=f"Pod {CLIENT} does not resolve {NOM}. The kube-dns Service still "
-        "exists and its address is in the Pod's resolv.conf, but a "
-        "Service with no endpoint answers nobody: check what stands "
-        f"behind it, and wait for its Pods to be ready. Output: {diagnostic}",
-        fr=f"Le Pod {CLIENT} ne résout pas {NOM}. Le Service kube-dns existe "
-        "toujours et son adresse est dans le resolv.conf du Pod, mais un "
-        "Service sans endpoint ne répond à personne : vérifiez ce qui se tient "
-        f"derrière lui, et attendez que ses Pods soient prêts. Sortie : {diagnostic}",
+        en=f"Pod {CLIENT} does not resolve {NOM}. The kube-dns Service's address is in the Pod's resolv.conf: "
+        "either nothing answers behind it, or what answers does not serve the cluster's zone. A CoreDNS that is "
+        f"Running and Ready can still answer NXDOMAIN. Output: {diagnostic}",
+        fr=f"Le Pod {CLIENT} ne résout pas {NOM}. L'adresse du Service kube-dns est dans le resolv.conf du Pod : "
+        "soit rien ne répond derrière lui, soit ce qui répond ne sert pas la zone du cluster. Un CoreDNS Running "
+        f"et Ready peut répondre NXDOMAIN quand même. Sortie : {diagnostic}",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. Et il joint réellement le Service par ce nom.
+# 4. Et il joint réellement le Service par ce nom.
 # ----------------------------------------------------------------------
 def test_le_client_joint_le_service_en_http(host):
     """Résoudre un nom ne suffit pas : la requête doit aboutir.

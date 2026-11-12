@@ -222,6 +222,9 @@ sections:
       - ckad-multi-container-sidecar
       - ckad-volumes-partage-entre-conteneurs
       - ckad-expose-service
+      # Lab guidé de la leçon « Services » : réparer un Service NodePort, noté sur
+      # une vraie requête vers chaque nœud.
+      - ckad-service-nodeport-reparer
       - ckad-security-context-hardened
       - ckad-rbac-role-rolebinding
       - ckad-networkpolicy-ingress-egress

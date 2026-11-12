@@ -61,7 +61,7 @@ criteria:
   - id: politique-de-la-classe
     label: "The volume carries Retain, the reclaim policy garde imposes"
     tests:
-      - test_le_volume_garde_ses_donnees_apres_la_revendication
+      - test_le_volume_porte_retain_de_la_classe_garde
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/

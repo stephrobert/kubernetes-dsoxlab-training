@@ -153,7 +153,7 @@ def test_le_volume_lie_a_ete_cree_pour_elle(host):
 # ----------------------------------------------------------------------
 # 4. Le volume porte Retain, la politique que garde lui impose.
 # ----------------------------------------------------------------------
-def test_le_volume_garde_ses_donnees_apres_la_revendication(host):
+def test_le_volume_porte_retain_de_la_classe_garde(host):
     pv = _volume(host)
     assert pv is not None, message(
         en=f"No volume is bound to {PVC}: there is no policy to read yet.",

@@ -17,14 +17,25 @@ which one replied.
 
 For the `app.local` host:
 
-1. An HTTP entry point exists, and the cluster declares it **programmed**. An
-   entry point that is accepted but not programmed routes nothing.
+1. An HTTP entry point named **`entree`** exists, and the cluster declares it
+   **programmed**. An entry point that is accepted but not programmed routes
+   nothing.
 
 2. Requests whose path starts with **`/api`** reach `svc-api`.
 
 3. Requests whose path starts with **`/web`** reach `svc-web`.
 
 4. A path you did not declare reaches **neither**.
+
+Another team, **`boutique`**, serves its catalogue in its own namespace, behind
+`svc-catalogue`. A route **`catalogue`** already exists in `lab` for the host
+**`catalogue.local`**, and it names `entree` as its parent. It serves nothing.
+
+5. The route `catalogue` is **accepted** by `entree` and its **references are
+   resolved**, according to its own status, up to date with its latest version.
+   Its backend stays the Service of `boutique`: it belongs to that team.
+
+6. `catalogue.local` **answers with the catalogue**.
 
 The controller and its class are already in place, leave them alone. The HTTP
 entry is exposed on the node's port **30080**.
@@ -50,6 +61,11 @@ A routing rule **with no match criteria** accepts everything arriving.
 One field decides who may attach to the entry point. Both objects living here
 in the same namespace, the most restrictive value is enough.
 
+A route is read like the Gateway: through its **status**, under
+`status.parents`, one entry per parent with its conditions. Their `reason` says
+what is wrong, and their `observedGeneration` says whether they describe the
+route's current version.
+
 Requests are made by telling `curl` where to reach the host:
 
 ```bash
@@ -59,7 +75,9 @@ curl -s --resolve app.local:30080:127.0.0.1 http://app.local:30080/api
 ## How you will know it works
 
 The first test reads the entry point's **conditions**, not merely its
-existence. The last queries all **three** paths, the third serving as control.
+existence. The next three query all **three** paths, the third serving as
+control. The fifth reads the **status** of the route `catalogue`, the sixth makes
+a real request to `catalogue.local`.
 
 ```bash
 dsoxlab check cka-gateway-api-httproute

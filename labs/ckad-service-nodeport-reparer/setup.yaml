@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis l'application
+# accueil et son Service NodePort écrit de travers.
+- name: Préparer le lab ckad-service-nodeport-reparer
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application et son Service cassé
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

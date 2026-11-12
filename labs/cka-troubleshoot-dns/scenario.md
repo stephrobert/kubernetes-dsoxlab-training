@@ -22,6 +22,9 @@ application that is broken, it is **something in the cluster**.
    the state a kubeadm cluster leaves it in. A patch inside the `client` Pod
    does not count: it is the cluster you are asked to repair.
 
+4. Its **configuration** serves the cluster's zone, **`cluster.local`**, as it
+   originally did.
+
 ## Useful bearings
 
 Name resolution in Kubernetes is not handled by the Pods themselves: each Pod
@@ -31,6 +34,11 @@ Pods stand behind it.
 
 Start by observing the failure from the `client` Pod, then work your way up:
 the Service, its endpoints, and what should be providing them.
+
+A component that is **Running and Ready** is not necessarily a correct one. If
+it answers, but answers that the name does not exist, its **configuration** is
+what to read: it lives in a ConfigMap of the same namespace, and the component
+reloads it on its own after a change, within one to two minutes.
 
 ## How you will know it works
 

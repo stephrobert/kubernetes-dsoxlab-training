@@ -1,12 +1,15 @@
 title: "Rétablir la résolution DNS du cluster"
 description: |
   Plus aucun Pod ne résout de nom de service. Trouver pourquoi le DNS du
-  cluster ne répond plus, le remettre en service, et prouver qu'un Pod client
+  cluster ne répond plus, le remettre en service, puis trouver pourquoi il
+  répond encore NXDOMAIN une fois Running et Ready, et prouver qu'un Pod client
   résout et joint à nouveau un Service par son nom.
 
 criteria:
   - id: coredns-retabli
     label: "CoreDNS tourne de nouveau comme kubeadm le pose, deux réplicas prêts"
+  - id: corefile-zone
+    label: "La configuration de CoreDNS sert la zone du cluster, cluster.local"
   - id: client-resout
     label: "Le Pod client résout web-svc.app.svc.cluster.local"
   - id: client-joint-en-http

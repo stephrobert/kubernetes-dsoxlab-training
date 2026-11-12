@@ -13,9 +13,31 @@
       changed_when: true
       failed_when: false
 
+    - name: Restaurer le Corefile d'origine s'il a été gardé
+      ansible.builtin.shell: |
+        set -o pipefail
+        S=/var/lib/dsoxlab/coredns-corefile.orig
+        [ -f "$S" ] || exit 0
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system create configmap coredns \
+          --from-file=Corefile="$S" --dry-run=client -o yaml \
+          | kubectl --kubeconfig /etc/kubernetes/admin.conf replace -f -
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system rollout restart deployment/coredns
+        rm -f "$S"
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
     - name: Remettre CoreDNS à ses deux replicas, l'état que kubeadm pose
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
         scale deployment coredns --replicas=2
       changed_when: true
+      failed_when: false
+
+    - name: Attendre que CoreDNS soit de nouveau prêt
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        rollout status deployment/coredns --timeout=180s
+      changed_when: false
       failed_when: false

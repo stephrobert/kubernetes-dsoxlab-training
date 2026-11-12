@@ -1,4 +1,4 @@
-# Route with the Gateway API, and see the Gateway declare itself programmed
+# Route with the Gateway API, and repair a route the cluster refuses
 
 **CKA** lab, *Services and Networking* domain (20 % of the exam), competency
 "Use the Gateway API to manage Ingress traffic".
@@ -30,13 +30,20 @@ Both applications answer with their own name, using
 `hashicorp/http-echo:1.0.0`: the inherited lab served `nginx:1.27` on both
 sides and could therefore not tell a reversed routing from a correct one.
 
+**The second half of the lab is a diagnosis.** The preparation sets up a route
+`catalogue` pointing at the Service `svc-catalogue` of the `boutique` namespace,
+with no ReferenceGrant. The controller refuses it: `ResolvedRefs=False`, reason
+`RefNotPermitted`, and the route serves nothing. The test reads `status.parents`
+(`Accepted`, `ResolvedRefs`, `observedGeneration`), requires a backend kept in
+`boutique`, then makes a real request to `catalogue.local`.
+
 Gateway API CRDs **v1.6.2**, `standard` channel, placed by the setup and not by
 the chart, which warns it will stop shipping them.
 
 | | |
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
-| Duration | about 25 minutes |
+| Duration | about 35 minutes |
 | Companion lesson | [Gateway API](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
 
 ```bash

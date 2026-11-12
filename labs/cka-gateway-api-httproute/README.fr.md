@@ -1,4 +1,4 @@
-# Router avec la Gateway API, et voir la Gateway se déclarer programmée
+# Router avec la Gateway API, et réparer une route que le cluster refuse
 
 Lab **CKA**, domaine *Services and Networking* (20 % de l'épreuve), compétence
 « Use the Gateway API to manage Ingress traffic ».
@@ -31,13 +31,20 @@ Les deux applications répondent leur nom, avec `hashicorp/http-echo:1.0.0` :
 le lab hérité servait `nginx:1.27` des deux côtés et ne pouvait donc pas
 distinguer un routage inversé d'un routage correct.
 
+**La seconde moitié du lab est un diagnostic.** La préparation pose une route
+`catalogue` qui vise le Service `svc-catalogue` du namespace `boutique`, sans
+ReferenceGrant. Le contrôleur la refuse : `ResolvedRefs=False`, raison
+`RefNotPermitted`, et la route ne sert rien. Le test lit `status.parents`
+(`Accepted`, `ResolvedRefs`, `observedGeneration`), exige un backend resté dans
+`boutique`, puis fait une vraie requête vers `catalogue.local`.
+
 CRD de la Gateway API **v1.6.2**, canal `standard`, posées par le setup et non
 par le chart, qui prévient d'ailleurs qu'il cessera de les livrer.
 
 | | |
 |---|---|
 | Cible | `k8s-cp.lab`, control plane du cluster kubeadm vanilla |
-| Durée | environ 25 minutes |
+| Durée | environ 35 minutes |
 | Leçon jumelée | [Gateway API](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/) |
 
 ```bash

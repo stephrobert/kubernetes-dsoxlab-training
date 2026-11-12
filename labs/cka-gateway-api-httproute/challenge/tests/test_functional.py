@@ -1,6 +1,13 @@
 """test_functional.py : cka-gateway-api-httproute
 
-Deux affirmations qui exercent le routage réel, jamais les commandes tapées.
+Six tests, un par état, qui lisent les conditions et exercent le routage réel,
+jamais les commandes tapées.
+
+Les deux derniers portent sur une panne posée par la préparation : la route
+catalogue vise un Service d'un autre namespace sans ReferenceGrant. Le
+contrôleur la refuse (ResolvedRefs=False, RefNotPermitted), et elle ne sert
+rien. Déplacer le Service dans lab contournerait la panne : le test exige un
+backend resté dans boutique.
 
 Le premier test lit la condition `Programmed` de la Gateway plutôt que sa
 seule existence. C'est la différence qui compte dans cette API : une Gateway
@@ -174,4 +181,90 @@ def test_un_chemin_non_declare_n_atteint_aucune_application(host):
         "everything to one application. Each path must be declared on its own.",
         fr=f"Un chemin que vous n'avez pas déclaré, /autre, est servi par {corps!r} (HTTP {code}) : le routage "
         "envoie tout vers une application. Chaque chemin se déclare à part.",
+    )
+
+
+# ----------------------------------------------------------------------
+# La route catalogue, posée par la préparation, vise un Service d'un autre
+# namespace sans autorisation. Le contrôleur la refuse : elle existe, elle est
+# acceptée par la Gateway, et ses références ne sont pas résolues.
+# ----------------------------------------------------------------------
+ROUTE_CATALOGUE = "catalogue"
+HOTE_CATALOGUE = "catalogue.local"
+NAMESPACE_CATALOGUE = "boutique"
+
+
+def _statut_catalogue(host) -> tuple[dict, dict]:
+    """Rend (route, statut du parent entree), vides s'ils manquent."""
+    rc, sortie, _ = _kubectl(host, f"-n {NAMESPACE} get httproute {ROUTE_CATALOGUE} -o json")
+    route = json.loads(sortie) if rc == 0 and sortie else {}
+    parents = (route.get("status") or {}).get("parents") or []
+    parent = next((p for p in parents if (p.get("parentRef") or {}).get("name") == "entree"), {})
+    return route, parent
+
+
+def _conditions(parent: dict) -> dict[str, tuple[str, str, int]]:
+    return {c.get("type"): (c.get("status", ""), c.get("reason", ""), c.get("observedGeneration", -1))
+            for c in parent.get("conditions") or []}
+
+
+def _catalogue_resolue(route: dict, parent: dict) -> bool:
+    cond = _conditions(parent)
+    generation = (route.get("metadata") or {}).get("generation")
+    return (
+        cond.get("Accepted", ("",))[0] == "True"
+        and cond.get("ResolvedRefs", ("",))[0] == "True"
+        and all(c[2] == generation for c in cond.values())
+    )
+
+
+def test_la_route_catalogue_est_acceptee_et_resolue(host):
+    route, parent = _statut_catalogue(host)
+    fin = time.monotonic() + (BUDGET_S if parent else 0)
+    while route and not _catalogue_resolue(route, parent) and time.monotonic() < fin:
+        time.sleep(PAS_S)
+        route, parent = _statut_catalogue(host)
+    assert route, message(
+        en=f"The HTTPRoute {ROUTE_CATALOGUE} no longer exists in {NAMESPACE}: it had to be repaired, not removed.",
+        fr=f"La HTTPRoute {ROUTE_CATALOGUE} n'existe plus dans {NAMESPACE} : il fallait la réparer, pas la retirer.",
+    )
+    cibles = sorted({
+        b.get("namespace", NAMESPACE)
+        for r in route.get("spec", {}).get("rules") or [] for b in r.get("backendRefs") or []
+    })
+    cond = _conditions(parent)
+    vu = {t: f"{s} ({r}, generation {g})" for t, (s, r, g) in cond.items()} or "no status for the Gateway entree"
+    generation = route.get("metadata", {}).get("generation")
+    assert _catalogue_resolue(route, parent) and cibles == [NAMESPACE_CATALOGUE], message(
+        en=f"{ROUTE_CATALOGUE} (generation {generation}) sends to the namespace(s) {cibles} and reports: {vu}. "
+        f"Expected Accepted=True and ResolvedRefs=True for the Gateway entree, up to date with the route's "
+        f"generation, its backend still in {NAMESPACE_CATALOGUE}: the Service belongs to that team, which must "
+        "allow the reference.",
+        fr=f"{ROUTE_CATALOGUE} (génération {generation}) envoie vers le(s) namespace(s) {cibles} et déclare : {vu}. "
+        f"Attendu Accepted=True et ResolvedRefs=True pour la Gateway entree, à jour de la génération de la "
+        f"route, son backend toujours dans {NAMESPACE_CATALOGUE} : le Service appartient à cette équipe, qui doit "
+        "autoriser la référence.",
+    )
+
+
+def test_catalogue_local_atteint_le_catalogue(host):
+    res = host.run(
+        f"curl -s --resolve {HOTE_CATALOGUE}:{PORT}:127.0.0.1 http://{HOTE_CATALOGUE}:{PORT}/ "
+        "--max-time 8 -w '|%{http_code}'"
+    )
+    corps, _, code = res.stdout.rpartition("|")
+    _, parent = _statut_catalogue(host)
+    fin = time.monotonic() + (BUDGET_S if parent else 0)
+    while corps.strip() != "catalogue" and time.monotonic() < fin:
+        time.sleep(PAS_S)
+        res = host.run(
+            f"curl -s --resolve {HOTE_CATALOGUE}:{PORT}:127.0.0.1 http://{HOTE_CATALOGUE}:{PORT}/ "
+            "--max-time 8 -w '|%{http_code}'"
+        )
+        corps, _, code = res.stdout.rpartition("|")
+    assert corps.strip() == "catalogue", message(
+        en=f"{HOTE_CATALOGUE} answers {corps.strip() or 'nothing'!r} (HTTP {code.strip() or 'none'}) instead of "
+        "\"catalogue\". A route whose reference is refused sends nothing to its backend.",
+        fr=f"{HOTE_CATALOGUE} répond {corps.strip() or 'rien'!r} (HTTP {code.strip() or 'aucun'}) au lieu de "
+        "« catalogue ». Une route dont la référence est refusée n'envoie rien à son backend.",
     )
