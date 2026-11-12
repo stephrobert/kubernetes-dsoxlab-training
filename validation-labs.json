@@ -57,8 +57,8 @@
    "total": 5
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-11",
-  "duree_s": 108,
+  "date": "2026-11-12",
+  "duree_s": 149,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -225,7 +225,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 603,
+  "duree_s": 617,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -298,7 +298,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 263,
+  "duree_s": 247,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -387,7 +387,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 202,
+  "duree_s": 216,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -529,7 +529,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 273,
+  "duree_s": 292,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -700,7 +700,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 238,
+  "duree_s": 266,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -764,7 +764,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 164,
+  "duree_s": 174,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -891,12 +891,12 @@
    "total": 6
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 145,
+  "date": "2026-11-12",
+  "duree_s": 147,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 54 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/6",
    "après la solution : 6/6",
    "après clean et run : 0/6",
@@ -1006,7 +1006,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 212,
+  "duree_s": 211,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -1203,7 +1203,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 313,
+  "duree_s": 297,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -1347,7 +1347,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 314,
+  "duree_s": 317,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -1633,8 +1633,8 @@
    "total": 5
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 80,
+  "date": "2026-11-12",
+  "duree_s": 88,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -1706,7 +1706,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 399,
+  "duree_s": 389,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -2165,7 +2165,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 281,
+  "duree_s": 315,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -2526,7 +2526,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 147,
+  "duree_s": 146,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3053,7 +3053,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 217,
+  "duree_s": 230,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3415,11 +3415,11 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-12",
-  "duree_s": 115,
+  "duree_s": 100,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -3472,8 +3472,8 @@
    "total": 7
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 118,
+  "date": "2026-11-12",
+  "duree_s": 129,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3532,12 +3532,12 @@
    "total": 6
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 131,
+  "date": "2026-11-12",
+  "duree_s": 127,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/6",
    "après la solution : 6/6",
    "après clean et run : 0/6",
@@ -3593,7 +3593,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 449,
+  "duree_s": 482,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3895,7 +3895,7 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-12",
-  "duree_s": 86,
+  "duree_s": 95,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -4115,11 +4115,11 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-12",
-  "duree_s": 151,
+  "duree_s": 152,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -4235,7 +4235,7 @@
   },
   "cible": "k8s-kind.lab",
   "date": "2026-11-12",
-  "duree_s": 240,
+  "duree_s": 179,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
