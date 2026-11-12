@@ -3698,19 +3698,17 @@
  "k8s-changer-de-contexte": {
   "apres": {
    "echecs": [],
-   "passed": 5,
+   "passed": 3,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 5
+   "total": 3
   },
   "avant": {
    "echecs": [
+    "test_la_preuve_est_dans_kube_system_du_cluster_recette",
     "test_le_contexte_actif_est_recette",
-    "test_le_contexte_recette_est_fusionne_sans_ecraser_kind_boutique",
-    "test_le_kubeconfig_principal_n_est_lisible_que_par_son_proprietaire",
-    "test_le_kubeconfig_recu_est_range_et_protege",
     "test_le_namespace_par_defaut_de_recette_est_kube_system"
    ],
    "passed": 0,
@@ -3718,18 +3716,18 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 5
+   "total": 3
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 130,
+  "date": "2026-11-12",
+  "duree_s": 95,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.0, 40 objets hors kube-system",
-   "avant le travail : 0/5",
-   "après la solution : 5/5",
-   "après clean et run : 0/5",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-changer-de-contexte.log",
@@ -3737,10 +3735,8 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
+    "test_la_preuve_est_dans_kube_system_du_cluster_recette",
     "test_le_contexte_actif_est_recette",
-    "test_le_contexte_recette_est_fusionne_sans_ecraser_kind_boutique",
-    "test_le_kubeconfig_principal_n_est_lisible_que_par_son_proprietaire",
-    "test_le_kubeconfig_recu_est_range_et_protege",
     "test_le_namespace_par_defaut_de_recette_est_kube_system"
    ],
    "passed": 0,
@@ -3748,7 +3744,7 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 5
+   "total": 3
   },
   "verdict": "VALIDE"
  },
