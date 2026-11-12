@@ -74,13 +74,9 @@ son digest sans redémarrage (P02), la base à identité stable avec un volume p
 réplica (P05), la donnée du correcteur qui survit à son Pod (P06), et les
 volumes créés par la classe et gardés (P07).
 
-Quatre **indices payants** sont proposés, et chacun retire des points du barème
-avant le calcul de la note : 2, 3, 5 puis 5, soit 15 au plus. Sans indice, sept
-critères donnent 70. Dès le premier indice, sept critères ne suffisent plus
-(69) : il en faut huit. Avec les quatre, huit critères donnent 68, et il en faut
-neuf (76).
-
-Aucune procédure n'est donnée : les leçons du niveau 2 ont tout enseigné.
+Sept critères donnent 70, dont les cinq critiques. Aucune procédure n'est
+donnée, et l'épreuve ne propose **aucun indice** : les leçons du niveau 2 ont
+tout enseigné.
 
 ```bash
 dsoxlab check  k8s-epreuve-deployer-une-application

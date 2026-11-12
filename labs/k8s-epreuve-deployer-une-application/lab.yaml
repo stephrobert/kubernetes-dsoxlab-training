@@ -8,8 +8,8 @@
 #
 # `lab_type: challenge` comme l'épreuve du niveau 1 : capstone est réservé aux
 # certifications. Seuil 70 (D06). Cinq critères critiques, qu'aucune moyenne
-# ne compense : P01, P02, P05, P06 et P07. Quatre indices payants à 2, 3, 5 et
-# 5, en gradation réelle.
+# ne compense : P01, P02, P05, P06 et P07. Aucun indice (D36), comme l'épreuve
+# du niveau 1 : un seul ferait tomber les critères critiques réussis sous 70.
 #
 # Il tourne sur le cluster kind « multi » (un control plane, deux workers), le
 # même que le challenge du module Workloads avancés, dans le namespace magasin.
