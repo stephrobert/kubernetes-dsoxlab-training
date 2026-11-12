@@ -1,12 +1,14 @@
 ---
-# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
-# le scénario décrit, un Service qui ne dessert rien, et une politique qui
-# ferme tout.
+# Joué par `dsoxlab run`. Le lab reprend les gestes de la leçon « Pod
+# Networking » : lire les plages d'adresses, joindre un Pod d'un autre nœud,
+# réparer un nœud dont le réseau des Pods est tombé, distinguer un refus
+# immédiat d'un délai dépassé.
 #
-# Transposé de K8sExamLab. Ce lab attendait un CNI qui applique les
-# NetworkPolicy : sur Flannel, block-all n'aurait rien bloqué, et le dernier
-# test n'aurait rien prouvé. Calico depuis l'issue #3. Confronté à
-# Kubernetes 1.37 le 2026-09-15.
+# Sur le cluster kubeadm du catalogue, avec Calico. Mesuré le 2026-11-12 :
+# sans son fichier CNI, le worker passe NotReady en moins de 10 s (« cni plugin
+# not initialized »), un Pod qu'on y place reste en ContainerCreating, et Calico
+# ne réécrit PAS le fichier de lui-même. Supprimer le Pod calico-node du worker
+# le fait réécrire par son conteneur d'init : le nœud revient en 5 s.
 - name: Préparer le lab cka-troubleshoot-networking
   hosts: lab_target
   become: true
@@ -14,9 +16,53 @@
     - name: Installer le socle, le cluster kubeadm du catalogue
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
 
-    - name: Poser la situation du lab
+    - name: Poser le namespace, la sonde et les deux Services à diagnostiquer
       ansible.builtin.script: fixtures/prepare.sh
       args:
         executable: /bin/bash
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
+
+    - name: Mettre de côté le fichier CNI du worker
+      # Une copie de sauvegarde, que le cleanup remet en place si l'apprenant
+      # n'a pas réparé. Le fichier n'est jamais effacé sans elle.
+      ansible.builtin.copy:
+        src: /etc/cni/net.d/10-calico.conflist
+        dest: /root/dsoxlab-10-calico.conflist
+        remote_src: true
+        mode: "0600"
+        force: false
+      delegate_to: k8s-w1.lab
+
+    - name: Retirer le fichier CNI du worker
+      ansible.builtin.file:
+        path: /etc/cni/net.d/10-calico.conflist
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Attendre que le worker se déclare NotReady
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf wait node/k8s-w1.lab
+          --for=condition=Ready=false --timeout=120s
+      changed_when: false
+
+    - name: Placer le Pod cible sur le worker
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f - <<'YAML'
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: cible
+          namespace: reseau
+        spec:
+          nodeName: k8s-w1.lab
+          containers:
+            - name: web
+              image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+        YAML
+      args:
+        executable: /bin/bash
+      changed_when: true

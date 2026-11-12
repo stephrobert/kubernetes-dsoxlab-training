@@ -1,27 +1,32 @@
+# Lab guidé de la leçon « Pod Networking » (KUBERN-07-01), module Réseau et
+# exposition. Il reprend les gestes de la leçon, sur le cluster kubeadm du
+# catalogue (Calico) : lire les plages d'adresses, joindre un Pod d'un autre
+# nœud, réparer un nœud dont le réseau des Pods est tombé, distinguer un refus
+# immédiat d'un délai dépassé. Les NetworkPolicies ne s'y enseignent pas : elles
+# viennent quatre leçons plus loin.
 id: cka-troubleshoot-networking
-title: "Restore traffic to a Service"
+title: "Repair a node's Pod network and read what the network says"
 level: troubleshooting
 section: cka
-difficulty: advanced
+difficulty: intermediate
 description: |
-  A Service no longer serves its Pods: wrong selector, wrong port, and a
-  network policy that closes everything. Set the Service straight, reopen
-  exactly what is needed without removing the security policy, and prove that
-  a client reaches the Service by its name.
+  A worker lost its Pod network: the node is NotReady and a Pod stays in
+  ContainerCreating. Record the cluster's address ranges, repair the node, prove
+  that a Pod reaches a Pod on another node, and tell an immediate refusal from a
+  timeout.
 skills:
   - troubleshooting
-  - services
-  - endpoints
-  - networkpolicy
+  - cni
+  - pod-networking
+  - calico
 distros:
   - ubuntu24
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/#mettre-en-pratique
 lab_type: lab
-estimated_time: 15m
+estimated_time: 30m
 
 # Compétence du blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot
-# services and networking ». Le dernier test prouve que le trafic passe, ce
-# qui suppose un CNI qui applique les NetworkPolicy : Calico, issue #3.
+# clusters and nodes » et « Troubleshoot services and networking ».
 certification_tags:
   - cka
 
@@ -30,6 +35,12 @@ runtime:
   targets:
     - name: cp
       host: k8s-cp.lab
+      # La panne est posée sur le worker, et le lab l'interroge par l'API du
+      # cluster : `roles` est le champ que le contrat prévoit pour les hôtes
+      # utilisés simultanément. Sans lui, `dsoxlab start` ne provisionne pas
+      # ce nœud.
+      roles:
+        worker: k8s-w1.lab
   default: cp
 
 validation:
@@ -37,29 +48,40 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: endpoints
-    label: "web-svc has endpoints, the Pods of web-app"
+  - id: plages
+    label: "The cluster's Pod and Service ranges are recorded"
     tests:
-      - test_le_service_a_des_endpoints
+      - test_les_plages_du_cluster_sont_consignees
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: bon-port
-    label: "web-svc forwards to the port nginx listens on"
+  - id: adresse-cible
+    label: "The current address of the Pod cible is recorded"
     tests:
-      - test_le_service_vise_le_bon_port
+      - test_l_adresse_de_cible_est_consignee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: politique-web
-    label: "allow-web-ingress reopens port 80 of the web Pods, and block-all stays"
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: worker-ready
+    label: "The worker is Ready again"
     tests:
-      - test_la_politique_rouvre_le_web_sans_retirer_block_all
+      - test_le_worker_est_ready
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
-  - id: client-joint
-    label: "From the client Pod, http://web-svc/ answers"
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: cible-sur-le-worker
+    label: "cible runs on the worker"
     tests:
-      - test_le_client_joint_le_service
+      - test_cible_tourne_sur_le_worker
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: d-un-noeud-a-l-autre
+    label: "sonde, on the control plane, reaches cible on the worker"
+    tests:
+      - test_sonde_joint_cible_depuis_l_autre_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: refus-ou-delai
+    label: "The immediate refusal and the timeout are told apart"
+    tests:
+      - test_le_refus_et_le_delai_sont_distingues
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
 
