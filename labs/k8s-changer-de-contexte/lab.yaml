@@ -1,36 +1,32 @@
 # Lab guidé de la leçon « Kubeconfig et contextes » du module Fondamentaux de
-# la formation. Il reprend la démonstration de fusion : un kubeconfig reçu,
-# rangé et protégé, fusionné sans écraser le sien, son contexte renommé, puis
-# la bascule et le namespace par défaut.
+# la formation. Il porte sur le geste de base de la leçon : lister les
+# contextes, basculer, fixer le namespace par défaut, et constater où une
+# commande sans -n ni --context envoie ce qu'elle crée. La fusion de deux
+# kubeconfigs, devenue un approfondissement facultatif de la leçon, est faite
+# par la préparation à la place de l'apprenant.
 #
-# Le kubeconfig « reçu » est celui du cluster kind « lab », renommé
-# kind-recette : la leçon crée un second cluster pour l'occasion, ce lab
-# réutilise un cluster du catalogue pour ne pas en monter un de plus sur la VM.
-# Le kubeconfig de départ de l'apprenant vise le cluster « boutique ».
-#
-# Il complète le challenge du module sans le refaire : le challenge règle un
-# contexte existant et protège un fichier à part, ce lab fait fusionner,
-# renommer et basculer.
+# Le second cluster est le cluster kind « lab », nommé recette dans le
+# kubeconfig : la leçon en crée un pour l'occasion, ce lab réutilise un cluster
+# du catalogue pour ne pas en monter un de plus sur la VM.
 id: k8s-changer-de-contexte
-title: "Merge a kubeconfig and switch context"
+title: "Switch context and set the default namespace"
 level: kubernetes-fundamentals
 section: kcna
 difficulty: beginner
 description: |
-  A kubeconfig for a second cluster waits in ~/Downloads. Store it and restrict
-  it, merge it into your own kubeconfig without losing your current context,
-  rename its context to recette, make it the active context with kube-system as
-  its default namespace, and keep your kubeconfig readable by you alone.
+  Your kubeconfig already holds two contexts. Switch to recette, give it
+  kube-system as its default namespace, and prove it with a ConfigMap created
+  without naming any context or namespace, which must land in the right place.
 skills:
   - kubeconfig
   - kubectl-config
   - contexts
-  - file-permissions
+  - namespaces
 distros:
   - debian13
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique
 lab_type: lab
-estimated_time: 20m
+estimated_time: 15m
 
 certification_tags:
   - kcna
@@ -47,20 +43,8 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: le-kubeconfig-recu-est-range
-    label: "The received kubeconfig is stored in ~/.kube/configs/recette.yaml, readable by its owner only, and gone from ~/Downloads"
-    tests:
-      - test_le_kubeconfig_recu_est_range_et_protege
-    lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
-  - id: le-contexte-recette-est-fusionne
-    label: "~/.kube/config holds the recette context, pointing at the received cluster, next to kind-boutique"
-    tests:
-      - test_le_contexte_recette_est_fusionne_sans_ecraser_kind_boutique
-    lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
   - id: le-contexte-actif-est-recette
-    label: "The active context is recette"
+    label: "The active context is recette, pointing at the recette cluster"
     tests:
       - test_le_contexte_actif_est_recette
     lessons:
@@ -71,9 +55,9 @@ criteria:
       - test_le_namespace_par_defaut_de_recette_est_kube_system
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
-  - id: le-kubeconfig-est-protege
-    label: "~/.kube/config is readable by its owner only"
+  - id: la-preuve-est-au-bon-endroit
+    label: "The ConfigMap preuve, created without -n nor --context, is in kube-system of the recette cluster only"
     tests:
-      - test_le_kubeconfig_principal_n_est_lisible_que_par_son_proprietaire
+      - test_la_preuve_est_dans_kube_system_du_cluster_recette
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
