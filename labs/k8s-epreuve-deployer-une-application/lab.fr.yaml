@@ -12,7 +12,7 @@ criteria:
   - id: p02-vitrine-disponible
     label: "P02 (critique) : la vitrine a tous ses réplicas disponibles sur l'image par digest, et aucun Pod de l'espace magasin n'a redémarré"
   - id: p03-ressources-et-sondes
-    label: "P03 : chaque conteneur de la vitrine est budgété, et les trois sondes sont sur son port"
+    label: "P03 : chaque conteneur de la vitrine, étape de préparation et compagnon compris, est budgété, et les trois sondes sont sur son port"
   - id: p04-init-et-sidecar
     label: "P04 : une étape de préparation se termine, et un compagnon prêt avant le serveur, actif à côté de lui toute la vie du Pod, relaie les lignes du volume partagé"
   - id: p05-identite-stable

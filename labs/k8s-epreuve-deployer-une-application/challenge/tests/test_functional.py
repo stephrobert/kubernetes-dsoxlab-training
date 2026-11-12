@@ -99,7 +99,25 @@ def _pods(host, selecteur: dict) -> list[dict]:
             if not p["metadata"].get("deletionTimestamp")]
 
 
+def _nom_exact(host, sorte: str, nom: str, en: str, fr: str) -> None:
+    """Échoue si l'objet n'existe pas sous son nom exact, en citant les noms
+    approchants : un overlay avec namePrefix rend prod-vitrine, pas vitrine."""
+    if host.run(f"{ADMIN} -n {NS} get {sorte} {nom}").rc == 0:
+        return
+    approchants = sorted(o["metadata"]["name"] for o in (_json(host, f"-n {NS} get {sorte}") or {}).get("items", [])
+                         if nom in o["metadata"]["name"])
+    pytest.fail(message(
+        en=f"{en} Found under a close name: {approchants}; the requirements ask for exactly {nom}, "
+        "with no prefix or suffix." if approchants else en,
+        fr=f"{fr} Trouvé sous un nom approchant : {approchants} ; le cahier des charges demande exactement "
+        f"{nom}, sans préfixe ni suffixe." if approchants else fr,
+    ))
+
+
 def _vitrine(host) -> dict:
+    _nom_exact(host, "deployment", VITRINE,
+               en=f"Nothing in {NS} keeps {VITRINE} running with interchangeable copies.",
+               fr=f"Rien dans {NS} ne fait tourner {VITRINE} en exemplaires interchangeables.")
     d = _attendre(host, f"-n {NS} get deployment {VITRINE}", _deploiement_pret)
     if d is None:
         pytest.fail(message(
@@ -330,6 +348,9 @@ def test_p07_volumes_crees_par_la_classe_en_retain(host):
 # P08. Sauvegarde planifiée, et un lancement à la main terminé qui a écrit.
 # ----------------------------------------------------------------------
 def test_p08_sauvegarde_planifiee_et_lancee_a_la_main(host):
+    _nom_exact(host, "cronjob", SAUVEGARDE,
+               en=f"No scheduled task named {SAUVEGARDE} in {NS}.",
+               fr=f"Aucune tâche planifiée nommée {SAUVEGARDE} dans {NS}.")
     cj = _json(host, f"-n {NS} get cronjob {SAUVEGARDE}")
     assert cj is not None and _planification(cj["spec"].get("schedule")) == _planification(PLANNING), message(
         en=f"{SAUVEGARDE} is not scheduled every day at 2:30 (found: {(cj or {}).get('spec', {}).get('schedule')!r}).",
@@ -367,6 +388,9 @@ def test_p09_agent_sur_chaque_noeud_taint_garde(host):
     noeuds = (_json(host, "get nodes") or {}).get("items", [])
     plans = [n for n in noeuds if TAINT in (n["metadata"].get("labels") or {})]
     teinte = all(any(t.get("key") == TAINT for t in n["spec"].get("taints") or []) for n in plans)
+    _nom_exact(host, "daemonset", AGENT,
+               en=f"No agent named {AGENT} in {NS}.",
+               fr=f"Aucun agent nommé {AGENT} dans {NS}.")
     ds = _attendre(host, f"-n {NS} get daemonset {AGENT}", _ds_pret)
     prets = set()
     if ds is not None:

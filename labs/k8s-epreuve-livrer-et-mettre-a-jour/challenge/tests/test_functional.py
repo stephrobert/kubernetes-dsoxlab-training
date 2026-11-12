@@ -327,16 +327,21 @@ def test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant(host):
         fr="~/epreuve/cause-stock.txt est absent : la cause de la panne se consigne avant la "
         "réparation.",
     )
-    # Un diagnostic se juge sur le fond : il nomme ce que stock cherche (la clé
-    # SEUIL) et dit que cela manque, que ce soit par l'état affiché par
-    # Kubernetes ou par une phrase.
+    # Un diagnostic se juge sur le fond : il nomme ce que stock cherche (le
+    # seuil, la clé SEUIL ou la variable STOCK_SEUIL) et dit que cela manque. La
+    # raison d'attente seule (CreateContainerConfigError) ne nomme rien.
     lue = _compact(cause.content_string)
+    nomme = "seuil" in lue
     dit_le_manque = any(m in lue for m in DIT_LE_MANQUE)
-    assert "seuil" in lue and dit_le_manque, message(
-        en="cause-stock.txt must say what the stock container looks for without finding it, and "
-        "that it is missing: the waiting reason Kubernetes shows, or a sentence that says it.",
-        fr="cause-stock.txt doit dire ce que le conteneur de stock cherche sans le trouver, et que "
-        "cela manque : la raison d'attente qu'affiche Kubernetes, ou une phrase qui le dit.",
+    manque_en = [] if nomme else ["what is missing (the threshold, its key or its variable)"]
+    manque_en += [] if dit_le_manque else ["that it is missing"]
+    manque_fr = [] if nomme else ["ce qui manque (le seuil, sa clé ou sa variable)"]
+    manque_fr += [] if dit_le_manque else ["que cela manque"]
+    assert nomme and dit_le_manque, message(
+        en=f"cause-stock.txt does not say {' nor '.join(manque_en)}. The waiting reason Kubernetes "
+        "shows is not enough on its own: it says that the start fails, not what is missing.",
+        fr=f"cause-stock.txt ne dit pas {' ni '.join(manque_fr)}. La raison d'attente qu'affiche "
+        "Kubernetes, seule, ne suffit pas : elle dit que le démarrage échoue, pas ce qui manque.",
     )
     dep = _json(host, ENTREPOT, "get deployment stock")
     assert dep is not None, message(
