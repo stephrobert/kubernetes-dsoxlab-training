@@ -207,6 +207,9 @@ sections:
       # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
       # puisqu'il ne dit plus quel est le sujet de la panne.
       - cka-capstone-portail
+      # L'examen blanc chronométré, au format et aux poids de la CKA : il vient
+      # après le capstone, quand tout le parcours a été joué.
+      - cka-examen-blanc
 
   - id: ckad
     title: "CKAD, Certified Kubernetes Application Developer"

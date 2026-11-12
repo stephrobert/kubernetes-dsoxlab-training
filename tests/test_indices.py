@@ -64,6 +64,8 @@ def test_le_catalogue_a_des_indices() -> None:
 SANS_INDICE = {
     "k8s-epreuve-livrer-et-mettre-a-jour": "D36, épreuve du niveau 1 sans indice",
     "k8s-epreuve-deployer-une-application": "D36, épreuve du niveau 2 sans indice",
+    "cka-examen-blanc": "examen blanc CKA sans indice, décision du 2026-11-12",
+    "ckad-examen-blanc": "examen blanc CKAD sans indice, décision du 2026-11-12",
 }
 
 
