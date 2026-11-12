@@ -185,33 +185,56 @@
  },
  "cka-gateway-api-httproute": {
   "apres": {
-   "passed": 2,
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
    "score": 100,
-   "total": 2
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
   },
   "avant": {
+   "echecs": [
+    "test_la_gateway_est_programmee",
+    "test_le_chemin_api_atteint_svc_api",
+    "test_le_chemin_web_atteint_svc_web",
+    "test_un_chemin_non_declare_n_atteint_aucune_application"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 543,
+  "date": "2026-11-12",
+  "duree_s": 237,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.1, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-gateway-api-httproute.log",
-  "kubernetes": "v1.37.1",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_la_gateway_est_programmee",
+    "test_le_chemin_api_atteint_svc_api",
+    "test_le_chemin_web_atteint_svc_web",
+    "test_un_chemin_non_declare_n_atteint_aucune_application"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -249,33 +272,56 @@
  },
  "cka-ingress-path-routing": {
   "apres": {
-   "passed": 2,
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
    "score": 100,
-   "total": 2
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
   },
   "avant": {
+   "echecs": [
+    "test_le_chemin_api_atteint_svc_api",
+    "test_le_chemin_web_atteint_svc_web",
+    "test_un_chemin_non_declare_n_atteint_aucune_application",
+    "test_une_regle_de_routage_existe_pour_l_hote"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 278,
+  "date": "2026-11-12",
+  "duree_s": 214,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.1, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-ingress-path-routing.log",
-  "kubernetes": "v1.37.1",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_le_chemin_api_atteint_svc_api",
+    "test_le_chemin_web_atteint_svc_web",
+    "test_un_chemin_non_declare_n_atteint_aucune_application",
+    "test_une_regle_de_routage_existe_pour_l_hote"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -364,33 +410,64 @@
  },
  "cka-networkpolicy-isolate-db": {
   "apres": {
-   "passed": 4,
+   "echecs": [],
+   "passed": 8,
+   "recorded": true,
    "score": 100,
-   "total": 4
+   "skipped": 0,
+   "status": "passed",
+   "total": 8
   },
   "avant": {
+   "echecs": [
+    "test_l_intrus_d_un_autre_namespace_est_bloque",
+    "test_la_base_peut_toujours_sortir",
+    "test_la_politique_controle_l_entree",
+    "test_la_politique_laisse_entrer_le_backend_du_meme_namespace",
+    "test_la_politique_n_ouvre_que_le_port_5432_en_tcp",
+    "test_la_politique_s_applique_a_la_base",
+    "test_le_backend_atteint_toujours_la_base",
+    "test_le_frontend_est_bloque"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 194,
+  "date": "2026-11-12",
+  "duree_s": 273,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/8",
+   "après la solution : 8/8",
+   "après clean et run : 0/8",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-networkpolicy-isolate-db.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_l_intrus_d_un_autre_namespace_est_bloque",
+    "test_la_base_peut_toujours_sortir",
+    "test_la_politique_controle_l_entree",
+    "test_la_politique_laisse_entrer_le_backend_du_meme_namespace",
+    "test_la_politique_n_ouvre_que_le_port_5432_en_tcp",
+    "test_la_politique_s_applique_a_la_base",
+    "test_le_backend_atteint_toujours_la_base",
+    "test_le_frontend_est_bloque"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
   },
   "verdict": "VALIDE"
  },
@@ -536,8 +613,8 @@
    "total": 11
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-11",
-  "duree_s": 167,
+  "date": "2026-11-12",
+  "duree_s": 164,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -754,18 +831,19 @@
  "cka-storageclass-provisionnement-dynamique": {
   "apres": {
    "echecs": [],
-   "passed": 5,
+   "passed": 6,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 5
+   "total": 6
   },
   "avant": {
    "echecs": [
-    "test_la_revendication_designe_la_classe_local_path",
+    "test_la_classe_garde_reprend_le_provisionneur_de_local_path",
+    "test_la_revendication_designe_la_classe_garde",
+    "test_le_volume_garde_ses_donnees_apres_la_revendication",
     "test_le_volume_lie_a_ete_cree_pour_elle",
-    "test_le_volume_porte_la_reclaim_policy_de_la_classe",
     "test_registre_a_ecrit_le_temoin",
     "test_registre_monte_la_revendication_sur_data"
    ],
@@ -774,18 +852,18 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 5
+   "total": 6
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-11",
-  "duree_s": 205,
+  "date": "2026-11-12",
+  "duree_s": 198,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.2, 12 objets hors kube-system",
-   "avant le travail : 0/5",
-   "après la solution : 5/5",
-   "après clean et run : 0/5",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-storageclass-provisionnement-dynamique.log",
@@ -793,9 +871,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_la_revendication_designe_la_classe_local_path",
+    "test_la_classe_garde_reprend_le_provisionneur_de_local_path",
+    "test_la_revendication_designe_la_classe_garde",
+    "test_le_volume_garde_ses_donnees_apres_la_revendication",
     "test_le_volume_lie_a_ete_cree_pour_elle",
-    "test_le_volume_porte_la_reclaim_policy_de_la_classe",
     "test_registre_a_ecrit_le_temoin",
     "test_registre_monte_la_revendication_sur_data"
    ],
@@ -804,7 +883,7 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 5
+   "total": 6
   },
   "verdict": "VALIDE"
  },
@@ -950,32 +1029,53 @@
  },
  "cka-troubleshoot-dns": {
   "apres": {
+   "echecs": [],
    "passed": 3,
+   "recorded": true,
    "score": 100,
+   "skipped": 0,
+   "status": "passed",
    "total": 3
   },
   "avant": {
+   "echecs": [
+    "test_coredns_tourne_comme_kubeadm_le_pose",
+    "test_le_client_joint_le_service_en_http",
+    "test_le_client_resout_le_service"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 191,
+  "date": "2026-11-12",
+  "duree_s": 270,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-dns.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_coredns_tourne_comme_kubeadm_le_pose",
+    "test_le_client_joint_le_service_en_http",
+    "test_le_client_resout_le_service"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 3
   },
   "verdict": "VALIDE"
@@ -1069,32 +1169,55 @@
  },
  "cka-troubleshoot-networking": {
   "apres": {
+   "echecs": [],
    "passed": 4,
+   "recorded": true,
    "score": 100,
+   "skipped": 0,
+   "status": "passed",
    "total": 4
   },
   "avant": {
+   "echecs": [
+    "test_la_politique_rouvre_le_web_sans_retirer_block_all",
+    "test_le_client_joint_le_service",
+    "test_le_service_a_des_endpoints",
+    "test_le_service_vise_le_bon_port"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 183,
+  "date": "2026-11-12",
+  "duree_s": 257,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-networking.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_la_politique_rouvre_le_web_sans_retirer_block_all",
+    "test_le_client_joint_le_service",
+    "test_le_service_a_des_endpoints",
+    "test_le_service_vise_le_bon_port"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
+   "skipped": 0,
+   "status": "failed",
    "total": 4
   },
   "verdict": "VALIDE"
@@ -1773,33 +1896,60 @@
  },
  "ckad-networkpolicy-ingress-egress": {
   "apres": {
-   "passed": 4,
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
    "score": 100,
-   "total": 4
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
   },
   "avant": {
+   "echecs": [
+    "test_backend_policy_vise_le_backend_dans_les_deux_sens",
+    "test_database_policy_vise_la_base_dans_les_deux_sens",
+    "test_la_base_ne_sort_pas",
+    "test_la_base_refuse_l_intrus",
+    "test_le_backend_joint_la_base_et_resout_des_noms",
+    "test_le_backend_n_accepte_que_le_frontend"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-09-16",
-  "duree_s": 210,
+  "date": "2026-11-12",
+  "duree_s": 281,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckad-networkpolicy-ingress-egress.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_backend_policy_vise_le_backend_dans_les_deux_sens",
+    "test_database_policy_vise_la_base_dans_les_deux_sens",
+    "test_la_base_ne_sort_pas",
+    "test_la_base_refuse_l_intrus",
+    "test_le_backend_joint_la_base_et_resout_des_noms",
+    "test_le_backend_n_accepte_que_le_frontend"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 4
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
@@ -2537,33 +2687,56 @@
  },
  "cks-ingress-tls": {
   "apres": {
-   "passed": 2,
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
    "score": 100,
-   "total": 2
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
   },
   "avant": {
+   "echecs": [
+    "test_l_ingress_declare_le_tls_de_l_hote_avec_ce_secret",
+    "test_le_certificat_est_depose_dans_un_secret_tls",
+    "test_le_serveur_presente_un_certificat_qui_nomme_l_hote",
+    "test_le_site_repond_en_https_verifie"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-10-12",
-  "duree_s": 278,
+  "date": "2026-11-12",
+  "duree_s": 212,
   "ecarts": [],
   "etapes": [
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-ingress-tls.log",
-  "kubernetes": "v1.37.0",
+  "kubernetes": "v1.37.2",
   "raisons": [],
   "rejeu": {
+   "echecs": [
+    "test_l_ingress_declare_le_tls_de_l_hote_avec_ce_secret",
+    "test_le_certificat_est_depose_dans_un_secret_tls",
+    "test_le_serveur_presente_un_certificat_qui_nomme_l_hote",
+    "test_le_site_repond_en_https_verifie"
+   ],
    "passed": 0,
+   "recorded": true,
    "score": 0,
-   "total": 2
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -3025,6 +3198,67 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-exposer-et-isoler": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_chemin_atteint_son_application",
+    "test_la_base_ne_sort_que_vers_le_dns",
+    "test_la_route_vitrine_est_prise_en_charge",
+    "test_le_service_ancien_atteint_ses_pods_sur_le_bon_port",
+    "test_seul_le_backend_joint_la_base",
+    "test_sonde_resout_et_joint_catalogue",
+    "test_un_refus_par_defaut_vise_la_base"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-12",
+  "duree_s": 463,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-exposer-et-isoler.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_chemin_atteint_son_application",
+    "test_la_base_ne_sort_que_vers_le_dns",
+    "test_la_route_vitrine_est_prise_en_charge",
+    "test_le_service_ancien_atteint_ses_pods_sur_le_bon_port",
+    "test_seul_le_backend_joint_la_base",
+    "test_sonde_resout_et_joint_catalogue",
+    "test_un_refus_par_defaut_vise_la_base"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
   },
   "verdict": "VALIDE"
  },
