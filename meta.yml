@@ -243,6 +243,9 @@ sections:
       # il ne s'adresse qu'à qui a déjà joué les dix-sept précédents, puisqu'il
       # ne dit plus quel objet employer.
       - ckad-capstone-boutique
+      # L'examen blanc chronométré, au format et aux poids de la CKAD : il vient
+      # après le capstone, quand tout le parcours a été joué.
+      - ckad-examen-blanc
       # Sert le module Fondamentaux de la formation, sur un cluster kind : le
       # lab de la leçon « Lire l'état du cluster ». Le challenge du module est
       # rangé en kcna depuis le 2026-11-10.
