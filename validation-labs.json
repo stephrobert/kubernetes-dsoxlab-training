@@ -609,7 +609,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 243,
+  "duree_s": 238,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -1229,37 +1229,39 @@
  "cka-troubleshoot-networking": {
   "apres": {
    "echecs": [],
-   "passed": 4,
+   "passed": 6,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 4
+   "total": 6
   },
   "avant": {
    "echecs": [
-    "test_la_politique_rouvre_le_web_sans_retirer_block_all",
-    "test_le_client_joint_le_service",
-    "test_le_service_a_des_endpoints",
-    "test_le_service_vise_le_bon_port"
+    "test_cible_tourne_sur_le_worker",
+    "test_l_adresse_de_cible_est_consignee",
+    "test_le_refus_et_le_delai_sont_distingues",
+    "test_le_worker_est_ready",
+    "test_les_plages_du_cluster_sont_consignees",
+    "test_sonde_joint_cible_depuis_l_autre_noeud"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 6
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 257,
+  "duree_s": 308,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.2, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-troubleshoot-networking.log",
@@ -1267,17 +1269,19 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_la_politique_rouvre_le_web_sans_retirer_block_all",
-    "test_le_client_joint_le_service",
-    "test_le_service_a_des_endpoints",
-    "test_le_service_vise_le_bon_port"
+    "test_cible_tourne_sur_le_worker",
+    "test_l_adresse_de_cible_est_consignee",
+    "test_le_refus_et_le_delai_sont_distingues",
+    "test_le_worker_est_ready",
+    "test_les_plages_du_cluster_sont_consignees",
+    "test_sonde_joint_cible_depuis_l_autre_noeud"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 6
   },
   "verdict": "VALIDE"
  },
