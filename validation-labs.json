@@ -209,7 +209,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 237,
+  "duree_s": 249,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -296,7 +296,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 214,
+  "duree_s": 202,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -578,6 +578,65 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-operateur-installer-et-configurer": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_l_operateur_est_disponible_sur_son_image_epinglee",
+    "test_la_crd_mongodbcommunity_est_etablie",
+    "test_le_statefulset_et_le_service_appartiennent_a_registre",
+    "test_mongod_demarre_avec_un_seuil_de_250_ms",
+    "test_mongod_tourne_sur_le_serveur_epingle",
+    "test_registre_est_running"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-12",
+  "duree_s": 243,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-operateur-installer-et-configurer.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_operateur_est_disponible_sur_son_image_epinglee",
+    "test_la_crd_mongodbcommunity_est_etablie",
+    "test_le_statefulset_et_le_service_appartiennent_a_registre",
+    "test_mongod_demarre_avec_un_seuil_de_250_ms",
+    "test_mongod_tourne_sur_le_serveur_epingle",
+    "test_registre_est_running"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
@@ -2711,7 +2770,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 212,
+  "duree_s": 217,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3230,7 +3289,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-12",
-  "duree_s": 463,
+  "duree_s": 449,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
