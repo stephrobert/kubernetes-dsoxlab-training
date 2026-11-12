@@ -10,7 +10,26 @@
   hosts: lab_target
   become: true
   tasks:
+    - name: Relever l'empreinte des Pods statiques avant la restauration
+      # Le kubelet recrée un Pod statique dont le manifeste change, mais pas
+      # tout de suite : juste après la copie, le Pod miroir montre encore
+      # l'ancien conteneur Running. Attendre « rien en Pending » passait alors
+      # aussitôt, puis le Pod repassait Pending (mesuré le 2026-11-12). On
+      # attend donc que son empreinte change.
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pod {{ item }}-{{ inventory_hostname }}
+        -o jsonpath={.metadata.annotations.kubernetes\\.io/config\\.hash}
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      register: empreintes_avant
+      changed_when: false
+      failed_when: false
+
     - name: Restaurer les manifestes du control plane
+      register: restauration
       ansible.builtin.copy:
         src: "/var/backups/{{ item }}.avant-cis.yaml"
         dest: "/etc/kubernetes/manifests/{{ item }}.yaml"
@@ -28,6 +47,25 @@
       register: sante
       until: sante.rc == 0
       retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que chaque Pod statique restauré ait changé d'empreinte et soit prêt
+      ansible.builtin.shell: |
+        set -o pipefail
+        K="kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system"
+        pod="{{ item.0.item }}-{{ inventory_hostname }}"
+        empreinte=$($K get pod "$pod" -o jsonpath='{.metadata.annotations.kubernetes\.io/config\.hash}')
+        pret=$($K get pod "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+        [ -n "$empreinte" ] && [ "$empreinte" != "{{ item.0.stdout }}" ] && [ "$pret" = "True" ]
+      args:
+        executable: /bin/bash
+      loop: "{{ empreintes_avant.results | zip(restauration.results) | list }}"
+      when: item.1.changed
+      register: recree
+      until: recree.rc == 0
+      retries: 60
       delay: 3
       changed_when: false
       failed_when: false

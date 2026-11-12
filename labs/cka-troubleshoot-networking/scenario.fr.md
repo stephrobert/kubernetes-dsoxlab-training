@@ -1,45 +1,62 @@
-# Rétablir le trafic vers un Service
+# Réparer le réseau des Pods d'un nœud et lire ce que dit le réseau
 
 ## La situation
 
-Dans le namespace **`lab`**, le Deployment **`web-app`** tourne en deux
-replicas, et chacun de ses Pods répond sur son port 80. Le Service
-**`web-svc`** doit les desservir, et pourtant rien ne passe : le Pod
-**`client`** du même namespace, qui l'interroge par son nom, n'obtient rien.
+Sur le cluster kubeadm du catalogue, le worker **`k8s-w1.lab`** est passé
+**NotReady** pendant la nuit. Le Pod **`cible`**, un nginx placé sur lui dans le
+namespace **`reseau`**, reste en **`ContainerCreating`**. Sur le control plane,
+le Pod **`sonde`** attend de pouvoir le joindre.
 
-Deux choses se sont produites depuis la dernière fois où ça marchait. Un
-collègue a « refait le Service ». Et l'équipe sécurité a posé une politique
-réseau **`block-all`**, qui ferme tout le trafic entrant du namespace. Cette
-politique est **voulue** : elle reste. À vous de rouvrir exactement ce qu'il
-faut, et rien de plus.
+Deux Services du même namespace, **`stock`** et **`archives`**, ne répondent
+pas non plus, mais chacun échoue à sa façon. L'équipe veut savoir lequel refuse
+et lequel fait attendre.
+
+Le CNI du cluster est **Calico**. Le répertoire **`~/reseau/`** est vide.
 
 ## Ce que vous devez obtenir
 
-1. `web-svc` a des **endpoints**, et ce sont les Pods de `web-app`.
+1. Dans **`~/reseau/plages.txt`**, une ligne **`pods: <plage>`** et une ligne
+   **`services: <plage>`** : les plages d'adresses des Pods et des Services du
+   **cluster entier**, telles que sa configuration les déclare.
 
-2. `web-svc` transmet le trafic sur le **port où nginx écoute**.
+2. Dans le même fichier, une ligne **`cible: <adresse>`** : l'adresse actuelle du
+   Pod `cible`.
 
-3. Une NetworkPolicy **`allow-web-ingress`** autorise le trafic entrant vers
-   les Pods **`app=web`** sur le **port 80**, depuis n'importe quelle source.
-   `block-all` est toujours là.
+3. Le worker **`k8s-w1.lab`** est de nouveau **Ready**.
 
-4. Depuis le Pod `client`, `http://web-svc/` **répond**.
+4. Le Pod **`cible`** tourne, **sur le worker**.
+
+5. Le Pod **`sonde`**, sur le control plane, **joint `cible` par son adresse**,
+   d'un nœud à l'autre.
+
+6. Dans **`~/reseau/verdicts.txt`**, une ligne **`stock: refus`** ou
+   **`stock: delai`**, et une ligne pour **`archives`** de la même forme : ce que
+   fait réellement chacun des deux Services.
 
 ## Les repères utiles
 
-Un Service n'est qu'un selector et des ports. Un Service sans endpoint, c'est
-un selector qui ne correspond aux labels d'aucun Pod. Des endpoints mais
-rien qui passe, c'est souvent un port. Tout est bon et toujours rien : une
-politique bloque.
+Un nœud NotReady donne sa raison dans ses conditions. Un Pod bloqué en
+`ContainerCreating` la donne dans ses événements. Les deux renvoient ici au même
+endroit : la configuration CNI du nœud, sous `/etc/cni/net.d/`, sur le worker.
 
-Les NetworkPolicy s'additionnent : une politique qui ferme tout et une autre
-qui ouvre un port précis donnent un port ouvert. Rien n'oblige à retirer la
-première.
+Ce fichier n'est pas écrit à la main : c'est le Pod du CNI, présent sur chaque
+nœud, qui le pose à son démarrage. Un Pod d'un DaemonSet se recrée tout seul
+quand on le supprime.
+
+Avec Calico, le podCIDR inscrit sur un nœud ne dit **pas** d'où viennent les
+adresses de ses Pods : Calico les tire de petits blocs du pool du cluster. La
+plage qui compte est celle du cluster.
+
+Une connexion refusée échoue **tout de suite**. Une connexion vers une adresse
+qui ne répond pas **attend** jusqu'au délai fixé. Chronométrer une requête
+suffit à les distinguer.
 
 ## Comment vous saurez que c'est bon
 
-Les tests lisent les endpoints du Service, ses ports, les deux politiques, et
-ils font réellement une requête depuis le Pod `client`.
+Chaque test vérifie un des six états ci-dessus. Le quatrième exige `cible` sur
+le worker : le déplacer sur le control plane contournerait la panne sans la
+réparer. Le sixième compare à un tirage au sort fait par la préparation : le bon
+verdict ne se devine pas.
 
 ```bash
 dsoxlab check cka-troubleshoot-networking

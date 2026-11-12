@@ -71,9 +71,9 @@ def _pod_pret(host) -> dict:
     pytest.fail(
         message(
         en=f"{POD} is in phase {pod['status'].get('phase')!r} after 90 s. If it is Pending, "
-        "kubectl describe pod says whether the claim is bound, and if not why.",
+        "the events of the Pod say whether the claim is bound, and if not why.",
         fr=f"{POD} est en phase {pod['status'].get('phase')!r} après 90 s. S'il est Pending, "
-        "kubectl describe pod dit si la réclamation est liée, et sinon pourquoi.",
+        "les events du Pod disent si la réclamation est liée, et sinon pourquoi.",
     )
     )
 

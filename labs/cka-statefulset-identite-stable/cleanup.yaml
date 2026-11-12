@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace identites, puis les volumes que
+# ses revendications avaient obtenus. Leur classe est en reclaimPolicy Delete,
+# mais le provisionneur les retire après coup : on attend qu'ils soient partis,
+# sinon la photographie du validateur les verrait encore. Le cluster « lab »
+# reste.
+- name: Nettoyer le lab cka-statefulset-identite-stable
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/lab.kubeconfig
+  tasks:
+    - name: Supprimer le namespace identites
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace identites
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les volumes qui revendiquaient dans identites
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get pv -o jsonpath='{range .items[?(@.spec.claimRef.namespace=="identites")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r {{ kubectl }} delete pv --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false

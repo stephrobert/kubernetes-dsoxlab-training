@@ -1,5 +1,20 @@
-title: "Obtenir un volume sans qu'un administrateur l'ait créé, et voir ce qu'il devient"
+title: "Créer sa StorageClass et obtenir un volume qu'aucun administrateur n'a créé"
 description: |
   Une revendication bloquée en attente parce que personne n'a préparé de volume
-  à la main. Laissez le cluster le provisionner à la demande, puis observez ce
-  que la classe décide quand la revendication disparaît : le volume la suit.
+  à la main. Créez une StorageClass qui reprend le provisionneur déjà installé
+  et garde ses volumes, laissez le cluster en provisionner un à la demande par
+  elle, et écrivez dedans depuis un Pod.
+
+criteria:
+  - id: classe-creee
+    label: "La classe garde reprend le provisionneur de local-path, garde ses volumes et retarde la liaison"
+  - id: designe-la-classe
+    label: "La revendication donnees désigne la classe garde"
+  - id: volume-cree-pour-elle
+    label: "Le volume lié à donnees a été créé pour elle par le provisionneur de la classe"
+  - id: politique-de-la-classe
+    label: "Le volume porte Retain, la reclaim policy que garde lui impose"
+  - id: registre-monte
+    label: "Le Pod registre monte la revendication sur /data"
+  - id: temoin-ecrit
+    label: "Le Pod registre a écrit le fichier témoin dans le volume"

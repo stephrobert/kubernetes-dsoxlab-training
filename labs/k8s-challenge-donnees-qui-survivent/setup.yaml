@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab, avec le
+# cluster « lab » et le kubeconfig de l'apprenant, puis pose le namespace
+# archives et la revendication journal-ancien restée Pending.
+#
+# kind_event_ttl à 24h : la cause du Pending se lit dans un événement, et la
+# preuve que le fichier témoin a survécu à son Pod aussi. Avec la durée de vie
+# par défaut (1h), les deux disparaîtraient pendant que l'apprenant travaille.
+- name: Préparer le challenge k8s-challenge-donnees-qui-survivent
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_event_ttl: 24h
+
+    - name: Poser le namespace archives et la revendication Pending
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

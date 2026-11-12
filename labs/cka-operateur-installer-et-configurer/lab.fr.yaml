@@ -1,0 +1,19 @@
+title: "Installer un opérateur et configurer ce qu'il fait tourner"
+description: |
+  Installez l'opérateur MongoDB par ses manifestes versionnés, images épinglées,
+  confiez-lui un replica set à un membre, puis changez un réglage de mongod en
+  ne modifiant que la ressource, et vérifiez que l'opérateur l'a appliqué.
+
+criteria:
+  - id: crd-etablie
+    label: "La CRD MongoDBCommunity est établie"
+  - id: operateur-disponible
+    label: "L'opérateur est disponible, sur son image épinglée par digest"
+  - id: ressource-running
+    label: "La ressource registre est en phase Running"
+  - id: objets-possedes
+    label: "Le StatefulSet et le Service appartiennent à registre"
+  - id: serveur-epingle
+    label: "mongod tourne sur l'image du serveur épinglée par digest"
+  - id: reglage-applique
+    label: "mongod démarre avec le seuil de 250 ms posé par la ressource"

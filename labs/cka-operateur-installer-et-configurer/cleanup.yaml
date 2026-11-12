@@ -1,0 +1,79 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace mongodb (la ressource, le
+# replica set, ses revendications, et ce que l'opérateur crée lui-même au
+# démarrage), puis tout ce que les deux manifestes posent hors namespace, nommé
+# un par un pour ne pas dépendre du réseau, et enfin le stockage.
+- name: Nettoyer le lab cka-operateur-installer-et-configurer
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer la ressource avant l'opérateur
+      # L'opérateur, encore en vie, retire proprement ce qu'il a créé.
+      ansible.builtin.command: >-
+        {{ kubectl }} -n mongodb delete mongodbcommunity --all
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace mongodb
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace mongodb
+        --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la configuration de webhook que l'opérateur pose
+      ansible.builtin.command: >-
+        {{ kubectl }} delete validatingwebhookconfiguration
+        mdbpolicy.mongodb.com mdbmultipolicy.mongodb.com --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les droits de cluster de l'opérateur
+      ansible.builtin.shell: |
+        {{ kubectl }} delete clusterrolebinding --ignore-not-found \
+          mongodb-kubernetes-operator-mongodb-cluster-mongodb-role-binding \
+          mongodb-kubernetes-operator-mongodb-cluster-telemetry-binding \
+          mongodb-kubernetes-operator-mongodb-webhook-crb
+        {{ kubectl }} delete clusterrole --ignore-not-found \
+          mongodb-kubernetes-operator-mongodb-cluster-mongodb-role \
+          mongodb-kubernetes-operator-cluster-telemetry \
+          mongodb-kubernetes-operator-mongodb-webhook-cr
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les CRD de l'opérateur
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd --ignore-not-found --wait=true --timeout=120s
+        mongodbcommunity.mongodbcommunity.mongodb.com
+        mongodb.mongodb.com mongodbmulticluster.mongodb.com
+        mongodbusers.mongodb.com mongodbsearch.mongodb.com
+        opsmanagers.mongodb.com clustermongodbroles.mongodb.com
+        voyageais.ai.mongodb.com
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le provisionneur de stockage
+      ansible.builtin.command:
+        cmd: >-
+          {{ kubectl }} delete -f /var/lib/dsoxlab/local-path-storage.yaml
+          --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Effacer ce que le provisionneur a écrit sur le control plane
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+
+    - name: Effacer ce que le provisionneur a écrit sur le worker
+      # Le replica set tourne presque toujours sur le worker : ses données,
+      # plusieurs centaines de Mo, rempliraient le disque au fil des labs.
+      ansible.builtin.file:
+        path: /opt/local-path-provisioner
+        state: absent
+      delegate_to: k8s-w1.lab

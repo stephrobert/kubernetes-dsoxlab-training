@@ -1,0 +1,105 @@
+# Challenge du module « Réseau et exposition » (niveau 3), hébergé par la leçon
+# « Network Policies » (KUBERN-07-05), section Mettre en pratique. Il croise les
+# gestes des labs guidés du module sans en refaire un : une route HTTP par hôte
+# et par chemin, un Service hérité à réparer, un Pod client dont le DNS est
+# cassé, puis l'isolement d'une base qui garde sa sortie DNS.
+#
+# Sur le cluster kubeadm du catalogue : Calico applique les NetworkPolicies, et
+# Traefik sert à la fois l'Ingress et la Gateway API (classes « traefik »),
+# exposé sur le NodePort 30080. L'énoncé laisse le choix de la route.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Sept
+# critères à poids égal, seuil 70, trois bloquants, un par compétence visée.
+# Quatre indices à 2, 3, 5 et 5, annoncés dans le scénario avec leur effet sur
+# la note.
+id: k8s-challenge-exposer-et-isoler
+title: "Expose an application and isolate its flows"
+level: services-networking
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, route two applications by host and path, repair a legacy
+  Service, give a client Pod back its name resolution, then isolate a database
+  behind a default refusal that still lets it resolve names.
+skills:
+  - ingress
+  - gateway-api
+  - service
+  - coredns
+  - networkpolicy
+  - troubleshooting
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Une exigence par compétence que le module enseigne : exposer, dépanner,
+  # isoler. Aucun total ne les compense.
+  - test_chaque_chemin_atteint_son_application
+  - test_sonde_resout_et_joint_catalogue
+  - test_seul_le_backend_joint_la_base
+estimated_time: 45m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: chemins-routes
+    label: "Each path of comptoir.local reaches its application, and nothing else answers"
+    tests:
+      - test_chaque_chemin_atteint_son_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: route-prise-en-charge
+    label: "The route vitrine is taken over by its controller"
+    tests:
+      - test_la_route_vitrine_est_prise_en_charge
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: service-ancien
+    label: "The Service ancien reaches its Pods on the port their container listens on"
+    tests:
+      - test_le_service_ancien_atteint_ses_pods_sur_le_bon_port
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: sonde-resout
+    label: "The Pod sonde resolves the Service catalogue and reaches it over HTTP"
+    tests:
+      - test_sonde_resout_et_joint_catalogue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: refus-par-defaut
+    label: "A default refusal targets the base Pod, and it alone"
+    tests:
+      - test_un_refus_par_defaut_vise_la_base
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: seul-le-backend
+    label: "Only the backend reaches the database; the frontend and the Pod from voisinage are refused"
+    tests:
+      - test_seul_le_backend_joint_la_base
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: dns-ouvert
+    label: "The database still resolves names, and reaches nothing else"
+    tests:
+      - test_la_base_ne_sort_que_vers_le_dns
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/

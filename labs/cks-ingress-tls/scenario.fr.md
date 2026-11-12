@@ -16,11 +16,17 @@ Ingress déjà en place.
 
 ## Ce que vous devez obtenir
 
-1. Le serveur présente, pour l'hôte `vitrine.lab`, un certificat qui **nomme
+1. Le certificat et sa clé sont déposés dans un **Secret de type
+   `kubernetes.io/tls`** de `vitrine`.
+
+2. L'Ingress déclare le **TLS de `vitrine.lab`** avec ce Secret.
+
+3. Le serveur présente, pour l'hôte `vitrine.lab`, un certificat qui **nomme
    cet hôte**. Il peut être auto-signé : il n'y a pas d'autorité à joindre ici.
 
-2. Le site continue de répondre. Une terminaison TLS qui casse la route ne
-   vaut pas mieux que pas de terminaison du tout.
+4. Le site continue de répondre, et un client qui **fait confiance à votre
+   certificat** le joint en HTTPS sans avertissement. Une terminaison TLS qui
+   casse la route ne vaut pas mieux que pas de terminaison du tout.
 
 Le contrôleur est déjà installé, ne le touchez pas. Son entrée sécurisée est
 exposée sur le port **30443** du nœud.
@@ -53,10 +59,11 @@ quelques secondes avant de conclure.
 
 ## Comment vous saurez que c'est bon
 
-Le dernier test ouvre la connexion et lit le certificat servi, puis vérifie
-que le site répond encore. Les deux mesures sont dans le même test : « le site
-répond en HTTPS » est déjà vrai avant votre intervention, et ne prouve rien
-tout seul.
+Chaque test vérifie un des quatre états ci-dessus. Le troisième ouvre la
+connexion et lit le certificat servi. Le quatrième appelle le site comme un
+client qui ne fait confiance qu'à votre certificat : « le site répond en
+HTTPS » est déjà vrai avant votre intervention, avec le certificat par défaut,
+et ne prouve rien tout seul.
 
 ```bash
 dsoxlab check cks-ingress-tls

@@ -15,7 +15,7 @@ skills:
   - node-scheduling
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/#mettre-en-pratique
 lab_type: lab
 estimated_time: 10m
 
@@ -37,3 +37,38 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: image-demandee
+    label: "The DaemonSet monitor-agent runs the requested image"
+    tests:
+      - test_le_daemonset_porte_l_image_demandee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+  - id: label-app-monitor
+    label: "Its Pods carry the label app: monitor"
+    tests:
+      - test_les_pods_portent_le_label_app_monitor
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+  - id: un-pod-par-noeud
+    label: "One Ready Pod on every node, control plane included"
+    tests:
+      - test_un_pod_pret_sur_chaque_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+  - id: taint-tolere
+    label: "The taint of the control plane is still there, and the agent tolerates it"
+    tests:
+      - test_le_taint_est_la_et_l_agent_le_tolere
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: heartbeat
+    label: "Each agent writes heartbeat in its logs"
+    tests:
+      - test_chaque_agent_ecrit_heartbeat
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+
+feedback: full

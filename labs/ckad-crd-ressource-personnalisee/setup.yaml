@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab, avec le
+# cluster « lab » et le kubeconfig de l'apprenant, puis pose la CRD Sauvegarde,
+# le namespace sauvegardes et ses deux ressources.
+- name: Préparer le lab ckad-crd-ressource-personnalisee
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Poser la CRD Sauvegarde et ses ressources
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

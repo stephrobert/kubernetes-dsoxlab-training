@@ -15,7 +15,7 @@ skills:
   - routage
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/#mettre-en-pratique
 lab_type: lab
 estimated_time: 25m
 
@@ -38,3 +38,31 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: gateway-programmee
+    label: "A Gateway exists and the cluster declares it Programmed"
+    tests:
+      - test_la_gateway_est_programmee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: chemin-api
+    label: "Path /api reaches svc-api"
+    tests:
+      - test_le_chemin_api_atteint_svc_api
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: chemin-web
+    label: "Path /web reaches svc-web"
+    tests:
+      - test_le_chemin_web_atteint_svc_web
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: chemin-non-declare
+    label: "An undeclared path reaches neither application"
+    tests:
+      - test_un_chemin_non_declare_n_atteint_aucune_application
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+
+feedback: full

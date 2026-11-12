@@ -1,0 +1,20 @@
+title: "Donner une identité stable à chaque réplica avec un StatefulSet"
+description: |
+  Remplacez un Deployment dont les Pods portent des noms tirés au hasard et ne
+  gardent rien par un StatefulSet derrière un Service headless : des réplicas
+  ordonnés, des noms stables qui se résolvent, un volume par réplica, et une
+  donnée qui survit à son Pod.
+
+criteria:
+  - id: trois-replicas-ready
+    label: "Le StatefulSet annuaire a ses trois réplicas, annuaire-0 à annuaire-2, tous Ready"
+  - id: service-headless
+    label: "Un Service headless annuaire sélectionne les Pods et gouverne le StatefulSet"
+  - id: noms-stables
+    label: "Chaque Pod se résout par son nom stable depuis un autre Pod"
+  - id: volume-par-replica
+    label: "Chaque réplica a sa propre revendication Bound, montée sur /data"
+  - id: donnee-survit
+    label: "La donnée du réplica 1 survit à la suppression de son Pod"
+  - id: deployment-remplace
+    label: "Le Deployment annuaire a laissé la place au StatefulSet"

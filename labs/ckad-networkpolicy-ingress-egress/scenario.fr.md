@@ -25,7 +25,7 @@ base ne parle à personne.
    **aucune sortie**.
 
 3. En vrai : `frontend` joint `backend`, `backend` joint `database` et
-   résout des noms, `intrus` ne joint ni `backend` ni `database`, et
+   résout des noms mais ne joint pas `intrus`, `intrus` ne joint ni `backend` ni `database`, et
    `database` ne joint rien, pas même le DNS.
 
 ## Les repères utiles

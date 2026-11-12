@@ -20,6 +20,8 @@ introuvable pour qui le lit.
 
 from __future__ import annotations
 
+import time
+
 import pytest
 
 from conftest import lab_host, lab_target_host, message
@@ -28,6 +30,8 @@ KUBECTL = "sudo -E kubectl --kubeconfig /etc/kubernetes/admin.conf"
 NAMESPACE = "app"
 CLIENT = "client"
 NOM = "web-svc.app.svc.cluster.local"
+ATTENTE = 120
+PAS = 5
 
 
 @pytest.fixture(scope="module")
@@ -70,25 +74,29 @@ def _dans_le_client(host, commande: str):
 # ----------------------------------------------------------------------
 # 1. Le composant DNS du cluster tourne.
 # ----------------------------------------------------------------------
-def test_coredns_tourne(host):
-    """Sans Pod CoreDNS, le Service kube-dns n'a personne derrière lui."""
-    rc, pods, diagnostic = _kubectl(
-        host,
-        "-n kube-system get pods -l k8s-app=kube-dns "
-        "--field-selector=status.phase=Running "
-        "-o jsonpath='{.items[*].metadata.name}'",
-    )
-    assert rc == 0, message(
-        en=f"kubectl failed on the control plane: {diagnostic}",
-        fr=f"kubectl a échoué sur le control plane : {diagnostic}",
-    )
-    assert pods, message(
-        en="No CoreDNS Pod is running in kube-system. Without it, no service name "
-        "resolves in the cluster. Look at the coredns Deployment, its "
-        "desired and ready replica counts, and the namespace's events.",
-        fr="Aucun Pod CoreDNS ne tourne dans kube-system. Sans lui, aucun nom de "
-        "service ne se résout dans le cluster. Regardez le Deployment coredns, "
-        "son nombre de replicas souhaités et prêts, et les events du namespace.",
+def test_coredns_tourne_comme_kubeadm_le_pose(host):
+    """Sans Pod CoreDNS, le Service kube-dns n'a personne derrière lui.
+
+    kubeadm pose CoreDNS à deux réplicas : un seul réplica résout aussi, mais ce
+    n'est pas le cluster rendu dans son état d'origine. L'attente ne s'ouvre
+    que si des réplicas sont demandés, donc jamais sur l'état de départ.
+    """
+    def lire() -> tuple[int, int]:
+        rc, sortie, _ = _kubectl(
+            host, "-n kube-system get deployment coredns -o jsonpath='{.spec.replicas} {.status.readyReplicas}'")
+        valeurs = [*sortie.split(), "0", "0"][:2] if rc == 0 else ["0", "0"]
+        return int(valeurs[0] or 0), int(valeurs[1] or 0)
+
+    voulus, prets = lire()
+    fin = time.monotonic() + (ATTENTE if voulus else 0)
+    while prets != voulus and time.monotonic() < fin:
+        time.sleep(PAS)
+        voulus, prets = lire()
+    assert voulus == 2 and prets == 2, message(
+        en=f"The coredns Deployment asks for {voulus} replica(s), {prets} ready. Expected 2 and 2, as kubeadm sets "
+        "it up: without a CoreDNS Pod, no service name resolves in the cluster.",
+        fr=f"Le Deployment coredns demande {voulus} réplica(s), {prets} prêt(s). Attendu 2 et 2, comme kubeadm le "
+        "pose : sans Pod CoreDNS, aucun nom de service ne se résout dans le cluster.",
     )
 
 

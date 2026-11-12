@@ -160,6 +160,14 @@ sections:
     labs:
       - cka-static-pod
       - cka-daemonset-all-nodes
+      # Lab guidé de la leçon « Les StatefulSets », module Workloads avancés.
+      - cka-statefulset-identite-stable
+      # Lab guidé de la leçon « Opérateurs », module Workloads avancés : installer
+      # un opérateur tiers et ne configurer que sa ressource.
+      - cka-operateur-installer-et-configurer
+      # Le challenge du module Workloads avancés, posé dans la leçon
+      # « Operators et CRDs pour développeurs », sur le cluster kind « multi ».
+      - k8s-challenge-choisir-le-bon-workload
       - cka-rbac-serviceaccount
       - cka-taints-tolerations-placement
       - cka-node-affinity
@@ -170,8 +178,14 @@ sections:
       # API sépare, et ce qu'elle ne change pas.
       - cka-ingress-path-routing
       - cka-gateway-api-httproute
+      # Le challenge du module Réseau et exposition, posé dans la leçon
+      # « Network Policies », sur le cluster kubeadm (Calico, Traefik).
+      - k8s-challenge-exposer-et-isoler
       - cka-pv-pvc-storageclass
       - cka-storageclass-provisionnement-dynamique
+      # Le challenge du module Stockage persistant, posé dans la leçon
+      # « StorageClass », sur le cluster kind « lab ».
+      - k8s-challenge-donnees-qui-survivent
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
       - cka-hpa-autoscaling
@@ -256,6 +270,12 @@ sections:
       # Le challenge du module, posé dans la leçon « Débugger une application »
       # (P12, D43), sur le cluster kind « lab ».
       - k8s-challenge-manifest-robuste
+      # Lab guidé de la leçon « Operators et CRDs pour développeurs », module
+      # Workloads avancés, sur le cluster kind « lab ».
+      - ckad-crd-ressource-personnalisee
+      # L'épreuve de fin du niveau 2, qui suppose les modules 4 à 6 joués, sur
+      # le cluster kind « multi ».
+      - k8s-epreuve-deployer-une-application
 
   - id: cks
     title: "CKS, Certified Kubernetes Security Specialist"

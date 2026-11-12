@@ -9,12 +9,29 @@
   become: true
   tasks:
     - name: Supprimer le namespace du lab, revendications comprises
-      # Les PersistentVolume provisionnés dynamiquement suivent leur
-      # revendication : c'est la reclaimPolicy Delete de la classe qui s'en
-      # charge, et c'est justement ce que le lab fait constater.
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace archives
         --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les volumes qui revendiquaient dans archives
+      # La classe garde est en Retain : ses volumes survivent à leur
+      # revendication, c'est l'objet du lab. Il faut donc les retirer ici.
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get pv \
+          -o jsonpath='{range .items[?(@.spec.claimRef.namespace=="archives")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r kubectl --kubeconfig /etc/kubernetes/admin.conf delete pv --wait=true --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la classe créée par l'apprenant
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete storageclass garde
+        --ignore-not-found
       changed_when: true
       failed_when: false
 
@@ -22,7 +39,7 @@
       ansible.builtin.command:
         cmd: >-
           kubectl --kubeconfig /etc/kubernetes/admin.conf delete -f
-          https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.33/deploy/local-path-storage.yaml
+          /var/lib/dsoxlab/local-path-storage.yaml
           --ignore-not-found --wait=true --timeout=180s
       changed_when: true
       failed_when: false

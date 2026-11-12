@@ -1,0 +1,21 @@
+title: "Exposer une application et isoler ses flux"
+description: |
+  Sans guidage, routez deux applications par hôte et par chemin, réparez un
+  Service hérité, rendez à un Pod client sa résolution de noms, puis isolez une
+  base derrière un refus par défaut qui la laisse résoudre des noms.
+
+criteria:
+  - id: chemins-routes
+    label: "Chaque chemin de comptoir.local atteint son application, et rien d'autre ne répond"
+  - id: route-prise-en-charge
+    label: "La route vitrine est prise en charge par son contrôleur"
+  - id: service-ancien
+    label: "Le Service ancien atteint ses Pods sur le port où leur conteneur écoute"
+  - id: sonde-resout
+    label: "Le Pod sonde résout le Service catalogue et le joint en HTTP"
+  - id: refus-par-defaut
+    label: "Un refus par défaut vise le Pod base, et lui seul"
+  - id: seul-le-backend
+    label: "Seul le backend joint la base ; le frontend et le Pod de voisinage sont refusés"
+  - id: dns-ouvert
+    label: "La base résout toujours des noms, et ne joint rien d'autre"

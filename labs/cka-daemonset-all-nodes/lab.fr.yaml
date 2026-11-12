@@ -4,3 +4,15 @@ description: |
   compris le control plane, protégé par son taint. Les tests comptent un Pod
   par nœud, vérifient que le taint est toujours là et que l'agent y tourne
   quand même, et lisent ses logs pour prouver qu'il fait son travail.
+
+criteria:
+  - id: image-demandee
+    label: "Le DaemonSet monitor-agent fait tourner l'image demandée"
+  - id: label-app-monitor
+    label: "Ses Pods portent le label app: monitor"
+  - id: un-pod-par-noeud
+    label: "Un Pod prêt sur chaque nœud, control plane compris"
+  - id: taint-tolere
+    label: "Le taint du control plane est toujours là, et l'agent le tolère"
+  - id: heartbeat
+    label: "Chaque agent écrit heartbeat dans ses logs"

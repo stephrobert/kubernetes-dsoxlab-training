@@ -16,11 +16,17 @@ already in place.
 
 ## What you must achieve
 
-1. The server presents, for the `vitrine.lab` host, a certificate that **names
+1. The certificate and its key are stored in a **Secret of type
+   `kubernetes.io/tls`** in `vitrine`.
+
+2. The Ingress declares **TLS for `vitrine.lab`** with that Secret.
+
+3. The server presents, for the `vitrine.lab` host, a certificate that **names
    that host**. It may be self-signed: there is no authority to reach here.
 
-2. The site keeps answering. A TLS termination that breaks the route is no
-   better than no termination at all.
+4. The site keeps answering, and a client that **trusts your certificate**
+   reaches it over HTTPS without any warning. A TLS termination that breaks the
+   route is no better than no termination at all.
 
 The controller is already installed, leave it alone. Its secure entry point is
 exposed on the node's port **30443**.
@@ -52,10 +58,11 @@ seconds before concluding.
 
 ## How you will know it works
 
-The last test opens the connection and reads the certificate served, then
-checks the site still answers. Both measurements are in the same test: "the
-site answers over HTTPS" is already true before you intervene, and proves
-nothing on its own.
+Each test checks one of the four states above. The third opens the connection
+and reads the certificate served. The fourth calls the site as a client that
+trusts only your certificate: "the site answers over HTTPS" is already true
+before you intervene, with the default certificate, and proves nothing on its
+own.
 
 ```bash
 dsoxlab check cks-ingress-tls

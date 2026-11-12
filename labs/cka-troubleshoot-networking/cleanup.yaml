@@ -1,13 +1,56 @@
 ---
-# Joué par `dsoxlab clean` : défait ce que le lab a créé. Tout vit dans le
-# namespace lab, politiques comprises, le supprimer suffit. Le cluster reste.
+# Joué par `dsoxlab clean` : remet le fichier CNI du worker si l'apprenant ne
+# l'a pas fait réécrire, attend que le nœud revienne, puis retire le namespace,
+# le dossier de l'apprenant et la mémoire du tirage.
 - name: Nettoyer le lab cka-troubleshoot-networking
   hosts: lab_target
   become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
   tasks:
-    - name: Supprimer le namespace de travail
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace lab
-        --ignore-not-found --wait=false
+    - name: Remettre le fichier CNI du worker s'il manque
+      ansible.builtin.copy:
+        src: /root/dsoxlab-10-calico.conflist
+        dest: /etc/cni/net.d/10-calico.conflist
+        remote_src: true
+        mode: "0600"
+        force: false
+      delegate_to: k8s-w1.lab
+      failed_when: false
+
+    - name: Faire réécrire la configuration par Calico
+      # Le Pod calico-node recréé réécrit le fichier et la configuration de son
+      # client : le même geste que la réparation attendue de l'apprenant.
+      ansible.builtin.shell: |
+        {{ kubectl }} -n kube-system delete pod -l k8s-app=calico-node \
+          --field-selector spec.nodeName=k8s-w1.lab --wait=true
+      args:
+        executable: /bin/bash
       changed_when: true
       failed_when: false
+
+    - name: Attendre que le worker soit Ready
+      ansible.builtin.command: >-
+        {{ kubectl }} wait node/k8s-w1.lab --for=condition=Ready --timeout=180s
+      changed_when: false
+
+    - name: Retirer la sauvegarde du fichier CNI
+      ansible.builtin.file:
+        path: /root/dsoxlab-10-calico.conflist
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace reseau
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant et la mémoire du tirage
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/reseau"
+        - /var/lib/dsoxlab/troubleshoot-networking.json

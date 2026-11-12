@@ -1,81 +1,107 @@
 #!/usr/bin/env bash
-# Pose la situation : une application qui marche, un Service refait de
-# travers, selector et port faux, et une politique qui ferme tout le trafic
-# entrant du namespace. Le client ne joint plus rien.
+# Pose la partie « cluster » de la situation, avant que le setup ne casse le
+# worker :
 #
-# Rejouable : les manifestes sont réappliqués à l'identique, ce qui remet le
-# Service de travers, et la politique d'ouverture d'un passage précédent est
-# retirée.
+# - le namespace reseau et le Pod sonde, épinglé sur le control plane ;
+# - deux Services à diagnostiquer, stock et archives. L'un n'a aucun endpoint,
+#   et kube-proxy refuse aussitôt toute connexion vers lui. L'autre envoie vers
+#   une adresse muette, 192.0.2.10 (bloc réservé à la documentation), où la
+#   connexion attend jusqu'au délai. Lequel est lequel est TIRÉ AU SORT à chaque
+#   préparation, et mémorisé pour les tests : le verdict ne se devine pas ;
+# - le dossier de travail de l'apprenant, vide.
+#
+# Rejouable : le namespace est attendu s'il se termine, puis recréé.
 set -euo pipefail
-# La trace complète va dans un journal sur le nœud : dsoxlab ne montre que
-# « non-zero return code » quand ce script échoue, et le validateur relit
-# ce fichier pour dire pourquoi.
 exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
 set -x
 
-if [[ "$(kubectl get namespace lab -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
-  kubectl wait --for=delete namespace/lab --timeout=180s
+LAB_USER="${LAB_USER:-ansible}"
+LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
+MEMOIRE=/var/lib/dsoxlab/troubleshoot-networking.json
+
+if [[ "$(kubectl get namespace reseau -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
+  kubectl wait --for=delete namespace/reseau --timeout=180s
 fi
-kubectl get namespace lab >/dev/null 2>&1 || kubectl create namespace lab
+kubectl get namespace reseau >/dev/null 2>&1 || kubectl create namespace reseau
 
-kubectl -n lab delete networkpolicy allow-web-ingress --ignore-not-found
+if (( RANDOM % 2 )); then
+  REFUS=stock; DELAI=archives
+else
+  REFUS=archives; DELAI=stock
+fi
 
-cat <<'EOF' | kubectl apply -f -
-apiVersion: apps/v1
-kind: Deployment
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
 metadata:
-  name: web-app
-  namespace: lab
+  name: sonde
+  namespace: reseau
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: web
-  template:
-    metadata:
-      labels:
-        app: web
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:1.27-alpine
-          ports:
-            - containerPort: 80
+  nodeName: k8s-cp.lab
+  containers:
+    - name: shell
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+      command: ["sleep", "infinity"]
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-svc
-  namespace: lab
+  name: ${REFUS}
+  namespace: reseau
 spec:
   selector:
-    app: webapp
+    app: ${REFUS}
   ports:
     - port: 80
-      targetPort: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: block-all
-  namespace: lab
-spec:
-  podSelector: {}
-  policyTypes:
-    - Ingress
+      targetPort: 80
 ---
 apiVersion: v1
-kind: Pod
+kind: Service
 metadata:
-  name: client
-  namespace: lab
+  name: ${DELAI}
+  namespace: reseau
 spec:
-  containers:
-    - name: client
-      image: busybox:1.36
-      command: ["sh", "-c", "sleep 3600"]
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: ${DELAI}-muet
+  namespace: reseau
+  labels:
+    kubernetes.io/service-name: ${DELAI}
+addressType: IPv4
+ports:
+  - port: 80
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 192.0.2.10
 EOF
 
-kubectl -n lab rollout status deployment/web-app --timeout=180s
-kubectl -n lab wait --for=condition=Ready pod/client --timeout=180s
-echo "Situation posée : web-svc ne dessert rien, block-all ferme le namespace."
+kubectl -n reseau wait --for=condition=Ready pod/sonde --timeout=180s
+
+install -d -m 0755 /var/lib/dsoxlab
+printf '{"refus": "%s", "delai": "%s"}\n' "$REFUS" "$DELAI" > "$MEMOIRE"
+chmod 0600 "$MEMOIRE"
+
+rm -rf "${LAB_HOME}/reseau"
+install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/reseau"
+
+# La situation : l'un refuse aussitôt, l'autre attend. On le mesure, sinon le
+# lab demanderait un verdict que le cluster ne permet pas de poser.
+debut=$(date +%s)
+if kubectl -n reseau exec sonde -- wget -qO- -T 5 "http://${REFUS}/"; then
+  echo "${REFUS} répond : la situation n'est pas celle du scénario" >&2; exit 1
+fi
+duree_refus=$(( $(date +%s) - debut ))
+debut=$(date +%s)
+if kubectl -n reseau exec sonde -- wget -qO- -T 5 "http://${DELAI}/"; then
+  echo "${DELAI} répond : la situation n'est pas celle du scénario" >&2; exit 1
+fi
+duree_delai=$(( $(date +%s) - debut ))
+echo "refus en ${duree_refus} s, délai en ${duree_delai} s"
+(( duree_refus <= 2 && duree_delai >= 4 ))
+echo "Partie cluster posée : sonde sur le control plane, un refus, un délai."

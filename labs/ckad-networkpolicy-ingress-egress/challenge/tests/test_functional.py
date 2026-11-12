@@ -60,61 +60,65 @@ def _politique(host, nom: str) -> dict:
 
 
 # ----------------------------------------------------------------------
-# 1. Les deux politiques existent et visent les bons Pods.
+# 1. et 2. Chaque politique vise son tier, dans les deux directions.
 # ----------------------------------------------------------------------
-def test_les_politiques_visent_les_bons_tiers(host):
-    for nom, tier in (("backend-policy", "backend"), ("database-policy", "database")):
-        p = _politique(host, nom)
-        selecteur = (p["spec"].get("podSelector") or {}).get("matchLabels") or {}
-        assert selecteur.get("tier") == tier, message(
-            en=f"{nom} selects {selecteur}, expected tier={tier}.",
-            fr=f"{nom} sélectionne {selecteur}, attendu tier={tier}.",
-        )
-        types = p["spec"].get("policyTypes") or ["Ingress"]
-        assert "Ingress" in types and "Egress" in types, message(
-            en=f"{nom} declares policyTypes {types}: both Ingress AND Egress are needed, otherwise "
-            "the missing direction is not restricted at all.",
-            fr=f"{nom} déclare policyTypes {types} : il faut Ingress ET Egress, sinon la "
-            "direction absente n'est pas restreinte du tout.",
-        )
+def _vise_son_tier(host, nom: str, tier: str) -> None:
+    p = _politique(host, nom)
+    selecteur = (p["spec"].get("podSelector") or {}).get("matchLabels") or {}
+    types = p["spec"].get("policyTypes") or ["Ingress"]
+    assert selecteur.get("tier") == tier and "Ingress" in types and "Egress" in types, message(
+        en=f"{nom} selects {selecteur} and declares policyTypes {types}. Expected tier={tier}, with both Ingress "
+        "AND Egress: a missing direction is not restricted at all.",
+        fr=f"{nom} sélectionne {selecteur} et déclare policyTypes {types}. Attendu tier={tier}, avec Ingress ET "
+        "Egress : une direction absente n'est pas restreinte du tout.",
+    )
+
+
+def test_backend_policy_vise_le_backend_dans_les_deux_sens(host):
+    _vise_son_tier(host, "backend-policy", "backend")
+
+
+def test_database_policy_vise_la_base_dans_les_deux_sens(host):
+    _vise_son_tier(host, "database-policy", "database")
 
 
 # ----------------------------------------------------------------------
-# 2. Le backend n'accepte que le frontend.
+# 3. Le backend n'accepte que le frontend.
 # ----------------------------------------------------------------------
 def test_le_backend_n_accepte_que_le_frontend(host):
-    assert _http(host, "frontend", "backend"), message(
-        en="frontend no longer reaches backend on port 80: the ingress rule of "
-        "backend-policy must allow tier=frontend Pods on that port.",
-        fr="frontend ne joint plus backend sur le port 80 : la règle ingress de "
-        "backend-policy doit autoriser les Pods tier=frontend sur ce port.",
-    )
-    assert not _http(host, "intrus", "backend"), message(
-        en="intrus reaches backend: nothing blocks it. backend-policy must exist, "
-        "select tier=backend, and allow only tier=frontend inbound.",
-        fr="intrus joint backend : rien ne le bloque. backend-policy doit exister, "
-        "sélectionner tier=backend, et n'autoriser en entrée que tier=frontend.",
+    joint = _http(host, "frontend", "backend")
+    intrus = _http(host, "intrus", "backend")
+    assert joint and not intrus, message(
+        en=f"frontend {'reaches' if joint else 'does not reach'} backend, intrus "
+        f"{'reaches' if intrus else 'does not reach'} it. Expected frontend allowed on port 80, intrus refused.",
+        fr=f"frontend {'joint' if joint else 'ne joint pas'} backend, intrus {'le joint' if intrus else 'ne le joint pas'}"
+        ". Attendu frontend autorisé sur le port 80, intrus refusé.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. Le backend sort vers la base et le DNS, et la base n'accepte que lui.
+# 4. Le backend ne sort que vers la base et vers le DNS.
 # ----------------------------------------------------------------------
-def test_le_backend_parle_a_la_base_et_resout_des_noms(host):
-    assert _http(host, "backend", "database"), message(
-        en="backend no longer reaches database: the egress rule of backend-policy must "
-        "allow tier=database on port 80, and the ingress rule of "
-        "database-policy must accept tier=backend.",
-        fr="backend ne joint plus database : la règle egress de backend-policy doit "
-        "autoriser tier=database sur le port 80, et la règle ingress de "
-        "database-policy doit accepter tier=backend.",
+def test_le_backend_joint_la_base_et_resout_des_noms(host):
+    base = _http(host, "backend", "database")
+    dns = _dns(host, "backend")
+    ailleurs = _http(host, "backend", "intrus")
+    assert base and dns and not ailleurs, message(
+        en=f"backend {'reaches' if base else 'does not reach'} database, {'resolves' if dns else 'does not resolve'} "
+        f"names, and {'reaches' if ailleurs else 'does not reach'} intrus. Expected database and DNS allowed, "
+        "everything else refused: its egress allows tier=database on port 80 and the cluster DNS (kube-system, "
+        "port 53, UDP and TCP), and nothing more.",
+        fr=f"backend {'joint' if base else 'ne joint pas'} database, {'résout' if dns else 'ne résout pas'} les noms, "
+        f"et {'joint' if ailleurs else 'ne joint pas'} intrus. Attendu la base et le DNS autorisés, tout le reste "
+        "refusé : sa sortie autorise tier=database sur le port 80 et le DNS du cluster (kube-system, port 53, UDP "
+        "et TCP), rien de plus.",
     )
-    assert _dns(host, "backend"), message(
-        en="backend no longer resolves any name: its egress is restricted and DNS is "
-        "not allowed. The resolver is in kube-system, port 53, UDP and TCP.",
-        fr="backend ne résout plus aucun nom : sa sortie est restreinte et le DNS n'est "
-        "pas autorisé. Le résolveur est dans kube-system, port 53, UDP et TCP.",
-    )
+
+
+# ----------------------------------------------------------------------
+# 5. La base n'accepte que le backend.
+# ----------------------------------------------------------------------
+def test_la_base_refuse_l_intrus(host):
     assert not _http(host, "intrus", "database"), message(
         en="intrus reaches database: database-policy must accept only tier=backend inbound.",
         fr="intrus joint database : database-policy doit n'accepter en entrée que tier=backend.",
@@ -122,18 +126,14 @@ def test_le_backend_parle_a_la_base_et_resout_des_noms(host):
 
 
 # ----------------------------------------------------------------------
-# 4. La base ne parle à personne, pas même au DNS.
+# 6. La base ne parle à personne, pas même au DNS.
 # ----------------------------------------------------------------------
 def test_la_base_ne_sort_pas(host):
-    assert not _http(host, "database", "backend"), message(
-        en="database reaches backend: its egress is not forbidden. Declaring Egress "
-        "in policyTypes with no egress rule forbids all outbound traffic.",
-        fr="database joint backend : sa sortie n'est pas interdite. Déclarer Egress "
-        "dans policyTypes sans aucune règle egress interdit toute sortie.",
-    )
-    assert not _dns(host, "database"), message(
-        en="database resolves names: its egress towards DNS is still allowed, so its "
-        "egress is not entirely forbidden.",
-        fr="database résout des noms : sa sortie vers le DNS reste permise, donc sa "
-        "sortie n'est pas entièrement interdite.",
+    sort = _http(host, "database", "backend")
+    dns = _dns(host, "database")
+    assert not sort and not dns, message(
+        en=f"database {'reaches' if sort else 'does not reach'} backend and {'resolves' if dns else 'does not resolve'} "
+        "names. Expected neither: declaring Egress in policyTypes with no egress rule forbids all outbound traffic.",
+        fr=f"database {'joint' if sort else 'ne joint pas'} backend et {'résout' if dns else 'ne résout pas'} les noms. "
+        "Attendu ni l'un ni l'autre : déclarer Egress dans policyTypes sans règle egress interdit toute sortie.",
     )

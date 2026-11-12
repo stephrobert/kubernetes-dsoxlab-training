@@ -4,3 +4,13 @@ description: |
   laquelle. Routez par le chemin, et prouvez-le de la seule façon qui compte :
   chaque chemin répond le nom de son application, et un chemin non déclaré ne
   répond ni l'une ni l'autre.
+
+criteria:
+  - id: regle-pour-l-hote
+    label: "Une règle Ingress dotée d'une classe vise app.local"
+  - id: chemin-api
+    label: "Le chemin /api atteint svc-api"
+  - id: chemin-web
+    label: "Le chemin /web atteint svc-web"
+  - id: chemin-non-declare
+    label: "Un chemin non déclaré n'atteint aucune des deux applications"

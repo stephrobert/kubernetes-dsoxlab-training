@@ -40,9 +40,9 @@ spec:
     spec:
       containers:
         - name: web
-          image: nginxinc/nginx-unprivileged:1.27-alpine
+          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
           ports:
-            - containerPort: 8080
+            - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -54,7 +54,7 @@ spec:
     app: site
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

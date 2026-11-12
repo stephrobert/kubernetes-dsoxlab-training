@@ -32,7 +32,7 @@ metadata:
 spec:
   containers:
     - name: postgres
-      image: postgres:17-alpine
+      image: postgres:18.6-alpine@sha256:9ba53c7d41ea093baf5c1ba635ba5434c4f979880527d49bb7d9237d3193085b
       env:
         - name: POSTGRES_PASSWORD
           value: lab-seulement
@@ -61,7 +61,7 @@ metadata:
 spec:
   containers:
     - name: shell
-      image: busybox:1.37
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sleep", "infinity"]
 ---
 apiVersion: v1
@@ -74,7 +74,7 @@ metadata:
 spec:
   containers:
     - name: shell
-      image: busybox:1.37
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sleep", "infinity"]
 ---
 apiVersion: v1
@@ -87,7 +87,7 @@ metadata:
 spec:
   containers:
     - name: shell
-      image: busybox:1.37
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sleep", "infinity"]
 EOF
 

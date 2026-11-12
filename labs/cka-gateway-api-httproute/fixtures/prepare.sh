@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: echo
-          image: hashicorp/http-echo:1.0.0
+          image: hashicorp/http-echo:1.0.0@sha256:fcb75f691c8b0414d670ae570240cbf95502cc18a9ba57e982ecac589760a186
           args: ["-text=api", "-listen=:5678"]
           ports:
             - containerPort: 5678
@@ -75,7 +75,7 @@ spec:
     spec:
       containers:
         - name: echo
-          image: hashicorp/http-echo:1.0.0
+          image: hashicorp/http-echo:1.0.0@sha256:fcb75f691c8b0414d670ae570240cbf95502cc18a9ba57e982ecac589760a186
           args: ["-text=web", "-listen=:5678"]
           ports:
             - containerPort: 5678

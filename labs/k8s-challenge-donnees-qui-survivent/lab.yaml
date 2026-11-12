@@ -1,0 +1,94 @@
+# Challenge du module « Stockage persistant » (niveau 2), hébergé par la leçon
+# « StorageClass » (KUBERN-08-02), section Mettre en pratique. Il croise les
+# gestes des deux labs guidés du module sans en refaire un : une revendication
+# servie par une StorageClass, un Pod qui y écrit, un témoin qui survit à son
+# Pod, une reclaim policy, et une revendication Pending à diagnostiquer avant de
+# la corriger.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Six
+# critères à poids égal, seuil 70, trois bloquants, comme le challenge du
+# module 4. Quatre indices à 2, 3, 5 et 5, annoncés dans le scénario avec leur
+# effet sur la note.
+id: k8s-challenge-donnees-qui-survivent
+title: "Keep data beyond the life of a Pod"
+level: storage
+section: cka
+difficulty: intermediate
+description: |
+  Without guidance, obtain a volume from a StorageClass, write a witness file
+  from a Pod, prove that it survives the recreation of that Pod, keep the data
+  beyond the claim, and fix a claim stuck in Pending after recording its cause.
+skills:
+  - storageclass
+  - persistentvolumeclaim
+  - provisionnement-dynamique
+  - reclaimpolicy
+  - troubleshooting
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les trois exigences qu'aucun total ne compense : un volume créé pour la
+  # revendication par la classe, des données qui survivent à leur Pod, et le
+  # diagnostic posé avant la correction.
+  - test_registre_donnees_est_liee_a_un_volume_cree_par_la_classe
+  - test_le_temoin_a_survecu_a_la_recreation_du_pod
+  - test_la_cause_du_pending_est_consignee_avant_la_correction
+estimated_time: 40m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: volume-cree-par-la-classe
+    label: "registre-donnees is Bound to a volume the class conserve created for it, with the requested size and access mode"
+    tests:
+      - test_registre_donnees_est_liee_a_un_volume_cree_par_la_classe
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: temoin-ecrit
+    label: "The Pod of registre mounts the claim on the requested path and wrote the witness file there"
+    tests:
+      - test_registre_monte_la_revendication_et_a_ecrit_le_temoin
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: temoin-intact
+    label: "After its Pod was deleted and recreated, the witness file is read again intact"
+    tests:
+      - test_le_temoin_a_survecu_a_la_recreation_du_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: reclaim-retain
+    label: "The volume of registre-donnees has the reclaim policy Retain"
+    tests:
+      - test_le_volume_de_registre_donnees_est_en_retain
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: cause-consignee
+    label: "The cause of the Pending is recorded before the correction"
+    tests:
+      - test_la_cause_du_pending_est_consignee_avant_la_correction
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: journal-bound
+    label: "journal-ancien is Bound after the correction"
+    tests:
+      - test_journal_ancien_est_bound
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/

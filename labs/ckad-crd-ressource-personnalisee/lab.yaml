@@ -1,0 +1,73 @@
+# Lab guidé de la leçon « Operators et CRDs pour développeurs » (KUBERN-09-04),
+# module Workloads avancés. La CRD Sauvegarde est celle de la leçon : on la
+# découvre, on crée et modifie des ressources, on lit le refus de l'API pour une
+# valeur hors bornes, et on débloque une ressource restée en Terminating.
+id: ckad-crd-ressource-personnalisee
+title: "Use a custom resource, read its schema refusals, unblock it"
+level: workloads
+section: ckad
+difficulty: intermediate
+description: |
+  Discover the API group of a CRD, create and modify custom resources, read the
+  refusal of the API for an out-of-bounds value, and unblock a resource stuck in
+  Terminating without touching the CRD.
+skills:
+  - crd
+  - custom-resources
+  - api-groups
+  - finalizers
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - ckad
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: quotidienne-creee
+    label: "The Sauvegarde quotidienne exists with the requested source and retention"
+    tests:
+      - test_la_sauvegarde_quotidienne_existe_avec_les_valeurs_demandees
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+  - id: hebdomadaire-modifiee
+    label: "hebdomadaire keeps 30 days, without having been recreated"
+    tests:
+      - test_hebdomadaire_garde_trente_jours_sans_avoir_ete_recreee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+  - id: groupe-api
+    label: "The API group and version of Sauvegarde are recorded"
+    tests:
+      - test_le_groupe_et_la_version_de_l_api_sont_consignes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+  - id: refus-hors-bornes
+    label: "The refusal of an out-of-bounds retention is recorded, and the API still refuses it"
+    tests:
+      - test_le_refus_d_une_retention_hors_bornes_est_consigne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+  - id: ancienne-debloquee
+    label: "ancienne is no longer stuck, and the CRD is the one of the start"
+    tests:
+      - test_ancienne_est_debloquee_sans_toucher_a_la_crd
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+
+feedback: full

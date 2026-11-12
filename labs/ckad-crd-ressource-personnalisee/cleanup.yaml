@@ -1,0 +1,42 @@
+---
+# Joué par `dsoxlab clean` : libère toute ressource Sauvegarde encore bloquée par
+# son finalizer, retire le namespace sauvegardes puis la CRD (objet de cluster,
+# que la photographie du validateur verrait), le dossier de l'apprenant et la
+# mémoire. Le cluster « lab » reste.
+- name: Nettoyer le lab ckad-crd-ressource-personnalisee
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/lab.kubeconfig
+  tasks:
+    - name: Retirer les finalizers des ressources Sauvegarde restantes
+      ansible.builtin.shell: |
+        for r in $({{ kubectl }} -n sauvegardes get sauvegardes -o name 2>/dev/null); do
+          {{ kubectl }} -n sauvegardes patch "$r" --type=merge -p '{"metadata":{"finalizers":null}}'
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace sauvegardes
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace sauvegardes
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la CRD Sauvegarde
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd sauvegardes.atelier.formation.k8s
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dossier de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/sauvegardes"
+        - /var/lib/dsoxlab/crd-ressource-personnalisee.json

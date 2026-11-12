@@ -37,8 +37,9 @@ curl -s --resolve app.local:30080:127.0.0.1 http://app.local:30080/api
 The object describing these rules lives in the **same namespace** as the
 Services it routes. That is not a detail: it cannot designate one elsewhere.
 
-Such an object designating no **class** is served by no controller, unless a
-default class exists.
+Name its **class**. Depending on the controller and its settings, an object
+without a class may be served anyway, or ignored: naming the class makes the
+choice of controller explicit, and depends on none of those settings.
 
 The **path type** matters: the one comparing a prefix accepts `/api` as well as
 `/api/v1`, while the one comparing exactly would accept only `/api`.
@@ -48,9 +49,9 @@ seconds.
 
 ## How you will know it works
 
-The last test queries all **three** paths. The third is the control: a single
-rule sending everything to one service would pass the first two measurements
-without routing anything.
+One test reads the rule, then one test per path queries all **three** paths.
+The undeclared path is the control: a single rule sending everything to one
+service would pass the other two measurements without routing anything.
 
 ```bash
 dsoxlab check cka-ingress-path-routing

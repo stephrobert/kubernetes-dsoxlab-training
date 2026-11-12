@@ -3,3 +3,11 @@ description: |
   Plus aucun Pod ne résout de nom de service. Trouver pourquoi le DNS du
   cluster ne répond plus, le remettre en service, et prouver qu'un Pod client
   résout et joint à nouveau un Service par son nom.
+
+criteria:
+  - id: coredns-retabli
+    label: "CoreDNS tourne de nouveau comme kubeadm le pose, deux réplicas prêts"
+  - id: client-resout
+    label: "Le Pod client résout web-svc.app.svc.cluster.local"
+  - id: client-joint-en-http
+    label: "Le Pod client joint web-svc en HTTP par ce nom"

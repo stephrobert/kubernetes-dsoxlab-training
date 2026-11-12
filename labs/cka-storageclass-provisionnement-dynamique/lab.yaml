@@ -1,12 +1,13 @@
 id: cka-storageclass-provisionnement-dynamique
-title: "Get a volume no administrator created, and follow what becomes of it"
+title: "Create your StorageClass and get a volume no administrator created"
 level: storage
 section: cka
 difficulty: intermediate
 description: |
-  A claim stuck in Pending because nobody prepared a volume by hand. Let the
-  cluster provision it on demand, then observe what the class decides when the
-  claim disappears: the volume goes with it.
+  A claim stuck in Pending because nobody prepared a volume by hand. Create a
+  StorageClass that reuses the provisioner already installed and keeps its
+  volumes, let the cluster provision one on demand through it, and write into
+  it from a Pod.
 skills:
   - storageclass
   - persistentvolumeclaim
@@ -14,9 +15,9 @@ skills:
   - reclaimpolicy
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
 lab_type: lab
-estimated_time: 25m
+estimated_time: 30m
 
 # Compétence du blueprint CKA, domaine Storage (10 %) : « Understand storage
 # classes, persistent volumes » et « Understand dynamic volume provisioning ».
@@ -37,3 +38,44 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: classe-creee
+    label: "The class garde reuses the provisioner of local-path, keeps its volumes and delays binding"
+    tests:
+      - test_la_classe_garde_reprend_le_provisionneur_de_local_path
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: designe-la-classe
+    label: "The claim donnees names the class garde"
+    tests:
+      - test_la_revendication_designe_la_classe_garde
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: volume-cree-pour-elle
+    label: "The volume bound to donnees was created for it by the provisioner of the class"
+    tests:
+      - test_le_volume_lie_a_ete_cree_pour_elle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: politique-de-la-classe
+    label: "The volume carries Retain, the reclaim policy garde imposes"
+    tests:
+      - test_le_volume_garde_ses_donnees_apres_la_revendication
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: registre-monte
+    label: "The Pod registre mounts the claim on /data"
+    tests:
+      - test_registre_monte_la_revendication_sur_data
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+  - id: temoin-ecrit
+    label: "The Pod registre wrote the witness file into the volume"
+    tests:
+      - test_registre_a_ecrit_le_temoin
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+
+feedback: full

@@ -1,0 +1,101 @@
+# Challenge du module « Workloads avancés » (niveau 2), hébergé par la leçon
+# « Operators et CRDs pour développeurs » (KUBERN-09-04), section Mettre en
+# pratique. Trois besoins, décrits sans nommer de type d'objet : une base à
+# identité stable, un agent par nœud, une ressource personnalisée dont le
+# schéma doit porter une borne. C'est à l'apprenant de choisir le workload.
+#
+# Il tourne sur le cluster kind « multi », un control plane et deux workers :
+# l'agent doit tourner sur chaque nœud, control plane compris, sans retirer son
+# taint.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Sept
+# critères à poids égal, seuil 70, trois bloquants. Quatre indices à 2, 3, 5 et
+# 5, annoncés dans le scénario avec leur effet sur la note.
+id: k8s-challenge-choisir-le-bon-workload
+title: "Choose and deploy the right workload for three needs"
+level: workloads
+section: cka
+difficulty: intermediate
+description: |
+  Without guidance, serve three needs described without naming any object: a
+  database whose replicas keep a stable identity and their data, an agent on
+  every node including the control plane, and a custom resource whose schema
+  enforces a bound.
+skills:
+  - statefulset
+  - daemonset
+  - taints-tolerations
+  - crd
+  - custom-resources
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les trois exigences qu'aucun total ne compense : la donnée qui survit à son
+  # Pod, le taint du control plane gardé et toléré, la ressource conforme.
+  - test_la_donnee_du_replica_1_survit_a_son_pod
+  - test_le_taint_du_control_plane_est_present_et_tolere
+  - test_la_collecte_journaux_est_conforme_et_sa_crd_established
+estimated_time: 50m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: replicas-ordonnes
+    label: "inventaire has its three ordered replicas, all Ready"
+    tests:
+      - test_inventaire_a_trois_replicas_ordonnes_et_ready
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: noms-stables
+    label: "The stable names of inventaire resolve behind a headless Service"
+    tests:
+      - test_les_noms_stables_se_resolvent_derriere_un_service_headless
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: donnee-survit
+    label: "The data of replica 1 survives the deletion of its Pod"
+    tests:
+      - test_la_donnee_du_replica_1_survit_a_son_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: agent-partout
+    label: "The agent collecteur is Ready on every node, control plane included"
+    tests:
+      - test_le_collecteur_est_pret_sur_chaque_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+  - id: taint-tolere
+    label: "The taint of the control plane is still there, and the agent tolerates it"
+    tests:
+      - test_le_taint_du_control_plane_est_present_et_tolere
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+  - id: collecte-conforme
+    label: "The Collecte journaux matches the requirements, and its CRD is Established"
+    tests:
+      - test_la_collecte_journaux_est_conforme_et_sa_crd_established
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+  - id: borne-refusee
+    label: "An out-of-bounds retention is refused by the API"
+    tests:
+      - test_une_retention_hors_bornes_est_refusee_en_dry_run_serveur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/

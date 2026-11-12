@@ -1,0 +1,80 @@
+# Lab guidé de la leçon « Les StatefulSets » (KUBERN-09-01), module Workloads
+# avancés. L'annuaire tourne en Deployment : des noms tirés au hasard, rien de
+# gardé. L'apprenant le remplace par un StatefulSet derrière un Service
+# headless, avec un volume par réplica, et prouve qu'une donnée du réplica 1
+# survit à son Pod.
+id: cka-statefulset-identite-stable
+title: "Give each replica a stable identity with a StatefulSet"
+level: workloads
+section: cka
+difficulty: intermediate
+description: |
+  Replace a Deployment whose Pods have random names and keep nothing with a
+  StatefulSet behind a headless Service: ordered replicas, stable names that
+  resolve, one volume per replica, and data that survives its Pod.
+skills:
+  - statefulset
+  - headless-service
+  - volumeclaimtemplates
+  - dns
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: trois-replicas-ready
+    label: "The StatefulSet annuaire has its three replicas, annuaire-0 to annuaire-2, all Ready"
+    tests:
+      - test_le_statefulset_annuaire_a_trois_replicas_ready
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: service-headless
+    label: "A headless Service annuaire selects the Pods and governs the StatefulSet"
+    tests:
+      - test_le_service_annuaire_est_headless_et_gouverne_le_statefulset
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: noms-stables
+    label: "Each Pod resolves by its stable name from another Pod"
+    tests:
+      - test_chaque_pod_se_resout_par_son_nom_stable
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: volume-par-replica
+    label: "Each replica has its own Bound claim, mounted on /data"
+    tests:
+      - test_chaque_replica_a_sa_propre_revendication
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+  - id: donnee-survit
+    label: "The data of replica 1 survives the deletion of its Pod"
+    tests:
+      - test_la_donnee_du_replica_1_survit_a_son_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+  - id: deployment-remplace
+    label: "The Deployment annuaire has made way for the StatefulSet"
+    tests:
+      - test_le_deployment_annuaire_a_laisse_la_place
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+
+feedback: full

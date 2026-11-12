@@ -25,7 +25,7 @@ database talks to nobody.
    **no outbound traffic at all**.
 
 3. For real: `frontend` reaches `backend`, `backend` reaches `database` and
-   resolves names, `intrus` reaches neither `backend` nor `database`, and
+   resolves names but does not reach `intrus`, `intrus` reaches neither `backend` nor `database`, and
    `database` reaches nothing, not even DNS.
 
 ## Useful bearings

@@ -80,18 +80,44 @@
   changed_when: false
 
 - name: Installer Traefik, exposé en NodePort
-  # Chart 41.6.0, appVersion v3.7.13, mesuré disponible le 2026-09-16.
-  # La version est ÉPINGLÉE : un chart qui bouge sous le lab en change le
+  # Chart 41.6.0, mesuré disponible le 2026-09-16. Son appVersion est v3.7.13 ;
+  # l'image est montée à v3.7.18, dernier correctif de la branche 3.7 publié le
+  # 2026-11-10, et ÉPINGLÉE par digest. Le chart demande versionOverride quand
+  # l'image est désignée par digest : il ne peut pas en déduire la version.
+  # Tout est épinglé : un chart ou une image qui bouge sous le lab en change le
   # comportement sans que rien ne le signale.
+  #
+  # L'ADRESSE DES INGRESS. Par défaut, Traefik recopie sur chaque Ingress
+  # l'adresse de son propre Service. En NodePort, ce Service n'en a aucune, et
+  # un Ingress pris en charge resterait sans adresse, ce qui ressemble à un
+  # Ingress ignoré (mesuré le 2026-11-12). On publie donc l'adresse du nœud, où
+  # le NodePort répond.
+  #
+  # LE TYPE DU SERVICE se règle par service.spec.type : le chart 41.6.0 ignore
+  # service.type, et laissait le Service en LoadBalancer jamais servi (mesuré
+  # le 2026-11-12). Les NodePort existaient quand même, d'où l'erreur restée
+  # invisible.
+  #
+  # PAS DE CLASSE PAR DÉFAUT. Le chart marque son IngressClass par défaut, et
+  # Kubernetes remplit alors lui-même ingressClassName sur tout Ingress qui
+  # n'en nomme aucune : le contrôle des labs ne verrait plus si l'apprenant
+  # l'a écrite. Ce réglage ne change PAS ce que Traefik sert : avec
+  # providers.kubernetesIngress.ingressClass laissé vide, Traefik traite aussi
+  # les Ingress sans classe (mesuré le 2026-11-12, classe par défaut ôtée).
   ansible.builtin.command:
     cmd: >-
       /usr/local/bin/helm upgrade --install traefik traefik/traefik
       --namespace traefik --create-namespace --version 41.6.0
-      --set service.type=NodePort
+      --set service.spec.type=NodePort
+      --set ingressClass.isDefaultClass=false
       --set ports.web.nodePort=30080
       --set ports.web.port=80
       --set ports.websecure.nodePort=30443
+      --set providers.kubernetesIngress.publishedService.enabled=false
+      --set providers.kubernetesIngress.ingressEndpoint.ip={{ ansible_default_ipv4.address }}
       --set deployment.replicas=1
+      --set image.digest=sha256:9c437ac4f09ce6f4980a8544902d3475fdf70a1a7c578729581d2535dfa7d635
+      --set versionOverride=v3.7.18
       --set-string podSecurityContext.sysctls[0].name=net.ipv4.ip_unprivileged_port_start
       --set-string podSecurityContext.sysctls[0].value=0
       --set providers.kubernetesGateway.enabled={{ traefik_gateway_api | default(false) | bool | lower }}
