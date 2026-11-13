@@ -26,7 +26,20 @@ for i in $(seq 1 240); do
   kubectl -n etcd-essai create configmap "lest-$i" --from-file=donnee=/tmp/etcd-essai-donnee > /dev/null
 done
 set -x
-kubectl -n etcd-essai delete configmaps --all --wait=true > /dev/null
+# Le lest se retire par lots de 40, et chaque lot se retente : supprimer 120 Mo
+# d'un coup a saturé l'API d'un plan de contrôle à 4 Go (TLS handshake timeout,
+# mesuré le 2026-11-13 au quatrième setup de suite).
+set +x
+for debut in $(seq 1 40 240); do
+  lot=$(seq "$debut" $((debut + 39)) | sed 's/^/configmap\/lest-/' | tr '\n' ' ')
+  for essai in 1 2 3 4 5; do
+    # shellcheck disable=SC2086
+    kubectl -n etcd-essai delete $lot --ignore-not-found --wait=true > /dev/null && break
+    [ "$essai" = 5 ] && { echo "le lest ne se retire pas, l'API sature" >&2; exit 1; }
+    sleep 10
+  done
+done
+set -x
 rm -f /tmp/etcd-essai-donnee
 
 # Compacter jusqu'à la révision courante : la place devient libre DANS le
