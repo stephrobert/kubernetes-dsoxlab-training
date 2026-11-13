@@ -1,0 +1,63 @@
+# Lab guidé de la leçon « etcd », module Administrer le cluster du niveau 4
+# (règle 17 : un lab guidé par leçon qui enseigne un geste). Le geste : lire la
+# santé d'etcd avec etcdctl et ses certificats, lire son quota, puis compacter
+# et défragmenter une base gonflée en comparant sa taille avant et après. La
+# sauvegarde et la restauration restent à cka-etcd-backup-restore.
+#
+# Le setup gonfle la base (des ConfigMaps de test écrites puis supprimées),
+# puis la compacte : etcd garde alors un gros fichier presque vide. Seule une
+# défragmentation rend cette place. Le compactage n'est pas un état à part :
+# l'API server compacte etcd de lui-même toutes les cinq minutes, un tel état
+# serait vrai sans travail.
+id: cka-etcd-sante-et-defragmentation
+title: "Check etcd health and defragment its database"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  With etcdctl and the etcd TLS certificates, read the health of the cluster's
+  etcd, its member and its space quota, then compact and defragment a bloated
+  database and compare its size before and after.
+skills:
+  - etcd
+  - etcdctl
+  - tls
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: membre-et-sante
+    label: "The answer gives the etcd member ID, its client endpoint, and that it is healthy"
+    tests:
+      - test_le_membre_et_sa_sante_sont_ceux_d_etcd
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+  - id: quota
+    label: "The answer gives the space quota etcd actually applies"
+    tests:
+      - test_le_quota_est_celui_qu_etcd_applique
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+  - id: defragmentation
+    label: "The etcd database has been defragmented: it gave back the space the setup freed"
+    tests:
+      - test_la_base_a_ete_defragmentee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/

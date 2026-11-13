@@ -1,0 +1,13 @@
+title: "Contrôler la santé d'etcd et défragmenter sa base"
+description: |
+  Avec etcdctl et les certificats TLS d'etcd, lire la santé de l'etcd du
+  cluster, son membre et son quota d'espace, puis compacter et défragmenter une
+  base gonflée en comparant sa taille avant et après.
+
+criteria:
+  - id: membre-et-sante
+    label: "La réponse donne l'identifiant du membre etcd, son point d'accès client, et qu'il est en bonne santé"
+  - id: quota
+    label: "La réponse donne le quota d'espace qu'etcd applique vraiment"
+  - id: defragmentation
+    label: "La base etcd a été défragmentée : elle a rendu la place que le setup a libérée"

@@ -1,0 +1,70 @@
+# Lab guidé de la leçon « cert-manager », module Administrer le cluster du
+# niveau 4 (règle 17). Le geste : émettre un certificat auto-signé, créer une CA
+# interne et signer avec elle le certificat d'un service, puis diagnostiquer et
+# réparer un certificat qui reste « not ready ». ACME (Let's Encrypt) reste hors
+# lab, faute d'accès public au cluster.
+#
+# cert-manager v1.21.3 (la dernière version, publiée le 2026-10-23), installé
+# par le setup depuis le manifeste officiel et retiré par le cleanup avec le
+# même manifeste : CRD, webhooks et rôles disparaissent avec lui.
+#
+# La chaîne se vérifie par openssl verify, pas par la seule condition Ready :
+# un certificat signé par le mauvais émetteur peut être Ready.
+id: k8s-emettre-un-certificat-avec-cert-manager
+title: "Issue certificates with cert-manager and an internal CA"
+level: cluster-hardening
+section: cks
+difficulty: intermediate
+description: |
+  With cert-manager, issue a self-signed certificate, build an internal
+  certificate authority and sign a service certificate with it, then diagnose
+  and repair a certificate that stays not ready.
+skills:
+  - cert-manager
+  - tls
+  - pki
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/#mettre-en-pratique
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: emetteur-auto-signe
+    label: "The self-signed issuer auto-signe is ready"
+    tests:
+      - test_l_emetteur_auto_signe_est_pret
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
+  - id: ca-interne
+    label: "The internal CA ca-interne is a CA certificate signed by auto-signe, and its issuer is ready"
+    tests:
+      - test_la_ca_interne_est_prete
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
+  - id: certificat-du-service
+    label: "The certificate vitrine-tls is ready, for its service name, and its chain leads to the internal CA"
+    tests:
+      - test_le_certificat_de_la_vitrine_est_signe_par_la_ca_interne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
+  - id: certificat-repare
+    label: "The broken certificate api-tls is repaired and signed by the internal CA"
+    tests:
+      - test_le_certificat_api_est_repare
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/

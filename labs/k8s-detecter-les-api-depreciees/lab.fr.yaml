@@ -1,0 +1,15 @@
+title: "Détecter et migrer les API retirées"
+description: |
+  Dans un dépôt de manifestes hérités, repérer ceux qui emploient une API
+  retirée de Kubernetes, les migrer vers l'API courante sans rien changer à ce
+  qu'ils décrivent, et les appliquer.
+
+criteria:
+  - id: rapport
+    label: "Le rapport liste exactement les manifestes qui employaient une API retirée"
+  - id: api-courantes
+    label: "Chaque manifeste du dépôt est accepté par l'API server"
+  - id: objets-appliques
+    label: "Les quatre objets migrés existent dans le namespace migration"
+  - id: rien-de-change
+    label: "Les objets migrés décrivent exactement ce que décrivaient les manifestes hérités"
