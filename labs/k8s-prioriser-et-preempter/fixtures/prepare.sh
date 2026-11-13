@@ -12,8 +12,9 @@
 # d'une part de libre, et le Pod urgent, qui demande une part, ne tient que si
 # un Pod de remplissage s'en va.
 #
-# Rejouable : le namespace est attendu s'il se termine, et les PriorityClass
-# d'un passage précédent, objets du cluster, sont retirées.
+# Rejouable : le namespace est attendu s'il se termine, et les deux
+# PriorityClass d'un passage précédent, basse et haute, objets du cluster, sont
+# retirées. Aucune autre.
 set -euo pipefail
 exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
 set -x
@@ -24,7 +25,10 @@ NOEUD=multi-worker
 NS=ordonnancement
 BUSYBOX="busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"
 
-kubectl get priorityclasses -o name | { grep -v '/system-' || true; } | xargs -r kubectl delete
+# Seules les deux classes du lab, nommément : une PriorityClass posée par un
+# autre lab ou par l'apprenant hors de ce lab n'a pas à disparaître (audit du
+# 2026-11-13).
+kubectl delete priorityclass basse haute --ignore-not-found
 if [[ "$(kubectl get namespace "$NS" -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
   kubectl wait --for=delete "namespace/$NS" --timeout=180s
 fi

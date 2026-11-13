@@ -108,15 +108,32 @@ def test_le_pod_urgent_tourne(host):
 # ----------------------------------------------------------------------
 # 4. Un Pod de remplissage a été préempté.
 # ----------------------------------------------------------------------
+def _horodatage(evenement: dict) -> str:
+    """L'instant de l'événement, à la seconde : eventTime porte des fractions,
+    creationTimestamp non, et « 07:00:00.12Z » se classerait avant « 07:00:00Z »."""
+    brut = (evenement.get("lastTimestamp") or evenement.get("eventTime") or evenement.get("firstTimestamp")
+            or evenement["metadata"].get("creationTimestamp") or "")
+    return brut[:19]
+
+
 def test_un_pod_de_basse_priorite_a_ete_preempte(host):
+    # La préemption doit être celle du Pod urgent ACTUEL : l'événement le nomme
+    # (par son UID, ou par namespace/nom selon les versions de l'ordonnanceur),
+    # et il est postérieur à sa création. Un événement laissé par une tentative
+    # précédente ne compte pas (audit du 2026-11-13).
+    urgent = _urgent(host, attendre=False)
+    uid, ne_le = urgent["metadata"]["uid"], urgent["metadata"]["creationTimestamp"][:19]
     evenements = (_json(host, f"-n {NS} get events --field-selector reason=Preempted") or {}).get("items") or []
     victimes = sorted({e["involvedObject"].get("name", "") for e in evenements
-                       if e["involvedObject"].get("name", "").startswith("remplissage-")})
+                       if e["involvedObject"].get("name", "").startswith("remplissage-")
+                       and (uid in e.get("message", "") or f"{NS}/urgent" in e.get("message", ""))
+                       and _horodatage(e) >= ne_le})
     assert victimes, message(
-        en=f"No Pod of remplissage was preempted in {NS}: the scheduler made no room by evicting a "
-        "lower-priority Pod. Room made by hand is not a preemption.",
-        fr=f"Aucun Pod de remplissage n'a été préempté dans {NS} : l'ordonnanceur n'a pas fait de place en "
-        "évinçant un Pod moins prioritaire. Une place faite à la main n'est pas une préemption.",
+        en=f"No Pod of remplissage was preempted in {NS} for the current Pod urgent: the scheduler made no room "
+        "for it by evicting a lower-priority Pod. Room made by hand is not a preemption.",
+        fr=f"Aucun Pod de remplissage n'a été préempté dans {NS} pour le Pod urgent actuel : l'ordonnanceur ne lui "
+        "a pas fait de place en évinçant un Pod moins prioritaire. Une place faite à la main n'est pas une "
+        "préemption.",
     )
 
 
