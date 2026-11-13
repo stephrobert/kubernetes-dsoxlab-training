@@ -1,0 +1,95 @@
+# Le challenge du module 9 (RBAC et ServiceAccounts), décision D59 du
+# 2026-11-12. C'est la preuve sans procédure du module : il croise RBAC (Role,
+# RoleBinding, `auth can-i`, la sous-ressource pods/log) et ServiceAccounts
+# (une identité dédiée, un jeton coupé là où il ne sert pas).
+#
+# Il ne refait aucun lab guidé à l'identique. cka-rbac-serviceaccount donne à
+# une application le droit de lire les Pods de SON namespace ; ici, le droit
+# porte sur une sous-ressource (pods/log) d'un AUTRE namespace, accordé là où
+# vivent les Pods lus, et le compte par défaut hérité doit perdre ses droits.
+#
+# Six états, à poids égal (dsoxlab note par test). Les états 2 et 3, la lecture
+# du journal de production et rien de plus, sont la raison d'être du challenge :
+# ils bloquent, aucune moyenne ne les compense. Le sixième, ajouté le
+# 2026-11-13, couvre la compétence de durcissement (k8s.workload.harden) que la
+# leçon Security Context enseigne : sans lui, aucune preuve sans aide du module
+# ne la couvrait.
+id: k8s-challenge-identite-et-droits-minimaux
+title: "Give an application its own identity and the least rights"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, give an observability tool its own identity, let it read
+  the logs of another namespace's Pods and nothing more, cut the token of the
+  Pod that never calls the API, strip the inherited rights of the
+  namespace's default account, and harden the tool without breaking it.
+skills:
+  - serviceaccount
+  - security-context
+  - role
+  - rolebinding
+  - rbac
+  - least-privilege
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_collecte_lit_les_journaux_de_production
+  - test_collecte_n_a_aucun_autre_droit
+estimated_time: 40m
+
+certification_tags:
+  - cka
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: identite-dediee
+    label: "collecte runs under its own identity, collecte, not the default account"
+    tests:
+      - test_collecte_tourne_sous_sa_propre_identite
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: journaux-de-production
+    label: "From its Pod, with its own token, collecte reads the logs of the Pods of production"
+    tests:
+      - test_collecte_lit_les_journaux_de_production
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: rien-de-plus
+    label: "The identity collecte holds no other right, anywhere: nothing more in production, nothing elsewhere, nothing on the cluster"
+    tests:
+      - test_collecte_n_a_aucun_autre_droit
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: jeton-coupe
+    label: "The running Pod of tableau, which never calls the API, carries no token"
+    tests:
+      - test_tableau_ne_porte_aucun_jeton
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: compte-par-defaut
+    label: "The default account of observatoire keeps no right, anywhere, beyond what every account receives"
+    tests:
+      - test_le_compte_par_defaut_n_a_plus_aucun_droit
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: collecte-durcie
+    label: "The Pod of collecte runs non-root under a numeric UID, without privilege escalation, with a read-only root and no capability, and still reads the logs"
+    tests:
+      - test_collecte_est_durcie_et_travaille
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
