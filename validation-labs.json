@@ -247,6 +247,59 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-etcd-sante-et-defragmentation": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_la_base_a_ete_defragmentee",
+    "test_le_membre_et_sa_sante_sont_ceux_d_etcd",
+    "test_le_quota_est_celui_qu_etcd_applique"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 406,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-etcd-sante-et-defragmentation.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_base_a_ete_defragmentee",
+    "test_le_membre_et_sa_sante_sont_ceux_d_etcd",
+    "test_le_quota_est_celui_qu_etcd_applique"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "cka-examen-blanc": {
   "apres": {
    "echecs": [],
@@ -4839,6 +4892,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-detecter-les-api-depreciees": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_manifeste_est_accepte_par_l_api",
+    "test_le_rapport_liste_les_manifestes_en_api_retiree",
+    "test_les_objets_decrivent_ce_que_decrivaient_les_anciens",
+    "test_les_objets_migres_existent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 159,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-detecter-les-api-depreciees.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_manifeste_est_accepte_par_l_api",
+    "test_le_rapport_liste_les_manifestes_en_api_retiree",
+    "test_les_objets_decrivent_ce_que_decrivaient_les_anciens",
+    "test_les_objets_migres_existent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-diagnostiquer-un-pod": {
   "apres": {
    "echecs": [],
@@ -4950,6 +5058,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-emettre-un-certificat-avec-cert-manager": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_emetteur_auto_signe_est_pret",
+    "test_la_ca_interne_est_prete",
+    "test_le_certificat_api_est_repare",
+    "test_le_certificat_de_la_vitrine_est_signe_par_la_ca_interne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 392,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-emettre-un-certificat-avec-cert-manager.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_emetteur_auto_signe_est_pret",
+    "test_la_ca_interne_est_prete",
+    "test_le_certificat_api_est_repare",
+    "test_le_certificat_de_la_vitrine_est_signe_par_la_ca_interne"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -5461,6 +5624,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-lire-les-interfaces-d-un-noeud": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_configuration_cni_est_celle_en_vigueur",
+    "test_le_runtime_et_sa_version_sont_ceux_du_noeud",
+    "test_le_socket_du_runtime_est_celui_du_kubelet",
+    "test_les_pilotes_csi_sont_ceux_du_cluster"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 125,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-lire-les-interfaces-d-un-noeud.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_configuration_cni_est_celle_en_vigueur",
+    "test_le_runtime_et_sa_version_sont_ceux_du_noeud",
+    "test_le_socket_du_runtime_est_celui_du_kubelet",
+    "test_les_pilotes_csi_sont_ceux_du_cluster"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
