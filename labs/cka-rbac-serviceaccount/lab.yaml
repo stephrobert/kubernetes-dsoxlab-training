@@ -8,7 +8,8 @@ description: |
   Create it, grant it the right to read the Pods of its namespace and
   nothing else, then prove from inside the Pod, with its own token, that
   listing goes through and that deleting, reading Secrets or looking
-  elsewhere are denied.
+  elsewhere are denied. Finally, cut the token of the Pod that never calls
+  the API.
 skills:
   - serviceaccount
   - role
@@ -19,7 +20,7 @@ distros:
   - ubuntu24
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
 lab_type: lab
-estimated_time: 15m
+estimated_time: 20m
 
 # Compétence du blueprint CKA, domaine Cluster Architecture, Installation and
 # Configuration (25 %) : « Manage role based access control (RBAC) ». Le lab

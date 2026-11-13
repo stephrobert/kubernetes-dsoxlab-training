@@ -1,8 +1,8 @@
 title: "Examen blanc CKA : 17 tâches en 120 minutes"
 description: |
   Un examen blanc chronométré au format de la CKA : dix-sept tâches réparties
-  comme les domaines officiels, sur un cluster kubeadm à plusieurs contextes,
-  noté sur l'état final du cluster, sans indice. Prévoyez 120 minutes.
+  comme les domaines officiels, sur un cluster kubeadm, chaque tâche sur l'hôte qu'elle désigne,
+  jointe par ssh, noté sur l'état final du cluster, sans indice. Prévoyez 120 minutes.
 
 criteria:
   - id: t01-classe-rapide

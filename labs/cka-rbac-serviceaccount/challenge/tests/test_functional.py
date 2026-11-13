@@ -2,13 +2,18 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première veut le Pod en marche sous son identité ;
+Cinq affirmations. La première veut le Pod en marche sous son identité ;
 sans ServiceAccount, il n'existe pas. La deuxième lit le Role et le
 RoleBinding et refuse tout droit en trop : un Role qui donnerait aussi
-delete, ou secrets, passerait un candidat trop généreux. Les deux dernières
+delete, ou secrets, passerait un candidat trop généreux. Les deux suivantes
 entrent dans le Pod et interrogent l'API avec le jeton projeté, ce qui est
 la seule preuve que l'application, et pas l'administrateur, a ces droits :
 lister doit répondre 200, tout le reste 403.
+
+La cinquième (D61) porte sur l'autre moitié du moindre privilège : le Pod
+d'affichage, qui n'appelle jamais l'API, ne doit porter aucun jeton. Elle lit
+les Pods EN MARCHE : couper le jeton sur le ServiceAccount sans recréer les
+Pods ne change rien à ceux qui tournent, et ne passe pas.
 """
 
 from __future__ import annotations
@@ -22,6 +27,8 @@ from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "app-team"
 DEPLOYMENT = "inventaire"
+SANS_API = "affichage"
+JETON = "/var/run/secrets/kubernetes.io/serviceaccount"
 SA = "pod-reader"
 ROLE = "pod-reader-role"
 BINDING = "pod-reader-binding"
@@ -195,4 +202,36 @@ def test_depuis_le_pod_tout_le_reste_est_refuse(host):
         fr=f"Ces requêtes devraient répondre 403 et répondent : {passes}. Le ServiceAccount a plus "
         "de droits que la consigne : un Role trop large, un ClusterRoleBinding, ou un rôle "
         "existant réutilisé. L'application ne doit pouvoir que lire les Pods de son namespace.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 5. Le Pod qui n'appelle pas l'API n'a aucun jeton monté (D61).
+# ----------------------------------------------------------------------
+def _porte_un_jeton(pod: dict) -> list[str]:
+    """Les conteneurs du Pod où un jeton de ServiceAccount est monté."""
+    projetes = {v["name"] for v in pod["spec"].get("volumes") or []
+                if any("serviceAccountToken" in s for s in (v.get("projected") or {}).get("sources") or [])}
+    return [c["name"] for c in (pod["spec"].get("containers") or []) + (pod["spec"].get("initContainers") or [])
+            if any(m.get("mountPath", "").startswith(JETON) or m.get("name") in projetes
+                   for m in c.get("volumeMounts") or [])]
+
+
+def test_le_pod_qui_n_appelle_pas_l_api_n_a_aucun_jeton(host):
+    res = _kubectl(host, f"-n {NAMESPACE} get pods -l app={SANS_API} -o json")
+    pods = [p for p in (json.loads(res.stdout)["items"] if res.rc == 0 else [])
+            if not p["metadata"].get("deletionTimestamp") and p["status"].get("phase") == "Running"]
+    assert pods, message(
+        en=f"No running Pod of {SANS_API} in {NAMESPACE}: it serves its page, it is not removed.",
+        fr=f"Aucun Pod de {SANS_API} en marche dans {NAMESPACE} : il sert sa page, on ne le retire pas.",
+    )
+    avec_jeton = {p["metadata"]["name"]: _porte_un_jeton(p) for p in pods}
+    avec_jeton = {nom: conteneurs for nom, conteneurs in avec_jeton.items() if conteneurs}
+    assert not avec_jeton, message(
+        en=f"{SANS_API} never calls the API, yet a ServiceAccount token is mounted in {avec_jeton}. "
+        f"A token nobody uses is a credential to steal: none should be mounted in {JETON}. A Pod "
+        "created before the change keeps its token until it is recreated.",
+        fr=f"{SANS_API} n'appelle jamais l'API, et pourtant un jeton de ServiceAccount est monté dans "
+        f"{avec_jeton}. Un jeton que personne n'utilise est un secret à voler : aucun ne doit être "
+        f"monté dans {JETON}. Un Pod créé avant le changement garde son jeton tant qu'il n'est pas recréé.",
     )

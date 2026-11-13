@@ -19,7 +19,7 @@ Vingt états à 5 points : dsoxlab note la part de tests réussis, et une tâche
 
 Helm et la construction d'images sont hors parcours dans le référentiel : ils ne
 figurent pas dans l'examen. Le setup installe Traefik et local-path, et pose
-trois contextes dans le kubeconfig de l'apprenant.
+un kubeconfig, l'alias `k` et la complétion sur les deux hôtes de tâche.
 
 | | |
 |---|---|

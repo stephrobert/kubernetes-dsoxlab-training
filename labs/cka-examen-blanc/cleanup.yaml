@@ -82,17 +82,8 @@
         path: /var/lib/etcd/sauvegarde-examen.db
         state: absent
 
-    - name: Retirer les contextes de l'examen du kubeconfig de l'apprenant
-      ansible.builtin.shell: |
-        for ctx in cka-infra cka-appli cka-reseau; do
-          kubectl --kubeconfig {{ maison }}/.kube/config config delete-context "$ctx" || true
-        done
-        kubectl --kubeconfig {{ maison }}/.kube/config config use-context kubernetes-admin@kubernetes
-      args:
-        executable: /bin/bash
-      become_user: "{{ ansible_user | default('ansible') }}"
-      changed_when: true
-      failed_when: false
+    - name: Défaire la mécanique de l'examen réel (D63)
+      ansible.builtin.include_tasks: ../../shared/examen-ssh-nettoyage.yml
 
     - name: Retirer les fichiers de l'examen
       ansible.builtin.file:

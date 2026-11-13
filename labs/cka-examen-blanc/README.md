@@ -18,7 +18,7 @@ task carries two states.
 | Servicing and Networking | 20 | 14, 15, 16, 17 |
 
 The setup installs Traefik (Ingress and Gateway API v1.6.2) and local-path,
-sets three contexts in the learner's kubeconfig, then takes the worker's kubelet
+sets a kubeconfig, the `k` alias and completion on both task hosts, then takes the worker's kubelet
 out of service. The `cleanup.yaml` brings the worker back and removes
 everything, cluster-wide objects included.
 
