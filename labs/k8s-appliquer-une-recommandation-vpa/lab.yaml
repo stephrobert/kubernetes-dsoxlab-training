@@ -1,0 +1,79 @@
+# Lab guidé de la leçon « Vertical Pod Scaling », module 8 de la formation
+# Kubernetes (décision de Stéphane du 2026-11-13, qui remplace
+# k8s-redimensionner-un-pod-a-chaud : ce dernier doublait
+# ckad-in-place-pod-vertical-scaling).
+#
+# Le geste : un VPA en mode Off sur un Deployment, lire sa recommandation
+# (lowerBound, target, upperBound), puis reporter des requests raisonnables dans
+# le Deployment. Les tests jugent les requests contre les bornes lues au moment
+# du check, pas contre une valeur figée.
+#
+# Sur le cluster kubeadm du catalogue, comme cka-hpa-autoscaling : metrics-server
+# v0.9.1 (avec --kubelet-insecure-tls) et le VPA 1.8.1, installé par son script
+# officiel au tag vertical-pod-autoscaler-1.8.1 et retiré par vpa-down.sh.
+id: k8s-appliquer-une-recommandation-vpa
+title: "Apply a VPA recommendation"
+level: workloads-scheduling
+section: cka
+difficulty: intermediate
+description: |
+  Put a Vertical Pod Autoscaler in Off mode on an undersized Deployment, read
+  its recommendation (lower bound, target, upper bound), then report sensible
+  requests into the Deployment yourself, without letting the VPA evict a Pod.
+skills:
+  - vertical-pod-autoscaler
+  - requests-limits
+  - metrics-server
+  - deployment
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: vpa-en-mode-off
+    label: "The VPA catalogue targets the Deployment catalogue, in Off mode"
+    tests:
+      - test_le_vpa_existe_en_mode_off
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+  - id: recommandation
+    label: "The VPA has produced a recommendation for the container catalogue"
+    tests:
+      - test_le_vpa_a_produit_une_recommandation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+  - id: requests-dans-les-bornes
+    label: "The Deployment's requests fit: CPU between the lower and the upper bound, memory between the measured usage and the upper bound"
+    tests:
+      - test_les_requests_sont_dans_les_bornes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: pods-a-jour
+    label: "The running Pods carry these requests"
+    tests:
+      - test_les_pods_tournent_avec_ces_requests
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+  - id: aucune-eviction
+    label: "The VPA evicted no Pod"
+    tests:
+      - test_le_vpa_n_a_evince_aucun_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/

@@ -1,0 +1,26 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset`. Les PriorityClass sont des objets
+# du CLUSTER : supprimer le namespace ne les retire pas. Seules les deux que le
+# scénario fait créer, basse et haute, partent, nommément : une classe posée hors
+# de ce lab reste (audit du 2026-11-13, vérifié par une classe témoin à
+# l'attestation).
+- name: Défaire le lab k8s-prioriser-et-preempter
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/multi.kubeconfig
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace ordonnancement --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer les deux PriorityClass du lab, et elles seules
+      ansible.builtin.command: >-
+        {{ kubectl }} delete priorityclass basse haute --ignore-not-found
+      changed_when: true
+
+    - name: Retirer le manifeste fourni
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/lab/urgent.yaml"
+        state: absent

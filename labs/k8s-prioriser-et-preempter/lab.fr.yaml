@@ -1,0 +1,17 @@
+title: "Prioriser des Pods et observer une préemption"
+description: |
+  Créer une PriorityClass basse et une haute, faire tourner sous la basse les
+  Pods qui remplissent un nœud, puis lancer un Pod urgent sous la haute et voir
+  l'ordonnanceur préempter un Pod de basse priorité pour lui faire de la place.
+
+criteria:
+  - id: deux-classes
+    label: "Les PriorityClass basse (1000) et haute (100000) existent, aucune n'étant la classe par défaut"
+  - id: remplissage-basse
+    label: "Les Pods de remplissage tournent sous la classe basse"
+  - id: urgent-tourne
+    label: "Le Pod urgent tourne sur le worker plein"
+  - id: preemption
+    label: "Un Pod de remplissage a été préempté pour lui faire de la place"
+  - id: urgent-haute
+    label: "Le Pod urgent porte la classe haute"
