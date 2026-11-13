@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Pose l'examen blanc CKAD sur le cluster kubeadm du catalogue :
 #
-#   - trois contextes dans le kubeconfig de l'apprenant, vers ce même cluster :
-#     ckad-atelier (namespace atelier), ckad-boutique (boutique) et
-#     ckad-securite (securite) ;
+#   - aucun contexte : chaque tâche désigne son hôte et son namespace (D63),
+#     la mécanique vit dans shared/examen-ssh.yml ;
 #   - ~/examen/ : le manifeste hérité de la tâche 8 et l'arbre Kustomize ;
 #   - l'état de départ de chaque tâche, faux par construction.
 #
@@ -26,13 +25,6 @@ for ns in atelier boutique securite; do
   fi
   kubectl get namespace "$ns" >/dev/null 2>&1 || kubectl create namespace "$ns"
 done
-
-CONF="${LAB_HOME}/.kube/config"
-for ctx in ckad-atelier:atelier ckad-boutique:boutique ckad-securite:securite; do
-  sudo -u "$LAB_USER" kubectl --kubeconfig "$CONF" config set-context "${ctx%%:*}" \
-    --cluster=kubernetes --user=kubernetes-admin --namespace="${ctx##*:}"
-done
-sudo -u "$LAB_USER" kubectl --kubeconfig "$CONF" config use-context kubernetes-admin@kubernetes
 
 rm -rf "${LAB_HOME}/examen"
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/examen"
@@ -260,4 +252,4 @@ IP_INTERNE="$(kubectl -n boutique get pod interne -o jsonpath='{.status.podIP}')
 kubectl -n boutique exec autre -- wget -qO- -T 5 "http://${IP_INTERNE}:5678/"
 test -z "$(kubectl -n boutique get endpointslices -l kubernetes.io/service-name=stock \
   -o jsonpath='{.items[*].endpoints[*].addresses[*]}')"
-echo "Examen posé : trois namespaces, trois contextes, les pannes en place."
+echo "Examen posé : trois namespaces, les pannes en place."

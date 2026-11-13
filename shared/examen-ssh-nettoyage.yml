@@ -1,0 +1,36 @@
+---
+# Défait shared/examen-ssh.yml : le kubeconfig du worker, l'autorisation de
+# ssh vers la base elle-même, l'alias et la complétion. Joué en root sur le
+# control plane, par le cleanup des deux examens blancs. Tout est idempotent :
+# un cleanup rejoué, ou joué sans setup, ne fait rien.
+
+- name: Retirer le kubeconfig de l'utilisateur du lab sur le worker
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user | default('ansible') }}/.kube"
+    state: absent
+  delegate_to: k8s-w1.lab
+
+- name: Lire la clé publique de l'utilisateur du lab sur le control plane
+  ansible.builtin.slurp:
+    src: "/home/{{ ansible_user | default('ansible') }}/.ssh/id_ed25519.pub"
+  register: examen_cle_cp
+  failed_when: false
+
+- name: Retirer l'autorisation de ssh k8s-cp.lab depuis la base
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys"
+    line: "{{ examen_cle_cp.content | b64decode | trim }}"
+    state: absent
+  when: examen_cle_cp.content is defined
+
+- name: Retirer l'alias k et la complétion des deux hôtes
+  ansible.builtin.blockinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.bashrc"
+    marker: "# {mark} DSOXLAB EXAMEN BLANC"
+    state: absent
+  delegate_to: "{{ hote_examen }}"
+  loop:
+    - "{{ inventory_hostname }}"
+    - k8s-w1.lab
+  loop_control:
+    loop_var: hote_examen

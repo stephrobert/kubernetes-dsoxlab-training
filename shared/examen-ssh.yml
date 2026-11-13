@@ -1,0 +1,66 @@
+---
+# La mécanique de l'examen réel, pour les deux examens blancs (décision D63) :
+# chaque tâche désigne un hôte, l'apprenant s'y connecte par ssh depuis la base
+# (k8s-cp.lab, la session de `dsoxlab run`), travaille, puis revient par exit.
+# Aucun contexte : chaque tâche écrit son namespace.
+#
+# Ce fichier pose ce qu'il faut sur les deux hôtes de tâche :
+#   - un kubeconfig pour l'utilisateur du lab sur k8s-w1.lab, qui n'en a pas ;
+#   - l'autorisation de `ssh k8s-cp.lab` depuis la base : le socle autorise la
+#     clé du control plane sur les workers, pas sur lui-même ;
+#   - l'alias `k` et la complétion de kubectl, comme à l'examen.
+#
+# Inclus par labs/cka-examen-blanc et labs/ckad-examen-blanc, défait par
+# shared/examen-ssh-nettoyage.yml. Joué en root sur le control plane.
+
+- name: Lire le kubeconfig d'administration du cluster
+  ansible.builtin.slurp:
+    src: /etc/kubernetes/admin.conf
+  register: examen_admin_conf
+
+- name: Créer le répertoire kubeconfig de l'utilisateur du lab sur le worker
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user | default('ansible') }}/.kube"
+    state: directory
+    owner: "{{ ansible_user | default('ansible') }}"
+    mode: "0700"
+  delegate_to: k8s-w1.lab
+
+- name: Poser le kubeconfig de l'utilisateur du lab sur le worker
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user | default('ansible') }}/.kube/config"
+    content: "{{ examen_admin_conf.content | b64decode }}"
+    owner: "{{ ansible_user | default('ansible') }}"
+    mode: "0600"
+  delegate_to: k8s-w1.lab
+
+- name: Lire la clé publique de l'utilisateur du lab sur le control plane
+  ansible.builtin.slurp:
+    src: "/home/{{ ansible_user | default('ansible') }}/.ssh/id_ed25519.pub"
+  register: examen_cle_cp
+
+- name: Autoriser ssh k8s-cp.lab depuis la base
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys"
+    line: "{{ examen_cle_cp.content | b64decode | trim }}"
+    create: true
+    owner: "{{ ansible_user | default('ansible') }}"
+    mode: "0600"
+
+- name: Poser l'alias k et la complétion de kubectl sur les deux hôtes
+  ansible.builtin.blockinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.bashrc"
+    marker: "# {mark} DSOXLAB EXAMEN BLANC"
+    create: true
+    owner: "{{ ansible_user | default('ansible') }}"
+    mode: "0644"
+    block: |
+      alias k=kubectl
+      source <(kubectl completion bash)
+      complete -o default -F __start_kubectl k
+  delegate_to: "{{ hote_examen }}"
+  loop:
+    - "{{ inventory_hostname }}"
+    - k8s-w1.lab
+  loop_control:
+    loop_var: hote_examen

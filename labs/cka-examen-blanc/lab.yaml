@@ -11,8 +11,8 @@
 # 2026-11-12). Avec des états à 5 points, il faut 14 états sur 20. Aucun critère
 # bloquant : l'examen réel n'en a pas.
 #
-# Sur le cluster kubeadm du catalogue, avec trois contextes dans le kubeconfig de
-# l'apprenant, tous vers ce cluster. dsoxlab ne chronomètre pas : la durée est
+# Sur le cluster kubeadm du catalogue. Comme à l'examen réel (D63), chaque tâche
+# désigne un hôte, joint par ssh depuis la base, et écrit son namespace. dsoxlab ne chronomètre pas : la durée est
 # écrite dans le scénario.
 id: cka-examen-blanc
 title: "CKA mock exam: 17 tasks in 120 minutes"
@@ -21,8 +21,8 @@ section: cka
 difficulty: advanced
 description: |
   A timed mock exam in the CKA format: seventeen tasks spread like the official
-  domains, on one kubeadm cluster with several contexts, graded on the cluster's
-  final state, no hint. Plan for 120 minutes.
+  domains, on one kubeadm cluster, each task on the host it names, reached by ssh,
+  graded on the cluster's final state, no hint. Plan for 120 minutes.
 skills:
   - storage
   - troubleshooting
