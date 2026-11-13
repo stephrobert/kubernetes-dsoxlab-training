@@ -8,6 +8,9 @@ inventory. The Deployment is there, but no Pod starts. The manifest declares
 a ServiceAccount **`pod-reader`** that nobody created, and with no identity,
 the ReplicaSet cannot launch anything.
 
+Next to it runs **`affichage`**, which serves a static page and never calls
+the API. Like any Pod, it received a ServiceAccount token it has no use for.
+
 You are on the control plane, with `kubectl` configured.
 
 ## What you must achieve
@@ -27,6 +30,10 @@ You are on the control plane, with `kubectl` configured.
    `app-team` answers `200`. Deleting a Pod, reading the Secrets, or listing
    the Pods of `default` answer `403`.
 
+5. The running Pod of **`affichage`** carries **no token**: nothing is
+   mounted in `/var/run/secrets/kubernetes.io/serviceaccount`. The
+   `inventaire` Pod, which needs its token, keeps it.
+
 ## Useful bearings
 
 A Pod never talks to the API in its own name: it presents its
@@ -42,11 +49,15 @@ and its token at hand: `kubectl exec` takes you there.
 A ReplicaSet that cannot create its Pods says so in the namespace events,
 not in logs that do not exist yet.
 
+A token is mounted when the Pod is created. Changing what decides it does not
+remove it from a Pod that is already running.
+
 ## How you will know it works
 
 The tests read the Role and the RoleBinding, then enter the Pod and query
 the API with its token, for what must go through as well as for what must be
-denied.
+denied. They finally read the running Pod of `affichage`, to check that no
+token is mounted in it.
 
 ```bash
 dsoxlab check cka-rbac-serviceaccount
