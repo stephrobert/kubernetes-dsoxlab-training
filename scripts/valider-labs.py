@@ -97,6 +97,7 @@ if os.path.exists("/etc/kubernetes/admin.conf"):
 else:
     CIBLES = [(os.path.basename(c)[:-len(".kubeconfig")] + ":", c) for c in sorted(glob.glob("/etc/kind/*.kubeconfig"))]
 K = []
+ESPACES_CNI = ("kube-flannel", "calico-system", "calico-apiserver", "tigera-operator")
 def get(*args):
     out = subprocess.run(K + list(args) + ["-o", "json"], capture_output=True, text=True)
     return json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {"items": []}
@@ -123,10 +124,15 @@ def photographier_un(prefixe):
         ks["deployment/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
     for d in get("get", "daemonsets", "-n", "kube-system")["items"]:
         ks["daemonset/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
-    # Le CNI vit dans son propre namespace ; ses Pods changent de nom à chaque
-    # redémarrage, on ne retient que le compte de son DaemonSet.
-    for d in get("get", "daemonsets", "-n", "kube-flannel")["items"]:
-        ks["daemonset/kube-flannel/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+    # Le CNI vit dans ses propres namespaces ; ses Pods changent de nom à chaque
+    # redémarrage, on ne retient que le compte de ses DaemonSets et Deployments.
+    # Calico par l'opérateur Tigera (D64) en a trois ; un Calico abîmé se voit
+    # donc toujours, un Pod simplement recréé n'est plus un écart.
+    for cni in ESPACES_CNI:
+        for d in get("get", "daemonsets", "-n", cni)["items"]:
+            ks["daemonset/" + cni + "/" + d["metadata"]["name"]] = [d["status"].get("desiredNumberScheduled", 0), d["status"].get("numberReady", 0)]
+        for d in get("get", "deployments", "-n", cni)["items"]:
+            ks["deployment/" + cni + "/" + d["metadata"]["name"]] = [d["spec"].get("replicas", 0), d["status"].get("readyReplicas", 0)]
     for p in get("get", "pods", "-n", "kube-system")["items"]:
         if any(o.get("kind") == "Node" for o in p["metadata"].get("ownerReferences") or []):
             ks["pod-statique/" + p["metadata"]["name"]] = p["status"].get("phase")
@@ -139,7 +145,7 @@ def photographier_un(prefixe):
                  "ingresses", "resourcequotas", "limitranges"):
         for x in get("get", kind, "-A")["items"]:
             nsn = x["metadata"]["namespace"]
-            if nsn in ("kube-system", "kube-flannel") or nsn in photo["terminating"]:
+            if nsn == "kube-system" or nsn in ESPACES_CNI or nsn in photo["terminating"]:
                 continue
             objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
     photo["objets"] = sorted(objets)
@@ -322,9 +328,16 @@ VERSION_PEUT_MONTER = frozenset({"cka-kubeadm-upgrade"})
 #: ConfigMaps passe. Le supprimer plutôt que l'accepter demanderait de faire
 #: écrire `resolvConf` par le socle dès l'init, ce qui touche la façon dont les
 #: soixante-quatre labs montent leur cluster.
+#:
+#: Le troisième n'est pas écrit par `kubeadm upgrade apply`, mais par l'API à la
+#: création du cluster, que le setup de ce lab refait par `kubeadm init`. Il ne
+#: porte que le JOUR de cette création, `{"since":"2026-11-13"}` : mesuré le
+#: 2026-11-13, une attestation commencée le 12 à 23:45 UTC et finie après minuit
+#: sortait ROUGE sur ce seul écart, le lab n'y étant pour rien.
 CONFIGMAPS_REGENERES_PAR_UPGRADE = frozenset({
     "configmap/kubeadm-config",
     "configmap/kubelet-config",
+    "configmap/kube-apiserver-legacy-service-account-token-tracking",
 })
 
 

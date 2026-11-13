@@ -158,7 +158,7 @@ def test_le_worker_a_ete_evacue(host):
         "le refuse par défaut : la consigne dit qu'il peut disparaître, et l'option existe.",
     )
     calico = [
-        p for p in _json(host, "-n kube-system get pods -l k8s-app=calico-node")["items"]
+        p for p in _json(host, "-n calico-system get pods -l k8s-app=calico-node")["items"]
         if p["spec"].get("nodeName") == WORKER and not p["metadata"].get("deletionTimestamp")
     ]
     assert calico, message(

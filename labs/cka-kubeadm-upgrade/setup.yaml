@@ -206,13 +206,6 @@
             owner: "{{ ansible_user | default('ubuntu') }}"
             mode: "0600"
 
-        - name: Réinstaller le CNI
-          # Le manifeste a été téléchargé par le socle : on le réapplique tel
-          # quel, sans ressortir sur le réseau.
-          ansible.builtin.command:
-            cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /root/calico.yaml
-          changed_when: true
-
         - name: Retirer le taint du plan de contrôle
           ansible.builtin.command:
             cmd: >-
@@ -220,6 +213,12 @@
               node-role.kubernetes.io/control-plane- --overwrite
           changed_when: true
           failed_when: false
+
+        - name: Réinstaller le CNI, Calico par l'opérateur Tigera
+          # Le même fichier que le socle : les manifestes téléchargés par lui
+          # sont réutilisés, sans ressortir sur le réseau. Après le taint, pour
+          # que les composants de Calico trouvent un nœud où tourner.
+          ansible.builtin.include_tasks: ../../shared/calico-operateur.yml
 
         - name: Fabriquer une commande de jointure
           ansible.builtin.command: kubeadm token create --print-join-command --ttl 30m
