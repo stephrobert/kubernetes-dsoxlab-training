@@ -18,8 +18,8 @@ task carries two states.
 | Services and Networking | 20 | 15, 16, 17 |
 
 Helm and image building are out of the course in the curriculum map: they are
-not in the exam. The setup installs Traefik and local-path, and sets three
-contexts in the learner's kubeconfig.
+not in the exam. The setup installs Traefik and local-path, and sets a
+kubeconfig, the `k` alias and completion on both task hosts.
 
 | | |
 |---|---|

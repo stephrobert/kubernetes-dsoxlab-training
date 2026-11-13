@@ -3,8 +3,8 @@
 # setup ne mette k8s-w1 hors service (tâche 3). Le worker porte déjà le taint de
 # la tâche 9 : tout ce qui est posé ici tourne sur le control plane.
 #
-#   - trois contextes dans le kubeconfig de l'apprenant, vers ce même cluster :
-#     cka-infra (namespace default), cka-appli (appli), cka-reseau (reseau) ;
+#   - aucun contexte : chaque tâche désigne son hôte et son namespace (D63),
+#     la mécanique vit dans shared/examen-ssh.yml ;
 #   - ~/examen/ : la CRD fournie et l'arbre Kustomize à compléter ;
 #   - l'état de départ de chaque tâche, faux par construction.
 #
@@ -27,14 +27,6 @@ for ns in appli reseau prod; do
   fi
   kubectl get namespace "$ns" >/dev/null 2>&1 || kubectl create namespace "$ns"
 done
-
-# Les contextes de l'examen, dans le kubeconfig de l'apprenant.
-CONF="${LAB_HOME}/.kube/config"
-for ctx in cka-infra:default cka-appli:appli cka-reseau:reseau; do
-  sudo -u "$LAB_USER" kubectl --kubeconfig "$CONF" config set-context "${ctx%%:*}" \
-    --cluster=kubernetes --user=kubernetes-admin --namespace="${ctx##*:}"
-done
-sudo -u "$LAB_USER" kubectl --kubeconfig "$CONF" config use-context kubernetes-admin@kubernetes
 
 # Les fichiers fournis.
 rm -rf "${LAB_HOME}/examen"
@@ -306,4 +298,4 @@ done
 kubectl -n reseau exec autre -- nc -z -w 3 db 5432
 test -z "$(kubectl -n appli get endpointslices -l kubernetes.io/service-name=annuaire \
   -o jsonpath='{.items[*].endpoints[*].addresses[*]}')"
-echo "Examen posé : trois namespaces, trois contextes, les pannes en place."
+echo "Examen posé : trois namespaces, les pannes en place."
