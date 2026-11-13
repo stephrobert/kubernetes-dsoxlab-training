@@ -44,9 +44,9 @@ Six states, equally weighted. The pass mark is **70 out of 100**, and states
 more. Passing the others does not make up for missing one of them.
 
 The tests enter the Pod of `collecte` and query the API with its token, then
-have the API compute each identity's effective rights: the
-application, not the administrator, must hold these rights. The feedback is
-limited to the verdict: passed or not, and the score.
+have the API compute each identity's effective rights: the application, not
+the administrator, must hold these rights. The feedback is limited to the
+verdict: passed or not, and the score.
 
 ```bash
 dsoxlab check  k8s-challenge-identite-et-droits-minimaux
