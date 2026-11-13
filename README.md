@@ -225,7 +225,7 @@ Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster 
 
 Five domains. Troubleshooting weighs 30 %, more than any other, and it is the one that separates those who know Kubernetes from those who can operate it.
 
-38 lab(s).
+39 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -265,8 +265,9 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 | 34 | [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) | Back up etcd, then restore the cluster from a snapshot | cluster-architecture-installation-configuration | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
 | 35 | [`k8s-detecter-les-api-depreciees`](labs/k8s-detecter-les-api-depreciees/) | Detect and migrate removed APIs | cluster-architecture-installation-configuration | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique) |
 | 36 | [`cka-kubeadm-upgrade`](labs/cka-kubeadm-upgrade/) | Upgrade a cluster one minor version, without interrupting what runs on it | cluster-architecture | 40m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
-| 37 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
-| 38 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 37 | [`k8s-challenge-sauvegarder-et-restaurer`](labs/k8s-challenge-sauvegarder-et-restaurer/) | Challenge: back up, restore and put a cluster back in order | cluster-architecture-installation-configuration | 50m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
+| 38 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 39 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 ### CKAD, Certified Kubernetes Application Developer
 
@@ -346,7 +347,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 19 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 20 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **107 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **108 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

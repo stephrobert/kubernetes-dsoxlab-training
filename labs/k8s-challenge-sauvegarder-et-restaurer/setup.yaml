@@ -1,0 +1,44 @@
+---
+# Joué par `dsoxlab run` : le socle, etcdctl et etcdutl, etcd ramené sur
+# /var/lib/etcd si un passage précédent l'en a sorti, puis la situation du
+# challenge (fixtures/prepare.sh).
+- name: Préparer le challenge k8s-challenge-sauvegarder-et-restaurer
+  hosts: lab_target
+  become: true
+  vars:
+    etcd_version: "3.7.0"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    # La version est celle de l'image registry.k8s.io/etcd:3.7.0-0 que
+    # kubeadm 1.37 déploie : le client parle la même API que le serveur.
+    - name: Récupérer l'archive etcd {{ etcd_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        dest: "/root/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        mode: "0644"
+
+    - name: Installer etcdctl et etcdutl dans /usr/local/bin
+      ansible.builtin.unarchive:
+        src: "/root/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+          - "etcd-v{{ etcd_version }}-linux-amd64/etcdctl"
+          - "etcd-v{{ etcd_version }}-linux-amd64/etcdutl"
+        creates: /usr/local/bin/etcdutl
+
+    - name: Ramener etcd sur /var/lib/etcd si un passage précédent l'en a sorti
+      ansible.builtin.script: fixtures/remettre-etcd.sh
+      args:
+        executable: /bin/bash
+
+    - name: Poser la situation, sauvegarde de la veille comprise
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
