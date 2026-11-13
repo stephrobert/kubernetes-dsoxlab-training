@@ -70,7 +70,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: rien-de-plus
-    label: "collecte can do nothing else: no deletion, no Secret, no other namespace"
+    label: "The identity collecte holds no other right, anywhere: nothing more in production, nothing elsewhere, nothing on the cluster"
     tests:
       - test_collecte_n_a_aucun_autre_droit
     lessons:
@@ -82,7 +82,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
   - id: compte-par-defaut
-    label: "The default account of observatoire keeps no right to change anything"
+    label: "The default account of observatoire keeps no right, anywhere, beyond what every account receives"
     tests:
       - test_le_compte_par_defaut_n_a_plus_aucun_droit
     lessons:

@@ -105,6 +105,26 @@ def _code_http(host, pod: str, chemin: str, methode: str = "GET") -> str:
     return res.stdout.strip()
 
 
+#: Ce que Kubernetes accorde à TOUT compte authentifié : s'interroger sur ses
+#: propres droits. Ce n'est pas un droit applicatif, on le retire des règles.
+_BASE_DE_TOUT_COMPTE = {"selfsubjectaccessreviews", "selfsubjectrulesreviews", "selfsubjectreviews"}
+
+
+def _droits_effectifs(host, sujet: str, ns: str) -> list[dict]:
+    """Les règles de ressource que l'API accorde à sujet dans ns, calculées par
+    une SelfSubjectRulesReview jouée sous son identité, moins la base de tout
+    compte. Un droit accordé pour tout le cluster y figure dans chaque namespace."""
+    revue = ('{"apiVersion":"authorization.k8s.io/v1","kind":"SelfSubjectRulesReview",'
+             f'"spec":{{"namespace":"{ns}"}}}}')
+    res = host.run(f"echo '{revue}' | {KUBECTL} create --as {sujet} -f - -o json")
+    assert res.rc == 0, message(
+        en=f"Cannot compute the rights of {sujet} in {ns}: {res.stderr.strip()[:200]}",
+        fr=f"Impossible de calculer les droits de {sujet} dans {ns} : {res.stderr.strip()[:200]}",
+    )
+    regles = (json.loads(res.stdout).get("status") or {}).get("resourceRules") or []
+    return [r for r in regles if not set(r.get("resources") or []) <= _BASE_DE_TOUT_COMPTE]
+
+
 def _sous_son_identite(pod: dict) -> bool:
     return pod["spec"].get("serviceAccountName") == SA
 
@@ -169,6 +189,25 @@ def test_collecte_n_a_aucun_autre_droit(host):
         fr=f"Ces requêtes de collecte devraient répondre 403 et répondent : {passes}. Son identité a plus "
         "que la lecture des journaux de production : un droit accordé pour tout le cluster, ou un rôle trop large.",
     )
+    # Au-delà de ces refus ponctuels, la politique EFFECTIVE de l'identité, telle
+    # que l'API la calcule (audit du 2026-11-13) : dans production, rien de plus
+    # que lire les Pods et leur journal ; ailleurs, rien du tout. Un droit
+    # accordé pour tout le cluster apparaît dans chaque namespace.
+    sujet = f"system:serviceaccount:{OBS}:{SA}"
+    en_trop = {}
+    for ns in (PROD, OBS, "kube-system", "default"):
+        regles = _droits_effectifs(host, sujet, ns)
+        if ns == PROD:
+            regles = [r for r in regles if not (
+                set(r.get("apiGroups") or []) <= {""}
+                and set(r.get("resources") or []) <= {"pods", "pods/log"}
+                and set(r.get("verbs") or []) <= {"get", "list", "watch"})]
+        if regles:
+            en_trop[ns] = [f"{','.join(r.get('verbs') or [])} {','.join(r.get('resources') or [])}" for r in regles]
+    assert not en_trop, message(
+        en=f"The identity {SA} holds more than reading the Pods of {PROD} and their logs: {en_trop}.",
+        fr=f"L'identité {SA} a plus que la lecture des Pods de {PROD} et de leur journal : {en_trop}.",
+    )
 
 
 # ----------------------------------------------------------------------
@@ -202,13 +241,13 @@ def test_tableau_ne_porte_aucun_jeton(host):
 # 5. Le compte par défaut d'observatoire ne garde aucun droit.
 # ----------------------------------------------------------------------
 def test_le_compte_par_defaut_n_a_plus_aucun_droit(host):
-    essais = [("create", "deployments", OBS), ("delete", "pods", OBS), ("update", "configmaps", OBS),
-              ("create", "rolebindings", OBS), ("get", "secrets", OBS)]
+    # La politique effective du compte, et non quelques can-i (audit du
+    # 2026-11-13) : dans observatoire, dans production et à l'échelle du
+    # cluster, il ne doit rien lui rester au-delà de ce que tout compte reçoit.
     accordes = []
-    for verbe, ressource, ns in essais:
-        res = host.run(f"{KUBECTL} auth can-i {verbe} {ressource} -n {ns} --as {DEFAUT}")
-        if res.stdout.strip() == "yes":
-            accordes.append(f"{verbe} {ressource}")
+    for ns in (OBS, PROD, "default"):
+        accordes += [f"{ns}: {','.join(r.get('verbs') or [])} {','.join(r.get('resources') or [])}"
+                     for r in _droits_effectifs(host, DEFAUT, ns)]
     assert not accordes, message(
         en=f"The default account of {OBS} can still: {accordes}. Every Pod that names no identity gets it: "
         "a right inherited by the default account is a right every forgotten Pod has.",

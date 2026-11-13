@@ -11,10 +11,10 @@ criteria:
   - id: journaux-de-production
     label: "Depuis son Pod, avec son propre jeton, collecte lit le journal des Pods de production"
   - id: rien-de-plus
-    label: "collecte ne peut rien d'autre : ni supprimer, ni lire un Secret, ni regarder un autre namespace"
+    label: "L'identité collecte n'a aucun autre droit, nulle part : rien de plus dans production, rien ailleurs, rien sur le cluster"
   - id: jeton-coupe
     label: "Le Pod en marche de tableau, qui n'appelle jamais l'API, ne porte aucun jeton"
   - id: compte-par-defaut
-    label: "Le compte par défaut d'observatoire ne garde aucun droit de rien modifier"
+    label: "Le compte par défaut d'observatoire ne garde aucun droit, nulle part, au-delà de ce que reçoit tout compte"
   - id: collecte-durcie
     label: "Le Pod de collecte tourne en non-root sous un UID numérique, sans élévation de privilèges, racine en lecture seule et sans capability, et lit toujours les journaux"

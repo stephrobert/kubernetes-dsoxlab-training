@@ -23,13 +23,15 @@ n'est donnée : le module vous a appris ce qu'il faut.
    non sous le compte par défaut.
 2. Depuis le Pod de `collecte`, **avec son propre jeton**, lire le **journal du
    Pod `commandes`** de `production` aboutit.
-3. **C'est tout** : avec ce même jeton, `collecte` ne peut ni **supprimer** un
-   Pod de `production`, ni **lire ses Secrets**, ni regarder un **autre
-   namespace**, journaux compris.
+3. **C'est tout** : l'identité `collecte` n'a **aucun autre droit, nulle part**.
+   Ni créer, modifier ou supprimer quoi que ce soit dans `production`, ni lire
+   ses Secrets, ni regarder un autre namespace, journaux compris, ni aucun droit
+   sur le cluster.
 4. Le Pod en marche de **`tableau`** ne porte **aucun jeton** : rien n'est monté
    dans `/var/run/secrets/kubernetes.io/serviceaccount`.
-5. Le **compte par défaut** d'`observatoire` ne garde **aucun droit** de créer,
-   modifier ou supprimer quoi que ce soit, ni de lire les Secrets du namespace.
+5. Le **compte par défaut** d'`observatoire` ne garde **aucun droit**, ni dans
+   le namespace, ni ailleurs, au-delà de ce que Kubernetes donne à tout compte :
+   s'interroger sur ses propres droits.
 6. Le Pod de **`collecte`** est **durci** : il tourne en **non-root sous un UID
    numérique**, ne peut pas **élever ses privilèges**, a une **racine en lecture
    seule** et a retiré **toutes ses capabilities**. Durci, il lit toujours le
@@ -42,7 +44,7 @@ Six états, à poids égal. Le seuil est de **70 sur 100**, et les états **2 et
 Réussir les autres ne compense pas l'un d'eux manqué.
 
 Les tests entrent dans le Pod de `collecte` et interrogent l'API avec son
-jeton : c'est l'application, et pas l'administrateur, qui doit avoir ces droits.
+jeton, puis font calculer par l'API les droits effectifs de chaque identité : c'est l'application, et pas l'administrateur, qui doit avoir ces droits.
 Le retour se limite au verdict : réussi ou non, et la note.
 
 ```bash

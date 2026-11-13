@@ -23,13 +23,15 @@ the module taught you what you need.
    under the default account.
 2. From the Pod of `collecte`, **with its own token**, reading the **log of the
    Pod `commandes`** of `production` succeeds.
-3. **That is all**: with that same token, `collecte` can neither **delete** a
-   Pod of `production`, nor **read its Secrets**, nor look at **another
-   namespace**, logs included.
+3. **That is all**: the `collecte` identity has **no other right, anywhere**.
+   It cannot create, change or delete anything in `production`, read its
+   Secrets, look at another namespace, logs included, or hold any right on
+   the cluster.
 4. The running Pod of **`tableau`** carries **no token**: nothing is mounted in
    `/var/run/secrets/kubernetes.io/serviceaccount`.
-5. The **default account** of `observatoire` keeps **no right** to create,
-   change or delete anything, nor to read the namespace's Secrets.
+5. The **default account** of `observatoire` keeps **no right**, in the
+   namespace or elsewhere, beyond what Kubernetes gives every account: asking
+   about its own rights.
 6. The Pod of **`collecte`** is **hardened**: it runs **non-root under a numeric
    UID**, cannot **escalate its privileges**, has a **read-only root
    filesystem** and has dropped **all its capabilities**. Hardened, it still
@@ -41,7 +43,8 @@ Six states, equally weighted. The pass mark is **70 out of 100**, and states
 **2 and 3** are **blocking**: reading the logs of `production`, and nothing
 more. Passing the others does not make up for missing one of them.
 
-The tests enter the Pod of `collecte` and query the API with its token: the
+The tests enter the Pod of `collecte` and query the API with its token, then
+have the API compute each identity's effective rights: the
 application, not the administrator, must hold these rights. The feedback is
 limited to the verdict: passed or not, and the score.
 
