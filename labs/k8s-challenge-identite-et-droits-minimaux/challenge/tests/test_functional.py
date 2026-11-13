@@ -105,24 +105,40 @@ def _code_http(host, pod: str, chemin: str, methode: str = "GET") -> str:
     return res.stdout.strip()
 
 
-#: Ce que Kubernetes accorde à TOUT compte authentifié : s'interroger sur ses
-#: propres droits. Ce n'est pas un droit applicatif, on le retire des règles.
-_BASE_DE_TOUT_COMPTE = {"selfsubjectaccessreviews", "selfsubjectrulesreviews", "selfsubjectreviews"}
+#: Un ServiceAccount d'un namespace qui n'existe pas : l'API le range dans
+#: system:serviceaccounts et system:authenticated, rien de plus. Ce qu'il
+#: reçoit, c'est ce que reçoit TOUT ServiceAccount : s'interroger sur ses
+#: propres droits, lire les ClusterTrustBundles (Kubernetes 1.37), plus ce que
+#: les extensions du cluster accordent à tous (l'API de Calico en ajoute).
+#: Mesuré, jamais écrit en dur. Un droit donné au groupe des ServiceAccounts
+#: d'observatoire, lui, reste visible.
+_TEMOIN = "system:serviceaccount:dsoxlab-temoin-inexistant:sans-droit"
+_BASES: dict[str, set] = {}
 
 
-def _droits_effectifs(host, sujet: str, ns: str) -> list[dict]:
-    """Les règles de ressource que l'API accorde à sujet dans ns, calculées par
-    une SelfSubjectRulesReview jouée sous son identité, moins la base de tout
-    compte. Un droit accordé pour tout le cluster y figure dans chaque namespace."""
+def _cle(regle: dict) -> tuple:
+    return tuple(tuple(sorted(regle.get(champ) or [])) for champ in ("apiGroups", "resources", "resourceNames", "verbs"))
+
+
+def _regles(host, sujet: str, ns: str) -> list[dict]:
     revue = ('{"apiVersion":"authorization.k8s.io/v1","kind":"SelfSubjectRulesReview",'
              f'"spec":{{"namespace":"{ns}"}}}}')
-    res = host.run(f"echo '{revue}' | {KUBECTL} create --as {sujet} -f - -o json")
+    res = host.run(f"echo '{revue}' | {KUBECTL} create --validate=false --as {sujet} -f - -o json")
     assert res.rc == 0, message(
         en=f"Cannot compute the rights of {sujet} in {ns}: {res.stderr.strip()[:200]}",
         fr=f"Impossible de calculer les droits de {sujet} dans {ns} : {res.stderr.strip()[:200]}",
     )
-    regles = (json.loads(res.stdout).get("status") or {}).get("resourceRules") or []
-    return [r for r in regles if not set(r.get("resources") or []) <= _BASE_DE_TOUT_COMPTE]
+    return (json.loads(res.stdout).get("status") or {}).get("resourceRules") or []
+
+
+def _droits_effectifs(host, sujet: str, ns: str) -> list[dict]:
+    """Les règles de ressource que l'API accorde à sujet dans ns, calculées par
+    une SelfSubjectRulesReview jouée sous son identité, moins ce que reçoit le
+    témoin dans le même namespace. Un droit accordé pour tout le cluster y
+    figure dans chaque namespace."""
+    if ns not in _BASES:
+        _BASES[ns] = {_cle(r) for r in _regles(host, _TEMOIN, ns)}
+    return [r for r in _regles(host, sujet, ns) if _cle(r) not in _BASES[ns]]
 
 
 def _sous_son_identite(pod: dict) -> bool:
