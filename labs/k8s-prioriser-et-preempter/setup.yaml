@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab run` : le cluster kind « multi » (un control plane, deux
+# workers), puis la situation du lab (fixtures/prepare.sh), qui remplit un
+# worker calculé sur son allocatable réel.
+- name: Préparer le lab k8s-prioriser-et-preempter
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kind multi
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: multi
+        kind_workers: 2
+        # L'événement de préemption est l'une des preuves lues par les tests :
+        # il ne doit pas expirer pendant que l'apprenant travaille.
+        kind_event_ttl: 24h
+
+    - name: Remplir un worker et poser le manifeste du Pod urgent
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/multi.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

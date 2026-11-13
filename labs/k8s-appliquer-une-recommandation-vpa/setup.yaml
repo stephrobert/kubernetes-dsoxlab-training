@@ -1,0 +1,50 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, metrics-server
+# v0.9.1, le Vertical Pod Autoscaler 1.8.1 installé par son script officiel
+# (hack/vpa-up.sh, au tag vertical-pod-autoscaler-1.8.1), puis la situation du
+# lab (fixtures/prepare.sh).
+- name: Préparer le lab k8s-appliquer-une-recommandation-vpa
+  hosts: lab_target
+  become: true
+  vars:
+    metrics_server_version: "0.9.1"
+    vpa_version: "1.8.1"
+    vpa_depot: "/root/autoscaler-vpa-{{ vpa_version }}"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Récupérer le manifeste de metrics-server {{ metrics_server_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/kubernetes-sigs/metrics-server/releases/download/v{{ metrics_server_version }}/components.yaml"
+        dest: "/root/metrics-server-v{{ metrics_server_version }}.yaml"
+        mode: "0644"
+
+    # vpa-up.sh fait un `git switch` (il lui faut un clone, pas une archive), et
+    # gencerts.sh appelle openssl : sans lui, le script ne s'arrête pas, mais le
+    # contrôleur d'admission reste en ContainerCreating faute de son secret
+    # (mesuré le 2026-11-13).
+    - name: Installer git et openssl, dont dépend le script du VPA
+      ansible.builtin.apt:
+        name:
+          - git
+          - openssl
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Récupérer le dépôt du VPA à son tag {{ vpa_version }}
+      ansible.builtin.git:
+        repo: https://github.com/kubernetes/autoscaler.git
+        dest: "{{ vpa_depot }}"
+        version: "vertical-pod-autoscaler-{{ vpa_version }}"
+        depth: 1
+
+    - name: Installer metrics-server, le VPA et l'application
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        MANIFESTE: "/root/metrics-server-v{{ metrics_server_version }}.yaml"
+        VPA_DEPOT: "{{ vpa_depot }}"

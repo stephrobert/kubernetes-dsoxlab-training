@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : tout ce que le challenge pose
+# vit dans ses deux namespaces, Role et RoleBinding compris. Rien n'est posé à
+# l'échelle du cluster ; un ClusterRoleBinding que l'apprenant aurait créé pour
+# collecte est retiré aussi, pour que le lab se rejoue à l'identique.
+- name: Défaire le challenge k8s-challenge-identite-et-droits-minimaux
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Retirer tout ClusterRoleBinding qui nomme un compte d'observatoire
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get clusterrolebindings -o json \
+          | python3 -c 'import json,sys; [print(b["metadata"]["name"]) for b in json.load(sys.stdin)["items"] if any(s.get("kind") == "ServiceAccount" and s.get("namespace") == "observatoire" for s in b.get("subjects") or [])]' \
+          | xargs -r {{ kubectl }} delete clusterrolebinding
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Supprimer les deux namespaces du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace observatoire production --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
