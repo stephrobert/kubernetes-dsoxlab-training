@@ -8,6 +8,10 @@ tenir l'inventaire. Le Deployment est là, mais aucun Pod ne démarre. Le
 manifeste déclare un ServiceAccount **`pod-reader`** que personne n'a créé,
 et sans identité, le ReplicaSet ne peut rien lancer.
 
+À côté tourne **`affichage`**, qui sert une page statique et n'appelle jamais
+l'API. Comme tout Pod, il a reçu un jeton de ServiceAccount dont il n'a pas
+l'usage.
+
 Vous êtes sur le control plane, avec `kubectl` configuré.
 
 ## Ce que vous devez obtenir
@@ -27,6 +31,10 @@ Vous êtes sur le control plane, avec `kubectl` configuré.
    d'`app-team` répond `200`. Supprimer un Pod, lire les Secrets, ou lister
    les Pods de `default` répondent `403`.
 
+5. Le Pod en marche d'**`affichage`** ne porte **aucun jeton** : rien n'est
+   monté dans `/var/run/secrets/kubernetes.io/serviceaccount`. Le Pod
+   d'`inventaire`, qui a besoin du sien, le garde.
+
 ## Les repères utiles
 
 Un Pod ne parle jamais à l'API en son nom propre : il présente le jeton de
@@ -42,11 +50,15 @@ main : `kubectl exec` vous y mène.
 Un ReplicaSet qui ne peut pas créer ses Pods le dit dans les events du
 namespace, pas dans des logs qui n'existent pas encore.
 
+Un jeton se monte à la création du Pod. Changer ce qui en décide ne le retire
+pas d'un Pod qui tourne déjà.
+
 ## Comment vous saurez que c'est bon
 
 Les tests lisent le Role et le RoleBinding, puis entrent dans le Pod et
 interrogent l'API avec son jeton, pour ce qui doit passer comme pour ce qui
-doit être refusé.
+doit être refusé. Ils lisent enfin le Pod en marche d'`affichage`, pour
+vérifier qu'aucun jeton n'y est monté.
 
 ```bash
 dsoxlab check cka-rbac-serviceaccount
