@@ -289,7 +289,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-13",
-  "duree_s": 731,
+  "duree_s": 636,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -909,18 +909,19 @@
  "cka-rbac-serviceaccount": {
   "apres": {
    "echecs": [],
-   "passed": 4,
+   "passed": 5,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 4
+   "total": 5
   },
   "avant": {
    "echecs": [
     "test_depuis_le_pod_lister_les_pods_passe",
     "test_depuis_le_pod_tout_le_reste_est_refuse",
     "test_l_application_demarre_sous_son_identite",
+    "test_le_pod_qui_n_appelle_pas_l_api_n_a_aucun_jeton",
     "test_le_role_accorde_la_lecture_et_rien_de_plus"
    ],
    "passed": 0,
@@ -928,18 +929,18 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 5
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-13",
-  "duree_s": 768,
+  "duree_s": 870,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.2, 12 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-rbac-serviceaccount.log",
@@ -950,6 +951,7 @@
     "test_depuis_le_pod_lister_les_pods_passe",
     "test_depuis_le_pod_tout_le_reste_est_refuse",
     "test_l_application_demarre_sous_son_identite",
+    "test_le_pod_qui_n_appelle_pas_l_api_n_a_aucun_jeton",
     "test_le_role_accorde_la_lecture_et_rien_de_plus"
    ],
    "passed": 0,
@@ -957,7 +959,7 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 5
   },
   "verdict": "VALIDE"
  },
@@ -1933,7 +1935,7 @@
   },
   "cible": "k8s-cp.lab",
   "date": "2026-11-13",
-  "duree_s": 419,
+  "duree_s": 425,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
