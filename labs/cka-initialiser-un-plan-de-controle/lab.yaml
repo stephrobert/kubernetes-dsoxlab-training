@@ -1,0 +1,86 @@
+# Lab guidé de la leçon kubeadm, module Installer un cluster du niveau 4
+# (règle 17). Le geste : préparer un plan de contrôle remis à zéro (modules et
+# ip_forward persistants, swap coupé durablement, paquets figés), l'initialiser
+# avec un fichier de configuration kubeadm, donner un kubeconfig à
+# l'utilisateur, puis poser Calico par l'opérateur jusqu'au nœud Ready.
+#
+# Le setup défait le cluster (kubeadm reset sur les deux nœuds) en gardant ses
+# certificats, puis défait la préparation du plan de contrôle. Le cleanup
+# défait le cluster de l'apprenant et rejoue le socle sur les certificats
+# d'origine : le cluster du catalogue est rendu entier, worker compris.
+id: cka-initialiser-un-plan-de-controle
+title: "Initialise a control plane with kubeadm"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  Prepare a reset control plane for Kubernetes 1.37 (kernel modules and IP
+  forwarding made persistent, swap off for good, packages held), initialise it
+  with a kubeadm configuration file, give the user a working kubeconfig, then
+  install Calico through its operator until the node is Ready.
+skills:
+  - kubeadm
+  - kubelet
+  - calico
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/#mettre-en-pratique
+lab_type: lab
+estimated_time: 45m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le worker est remis à zéro par le setup et rejoint par le cleanup :
+      # `roles` est le champ que le contrat prévoit pour les hôtes utilisés en
+      # même temps.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: init-par-fichier
+    label: "The cluster was initialised from a configuration file, under the name catalogue"
+    tests:
+      - test_le_cluster_est_initialise_par_le_fichier_de_configuration
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: kubeconfig-utilisateur
+    label: "The user's kubeconfig reaches the new cluster without sudo"
+    tests:
+      - test_le_kubeconfig_de_l_utilisateur_vise_le_nouveau_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: calico-sur-le-noeud
+    label: "Calico runs on the control plane"
+    tests:
+      - test_calico_tourne_sur_le_plan_de_controle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: noeud-ready
+    label: "The node is Ready and CoreDNS runs"
+    tests:
+      - test_le_noeud_est_ready_et_coredns_tourne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: preparation-durable
+    label: "Modules, IP forwarding and swap survive a reboot"
+    tests:
+      - test_la_preparation_du_noeud_survit_au_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: paquets-figes
+    label: "kubeadm, kubelet and kubectl are held"
+    tests:
+      - test_les_paquets_sont_figes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
