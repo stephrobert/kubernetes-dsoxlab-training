@@ -1,0 +1,15 @@
+title: "Vérifier et renouveler les certificats d'un cluster kubeadm"
+description: |
+  Lire l'échéance de chaque certificat d'un cluster kubeadm, renouveler ceux du
+  plan de contrôle, les faire recharger par les composants, puis recopier
+  admin.conf et vérifier que kubectl répond.
+
+criteria:
+  - id: echeance-de-la-ca
+    label: "La réponse donne la date d'échéance de l'autorité de certification du cluster"
+  - id: certificats-renouveles
+    label: "Les certificats du plan de contrôle ont été renouvelés"
+  - id: composants-recharges
+    label: "L'API server et etcd servent les certificats renouvelés"
+  - id: kubeconfig-a-jour
+    label: "Le kubeconfig de l'utilisateur porte le certificat d'administration renouvelé, et kubectl répond"

@@ -1,0 +1,16 @@
+title: "Donner un accès humain par une CertificateSigningRequest"
+description: |
+  Donner à l'utilisatrice camille un accès au cluster par l'API
+  CertificateSigningRequest : sa clé et sa demande, l'approbation, le
+  certificat délivré, son kubeconfig, puis des droits de lecture sur un
+  namespace, vérifiés sous sa propre identité.
+
+criteria:
+  - id: demande-delivree
+    label: "La CertificateSigningRequest camille est approuvée et délivrée, pour l'authentification d'un client"
+  - id: kubeconfig-de-camille
+    label: "Le kubeconfig de camille porte le certificat que l'API a délivré, et l'identifie"
+  - id: lecture-autorisee
+    label: "camille lit les Pods d'equipe-web"
+  - id: rien-de-plus
+    label: "camille ne peut rien de plus : aucune modification, aucun Secret, aucun autre namespace"

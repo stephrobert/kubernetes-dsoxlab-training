@@ -198,12 +198,22 @@ sections:
       - cka-troubleshoot-node-notready
       - cka-troubleshoot-kubelet
       - cka-troubleshoot-apiserver
+      # Niveau 4, lot A (vague 1) : les interfaces d'un nœud (CNI, CSI et CRI),
+      # puis la santé d'etcd avant sa sauvegarde.
+      - k8s-lire-les-interfaces-d-un-noeud
+      - cka-etcd-sante-et-defragmentation
       - cka-etcd-backup-restore
+      # Les API retirées se repèrent avant toute montée de version.
+      - k8s-detecter-les-api-depreciees
       # La montée de version vient juste après la sauvegarde d'etcd, et dans
       # cet ordre : on n'opère pas sur un plan de contrôle dont on ne sait pas
       # restaurer l'état. C'est aussi le seul lab du catalogue qui reconstruit
       # le cluster, d'où sa place tardive.
       - cka-kubeadm-upgrade
+      # Niveau 4, lot A (vague 1) : la PKI du cluster (renouveler, donner un
+      # accès par CSR), puis cert-manager.
+      - kubeadm-verifier-et-renouveler-les-certificats
+      - k8s-donner-un-acces-par-csr
       # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
       # puisqu'il ne dit plus quel est le sujet de la panne.
       - cka-capstone-portail
@@ -319,6 +329,9 @@ sections:
       # chiffrement ajoute par-dessus.
       - cks-istio-mtls-lockdown
       - cks-ingress-tls
+      # Niveau 4, lot A (vague 1) : des certificats émis par cert-manager et
+      # une CA interne, juste après le TLS d'un Ingress.
+      - k8s-emettre-un-certificat-avec-cert-manager
       - cks-cis-benchmark-remediate
 
       # Le capstone vient en dernier, comme ceux du CKA et du CKAD : il ne

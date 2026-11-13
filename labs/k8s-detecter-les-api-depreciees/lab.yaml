@@ -1,0 +1,70 @@
+# Lab guidé de la leçon « Gérer les dépréciations d'API », module Administrer le
+# cluster du niveau 4. Le geste : repérer dans un dépôt de manifestes ceux qui
+# emploient une API retirée, les migrer vers l'API courante sans rien changer à
+# ce qu'ils décrivent, et les appliquer.
+#
+# Six manifestes hérités ; quatre emploient une API retirée (PodDisruptionBudget
+# policy/v1beta1, HorizontalPodAutoscaler autoscaling/v2beta2, CronJob
+# batch/v1beta1, Ingress networking.k8s.io/v1beta1, dont les champs du backend
+# ont changé de forme). Les tests jugent le rapport de détection, l'acceptation
+# des fichiers par l'API (dry-run côté serveur), la présence des objets et la
+# fidélité de ce qu'ils décrivent.
+id: k8s-detecter-les-api-depreciees
+title: "Detect and migrate removed APIs"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  In a repository of legacy manifests, find the ones that use an API removed
+  from Kubernetes, migrate them to the current API without changing what they
+  describe, and apply them.
+skills:
+  - api-deprecation
+  - upgrade
+  - manifests
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: rapport
+    label: "The report lists exactly the manifests that used a removed API"
+    tests:
+      - test_le_rapport_liste_les_manifestes_en_api_retiree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: api-courantes
+    label: "Every manifest of the repository is accepted by the API server"
+    tests:
+      - test_chaque_manifeste_est_accepte_par_l_api
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: objets-appliques
+    label: "The four migrated objects exist in the migration namespace"
+    tests:
+      - test_les_objets_migres_existent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: rien-de-change
+    label: "The migrated objects describe exactly what the legacy manifests described"
+    tests:
+      - test_les_objets_decrivent_ce_que_decrivaient_les_anciens
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/

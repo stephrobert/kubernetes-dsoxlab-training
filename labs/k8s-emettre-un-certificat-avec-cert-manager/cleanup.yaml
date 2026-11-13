@@ -1,0 +1,30 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le namespace du lab, puis
+# cert-manager retiré avec son manifeste officiel (CRD, webhooks, rôles et
+# namespace cert-manager compris). Le cluster revient à l'état du socle.
+- name: Défaire le lab k8s-emettre-un-certificat-avec-cert-manager
+  hosts: lab_target
+  become: true
+  vars:
+    cert_manager_version: "1.21.3"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace atelier-tls --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer cert-manager avec son manifeste
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /root/cert-manager-v{{ cert_manager_version }}.yaml
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Vérifier qu'il ne reste aucune CRD de cert-manager
+      ansible.builtin.shell: |
+        set -o pipefail
+        test -z "$({{ kubectl }} get crd -o name | grep cert-manager.io || true)"
+      args:
+        executable: /bin/bash
+      changed_when: false

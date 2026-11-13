@@ -1,0 +1,15 @@
+title: "Émettre des certificats avec cert-manager et une CA interne"
+description: |
+  Avec cert-manager, émettre un certificat auto-signé, construire une autorité
+  de certification interne et signer avec elle le certificat d'un service, puis
+  diagnostiquer et réparer un certificat qui reste « not ready ».
+
+criteria:
+  - id: emetteur-auto-signe
+    label: "L'émetteur auto-signé auto-signe est prêt"
+  - id: ca-interne
+    label: "La CA interne ca-interne est un certificat d'autorité signé par auto-signe, et son émetteur est prêt"
+  - id: certificat-du-service
+    label: "Le certificat vitrine-tls est prêt, pour le nom de son service, et sa chaîne mène à la CA interne"
+  - id: certificat-repare
+    label: "Le certificat cassé api-tls est réparé et signé par la CA interne"

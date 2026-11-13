@@ -1,0 +1,31 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le namespace de test, le fichier
+# de réponses et le relevé du setup ; puis une défragmentation, pour rendre au
+# cluster une base de la taille d'avant le lab.
+- name: Défaire le lab cka-etcd-sante-et-defragmentation
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    etcdctl: >-
+      kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system exec etcd-{{ inventory_hostname }} --
+      etcdctl --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt
+      --key /etc/kubernetes/pki/etcd/server.key
+  tasks:
+    - name: Supprimer le namespace de test
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace etcd-essai --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Défragmenter, pour rendre la place
+      ansible.builtin.command: "{{ etcdctl }} defrag"
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le fichier de réponses et le relevé du setup
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/etcd"
+        - /var/lib/dsoxlab/etcd-taille-avant

@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis le fichier de
+# réponses vide (fixtures/prepare.sh).
+- name: Préparer le lab k8s-lire-les-interfaces-d-un-noeud
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le fichier de réponses vide
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

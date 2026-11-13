@@ -1,0 +1,17 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis la base etcd
+# gonflée et le fichier de réponses vide (fixtures/prepare.sh).
+- name: Préparer le lab cka-etcd-sante-et-defragmentation
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Gonfler la base etcd et poser le fichier de réponses
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

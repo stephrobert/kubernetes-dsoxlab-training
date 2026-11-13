@@ -1,0 +1,72 @@
+# Lab guidé de la leçon « CNI, CSI et CRI », module Installer un cluster du
+# niveau 4 (décision D73 du 2026-11-13). Le geste : sur un nœud, lire le socket
+# du runtime que le kubelet emploie, la configuration CNI en vigueur et les
+# pilotes CSI du cluster, pour savoir où regarder quand l'une des trois
+# interfaces casse.
+#
+# Un lab de lecture se prouve par ce que l'apprenant a trouvé : il le consigne
+# dans ~/interfaces/reponses.yaml, et chaque test compare une réponse à la
+# valeur RÉELLE, relue sur le nœud au moment du check, jamais à une valeur
+# écrite dans le test. Une réponse recopiée d'une documentation (un socket
+# dockershim, Flannel) ne correspond pas au cluster et ne passe pas.
+id: k8s-lire-les-interfaces-d-un-noeud
+title: "Read the CRI, CNI and CSI interfaces of a node"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: beginner
+description: |
+  On a kubeadm node, find the container runtime socket the kubelet uses, the
+  runtime and its version, the CNI configuration in force and its plugin, and
+  the CSI drivers of the cluster: where to look when one of the three
+  interfaces breaks.
+skills:
+  - cri
+  - cni
+  - csi
+  - kubelet
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/#mettre-en-pratique
+lab_type: lab
+estimated_time: 20m
+
+certification_tags:
+  - cka
+  - kcna
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: socket-du-runtime
+    label: "The answer gives the container runtime socket the kubelet actually uses"
+    tests:
+      - test_le_socket_du_runtime_est_celui_du_kubelet
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/
+  - id: runtime-et-version
+    label: "The answer gives the runtime and the version the node reports"
+    tests:
+      - test_le_runtime_et_sa_version_sont_ceux_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/
+  - id: configuration-cni
+    label: "The answer gives the CNI configuration file in force and its main plugin"
+    tests:
+      - test_la_configuration_cni_est_celle_en_vigueur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/
+  - id: pilotes-csi
+    label: "The answer lists exactly the CSI drivers registered in the cluster"
+    tests:
+      - test_les_pilotes_csi_sont_ceux_du_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/

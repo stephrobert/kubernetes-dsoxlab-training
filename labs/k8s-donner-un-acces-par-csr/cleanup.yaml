@@ -1,0 +1,32 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : la demande camille (un objet du
+# cluster), tout droit accordé à camille à l'échelle du cluster, le namespace
+# equipe-web et le répertoire ~/acces.
+- name: Défaire le lab k8s-donner-un-acces-par-csr
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Retirer la demande de certificat de camille
+      ansible.builtin.command: "{{ kubectl }} delete csr camille --ignore-not-found"
+      changed_when: true
+
+    - name: Retirer tout ClusterRoleBinding qui nomme camille
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get clusterrolebindings -o json \
+          | python3 -c 'import json,sys; [print(b["metadata"]["name"]) for b in json.load(sys.stdin)["items"] if any(s.get("kind") == "User" and s.get("name") == "camille" for s in b.get("subjects") or [])]' \
+          | xargs -r {{ kubectl }} delete clusterrolebinding
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Supprimer le namespace equipe-web
+      ansible.builtin.command: "{{ kubectl }} delete namespace equipe-web --ignore-not-found --wait=true --timeout=180s"
+      changed_when: true
+
+    - name: Retirer le répertoire des accès
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/acces"
+        state: absent
