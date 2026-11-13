@@ -1,0 +1,63 @@
+---
+# Défait shared/examen-ssh.yml, et seulement ce qu'il a créé (audit du
+# 2026-11-13) : le kubeconfig dédié du worker, le répertoire ~/.kube s'il l'a
+# créé et qu'il est vide, l'autorisation de ssh vers la base si c'est lui qui
+# l'a ajoutée, l'alias et la complétion. Les marqueurs posés par le setup
+# disent ce qui lui appartient. Tout est idempotent : un cleanup rejoué, ou joué
+# sans setup, ne retire rien d'autre.
+
+- name: Retirer le kubeconfig dédié de l'examen sur le worker
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user | default('ansible') }}/.kube/dsoxlab-examen.conf"
+    state: absent
+  delegate_to: k8s-w1.lab
+
+- name: Savoir si l'examen a créé le répertoire kubeconfig du worker
+  ansible.builtin.stat:
+    path: /var/lib/dsoxlab/examen-kube-cree
+  register: examen_kube_cree
+  delegate_to: k8s-w1.lab
+
+- name: Retirer ce répertoire s'il est vide, et lui seulement
+  ansible.builtin.command:
+    cmd: rmdir --ignore-fail-on-non-empty "/home/{{ ansible_user | default('ansible') }}/.kube"
+  delegate_to: k8s-w1.lab
+  when: examen_kube_cree.stat.exists
+  changed_when: true
+  failed_when: false
+
+- name: Retirer le marqueur du répertoire kubeconfig
+  ansible.builtin.file:
+    path: /var/lib/dsoxlab/examen-kube-cree
+    state: absent
+  delegate_to: k8s-w1.lab
+
+- name: Lire l'autorisation que l'examen a ajoutée, s'il en a ajouté une
+  ansible.builtin.slurp:
+    src: /var/lib/dsoxlab/examen-cle-ajoutee
+  register: examen_cle_ajoutee
+  failed_when: false
+
+- name: Retirer cette autorisation, et elle seulement
+  ansible.builtin.lineinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys"
+    line: "{{ examen_cle_ajoutee.content | b64decode | trim }}"
+    state: absent
+  when: examen_cle_ajoutee.content is defined
+
+- name: Retirer le marqueur de l'autorisation
+  ansible.builtin.file:
+    path: /var/lib/dsoxlab/examen-cle-ajoutee
+    state: absent
+
+- name: Retirer l'alias k et la complétion des deux hôtes
+  ansible.builtin.blockinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.bashrc"
+    marker: "# {mark} DSOXLAB EXAMEN BLANC"
+    state: absent
+  delegate_to: "{{ hote_examen }}"
+  loop:
+    - "{{ inventory_hostname }}"
+    - k8s-w1.lab
+  loop_control:
+    loop_var: hote_examen

@@ -18,7 +18,7 @@ Vingt états à 5 points : dsoxlab note la part de tests réussis, et une tâche
 | Servicing and Networking | 20 | 14, 15, 16, 17 |
 
 Le setup installe Traefik (Ingress et Gateway API v1.6.2) et local-path, pose
-trois contextes dans le kubeconfig de l'apprenant, puis met le kubelet du worker
+un kubeconfig, l'alias `k` et la complétion sur les deux hôtes de tâche, puis met le kubelet du worker
 hors service. Le `cleanup.yaml` remet le worker en service et retire tout, y
 compris les objets du cluster entier.
 
