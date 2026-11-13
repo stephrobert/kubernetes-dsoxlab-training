@@ -9,7 +9,7 @@ se juge sur les numéros de série, relevés au lancement.
 |---|---|
 | Cible | `k8s-cp.lab`, cluster kubeadm du catalogue |
 | Durée | environ 30 minutes |
-| Page associée | [PKI du cluster, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/#mettre-en-pratique) |
+| Page associée | [PKI du cluster, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   kubeadm-verifier-et-renouveler-les-certificats

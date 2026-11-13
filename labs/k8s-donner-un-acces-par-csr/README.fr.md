@@ -9,7 +9,7 @@ namespace, vérifiés sous son identité. La clé de la CA ne sort jamais du nœ
 |---|---|
 | Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab pose le namespace `equipe-web` |
 | Durée | environ 25 minutes |
-| Page associée | [PKI du cluster, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/#mettre-en-pratique) |
+| Page associée | [PKI du cluster, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   k8s-donner-un-acces-par-csr

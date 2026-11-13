@@ -9,7 +9,7 @@ under her identity. The CA key never leaves the node.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `equipe-web` namespace |
 | Duration | about 25 minutes |
-| Related page | [Cluster PKI, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/#mettre-en-pratique) |
+| Related page | [Cluster PKI, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
 
 ```bash
 dsoxlab run   k8s-donner-un-acces-par-csr

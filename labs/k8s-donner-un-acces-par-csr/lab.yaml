@@ -27,7 +27,7 @@ skills:
   - kubeconfig
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
 lab_type: lab
 estimated_time: 25m
 
@@ -52,13 +52,13 @@ criteria:
     tests:
       - test_la_demande_camille_est_approuvee_et_delivree
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: kubeconfig-de-camille
     label: "Camille's kubeconfig carries the certificate the API issued, and identifies her"
     tests:
       - test_le_kubeconfig_porte_le_certificat_delivre_et_l_identifie
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: lecture-autorisee
     label: "Camille can read the Pods of equipe-web"
     tests:

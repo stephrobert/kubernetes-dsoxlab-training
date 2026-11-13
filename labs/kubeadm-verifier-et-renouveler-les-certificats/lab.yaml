@@ -28,7 +28,7 @@ skills:
   - certificates
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
 lab_type: lab
 estimated_time: 30m
 
@@ -52,22 +52,22 @@ criteria:
     tests:
       - test_l_echeance_de_la_ca_est_la_bonne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: certificats-renouveles
     label: "The control plane certificates have been renewed"
     tests:
       - test_les_certificats_du_plan_de_controle_sont_renouveles
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: composants-recharges
     label: "The API server and etcd serve the renewed certificates"
     tests:
       - test_l_api_server_et_etcd_servent_les_nouveaux_certificats
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: kubeconfig-a-jour
     label: "The user's kubeconfig carries the renewed admin certificate, and kubectl answers"
     tests:
       - test_le_kubeconfig_porte_le_nouveau_certificat_et_kubectl_repond
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
