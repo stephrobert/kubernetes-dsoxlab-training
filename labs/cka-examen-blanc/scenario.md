@@ -7,12 +7,13 @@ the cluster, with no hint. **Plan for 120 minutes**, in one sitting, and start
 your own timer: the tool does not. The tasks are independent, except task 9,
 which requires the node of task 3 repaired.
 
-You work on the control plane **`k8s-cp.lab`**, with `kubectl`. Your kubeconfig
-holds three contexts, all pointing at the same cluster: **`cka-infra`**
-(namespace `default`), **`cka-appli`** (namespace `appli`) and **`cka-reseau`**
-(namespace `reseau`). **Each task starts with the context to use.** Switch
-before working: a resource created in the wrong namespace does not count. The
-worker **`k8s-w1.lab`** is reached with `ssh k8s-w1.lab`.
+You start from the **base**, `k8s-cp.lab`, the session `dsoxlab run` opens.
+**Each task names the host to do it on**: connect with `ssh`, work, then go
+back to the base with `exit` before the next task. Never run `ssh` from a task
+host. Both hosts, **`k8s-cp.lab`** and **`k8s-w1.lab`**, have `kubectl`
+configured, the `k` alias and completion. **No context sets the namespace**:
+each task gives its own, write it in your commands. A resource created in the
+wrong namespace does not count.
 
 The images to use:
 
@@ -24,102 +25,170 @@ busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db58
 
 ## The tasks
 
-### Task 1 (5%): context `cka-infra`
+### Task 1 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · no namespace (cluster resource)
 
 Create the StorageClass **`rapide`**, served by the `rancher.io/local-path`
 provisioner, which **keeps** its volumes when their claim disappears and creates
 them only when a Pod uses the claim.
 
-### Task 2 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 2 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`appli`**
 
 Create the claim **`donnees`** of **100Mi**, `ReadWriteOnce`, on the class
 `rapide`. The Pod **`ecrivain`** (busybox image) mounts it on **`/data`** and
 writes the file **`/data/ok`** there, whose content is `ok`.
 
-### Task 3 (10%): context `cka-infra`
+Then go back to the base: `exit`.
+
+### Task 3 (10%)
+
+**Connect: `ssh k8s-w1.lab`** · no namespace (cluster resource)
 
 The node **`k8s-w1.lab`** is `NotReady`. Bring it back into service, so that it
 stays so **after a reboot**.
 
-### Task 4 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 4 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`appli`**
 
 The Deployment **`facture`** cannot start. Repair it so that its **two
 replicas** are ready. It must serve nginx the way the image does on its own.
 
-### Task 5 (10%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 5 (10%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`appli`**
 
 The Service **`annuaire`** leads to no Pod. Repair it without touching the
 Deployment `annuaire`, so that the Pod **`client`** gets the answer `annuaire`
 when it queries `http://annuaire/`.
 
-### Task 6 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 6 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`appli`**
 
 Write into **`~/examen/erreurs.txt`** the log lines of the **`app`** container
 of the Pod **`journal`** that contain **`ERROR`**, and only those, one per line.
 
-### Task 7 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 7 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`appli`**
 
 Update the Deployment **`vitrine`** to the **nginx 1.30.6** image, then bring it
 back to the previous version with a **rollback**.
 
-### Task 8 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 8 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`appli`**
 
 Create the ConfigMap **`reglages`** (key `mode`, value `production`) and the
 Secret **`acces`** (key `mot-de-passe`, value `jeton-de-demonstration`). The
 container of the Deployment **`api`** must receive the variable **`MODE`** from
 the ConfigMap, and the variable **`MOT_DE_PASSE`** from the Secret.
 
-### Task 9 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 9 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`appli`**
 
 The node `k8s-w1.lab` carries the taint `examen=reserve:NoSchedule` and the
 label `role-examen=rapports`. Run **all** the Pods of the Deployment
 **`rapport`** on that node, and only there, **without removing the taint** and
 without naming the node. This task requires task 3 done.
 
-### Task 10 (10%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 10 (10%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`appli`**
 
 Create the ServiceAccount **`lecteur`**, and give it the right to **get, list
 and watch the Pods** of the `appli` namespace, and **nothing else**.
 
-### Task 11 (5%): context `cka-infra`
+Then go back to the base: `exit`.
+
+### Task 11 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · no namespace (cluster resource)
 
 Save an etcd snapshot into **`/var/lib/etcd/sauvegarde-examen.db`** on
 `k8s-cp.lab`. etcd runs in the Pod `etcd-k8s-cp.lab` of the `kube-system`
 namespace, with its certificates under `/etc/kubernetes/pki/etcd/`.
 
-### Task 12 (5%): context `cka-appli`
+Then go back to the base: `exit`.
+
+### Task 12 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`appli`**
 
 Install the definition **`~/examen/crd-sauvegarde.yaml`**, then create in
 `appli` the **`Sauvegarde`** resource named **`quotidienne`**, with source
 **`base`** and a retention of **`7`** days.
 
-### Task 13 (5%): context `cka-infra`
+Then go back to the base: `exit`.
+
+### Task 13 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`default`**
 
 Complete the overlay **`~/examen/kustomize/overlays/prod/`** so that it places
 the application in the **`prod`** namespace, with **3 replicas** and the label
 **`env: prod`** on the Deployment and its Pods, then apply it.
 
-### Task 14 (5%): context `cka-reseau`
+Then go back to the base: `exit`.
+
+### Task 14 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`reseau`**
 
 Only the Pod **`front`** may reach the database **`db`** on port **5432**. The
 Pod `autre`, in the same namespace, is refused.
 
-### Task 15 (5%): context `cka-reseau`
+Then go back to the base: `exit`.
+
+### Task 15 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`reseau`**
 
 Create the Ingress **`boutique`**, of class `traefik`, which sends
 `http://boutique.examen/api` to the Service **`api`**. The controller answers on
 the node's port **30080**.
 
-### Task 16 (5%): context `cka-reseau`
+Then go back to the base: `exit`.
+
+### Task 16 (5%)
+
+**Connect: `ssh k8s-w1.lab`** · namespace **`reseau`**
 
 With the Gateway API, serve the host **`magasin.examen`** through the Service
 **`web`**: a Gateway of class `traefik`, on port 80, and an HTTPRoute named
 **`magasin`**, accepted by that Gateway.
 
-### Task 17 (5%): context `cka-reseau`
+Then go back to the base: `exit`.
+
+### Task 17 (5%)
+
+**Connect: `ssh k8s-cp.lab`** · namespace **`reseau`**
 
 Publish the Deployment **`accueil`** (it listens on port 5678) through a Service
 **`accueil`** of type **NodePort**, on port **30092** of every node.
+
+Then go back to the base: `exit`.
 
 ## How you will be graded
 
@@ -130,8 +199,8 @@ and the feedback is the verdict only, as on exam night.
 
 ## What this mock exam does not reproduce
 
-- **One cluster per task**: the real exam chains several. Here, the three
-  contexts point at the same cluster, with different namespaces.
+- **One cluster per task**: the real exam chains several. Here, both hosts
+  point at the same cluster, with different namespaces.
 - **The remote desktop and its browser** limited to the official documentation.
 - **The timer**, which you keep yourself.
 - **Partial credit** inside a state: a state is passed or not.

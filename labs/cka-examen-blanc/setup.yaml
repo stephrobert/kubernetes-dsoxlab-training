@@ -54,6 +54,9 @@
         KUBECONFIG: /etc/kubernetes/admin.conf
         LAB_USER: "{{ ansible_user | default('ansible') }}"
 
+    - name: Poser la mécanique de l'examen réel, un hôte par tâche (D63)
+      ansible.builtin.include_tasks: ../../shared/examen-ssh.yml
+
     - name: Mettre le kubelet du worker hors service (tâche 3)
       ansible.builtin.systemd:
         name: kubelet

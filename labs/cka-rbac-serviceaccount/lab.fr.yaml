@@ -4,4 +4,5 @@ description: |
   pas. Le créer, lui accorder le droit de lire les Pods de son namespace et
   rien d'autre, puis prouver depuis l'intérieur du Pod, avec son propre
   jeton, que lister passe et que supprimer, lire les Secrets ou regarder
-  ailleurs sont refusés.
+  ailleurs sont refusés. Enfin, couper le jeton du Pod qui n'appelle
+  jamais l'API.

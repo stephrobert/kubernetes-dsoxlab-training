@@ -18,8 +18,8 @@ section: ckad
 difficulty: advanced
 description: |
   A timed mock exam in the CKAD format: seventeen tasks spread like the official
-  domains, on one kubeadm cluster with several contexts, graded on the cluster's
-  final state, no hint. Plan for 120 minutes.
+  domains, on one kubeadm cluster, each task on the host it names, reached by ssh,
+  graded on the cluster's final state, no hint. Plan for 120 minutes.
 skills:
   - workloads
   - deployment-strategies
