@@ -1,0 +1,37 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, cert-manager
+# v1.21.3 depuis le manifeste officiel, puis la situation du lab
+# (fixtures/prepare.sh).
+- name: Préparer le lab k8s-emettre-un-certificat-avec-cert-manager
+  hosts: lab_target
+  become: true
+  vars:
+    cert_manager_version: "1.21.3"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Récupérer le manifeste de cert-manager {{ cert_manager_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/cert-manager/cert-manager/releases/download/v{{ cert_manager_version }}/cert-manager.yaml"
+        dest: "/root/cert-manager-v{{ cert_manager_version }}.yaml"
+        mode: "0644"
+
+    - name: Installer cert-manager
+      ansible.builtin.command: >-
+        {{ kubectl }} apply --server-side --force-conflicts -f /root/cert-manager-v{{ cert_manager_version }}.yaml
+      register: installation
+      changed_when: "'serverside-applied' in installation.stdout"
+
+    - name: Attendre que cert-manager et son webhook soient disponibles
+      ansible.builtin.command: >-
+        {{ kubectl }} -n cert-manager wait --for=condition=Available deployment --all --timeout=300s
+      changed_when: false
+
+    - name: Poser le namespace et le certificat cassé
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

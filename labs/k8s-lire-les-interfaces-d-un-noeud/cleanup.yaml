@@ -1,0 +1,11 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le lab ne change rien au
+# cluster, il ne retire que le fichier de réponses.
+- name: Défaire le lab k8s-lire-les-interfaces-d-un-noeud
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le répertoire des réponses
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/interfaces"
+        state: absent

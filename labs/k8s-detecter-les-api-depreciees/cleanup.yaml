@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le namespace migration et le
+# dépôt de manifestes.
+- name: Défaire le lab k8s-detecter-les-api-depreciees
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace migration
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace migration
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer le dépôt de manifestes et sa copie
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/manifestes"
+        - /var/lib/dsoxlab/k8s-detecter-les-api-depreciees

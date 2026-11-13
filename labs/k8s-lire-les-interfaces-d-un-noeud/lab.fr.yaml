@@ -1,0 +1,16 @@
+title: "Lire les interfaces CRI, CNI et CSI d'un nœud"
+description: |
+  Sur un nœud kubeadm, retrouver le socket du runtime de conteneurs qu'emploie
+  le kubelet, le runtime et sa version, la configuration CNI en vigueur et son
+  plugin, et les pilotes CSI du cluster : là où regarder quand l'une des trois
+  interfaces casse.
+
+criteria:
+  - id: socket-du-runtime
+    label: "La réponse donne le socket du runtime de conteneurs que le kubelet emploie vraiment"
+  - id: runtime-et-version
+    label: "La réponse donne le runtime et la version que le nœud annonce"
+  - id: configuration-cni
+    label: "La réponse donne le fichier de configuration CNI en vigueur et son plugin principal"
+  - id: pilotes-csi
+    label: "La réponse liste exactement les pilotes CSI enregistrés dans le cluster"
