@@ -1,0 +1,100 @@
+---
+# Le CNI du catalogue : Calico v3.32.2, installé par l'opérateur Tigera, comme
+# la page kubeadm de la formation (décision D64, 2026-11-12). Inclus par
+# shared/kubeadm-cluster.yml, qui monte le cluster de tous les labs, et par
+# labs/cka-kubeadm-upgrade/setup.yaml, qui le reconstruit une version en
+# arrière : une seule description du CNI pour les deux.
+#
+# L'opérateur pose Calico dans l'espace calico-system, et non plus dans
+# kube-system comme le manifeste calico.yaml qu'il remplace.
+#
+# Le pool d'adresses reprend le CIDR des Pods de `kubeadm init`
+# (10.244.0.0/16) : sans lui, Calico créerait son pool sur 192.168.0.0/16. Les
+# autres valeurs sont celles de la page (blocs /26, VXLANCrossSubnet, NAT
+# sortant).
+#
+# get_url ne télécharge qu'en l'absence du fichier : le manifeste est figé sur
+# une version, et une exécution suivante ne ressort pas sur le réseau.
+
+# Depuis Calico 3.31, tigera-operator.yaml ne porte plus les CRD : il ne pose
+# que l'opérateur et ses droits. Les CRD (Installation, APIServer, et les
+# ressources de Calico) vivent dans operator-crds.yaml, à appliquer avant.
+# Mesuré le 2026-11-12 sur v3.32.2 : sans lui, l'attente des CRD échoue en
+# NotFound, l'opérateur n'ayant rien à servir.
+- name: Récupérer les CRD de l'opérateur Tigera
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/operator-crds.yaml
+    dest: /root/operator-crds.yaml
+    mode: "0644"
+
+- name: Récupérer le manifeste de l'opérateur Tigera
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/tigera-operator.yaml
+    dest: /root/tigera-operator.yaml
+    mode: "0644"
+
+- name: Écrire la configuration de Calico pour l'opérateur
+  ansible.builtin.copy:
+    dest: /root/calico-installation.yaml
+    mode: "0644"
+    content: |
+      apiVersion: operator.tigera.io/v1
+      kind: Installation
+      metadata:
+        name: default
+      spec:
+        calicoNetwork:
+          ipPools:
+            - blockSize: 26
+              cidr: 10.244.0.0/16
+              encapsulation: VXLANCrossSubnet
+              natOutgoing: Enabled
+              nodeSelector: all()
+      ---
+      apiVersion: operator.tigera.io/v1
+      kind: APIServer
+      metadata:
+        name: default
+      spec: {}
+
+# Application côté serveur : les CRD de l'opérateur dépassent la taille
+# d'annotation d'un `kubectl apply` classique, et elle reste idempotente là où
+# `kubectl create`, celui de la page, échoue au second passage.
+- name: Installer les CRD de l'opérateur Tigera
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf apply --server-side
+    --force-conflicts -f /root/operator-crds.yaml
+  register: crd_operateur
+  changed_when: "'serverside-applied' in crd_operateur.stdout"
+
+- name: Installer l'opérateur Tigera
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf apply --server-side
+    --force-conflicts -f /root/tigera-operator.yaml
+  register: operateur
+  changed_when: "'serverside-applied' in operateur.stdout"
+
+- name: Attendre que les CRD de l'opérateur soient enregistrées
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Established
+    crd/installations.operator.tigera.io crd/apiservers.operator.tigera.io --timeout=120s
+  changed_when: false
+
+- name: Déclarer Calico auprès de l'opérateur
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /root/calico-installation.yaml
+  register: installation
+  changed_when: "'created' in installation.stdout or 'configured' in installation.stdout"
+
+# Les tigerastatus n'existent qu'une fois l'opérateur au travail : `kubectl
+# wait --all` sur une liste vide sort en erreur, d'où la boucle, qui attend à la
+# fois leur apparition et leur disponibilité.
+- name: Attendre que Calico soit disponible (tigerastatus Available)
+  ansible.builtin.command: >-
+    kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Available
+    tigerastatus --all --timeout=30s
+  register: statut_calico
+  until: statut_calico.rc == 0
+  retries: 30
+  delay: 10
+  changed_when: false

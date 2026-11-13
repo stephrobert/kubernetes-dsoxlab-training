@@ -99,32 +99,33 @@
 # qui exerce les deux côtés, ce qui suppose un CNI qui applique les règles.
 # Issue #3.
 #
-# get_url ne télécharge qu'en l'absence du fichier : le manifeste est figé
-# sur une version, et une exécution suivante ne le retire pas.
-- name: Récupérer le manifeste Calico
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/projectcalico/calico/v3.32.2/manifests/calico.yaml
-    dest: /root/calico.yaml
-    mode: "0644"
-
-# Sans cela, Calico créerait son pool sur 192.168.0.0/16 alors que kubeadm a
-# réservé 10.244.0.0/16 aux Pods.
-- name: Aligner le pool d'adresses Calico sur le CIDR des Pods, le nom
-  ansible.builtin.replace:
-    path: /root/calico.yaml
-    regexp: '# - name: CALICO_IPV4POOL_CIDR'
-    replace: '- name: CALICO_IPV4POOL_CIDR'
-
-- name: Aligner le pool d'adresses Calico sur le CIDR des Pods, la valeur
-  ansible.builtin.replace:
-    path: /root/calico.yaml
-    regexp: '#   value: "192.168.0.0/16"'
-    replace: '  value: "10.244.0.0/16"'
-
-- name: Installer le CNI, Calico
+# Depuis D64 (2026-11-12), Calico est installé par l'opérateur Tigera, comme
+# sur la page kubeadm : voir shared/calico-operateur.yml.
+#
+# Un cluster monté avant D64 porte le Calico du manifeste, dans kube-system.
+# Poser l'opérateur par-dessus donnerait deux Calico qui se disputent les
+# nœuds : le socle le refuse et dit quoi faire, plutôt que de laisser un réseau
+# à moitié migré.
+- name: Chercher un Calico installé par l'ancien manifeste
   ansible.builtin.command: >-
-    kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /root/calico.yaml
-  changed_when: true
+    kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+    get daemonset calico-node -o name
+  register: calico_manifeste
+  changed_when: false
+  failed_when: false
+
+- name: Refuser un cluster monté avec l'ancien manifeste Calico
+  ansible.builtin.fail:
+    msg: >-
+      Ce cluster a été monté avec le manifeste calico.yaml (Calico dans
+      kube-system). Le catalogue installe désormais Calico par l'opérateur
+      Tigera (calico-system). Détruisez puis reprovisionnez l'infrastructure :
+      dsoxlab destroy, puis dsoxlab provision. Le lab suivant remontera le
+      cluster.
+  when: calico_manifeste.rc == 0
+
+- name: Installer le CNI, Calico par l'opérateur Tigera
+  ansible.builtin.include_tasks: calico-operateur.yml
 
 - name: Attendre que le control plane soit Ready
   ansible.builtin.command: >-

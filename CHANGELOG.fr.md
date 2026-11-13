@@ -10,6 +10,21 @@ projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Modifié
 
+- **Calico est installé par l'opérateur Tigera**, comme sur la page kubeadm de
+  la formation (décision D64), au lieu du manifeste `calico.yaml`. Même
+  version, v3.32.2, et même CIDR des Pods, `10.244.0.0/16`. Le nouveau
+  `shared/calico-operateur.yml` sert au socle et à `cka-kubeadm-upgrade`.
+  Depuis Calico 3.31, `tigera-operator.yaml` ne porte plus les CRD :
+  `operator-crds.yaml` est donc appliqué avant. Calico tourne désormais dans
+  `calico-system`, plus dans `kube-system`. `cka-node-drain-cordon` et
+  `cka-troubleshoot-networking` (test, nettoyage, indice, solution) suivent.
+  **Un cluster monté avant ce changement est refusé** par le socle, avec la
+  marche à suivre : `dsoxlab destroy`, puis `dsoxlab provision`.
+- **La photographie du cluster du validateur** traite les espaces de
+  l'opérateur comme celui de Flannel : elle compte les réplicas prêts de leurs
+  Deployments et DaemonSets, pas chaque Pod par son nom. Un Pod simplement
+  recréé n'est plus un écart.
+
 - **L'hôte `k8s-kind.lab` descend de 8192 Mo et 4 vCPU à 4096 Mo et 2 vCPU**,
   sur mesure et non sur estimation. Les deux labs du module Fondamentaux
   sortent VALIDE à cette taille, cycle `0 → N → 0` et photographie du cluster

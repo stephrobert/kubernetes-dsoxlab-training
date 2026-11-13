@@ -22,7 +22,7 @@
       # Le Pod calico-node recréé réécrit le fichier et la configuration de son
       # client : le même geste que la réparation attendue de l'apprenant.
       ansible.builtin.shell: |
-        {{ kubectl }} -n kube-system delete pod -l k8s-app=calico-node \
+        {{ kubectl }} -n calico-system delete pod -l k8s-app=calico-node \
           --field-selector spec.nodeName=k8s-w1.lab --wait=true
       args:
         executable: /bin/bash
