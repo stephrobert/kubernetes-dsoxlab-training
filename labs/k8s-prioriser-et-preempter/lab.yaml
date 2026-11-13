@@ -1,0 +1,72 @@
+# Lab guidé de la leçon « Scheduling avancé », module 8 de la formation
+# Kubernetes (décision D56). Le geste : deux PriorityClass, un nœud rempli de
+# Pods de basse priorité, puis un Pod de haute priorité qui en préempte un.
+#
+# Sur le cluster kind « multi » de k8s-kind.lab (un control plane, deux
+# workers). Sur kind, un nœud annonce tous les CPU de l'hôte : le setup calcule
+# le remplissage sur l'allocatable réel du worker, jamais sur une valeur fixe.
+# Les PriorityClass sont des objets du cluster : setup et cleanup les retirent.
+id: k8s-prioriser-et-preempter
+title: "Prioritize Pods and watch a preemption"
+level: workloads-scheduling
+section: cka
+difficulty: intermediate
+description: |
+  Create a low and a high PriorityClass, run the Pods that fill a node under
+  the low one, then start an urgent Pod under the high one and watch the
+  scheduler preempt a low-priority Pod to make room for it.
+skills:
+  - priorityclass
+  - preemption
+  - scheduling
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: deux-classes
+    label: "The PriorityClasses basse (1000) and haute (100000) exist, neither being the default class"
+    tests:
+      - test_les_deux_classes_existent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+  - id: remplissage-basse
+    label: "The Pods of remplissage run under the class basse"
+    tests:
+      - test_le_remplissage_tourne_sous_la_classe_basse
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+  - id: urgent-tourne
+    label: "The Pod urgent runs on the full worker"
+    tests:
+      - test_le_pod_urgent_tourne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+  - id: preemption
+    label: "A Pod of remplissage was preempted to make room for it"
+    tests:
+      - test_un_pod_de_basse_priorite_a_ete_preempte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+  - id: urgent-haute
+    label: "The Pod urgent carries the class haute"
+    tests:
+      - test_le_pod_urgent_porte_la_classe_haute
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/

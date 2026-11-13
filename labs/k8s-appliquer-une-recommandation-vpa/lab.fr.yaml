@@ -1,0 +1,18 @@
+title: "Appliquer une recommandation du VPA"
+description: |
+  Poser un Vertical Pod Autoscaler en mode Off sur un Deployment sous-dimensionné,
+  lire sa recommandation (borne basse, cible, borne haute), puis reporter
+  vous-même des requests raisonnables dans le Deployment, sans laisser le VPA
+  évincer un Pod.
+
+criteria:
+  - id: vpa-en-mode-off
+    label: "Le VPA catalogue vise le Deployment catalogue, en mode Off"
+  - id: recommandation
+    label: "Le VPA a produit une recommandation pour le conteneur catalogue"
+  - id: requests-dans-les-bornes
+    label: "Les requests du Deployment conviennent : le CPU entre la borne basse et la borne haute, la mémoire entre la consommation mesurée et la borne haute"
+  - id: pods-a-jour
+    label: "Les Pods en marche portent ces requests"
+  - id: aucune-eviction
+    label: "Le VPA n'a évincé aucun Pod"

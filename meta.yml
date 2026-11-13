@@ -171,6 +171,9 @@ sections:
       - cka-rbac-serviceaccount
       - cka-taints-tolerations-placement
       - cka-node-affinity
+      # Lab guidé de la leçon « Scheduling avancé », module 8 (D56), sur le
+      # cluster kind « multi ».
+      - k8s-prioriser-et-preempter
       - cka-networkpolicy-isolate-db
       # Les deux labs de routage se suivent, et dans cet ordre : ils posent la
       # MÊME situation de départ, et seule la façon de la router change.
@@ -189,6 +192,9 @@ sections:
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
       - cka-hpa-autoscaling
+      # Lab guidé de la leçon « Vertical Pod Scaling », module 8, sur le
+      # cluster kubeadm.
+      - k8s-appliquer-une-recommandation-vpa
       - cka-resourcequota-limitrange
       - cka-troubleshoot-imagepullbackoff
       - cka-troubleshoot-crashloopbackoff

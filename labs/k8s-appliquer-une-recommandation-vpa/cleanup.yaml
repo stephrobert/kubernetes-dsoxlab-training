@@ -1,0 +1,52 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le namespace du lab, puis le
+# VPA retiré par son script officiel (hack/vpa-down.sh : CRD, RBAC, déploiements,
+# certificats et webhook du contrôleur d'admission), puis metrics-server. Le
+# cluster revient à l'état du socle.
+- name: Défaire le lab k8s-appliquer-une-recommandation-vpa
+  hosts: lab_target
+  become: true
+  vars:
+    metrics_server_version: "0.9.1"
+    vpa_version: "1.8.1"
+    vpa_depot: "/root/autoscaler-vpa-{{ vpa_version }}"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace dimensionnement --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Savoir si le dépôt du VPA est présent
+      ansible.builtin.stat:
+        path: "{{ vpa_depot }}/vertical-pod-autoscaler/hack/vpa-down.sh"
+      register: vpa_down
+
+    # vpa-down.sh rend 1 même quand tout a réussi : il finit sur un `if` sans
+    # `exit 0` (mesuré le 2026-11-13 sur VPA 1.8.1). Son code de retour ne dit
+    # donc rien ; ce qui compte, c'est que le VPA ait disparu, vérifié juste après.
+    - name: Retirer le VPA par son script officiel
+      ansible.builtin.command:
+        cmd: ./hack/vpa-down.sh
+        chdir: "{{ vpa_depot }}/vertical-pod-autoscaler"
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+      when: vpa_down.stat.exists
+
+    - name: Vérifier qu'il ne reste ni Pod ni CRD du VPA
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} -n kube-system wait --for=delete pod \
+          -l 'app in (vpa-recommender,vpa-updater,vpa-admission-controller)' --timeout=120s
+        test -z "$({{ kubectl }} get crd -o name | grep autoscaling.k8s.io || true)"
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Retirer metrics-server
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /root/metrics-server-v{{ metrics_server_version }}.yaml --ignore-not-found
+      changed_when: true
+      failed_when: false
