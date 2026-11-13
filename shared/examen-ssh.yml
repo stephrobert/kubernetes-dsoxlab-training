@@ -4,10 +4,14 @@
 # (k8s-cp.lab, la session de `dsoxlab run`), travaille, puis revient par exit.
 # Aucun contexte : chaque tâche écrit son namespace.
 #
-# Ce fichier pose ce qu'il faut sur les deux hôtes de tâche :
-#   - un kubeconfig pour l'utilisateur du lab sur k8s-w1.lab, qui n'en a pas ;
-#   - l'autorisation de `ssh k8s-cp.lab` depuis la base : le socle autorise la
-#     clé du control plane sur les workers, pas sur lui-même ;
+# Ce fichier pose ce qu'il faut sur les deux hôtes de tâche, et rien qu'il ne
+# puisse défaire sans toucher à ce qui existait avant lui (audit du 2026-11-13) :
+#   - sur k8s-w1.lab, un kubeconfig DÉDIÉ, ~/.kube/dsoxlab-examen.conf, que le
+#     bloc du .bashrc désigne par KUBECONFIG. Un ~/.kube/config ou tout autre
+#     fichier de l'apprenant reste intact. Si ~/.kube n'existait pas, un marqueur
+#     le note, pour que le nettoyage ne retire que ce qu'il a créé ;
+#   - l'autorisation de `ssh k8s-cp.lab` depuis la base. Un marqueur note que le
+#     setup l'a AJOUTÉE : une clé déjà autorisée n'est jamais retirée ;
 #   - l'alias `k` et la complétion de kubectl, comme à l'examen.
 #
 # Inclus par labs/cka-examen-blanc et labs/ckad-examen-blanc, défait par
@@ -18,6 +22,32 @@
     src: /etc/kubernetes/admin.conf
   register: examen_admin_conf
 
+- name: Savoir si le répertoire kubeconfig existe déjà sur le worker
+  ansible.builtin.stat:
+    path: "/home/{{ ansible_user | default('ansible') }}/.kube"
+  register: examen_kube_avant
+  delegate_to: k8s-w1.lab
+
+- name: Créer le répertoire des marqueurs de l'examen sur les deux hôtes
+  ansible.builtin.file:
+    path: /var/lib/dsoxlab
+    state: directory
+    mode: "0755"
+  delegate_to: "{{ hote_examen }}"
+  loop:
+    - "{{ inventory_hostname }}"
+    - k8s-w1.lab
+  loop_control:
+    loop_var: hote_examen
+
+- name: Noter que le répertoire kubeconfig du worker est créé par l'examen
+  ansible.builtin.copy:
+    dest: /var/lib/dsoxlab/examen-kube-cree
+    content: "{{ ansible_user | default('ansible') }}\n"
+    mode: "0644"
+  delegate_to: k8s-w1.lab
+  when: not examen_kube_avant.stat.exists
+
 - name: Créer le répertoire kubeconfig de l'utilisateur du lab sur le worker
   ansible.builtin.file:
     path: "/home/{{ ansible_user | default('ansible') }}/.kube"
@@ -26,9 +56,9 @@
     mode: "0700"
   delegate_to: k8s-w1.lab
 
-- name: Poser le kubeconfig de l'utilisateur du lab sur le worker
+- name: Poser le kubeconfig dédié de l'examen sur le worker
   ansible.builtin.copy:
-    dest: "/home/{{ ansible_user | default('ansible') }}/.kube/config"
+    dest: "/home/{{ ansible_user | default('ansible') }}/.kube/dsoxlab-examen.conf"
     content: "{{ examen_admin_conf.content | b64decode }}"
     owner: "{{ ansible_user | default('ansible') }}"
     mode: "0600"
@@ -46,8 +76,16 @@
     create: true
     owner: "{{ ansible_user | default('ansible') }}"
     mode: "0600"
+  register: examen_cle_ajoutee
 
-- name: Poser l'alias k et la complétion de kubectl sur les deux hôtes
+- name: Noter que l'autorisation a été ajoutée par l'examen
+  ansible.builtin.copy:
+    dest: /var/lib/dsoxlab/examen-cle-ajoutee
+    content: "{{ examen_cle_cp.content | b64decode | trim }}\n"
+    mode: "0644"
+  when: examen_cle_ajoutee is changed
+
+- name: Poser l'alias k et la complétion de kubectl sur la base
   ansible.builtin.blockinfile:
     path: "/home/{{ ansible_user | default('ansible') }}/.bashrc"
     marker: "# {mark} DSOXLAB EXAMEN BLANC"
@@ -58,9 +96,17 @@
       alias k=kubectl
       source <(kubectl completion bash)
       complete -o default -F __start_kubectl k
-  delegate_to: "{{ hote_examen }}"
-  loop:
-    - "{{ inventory_hostname }}"
-    - k8s-w1.lab
-  loop_control:
-    loop_var: hote_examen
+
+- name: Poser le kubeconfig dédié, l'alias k et la complétion sur le worker
+  ansible.builtin.blockinfile:
+    path: "/home/{{ ansible_user | default('ansible') }}/.bashrc"
+    marker: "# {mark} DSOXLAB EXAMEN BLANC"
+    create: true
+    owner: "{{ ansible_user | default('ansible') }}"
+    mode: "0644"
+    block: |
+      export KUBECONFIG="$HOME/.kube/dsoxlab-examen.conf"
+      alias k=kubectl
+      source <(kubectl completion bash)
+      complete -o default -F __start_kubectl k
+  delegate_to: k8s-w1.lab
