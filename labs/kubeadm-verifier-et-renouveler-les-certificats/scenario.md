@@ -16,7 +16,8 @@ You are on **`k8s-cp.lab`**, the control plane of the kubeadm cluster, with
 2. The **control plane** certificates are **renewed**: those of the API server,
    of its clients to the kubelet and to etcd, of the front-proxy, and those of
    etcd.
-3. The **API server** and **etcd** **serve** the renewed certificates.
+3. **kube-controller-manager** and **kube-scheduler** run with the **renewed
+   client certificate** of their kubeconfig.
 4. Your **`~/.kube/config`** carries the **renewed admin certificate**, and
    `kubectl` answers with it.
 
@@ -26,8 +27,10 @@ You are on **`k8s-cp.lab`**, the control plane of the kubeadm cluster, with
   authority that signed it. `openssl x509 -noout -dates -in <file>` reads a
   certificate by hand.
 - `kubeadm certs renew` renews one certificate, or all of them.
-- The control plane components are **static Pods**: they only read their
-  certificates again when they restart. The manifests live in
+- The control plane components are **static Pods**. The API server and etcd
+  reload their serving certificate on their own when the file changes; the
+  controller manager and the scheduler only read the client certificate of
+  their kubeconfig when they start. The manifests live in
   `/etc/kubernetes/manifests`, and the kubelet stops a static Pod whose manifest
   disappears.
 - Renewal also rewrites `/etc/kubernetes/admin.conf`, but not the copy you made

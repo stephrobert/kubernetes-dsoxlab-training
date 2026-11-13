@@ -17,7 +17,8 @@ Vous êtes sur **`k8s-cp.lab`**, le plan de contrôle du cluster kubeadm, avec
 2. Les certificats du **plan de contrôle** sont **renouvelés** : ceux de l'API
    server, de ses clients vers le kubelet et vers etcd, du front-proxy, et ceux
    d'etcd.
-3. L'**API server** et **etcd** **servent** les certificats renouvelés.
+3. **kube-controller-manager** et **kube-scheduler** tournent avec le
+   **certificat client renouvelé** de leur kubeconfig.
 4. Votre **`~/.kube/config`** porte le **certificat d'administration
    renouvelé**, et `kubectl` répond avec lui.
 
@@ -27,8 +28,10 @@ Vous êtes sur **`k8s-cp.lab`**, le plan de contrôle du cluster kubeadm, avec
   l'autorité qui l'a signé. `openssl x509 -noout -dates -in <fichier>` lit un
   certificat à la main.
 - `kubeadm certs renew` renouvelle un certificat, ou tous.
-- Les composants du plan de contrôle sont des **Pods statiques** : ils ne
-  relisent leurs certificats qu'à leur redémarrage. Les manifestes vivent dans
+- Les composants du plan de contrôle sont des **Pods statiques**. L'API server
+  et etcd rechargent seuls leur certificat de service quand le fichier change ;
+  le controller-manager et le scheduler ne relisent le certificat client de
+  leur kubeconfig qu'à leur démarrage. Les manifestes vivent dans
   `/etc/kubernetes/manifests`, et le kubelet arrête un Pod statique dont le
   manifeste disparaît.
 - Le renouvellement réécrit aussi `/etc/kubernetes/admin.conf`, mais pas la

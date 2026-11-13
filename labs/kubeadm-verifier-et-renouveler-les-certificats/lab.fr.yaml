@@ -10,6 +10,6 @@ criteria:
   - id: certificats-renouveles
     label: "Les certificats du plan de contrôle ont été renouvelés"
   - id: composants-recharges
-    label: "L'API server et etcd servent les certificats renouvelés"
+    label: "Le controller-manager et le scheduler ont redémarré depuis le renouvellement"
   - id: kubeconfig-a-jour
     label: "Le kubeconfig de l'utilisateur porte le certificat d'administration renouvelé, et kubectl répond"

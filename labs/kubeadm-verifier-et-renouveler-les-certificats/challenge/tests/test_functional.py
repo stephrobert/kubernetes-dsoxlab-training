@@ -4,8 +4,9 @@
    certificat au moment du check ;
 2. les sept certificats du plan de contrôle portent un autre numéro de série
    que celui relevé par le setup ;
-3. l'API server (6443) et etcd (2379) servent le certificat du disque : un
-   renouvellement non rechargé ne passe pas ;
+3. kube-controller-manager et kube-scheduler ont redémarré après le
+   renouvellement de leur kubeconfig (l'API server et etcd, eux, rechargent
+   seuls leur certificat de service : mesuré sur 1.37) ;
 4. le kubeconfig de l'utilisateur porte le certificat client renouvelé
    d'admin.conf, et kubectl répond avec lui.
 
@@ -74,23 +75,42 @@ def test_les_certificats_du_plan_de_controle_sont_renouveles(host):
     )
 
 
-def _serie_servie(host, port: int) -> str:
-    res = host.run(f"echo | openssl s_client -connect 127.0.0.1:{port} 2>/dev/null | openssl x509 -noout -serial")
-    return res.stdout.split("=", 1)[1].strip() if res.rc == 0 and "=" in res.stdout else ""
+def _date_fichier(host, chemin: str) -> int:
+    return int(host.check_output(f"sudo stat -c %Y {chemin}").strip())
 
 
-def test_l_api_server_et_etcd_servent_les_nouveaux_certificats(host):
+def _demarrage_conteneur(host, nom: str) -> int | None:
+    """L'heure de création du conteneur en marche, en secondes depuis l'époque."""
+    res = host.run(f"sudo crictl ps --name '^{nom}$' -o json")
+    if res.rc != 0:
+        return None
+    conteneurs = json.loads(res.stdout).get("containers") or []
+    return int(conteneurs[0]["createdAt"]) // 10**9 if conteneurs else None
+
+
+def test_le_controller_manager_et_le_scheduler_ont_redemarre(host):
+    # kube-apiserver et etcd rechargent seuls leur certificat de service quand
+    # le fichier change (mesuré sur 1.37). kube-controller-manager et
+    # kube-scheduler, eux, ne relisent le certificat client de leur kubeconfig
+    # qu'au démarrage : sans redémarrage, ils tomberont à l'échéance de l'ancien.
+    # Le kubeconfig doit avoir été réécrit pendant le lab (après le relevé du
+    # setup), et le conteneur avoir démarré APRÈS cette réécriture.
+    depart = _date_fichier(host, "/var/lib/dsoxlab/pki-series.json")
     ecarts = {}
-    for port, nom in ((6443, "apiserver"), (2379, "etcd/server")):
-        servi, disque = _serie_servie(host, port), _serie_fichier(host, f"/etc/kubernetes/pki/{nom}.crt")
-        if servi != disque:
-            ecarts[nom] = message(en=f"serves {servi or 'nothing'}, disk has {disque}",
-                                  fr=f"sert {servi or 'rien'}, le disque porte {disque}")
+    for nom, conf in (("kube-controller-manager", "controller-manager.conf"),
+                      ("kube-scheduler", "scheduler.conf")):
+        ecrit = _date_fichier(host, f"/etc/kubernetes/{conf}")
+        demarre = _demarrage_conteneur(host, nom)
+        if ecrit <= depart:
+            ecarts[nom] = message(en=f"{conf} has not been renewed", fr=f"{conf} n'a pas été renouvelé")
+        elif demarre is None or demarre <= ecrit:
+            ecarts[nom] = message(en=f"still runs with the client certificate read before the renewal of {conf}",
+                                  fr=f"tourne encore avec le certificat client lu avant le renouvellement de {conf}")
     assert not ecarts, message(
-        en=f"These components do not serve the certificate on disk: {ecarts}. A renewed certificate is only "
-        "used once the component has been restarted.",
-        fr=f"Ces composants ne servent pas le certificat du disque : {ecarts}. Un certificat renouvelé ne sert "
-        "qu'une fois le composant redémarré.",
+        en=f"These components still use their old client certificate: {ecarts}. They only read their kubeconfig "
+        "when they start.",
+        fr=f"Ces composants utilisent encore leur ancien certificat client : {ecarts}. Ils ne lisent leur "
+        "kubeconfig qu'au démarrage.",
     )
 
 

@@ -60,9 +60,9 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: composants-recharges
-    label: "The API server and etcd serve the renewed certificates"
+    label: "The controller manager and the scheduler have restarted since the renewal"
     tests:
-      - test_l_api_server_et_etcd_servent_les_nouveaux_certificats
+      - test_le_controller_manager_et_le_scheduler_ont_redemarre
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: kubeconfig-a-jour
