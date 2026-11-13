@@ -118,6 +118,27 @@ def _requests_du_modele(host) -> dict:
     return (c.get("resources") or {}).get("requests") or {}
 
 
+def _ecarts_aux_bornes(host, reco: dict, requests: dict) -> dict:
+    """Ce qui, dans requests, sort des bornes de la recommandation."""
+    ecarts = {}
+    # Le CPU se juge entre les deux bornes.
+    cpu = _quantite(requests.get("cpu"))
+    bas, haut = _quantite(reco["lowerBound"].get("cpu")), _quantite(reco["upperBound"].get("cpu"))
+    if cpu is None or bas is None or haut is None or not bas <= cpu <= haut:
+        ecarts["cpu"] = (f"{requests.get('cpu')} hors de "
+                         f"[{reco['lowerBound'].get('cpu')}, {reco['upperBound'].get('cpu')}]")
+    # La mémoire, non : la borne basse du recommender est son plancher de
+    # 250Mi, que la leçon dit de ne pas recopier. Elle se juge entre la
+    # consommation que mesure metrics-server et la borne haute.
+    memoire = _quantite(requests.get("memory"))
+    haut = _quantite(reco["upperBound"].get("memory"))
+    conso = _consommation_memoire(host)
+    if memoire is None or haut is None or conso is None or not conso <= memoire <= haut:
+        ecarts["memory"] = (f"{requests.get('memory')} hors de [{_en_mi(conso)} mesurés, "
+                            f"{reco['upperBound'].get('memory')}]")
+    return ecarts
+
+
 # ----------------------------------------------------------------------
 # 1. Le VPA existe, vise catalogue, en mode Off.
 # ----------------------------------------------------------------------
@@ -161,23 +182,7 @@ def test_les_requests_sont_dans_les_bornes(host):
         en=f"The VPA {NOM} has no recommendation yet: the requests cannot be judged against it.",
         fr=f"Le VPA {NOM} n'a pas encore de recommandation : les requests ne se jugent pas sans elle.",
     )
-    requests = _requests_du_modele(host)
-    ecarts = {}
-    # Le CPU se juge entre les deux bornes.
-    cpu = _quantite(requests.get("cpu"))
-    bas, haut = _quantite(reco["lowerBound"].get("cpu")), _quantite(reco["upperBound"].get("cpu"))
-    if cpu is None or bas is None or haut is None or not bas <= cpu <= haut:
-        ecarts["cpu"] = (f"{requests.get('cpu')} hors de "
-                         f"[{reco['lowerBound'].get('cpu')}, {reco['upperBound'].get('cpu')}]")
-    # La mémoire, non : la borne basse du recommender est son plancher de
-    # 250Mi, que la leçon dit de ne pas recopier. Elle se juge entre la
-    # consommation que mesure metrics-server et la borne haute.
-    memoire = _quantite(requests.get("memory"))
-    haut = _quantite(reco["upperBound"].get("memory"))
-    conso = _consommation_memoire(host)
-    if memoire is None or haut is None or conso is None or not conso <= memoire <= haut:
-        ecarts["memory"] = (f"{requests.get('memory')} hors de [{_en_mi(conso)} mesurés, "
-                            f"{reco['upperBound'].get('memory')}]")
+    ecarts = _ecarts_aux_bornes(host, reco, _requests_du_modele(host))
     assert not ecarts, message(
         en=f"The requests of the Deployment {NOM} do not fit: {ecarts}. CPU goes between lowerBound and upperBound; "
         "memory between the usage metrics-server measures and upperBound.",
@@ -190,10 +195,12 @@ def test_les_requests_sont_dans_les_bornes(host):
 # 4. Les Pods en marche portent ces requests.
 # ----------------------------------------------------------------------
 def test_les_pods_tournent_avec_ces_requests(host):
-    voulues = {k: _quantite(v) for k, v in _requests_du_modele(host).items()}
+    voulues_brutes = _requests_du_modele(host)
+    voulues = {k: _quantite(v) for k, v in voulues_brutes.items()}
     dep = _json(host, f"-n {NS} get deployment {NOM}")
     replicas = (dep or {}).get("spec", {}).get("replicas", 1)
     ecarts: dict[str, dict] = {}
+    alignes = False
     for _ in range(18):
         pods = [p for p in (_json(host, f"-n {NS} get pods -l app={NOM}") or {}).get("items", [])
                 if not p["metadata"].get("deletionTimestamp") and p["status"].get("phase") == "Running"
@@ -205,8 +212,26 @@ def test_les_pods_tournent_avec_ces_requests(host):
             if portees != voulues:
                 ecarts[p["metadata"]["name"]] = (c.get("resources") or {}).get("requests")
         if len(pods) == replicas and not ecarts:
-            return
+            alignes = True
+            break
         time.sleep(PAS)
+    if alignes:
+        # Porter les requests du Deployment ne suffit pas : au départ, les Pods
+        # portent déjà celles du Deployment d'origine. Ces requests doivent
+        # être celles que la recommandation justifie.
+        reco = _recommandation(host, attendre=True)
+        assert reco is not None, message(
+            en=f"The VPA {NOM} has no recommendation yet: the Pods' requests cannot be judged against it.",
+            fr=f"Le VPA {NOM} n'a pas encore de recommandation : les requests des Pods ne se jugent pas sans elle.",
+        )
+        hors = _ecarts_aux_bornes(host, reco, voulues_brutes)
+        assert not hors, message(
+            en=f"The running Pods of {NOM} carry requests that the recommendation does not justify: {hors}. "
+            "Apply the recommendation in the Deployment, then let its Pods be recreated.",
+            fr=f"Les Pods en marche de {NOM} portent des requests que la recommandation ne justifie pas : {hors}. "
+            "Appliquez la recommandation dans le Deployment, puis laissez ses Pods être recréés.",
+        )
+        return
     raise AssertionError(message(
         en=f"The running Pods of {NOM} do not all carry the Deployment's requests ({len(pods)} ready out of "
         f"{replicas}, different: {ecarts}).",
