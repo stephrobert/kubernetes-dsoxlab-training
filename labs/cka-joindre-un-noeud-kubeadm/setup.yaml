@@ -1,0 +1,41 @@
+---
+# Joué par `dsoxlab run`.
+#
+# Le socle d'abord : il garantit un cluster entier avant qu'on n'y touche, et
+# répare celui qu'un passage interrompu aurait laissé sans son worker. Puis le
+# worker k8s-w1.lab est retiré du cluster, réinitialisé, et sa préparation est
+# défaite (fixtures/reinitialiser-worker.sh) : c'est l'état d'une machine qu'on
+# s'apprête à joindre.
+- name: Préparer le lab cka-joindre-un-noeud-kubeadm
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Vider le worker de ses Pods
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf drain {{ worker }}
+        --ignore-daemonsets --delete-emptydir-data --force --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le worker du cluster
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete node {{ worker }}
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+
+    - name: Réinitialiser le worker et défaire sa préparation
+      ansible.builtin.script: fixtures/reinitialiser-worker.sh
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ worker }}"
+
+    - name: Poser le namespace du lab
+      ansible.builtin.shell: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf create namespace jonction
+        --dry-run=client -o yaml | kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f -
+      changed_when: true

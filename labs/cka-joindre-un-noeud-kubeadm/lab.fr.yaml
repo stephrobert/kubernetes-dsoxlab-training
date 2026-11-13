@@ -1,0 +1,21 @@
+title: "Joindre un worker à un cluster kubeadm"
+description: |
+  Préparer un worker réinitialisé pour Kubernetes 1.37 (swap coupé durablement,
+  containerd sur le pilote de cgroup systemd, paquets figés), le joindre au
+  cluster avec la commande que donne le plan de contrôle, vérifier qu'il est
+  Ready avec le kubelet attendu, puis prouver qu'il accueille des charges en y
+  forçant un Pod.
+
+criteria:
+  - id: noeud-joint
+    label: "Le worker a rejoint le cluster et il est Ready"
+  - id: version-du-kubelet
+    label: "Son kubelet annonce la version du cluster"
+  - id: swap-coupe
+    label: "Le swap est coupé sur le worker, et le reste après un redémarrage"
+  - id: pilote-systemd
+    label: "containerd tourne avec le pilote de cgroup systemd"
+  - id: paquets-figes
+    label: "kubeadm, kubelet et kubectl sont figés"
+  - id: pod-sur-le-worker
+    label: "Un Pod forcé sur le worker y tourne"

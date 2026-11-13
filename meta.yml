@@ -207,6 +207,8 @@ sections:
       - cka-troubleshoot-node-notready
       - cka-troubleshoot-kubelet
       - cka-troubleshoot-apiserver
+      # Niveau 4, lot A (vague 2) : joindre un worker au cluster kubeadm.
+      - cka-joindre-un-noeud-kubeadm
       # Niveau 4, lot A (vague 1) : les interfaces d'un nœud (CNI, CSI et CRI),
       # puis la santé d'etcd avant sa sauvegarde.
       - k8s-lire-les-interfaces-d-un-noeud
