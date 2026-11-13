@@ -1,0 +1,20 @@
+title: "Donner à une application sa propre identité et le moindre droit"
+description: |
+  Sans procédure, donner à un outil d'observation sa propre identité, le
+  laisser lire le journal des Pods d'un autre namespace et rien de plus, couper
+  le jeton du Pod qui n'appelle jamais l'API, retirer au compte par défaut
+  du namespace les droits dont il a hérité, et durcir l'outil sans le casser.
+
+criteria:
+  - id: identite-dediee
+    label: "collecte tourne sous sa propre identité, collecte, et non sous le compte par défaut"
+  - id: journaux-de-production
+    label: "Depuis son Pod, avec son propre jeton, collecte lit le journal des Pods de production"
+  - id: rien-de-plus
+    label: "collecte ne peut rien d'autre : ni supprimer, ni lire un Secret, ni regarder un autre namespace"
+  - id: jeton-coupe
+    label: "Le Pod en marche de tableau, qui n'appelle jamais l'API, ne porte aucun jeton"
+  - id: compte-par-defaut
+    label: "Le compte par défaut d'observatoire ne garde aucun droit de rien modifier"
+  - id: collecte-durcie
+    label: "Le Pod de collecte tourne en non-root sous un UID numérique, sans élévation de privilèges, racine en lecture seule et sans capability, et lit toujours les journaux"

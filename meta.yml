@@ -169,6 +169,9 @@ sections:
       # « Operators et CRDs pour développeurs », sur le cluster kind « multi ».
       - k8s-challenge-choisir-le-bon-workload
       - cka-rbac-serviceaccount
+      # Le challenge du module 9 (RBAC et ServiceAccounts), posé dans la leçon
+      # « ServiceAccounts », sur le cluster kubeadm.
+      - k8s-challenge-identite-et-droits-minimaux
       - cka-taints-tolerations-placement
       - cka-node-affinity
       - cka-networkpolicy-isolate-db
