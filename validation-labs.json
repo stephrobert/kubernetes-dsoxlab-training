@@ -4023,6 +4023,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-appliquer-une-recommandation-vpa": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_le_vpa_a_produit_une_recommandation",
+    "test_le_vpa_existe_en_mode_off",
+    "test_le_vpa_n_a_evince_aucun_pod",
+    "test_les_pods_tournent_avec_ces_requests",
+    "test_les_requests_sont_dans_les_bornes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 378,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-appliquer-une-recommandation-vpa.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_vpa_a_produit_une_recommandation",
+    "test_le_vpa_existe_en_mode_off",
+    "test_le_vpa_n_a_evince_aucun_pod",
+    "test_les_pods_tournent_avec_ces_requests",
+    "test_les_requests_sont_dans_les_bornes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-atteindre-une-application": {
   "apres": {
    "echecs": [],
@@ -4256,6 +4313,65 @@
    "skipped": 0,
    "status": "failed",
    "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-identite-et-droits-minimaux": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_collecte_est_durcie_et_travaille",
+    "test_collecte_lit_les_journaux_de_production",
+    "test_collecte_n_a_aucun_autre_droit",
+    "test_collecte_tourne_sous_sa_propre_identite",
+    "test_le_compte_par_defaut_n_a_plus_aucun_droit",
+    "test_tableau_ne_porte_aucun_jeton"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-13",
+  "duree_s": 274,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-identite-et-droits-minimaux.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_collecte_est_durcie_et_travaille",
+    "test_collecte_lit_les_journaux_de_production",
+    "test_collecte_n_a_aucun_autre_droit",
+    "test_collecte_tourne_sous_sa_propre_identite",
+    "test_le_compte_par_defaut_n_a_plus_aucun_droit",
+    "test_tableau_ne_porte_aucun_jeton"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
@@ -5565,6 +5681,63 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-prioriser-et-preempter": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_le_pod_urgent_porte_la_classe_haute",
+    "test_le_pod_urgent_tourne",
+    "test_le_remplissage_tourne_sous_la_classe_basse",
+    "test_les_deux_classes_existent",
+    "test_un_pod_de_basse_priorite_a_ete_preempte"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-13",
+  "duree_s": 207,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-prioriser-et-preempter.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_pod_urgent_porte_la_classe_haute",
+    "test_le_pod_urgent_tourne",
+    "test_le_remplissage_tourne_sous_la_classe_basse",
+    "test_les_deux_classes_existent",
+    "test_un_pod_de_basse_priorite_a_ete_preempte"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
