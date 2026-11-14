@@ -3558,6 +3558,93 @@
   },
   "verdict": "VALIDE"
  },
+ "cks-examen-blanc": {
+  "apres": {
+   "echecs": [],
+   "passed": 20,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 20
+  },
+  "avant": {
+   "echecs": [
+    "test_t01_seul_le_flux_prevu_passe_dans_zone",
+    "test_t02_le_site_sert_en_https_avec_son_certificat",
+    "test_t03_l_audit_cis_rejoue_ne_reproche_plus_le_profilage",
+    "test_t04a_dev_sa_garde_son_travail_sans_etre_administrateur",
+    "test_t04b_dev_sa_ne_lit_plus_les_secrets_et_son_droit_vit_dans_le_namespace",
+    "test_t05_releveur_tourne_sans_jeton_d_api",
+    "test_t06_confine_est_tenu_par_apparmor_sur_le_worker",
+    "test_t07_seccomp_refuse_chmod_au_seul_pod_vise",
+    "test_t08a_durci_refuse_a_l_admission_ce_que_restricted_interdit",
+    "test_t08b_le_pod_conforme_tourne_sous_restricted",
+    "test_t09_secure_app_remplace_insecure_app_sans_ses_defauts",
+    "test_t10_la_cle_d_api_arrive_par_un_secret_en_fichier",
+    "test_t11a_pinned_app_tourne_sur_le_digest_de_nginx_1305",
+    "test_t11b_chaine_refuse_toute_image_non_epinglee",
+    "test_t12_le_dockerfile_d_inventaire_passe_l_analyse",
+    "test_t13_la_cle_publiee_valide_web_et_refuse_outil",
+    "test_t14a_la_lecture_du_secret_est_journalisee_avec_son_corps",
+    "test_t14b_une_lecture_banale_est_journalisee_en_metadata_seulement",
+    "test_t15_vitrine_ne_s_ecrit_plus_et_sert_toujours",
+    "test_t16_le_pod_compromis_est_retire_et_lui_seul"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 1220,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/20",
+   "après la solution : 20/20",
+   "après clean et run : 0/20",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-examen-blanc.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_t01_seul_le_flux_prevu_passe_dans_zone",
+    "test_t02_le_site_sert_en_https_avec_son_certificat",
+    "test_t03_l_audit_cis_rejoue_ne_reproche_plus_le_profilage",
+    "test_t04a_dev_sa_garde_son_travail_sans_etre_administrateur",
+    "test_t04b_dev_sa_ne_lit_plus_les_secrets_et_son_droit_vit_dans_le_namespace",
+    "test_t05_releveur_tourne_sans_jeton_d_api",
+    "test_t06_confine_est_tenu_par_apparmor_sur_le_worker",
+    "test_t07_seccomp_refuse_chmod_au_seul_pod_vise",
+    "test_t08a_durci_refuse_a_l_admission_ce_que_restricted_interdit",
+    "test_t08b_le_pod_conforme_tourne_sous_restricted",
+    "test_t09_secure_app_remplace_insecure_app_sans_ses_defauts",
+    "test_t10_la_cle_d_api_arrive_par_un_secret_en_fichier",
+    "test_t11a_pinned_app_tourne_sur_le_digest_de_nginx_1305",
+    "test_t11b_chaine_refuse_toute_image_non_epinglee",
+    "test_t12_le_dockerfile_d_inventaire_passe_l_analyse",
+    "test_t13_la_cle_publiee_valide_web_et_refuse_outil",
+    "test_t14a_la_lecture_du_secret_est_journalisee_avec_son_corps",
+    "test_t14b_une_lecture_banale_est_journalisee_en_metadata_seulement",
+    "test_t15_vitrine_ne_s_ecrit_plus_et_sert_toujours",
+    "test_t16_le_pod_compromis_est_retire_et_lui_seul"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 20
+  },
+  "verdict": "VALIDE"
+ },
  "cks-image-pinned-digest": {
   "apres": {
    "echecs": [],

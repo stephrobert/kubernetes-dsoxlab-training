@@ -346,7 +346,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 24 | [`k8s-contenir-un-deni-de-service`](labs/k8s-contenir-un-deni-de-service/) | Contain a denial of service inside its namespace | cluster-hardening | 30m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 25 | [`k8s-challenge-contenir-une-attaque`](labs/k8s-challenge-contenir-une-attaque/) | Detect and contain a persistence and a denial of service | cluster-hardening | 45m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 26 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
-| 27 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 27 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
 Total: **122 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
