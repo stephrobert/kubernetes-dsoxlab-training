@@ -1,0 +1,206 @@
+---
+# Joué par `dsoxlab run` : quatre pannes sur le cluster kubeadm du catalogue.
+#
+# L'ORDRE EST LA CLÉ DE CE SETUP. Deux des pannes coupent ce dont le setup a
+# besoin : sans kubelet sur le worker, le socle attend en vain que tous les
+# nœuds soient Ready ; sans API server, plus aucune commande kubectl ne passe.
+# D'où quatre temps :
+#   1. défaire ce qu'un passage précédent aurait laissé cassé (API server puis
+#      kubelet), sinon le socle ne finit pas ;
+#   2. le socle, puis les applications (fixtures/prepare.sh), API saine ;
+#   3. la panne du kubelet du worker, et l'attente du NotReady, API saine ;
+#   4. EN DERNIER, la panne de l'API server (fixtures/panne-api-server.sh).
+# Chaque fichier cassé est d'abord copié sous /var/lib/dsoxlab : cleanup.yaml
+# le remet tel quel, quoi que l'apprenant en ait fait.
+- name: Préparer le challenge k8s-challenge-depanner-une-application
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    worker: k8s-w1.lab
+    manifeste: /etc/kubernetes/manifests/kube-apiserver.yaml
+    copie_manifeste: /var/lib/dsoxlab/depanner-kube-apiserver.yaml
+    config_kubelet: /var/lib/kubelet/config.yaml
+    copie_config_kubelet: /var/lib/dsoxlab/depanner-kubelet-config.yaml
+  tasks:
+    # ------------------------------------------------------------------
+    # 1. Défaire un passage précédent, API server d'abord.
+    # ------------------------------------------------------------------
+    - name: Chercher un manifeste d'API server laissé de côté
+      ansible.builtin.stat:
+        path: "{{ copie_manifeste }}"
+      register: copie_api
+
+    - name: Rendre le manifeste sain de l'API server
+      ansible.builtin.copy:
+        src: "{{ copie_manifeste }}"
+        dest: "{{ manifeste }}"
+        remote_src: true
+        mode: "0600"
+      when: copie_api.stat.exists
+      register: api_rendue
+
+    - name: Chercher le manifeste de l'API server
+      ansible.builtin.stat:
+        path: "{{ manifeste }}"
+      register: manifeste_api
+
+    - name: Corriger le flag mal orthographié, au cas où
+      ansible.builtin.replace:
+        path: "{{ manifeste }}"
+        regexp: '--authorization-modes='
+        replace: '--authorization-mode='
+      when: manifeste_api.stat.exists
+      register: api_corrigee
+
+    - name: Retirer la copie du manifeste
+      ansible.builtin.file:
+        path: "{{ copie_manifeste }}"
+        state: absent
+
+    - name: Attendre que l'API server réponde
+      ansible.builtin.command: "{{ kubectl }} get --raw /readyz"
+      register: sante
+      until: sante.rc == 0
+      retries: 60
+      delay: 3
+      changed_when: false
+      when: api_rendue is changed or api_corrigee is changed
+
+    # Le kube-controller-manager et le kube-scheduler perdent leur bail quand
+    # l'API tombe, sortent, et le kubelet espace leurs redémarrages jusqu'à
+    # cinq minutes. Relancer le kubelet efface ce délai.
+    - name: Relancer le kubelet du control plane, qui efface ses délais de redémarrage
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+      when: api_rendue is changed or api_corrigee is changed
+
+    - name: Attendre les composants du control plane
+      ansible.builtin.command: >-
+        {{ kubectl }} -n kube-system wait --for=condition=Ready pod
+        -l tier=control-plane --timeout=300s
+      changed_when: false
+      when: api_rendue is changed or api_corrigee is changed
+
+    - name: Savoir si le worker a déjà rejoint un cluster
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      delegate_to: "{{ worker }}"
+      register: worker_joint
+
+    - name: Chercher une configuration de kubelet laissée de côté
+      ansible.builtin.stat:
+        path: "{{ copie_config_kubelet }}"
+      delegate_to: "{{ worker }}"
+      register: copie_kubelet
+
+    - name: Rendre la configuration saine du kubelet du worker
+      ansible.builtin.copy:
+        src: "{{ copie_config_kubelet }}"
+        dest: "{{ config_kubelet }}"
+        remote_src: true
+        mode: "0644"
+      delegate_to: "{{ worker }}"
+      when: copie_kubelet.stat.exists
+      register: kubelet_rendu
+
+    - name: Retirer l'adresse impossible, au cas où
+      ansible.builtin.lineinfile:
+        path: "{{ config_kubelet }}"
+        regexp: '999\.999\.999\.999'
+        state: absent
+      delegate_to: "{{ worker }}"
+      when: worker_joint.stat.exists
+      register: kubelet_corrige
+
+    - name: Retirer la copie de la configuration du kubelet
+      ansible.builtin.file:
+        path: "{{ copie_config_kubelet }}"
+        state: absent
+      delegate_to: "{{ worker }}"
+
+    - name: Remettre le kubelet du worker en service, activé
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: "{{ 'restarted' if (kubelet_rendu is changed or kubelet_corrige is changed) else 'started' }}"
+        enabled: true
+      delegate_to: "{{ worker }}"
+      when: worker_joint.stat.exists
+
+    # ------------------------------------------------------------------
+    # 2. Le socle et les applications, cluster sain.
+    # ------------------------------------------------------------------
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser les trois applications du namespace commerce
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
+
+    # ------------------------------------------------------------------
+    # 3. Le kubelet du worker : configuration illisible, service arrêté et
+    #    désactivé. Le démarrer ne suffira pas, réparer le fichier non plus.
+    # ------------------------------------------------------------------
+    - name: Préparer le répertoire des copies sur le worker
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab
+        state: directory
+        mode: "0700"
+      delegate_to: "{{ worker }}"
+
+    - name: Garder la configuration saine du kubelet
+      ansible.builtin.copy:
+        src: "{{ config_kubelet }}"
+        dest: "{{ copie_config_kubelet }}"
+        remote_src: true
+        mode: "0600"
+      delegate_to: "{{ worker }}"
+
+    # Repris de cka-troubleshoot-kubelet, mesuré le 2026-09-14 : c'est
+    # l'indentation qui casse, le kubelet ne valide pas les adresses.
+    - name: Ajouter un résolveur mal indenté à la configuration du kubelet
+      ansible.builtin.lineinfile:
+        path: "{{ config_kubelet }}"
+        insertafter: '^clusterDNS:'
+        line: "  - 999.999.999.999"
+      delegate_to: "{{ worker }}"
+
+    - name: Relancer le kubelet, qui refuse sa configuration et le note au journal
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+      delegate_to: "{{ worker }}"
+      failed_when: false
+
+    - name: Arrêter et désactiver le kubelet du worker
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: stopped
+        enabled: false
+      delegate_to: "{{ worker }}"
+
+    - name: Attendre que le control plane voie le worker NotReady
+      ansible.builtin.command: >-
+        {{ kubectl }} get node {{ worker }}
+        -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+      register: pret
+      until: pret.stdout != "True"
+      retries: 40
+      delay: 5
+      changed_when: false
+
+    # ------------------------------------------------------------------
+    # 4. En dernier : l'API server. Après cette tâche, plus rien ne passe
+    #    par kubectl, et c'est voulu.
+    # ------------------------------------------------------------------
+    - name: Casser l'API server
+      ansible.builtin.script: fixtures/panne-api-server.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,106 @@
+# Le challenge du module « Fiabiliser et exploiter » du niveau 4 (fiche
+# E-garantir-la-disponibilite, hébergée par KUBERN-14-18). C'est la preuve sans
+# procédure du module : rendre une application disponible pendant une
+# maintenance, puis rendre compte de l'état du cluster.
+#
+# Il assemble des pièces attestées, sans en refaire une à l'identique :
+#   - ckad-probes-all-types : des sondes, ici jugées sur le trafic réel ;
+#   - cka-node-drain-cordon : le drain du worker, ici lancé par le test ;
+#   - cka-taints-tolerations-placement : le placement sur les nœuds ;
+#   - kubeadm-verifier-et-renouveler-les-certificats : l'échéance des
+#     certificats, ici reportée dans un rapport de routine.
+#
+# Le cluster kubeadm du catalogue a DEUX nœuds ordonnançables (le socle retire
+# le taint du control plane) : trois exemplaires ne tiennent pas sur trois
+# nœuds distincts, et le test de répartition lit les nœuds réellement
+# disponibles. Une anti-affinité requise laisserait un exemplaire en attente ;
+# une contrainte impérative qui compte le nœud cordonné bloquerait
+# l'évacuation. Les tests 1 et 5 le voient.
+#
+# Six états, à poids égal (dsoxlab note par test). Deux sont bloquants : le
+# budget qui garantit le minimum, et le minimum tenu pendant l'évacuation, qui
+# sont la raison d'être du challenge.
+id: k8s-challenge-garantir-la-disponibilite
+title: "Keep an application available during a maintenance"
+level: workloads-scheduling
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, run an application as three copies spread across the
+  nodes, protected by a disruption budget, with probes that keep traffic
+  away until a copy is ready, keep its minimum while a node is evacuated,
+  and write a routine report that matches the real state of the cluster.
+skills:
+  - poddisruptionbudget
+  - topology-spread
+  - probes
+  - drain
+  - kubeadm-certs
+  - operations
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_un_budget_garantit_le_minimum
+  - test_le_minimum_tient_pendant_l_evacuation_d_un_noeud
+estimated_time: 45m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le test évacue k8s-w1.lab et y répartit l'application : il lui faut ce
+      # nœud en même temps que le control plane, ce que dit `roles`.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: trois-exemplaires
+    label: "The application paiement runs at least three available copies"
+    tests:
+      - test_au_moins_trois_exemplaires_disponibles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/disponibilite-applicative-kubernetes/
+  - id: budget-minimum
+    label: "A single disruption budget targets the Pods of paiement, guarantees at least two of them and still allows a maintenance"
+    tests:
+      - test_un_budget_garantit_le_minimum
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/disponibilite-applicative-kubernetes/
+  - id: repartition
+    label: "The copies are spread across as many different nodes as the cluster can offer, by a declared rule"
+    tests:
+      - test_les_exemplaires_sont_repartis_sur_des_noeuds_differents
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/make-kubernetes-reliable/
+  - id: sondes-et-trafic
+    label: "Readiness and liveness probes are declared, and a copy receives traffic only once it is ready"
+    tests:
+      - test_les_sondes_sont_declarees_et_le_trafic_attend_d_etre_pret
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/make-kubernetes-reliable/
+  - id: minimum-pendant-l-evacuation
+    label: "While the test evacuates k8s-w1.lab, paiement never drops below two available copies, and the evacuation completes"
+    tests:
+      - test_le_minimum_tient_pendant_l_evacuation_d_un_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/disponibilite-applicative-kubernetes/
+  - id: rapport-de-routine
+    label: "~/routine/rapport.txt lists the nodes, the Pods in error, the finished Jobs still kept and the expiry of the certificates, as the cluster really is"
+    tests:
+      - test_le_rapport_de_routine_dit_l_etat_reel_du_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/

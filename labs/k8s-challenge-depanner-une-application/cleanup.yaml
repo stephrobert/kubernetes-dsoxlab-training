@@ -1,0 +1,120 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : rend le cluster tel qu'avant le
+# setup, que l'apprenant ait réparé ou non, et dans l'ordre inverse des pannes.
+# L'API server d'abord : sans lui, rien d'autre ne se constate. Puis le kubelet
+# du worker, dont on attend le Ready. Puis le namespace commerce, et les
+# fichiers de causes. Les copies saines posées par le setup sont remises puis
+# supprimées : elles ne doivent pas survivre au lab.
+- name: Défaire le challenge k8s-challenge-depanner-une-application
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    worker: k8s-w1.lab
+    manifeste: /etc/kubernetes/manifests/kube-apiserver.yaml
+    copie_manifeste: /var/lib/dsoxlab/depanner-kube-apiserver.yaml
+    config_kubelet: /var/lib/kubelet/config.yaml
+    copie_config_kubelet: /var/lib/dsoxlab/depanner-kubelet-config.yaml
+  tasks:
+    - name: Chercher le manifeste sain gardé par le setup
+      ansible.builtin.stat:
+        path: "{{ copie_manifeste }}"
+      register: copie_api
+
+    - name: Rendre le manifeste sain de l'API server
+      ansible.builtin.copy:
+        src: "{{ copie_manifeste }}"
+        dest: "{{ manifeste }}"
+        remote_src: true
+        mode: "0600"
+      when: copie_api.stat.exists
+      register: api_rendue
+
+    - name: Corriger le flag mal orthographié, si la copie manquait
+      ansible.builtin.replace:
+        path: "{{ manifeste }}"
+        regexp: '--authorization-modes='
+        replace: '--authorization-mode='
+      register: api_corrigee
+
+    - name: Retirer la copie du manifeste
+      ansible.builtin.file:
+        path: "{{ copie_manifeste }}"
+        state: absent
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: "{{ kubectl }} get --raw /readyz"
+      register: sante
+      until: sante.rc == 0
+      retries: 60
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    # Le kube-controller-manager et le kube-scheduler ont pu sortir pendant la
+    # panne de l'API, et le kubelet espace leurs redémarrages jusqu'à cinq
+    # minutes : le lab suivant partirait d'un cluster qui ne réconcilie plus.
+    - name: Relancer le kubelet du control plane, qui efface ses délais de redémarrage
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+      when: api_rendue is changed or api_corrigee is changed
+
+    - name: Attendre les composants du control plane
+      ansible.builtin.command: >-
+        {{ kubectl }} -n kube-system wait --for=condition=Ready pod
+        -l tier=control-plane --timeout=300s
+      changed_when: false
+      failed_when: false
+
+    - name: Chercher la configuration saine du kubelet gardée par le setup
+      ansible.builtin.stat:
+        path: "{{ copie_config_kubelet }}"
+      delegate_to: "{{ worker }}"
+      register: copie_kubelet
+
+    - name: Rendre la configuration saine du kubelet du worker
+      ansible.builtin.copy:
+        src: "{{ copie_config_kubelet }}"
+        dest: "{{ config_kubelet }}"
+        remote_src: true
+        mode: "0644"
+      delegate_to: "{{ worker }}"
+      when: copie_kubelet.stat.exists
+
+    - name: Retirer l'adresse impossible, si la copie manquait
+      ansible.builtin.lineinfile:
+        path: "{{ config_kubelet }}"
+        regexp: '999\.999\.999\.999'
+        state: absent
+      delegate_to: "{{ worker }}"
+
+    - name: Retirer la copie de la configuration du kubelet
+      ansible.builtin.file:
+        path: "{{ copie_config_kubelet }}"
+        state: absent
+      delegate_to: "{{ worker }}"
+
+    - name: Relancer le kubelet du worker, activé
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: restarted
+        enabled: true
+      delegate_to: "{{ worker }}"
+
+    - name: Attendre que le worker soit Ready
+      ansible.builtin.command: >-
+        {{ kubectl }} wait --for=condition=Ready node/{{ worker }} --timeout=180s
+      changed_when: false
+      failed_when: false
+
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace commerce --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de causes
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/incident"
+        state: absent
