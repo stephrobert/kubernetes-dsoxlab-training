@@ -1,0 +1,73 @@
+# Premier lab guidé de la leçon « PKI d'un cluster Kubernetes », module
+# Administrer le cluster du niveau 4. Le geste : lire l'échéance des
+# certificats d'un cluster kubeadm, renouveler ceux du plan de contrôle, faire
+# recharger les composants, puis recopier admin.conf et vérifier que kubectl
+# répond. Le second lab de la leçon, k8s-donner-un-acces-par-csr, porte l'accès
+# humain par l'API CertificateSigningRequest.
+#
+# Le renouvellement se juge sur le NUMÉRO DE SÉRIE des certificats, relevé par
+# le setup, et non sur leur date : sur un cluster tout juste monté, des
+# certificats récents passeraient pour renouvelés. Un certificat renouvelé sur
+# le disque ne sert à rien tant que le composant ne l'a pas rechargé : un test
+# compare ce que servent l'API server et etcd à ce que contient le disque.
+#
+# doc_url : la page PKI est à créer (fiche KUBERN-13-05) ; son chemin est celui
+# que le plan prévoit, à confirmer avec la session du site.
+id: kubeadm-verifier-et-renouveler-les-certificats
+title: "Check and renew the certificates of a kubeadm cluster"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  Read the expiry of every certificate of a kubeadm cluster, renew those of the
+  control plane, make the components reload them, then copy admin.conf again
+  and check that kubectl answers.
+skills:
+  - pki
+  - kubeadm
+  - certificates
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: echeance-de-la-ca
+    label: "The answer gives the expiry date of the cluster's certificate authority"
+    tests:
+      - test_l_echeance_de_la_ca_est_la_bonne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: certificats-renouveles
+    label: "The control plane certificates have been renewed"
+    tests:
+      - test_les_certificats_du_plan_de_controle_sont_renouveles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: composants-recharges
+    label: "The controller manager and the scheduler have restarted since the renewal"
+    tests:
+      - test_le_controller_manager_et_le_scheduler_ont_redemarre
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: kubeconfig-a-jour
+    label: "The user's kubeconfig carries the renewed admin certificate, and kubectl answers"
+    tests:
+      - test_le_kubeconfig_porte_le_nouveau_certificat_et_kubectl_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/

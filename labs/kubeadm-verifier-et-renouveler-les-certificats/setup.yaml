@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis le relevé des
+# numéros de série et le fichier de réponses (fixtures/prepare.sh).
+- name: Préparer le lab kubeadm-verifier-et-renouveler-les-certificats
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Relever les numéros de série et poser le fichier de réponses
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

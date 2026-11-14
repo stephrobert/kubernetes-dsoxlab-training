@@ -1,0 +1,17 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis le namespace
+# equipe-web et le répertoire ~/acces (fixtures/prepare.sh).
+- name: Préparer le lab k8s-donner-un-acces-par-csr
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le namespace equipe-web et le répertoire des accès
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

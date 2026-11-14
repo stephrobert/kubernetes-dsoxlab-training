@@ -1,0 +1,73 @@
+# Second lab guidé de la leçon « PKI d'un cluster Kubernetes », module
+# Administrer le cluster du niveau 4 (décision D73, et D60 : la création d'un
+# utilisateur humain par certificat, retirée de la leçon RBAC, arrive ici). Le
+# geste : donner un accès à une utilisatrice par l'API
+# CertificateSigningRequest, de la demande signée à son kubeconfig, sans sortir
+# la clé de l'autorité du nœud, puis vérifier ses droits.
+#
+# Le test clé compare le certificat du kubeconfig à celui que l'API a délivré
+# pour la demande camille : un certificat signé à la main avec la clé de la CA
+# du nœud ne passe pas.
+#
+# doc_url : la page PKI est à créer (fiche KUBERN-13-05) ; chemin à confirmer.
+id: k8s-donner-un-acces-par-csr
+title: "Give a person access through a CertificateSigningRequest"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  Give the user camille access to the cluster through the
+  CertificateSigningRequest API: her key and request, the approval, the issued
+  certificate, her kubeconfig, then read-only rights on one namespace, checked
+  with her own identity.
+skills:
+  - pki
+  - certificatesigningrequest
+  - rbac
+  - kubeconfig
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+lab_type: lab
+estimated_time: 25m
+
+certification_tags:
+  - cka
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: demande-delivree
+    label: "The CertificateSigningRequest camille is approved and issued, for client authentication"
+    tests:
+      - test_la_demande_camille_est_approuvee_et_delivree
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: kubeconfig-de-camille
+    label: "Camille's kubeconfig carries the certificate the API issued, and identifies her"
+    tests:
+      - test_le_kubeconfig_porte_le_certificat_delivre_et_l_identifie
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: lecture-autorisee
+    label: "Camille can read the Pods of equipe-web"
+    tests:
+      - test_camille_lit_les_pods_d_equipe_web
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: rien-de-plus
+    label: "Camille can do nothing more: no change, no Secret, no other namespace"
+    tests:
+      - test_camille_ne_peut_rien_de_plus
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
