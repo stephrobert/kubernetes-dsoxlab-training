@@ -344,9 +344,17 @@ sections:
       - cks-runtime-sandbox-gvisor
       - cks-image-pinned-digest
       - cks-validating-admission-policy
+      # Le challenge du module Politiques d'admission (niveau 5), posé dans la
+      # leçon « VAP vs Kyverno vs Gatekeeper » : standard restricted, Pod
+      # privilégié reconstruit et politique native, sur le cluster kubeadm.
+      - k8s-challenge-faire-refuser-par-admission
       - cks-image-scanning-trivy
       - cks-cosign-verify-image
       - cks-dockerfile-static-analysis
+      # Le challenge du module Chaîne d'approvisionnement (niveau 5), posé
+      # dans la leçon « Image Scanning » : épingler, analyser, signer, et un
+      # cluster qui refuse le non signé (Kyverno posé par le setup).
+      - k8s-challenge-livrer-une-image-verifiee
       - cks-rbac-least-privilege
       - cks-api-server-hardening
       - cks-audit-log-policy
@@ -362,6 +370,10 @@ sections:
       # une CA interne, juste après le TLS d'un Ingress.
       - k8s-emettre-un-certificat-avec-cert-manager
       - cks-cis-benchmark-remediate
+      # Le challenge du module Durcir le cluster (niveau 5), posé dans la
+      # leçon « Audit Logs » : il croise l'API server durci, la remédiation
+      # CIS et l'audit, sur le cluster kubeadm.
+      - k8s-challenge-durcir-le-plan-de-controle
       # Module Modèle de menaces et cadres (niveau 5, KCSA), sur le cluster
       # kubeadm : le lab guidé de la leçon Persistance. Il suppose joués les
       # labs RBAC et audit ci-dessus.

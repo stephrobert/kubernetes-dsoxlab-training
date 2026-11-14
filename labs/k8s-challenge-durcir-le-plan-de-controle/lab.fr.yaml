@@ -1,0 +1,22 @@
+title: "Corriger les écarts CIS d'un cluster, sans guidage"
+description: |
+  Sans procédure, durcir l'API server d'un cluster kubeadm, corriger l'écart
+  que l'audit CIS reproche à trois composants du plan de contrôle, le prouver
+  en relançant kube-bench, puis donner à l'API server une politique d'audit à
+  deux niveaux et montrer la trace qu'il écrit.
+
+criteria:
+  - id: reglages-de-l-api-server
+    label: "Le manifeste de l'API server porte les réglages de durcissement : profileur coupé, vérification des comptes de service, plancher TLS"
+  - id: profileur-ferme
+    label: "Le profileur /debug/pprof/ ne répond plus, et l'API server répond toujours sur /version"
+  - id: trois-composants-corriges
+    label: "L'API server, le controller manager et le scheduler portent tous trois la correction de l'écart CIS"
+  - id: audit-cis-relance
+    label: "kube-bench, relancé, compte moins d'échecs qu'au départ, et les trois contrôles visés passent"
+  - id: politique-a-deux-niveaux
+    label: "La politique d'audit enregistre en entier les accès aux Secrets, et le reste en métadonnées"
+  - id: audit-actif
+    label: "L'API server tourne avec l'audit, son fichier de politique et son journal montés depuis le nœud"
+  - id: journal-qui-trace
+    label: "Le journal contient une lecture de Secret enregistrée en entier et une lecture banale enregistrée en métadonnées seulement"

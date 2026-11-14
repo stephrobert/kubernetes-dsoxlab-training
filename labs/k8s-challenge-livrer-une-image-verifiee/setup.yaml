@@ -1,0 +1,78 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, les trois outils
+# des labs guidés (cosign, crane, Trivy, mêmes versions), le manifeste de
+# Kyverno, puis la situation du challenge (fixtures/prepare.sh), fausse sur
+# les dix états par construction.
+- name: Préparer le challenge k8s-challenge-livrer-une-image-verifiee
+  hosts: lab_target
+  become: true
+  vars:
+    # Kyverno, le moteur d'admission qui sait vérifier une signature cosign.
+    # Version épinglée, manifeste officiel de la release, empreinte relevée le
+    # 2026-11-14 sur le fichier publié. La 1.19.2 lit les signatures de
+    # cosign 3 (correctif « verify annotations properly for cosign v2 and
+    # v3 ») ; la 1.20.0, parue le 2026-11-12, était trop récente pour la
+    # retenir cette nuit-là.
+    kyverno_version: "1.19.2"
+    kyverno_sha256: "4f785937dc7fe49a0731108b15def1538923c73d9236255bc69d94d498037969"
+    kyverno_manifeste: "/var/lib/dsoxlab/kyverno/install-v{{ kyverno_version }}.yaml"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser cosign sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: cosign
+        outil_version: "3.1.3"
+        # cosign n'accepte pas --version, seulement la sous-commande.
+        outil_verification: version
+
+    - name: Poser crane sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: crane
+        outil_version: "0.22.1"
+        outil_verification: version
+
+    - name: Poser Trivy sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: trivy
+        outil_version: "0.74.0"
+
+    - name: Créer le répertoire de l'application inventaire
+      ansible.builtin.file:
+        path: /root/inventaire
+        state: directory
+        mode: "0755"
+
+    - name: Déposer le Dockerfile fautif, en écrasant un travail précédent
+      # `force: true` : sans lui, un second run partirait du Dockerfile corrigé.
+      ansible.builtin.copy:
+        src: fixtures/Dockerfile
+        dest: /root/inventaire/Dockerfile
+        mode: "0644"
+        force: true
+
+    - name: Créer le répertoire du manifeste Kyverno
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/kyverno
+        state: directory
+        mode: "0700"
+
+    - name: Télécharger le manifeste officiel de Kyverno, empreinte vérifiée
+      ansible.builtin.get_url:
+        url: "https://github.com/kyverno/kyverno/releases/download/v{{ kyverno_version }}/install.yaml"
+        dest: "{{ kyverno_manifeste }}"
+        checksum: "sha256:{{ kyverno_sha256 }}"
+        mode: "0600"
+
+    - name: Poser le registre, les applications et le moteur d'admission
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        KYVERNO_VERSION: "{{ kyverno_version }}"
+        KYVERNO_MANIFESTE: "{{ kyverno_manifeste }}"

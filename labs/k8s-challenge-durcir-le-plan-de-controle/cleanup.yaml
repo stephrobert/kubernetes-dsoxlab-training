@@ -1,0 +1,96 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : rend les trois manifestes du
+# plan de contrôle tels qu'ils étaient, retire la politique et le journal
+# d'audit, puis le namespace du challenge.
+#
+# Les trois composants sont des Pods STATIQUES : leurs fichiers vivent sur le
+# nœud, hors du cluster. Les laisser modifiés ferait passer les premiers tests
+# du prochain passage avant tout travail. On reprend l'attente du lab guidé
+# cks-cis-benchmark-remediate : le Pod miroir montre encore l'ancien conteneur
+# Running juste après la copie, donc on attend que son empreinte CHANGE.
+- name: Défaire le challenge k8s-challenge-durcir-le-plan-de-controle
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Relever l'empreinte des Pods statiques avant la restauration
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pod {{ item }}-{{ inventory_hostname }}
+        -o jsonpath={.metadata.annotations.kubernetes\\.io/config\\.hash}
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      register: empreintes_avant
+      changed_when: false
+      failed_when: false
+
+    - name: Restaurer les manifestes du plan de contrôle
+      register: restauration
+      ansible.builtin.copy:
+        src: "/var/backups/{{ item }}.avant-durcir-plan.yaml"
+        dest: "/etc/kubernetes/manifests/{{ item }}.yaml"
+        remote_src: true
+        mode: "0600"
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      failed_when: false
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que chaque Pod statique restauré ait changé d'empreinte et soit prêt
+      ansible.builtin.shell: |
+        set -o pipefail
+        K="kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system"
+        pod="{{ item.0.item }}-{{ inventory_hostname }}"
+        empreinte=$($K get pod "$pod" -o jsonpath='{.metadata.annotations.kubernetes\.io/config\.hash}')
+        pret=$($K get pod "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+        [ -n "$empreinte" ] && [ "$empreinte" != "{{ item.0.stdout }}" ] && [ "$pret" = "True" ]
+      args:
+        executable: /bin/bash
+      loop: "{{ empreintes_avant.results | zip(restauration.results) | list }}"
+      when: item.1.changed
+      register: recree
+      until: recree.rc == 0
+      retries: 60
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que les Pods du plan de contrôle soient Running
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pods -l tier=control-plane
+        -o jsonpath={.items[*].status.phase}
+      register: phases
+      until: phases.stdout and 'Pending' not in phases.stdout
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer la politique, le journal d'audit et le compte de départ du nœud
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes/audit-policy.yaml
+        - /var/log/kubernetes/audit.log
+        - /var/lib/dsoxlab/k8s-challenge-durcir-le-plan-de-controle
+
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace conformite
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false

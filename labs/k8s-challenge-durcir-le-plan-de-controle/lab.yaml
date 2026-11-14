@@ -1,0 +1,104 @@
+# Le challenge du module Durcir le cluster (niveau 5). C'est la preuve sans
+# procédure du module : il croise trois labs guidés, chacun déjà attesté,
+# sur le même plan de contrôle et dans la même session.
+#
+#   - cks-api-server-hardening : les réglages de l'API server, profileur fermé ;
+#   - cks-cis-benchmark-remediate : le défaut que l'audit CIS reproche aux
+#     trois composants, et l'audit relancé qui le prouve ;
+#   - cks-audit-log-policy : la politique d'audit à deux niveaux et le journal.
+#
+# Ce que le challenge ajoute : les trois modifications portent sur le MÊME
+# manifeste de l'API server, et chacune doit survivre aux deux autres. Le
+# compte d'échecs de départ n'est plus écrit en dur comme dans le lab guidé :
+# le setup relance kube-bench lui-même et range son compte sur le nœud.
+#
+# Sept états, à poids égal. Les états 4 et 7 bloquent : un audit relancé qui
+# compte moins d'échecs, et un journal qui trace vraiment. Ce sont les deux
+# preuves que l'outil donne, et non le fichier qu'on a écrit.
+id: k8s-challenge-durcir-le-plan-de-controle
+title: "Fix a cluster's CIS findings, without guidance"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, harden the API server of a kubeadm cluster, fix the
+  finding the CIS audit holds against three control plane components, prove
+  it by running kube-bench again, then give the API server a two-level audit
+  policy and show the trace it writes.
+skills:
+  - api-server
+  - cis-benchmark
+  - kube-bench
+  - audit-policy
+  - audit-log
+  - static-pod
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_kube_bench_relance_compte_moins_d_echecs
+  - test_le_journal_trace_les_secrets_en_entier_et_le_reste_en_metadonnees
+estimated_time: 50m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: reglages-de-l-api-server
+    label: "The API server manifest carries the hardening settings: profiling off, service account lookup on, a TLS floor"
+    tests:
+      - test_l_api_server_porte_les_reglages_de_durcissement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/docs/securiser/kubernetes/
+  - id: profileur-ferme
+    label: "The /debug/pprof/ profiler no longer answers, and the API server still answers on /version"
+    tests:
+      - test_le_profileur_est_ferme_et_l_api_repond_toujours
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: trois-composants-corriges
+    label: "The API server, the controller manager and the scheduler all carry the fix for the CIS finding"
+    tests:
+      - test_les_trois_composants_portent_la_correction_cis
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: audit-cis-relance
+    label: "kube-bench, run again, counts fewer failures than at the start, and the three targeted checks pass"
+    tests:
+      - test_kube_bench_relance_compte_moins_d_echecs
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: politique-a-deux-niveaux
+    label: "The audit policy records Secret accesses in full and everything else as metadata"
+    tests:
+      - test_la_politique_d_audit_distingue_les_secrets_du_reste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/
+  - id: audit-actif
+    label: "The API server runs with the audit on, its policy file and its log mounted from the node"
+    tests:
+      - test_l_api_server_tourne_avec_l_audit_monte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: journal-qui-trace
+    label: "The log holds a Secret read recorded in full and an ordinary read recorded as metadata only"
+    tests:
+      - test_le_journal_trace_les_secrets_en_entier_et_le_reste_en_metadonnees
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/

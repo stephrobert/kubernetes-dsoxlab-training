@@ -1,0 +1,94 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire Kyverno en entier, le
+# namespace du challenge, puis les fichiers posés sur le nœud.
+#
+# KYVERNO EST RETIRÉ, et l'ordre compte. Ses webhooks ne sont pas dans son
+# manifeste : le contrôleur d'admission les crée lui-même au démarrage. Un
+# webhook en échec fermé qui survit à son service bloquerait la création de
+# Pods dans tout le cluster, pour tous les labs suivants. D'où la séquence :
+# politiques retirées, contrôleur arrêté (il ne peut plus recréer ses
+# webhooks), webhooks supprimés, manifeste désinstallé, webhooks supprimés
+# encore une fois. CRD, ClusterRoles et namespace partent avec le manifeste ;
+# le validateur les photographie tous.
+#
+# cosign, crane et Trivy restent posés, comme dans les labs guidés : ce sont
+# des outils, ils ne changent rien au cluster.
+- name: Défaire le challenge k8s-challenge-livrer-une-image-verifiee
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    kyverno_manifeste: /var/lib/dsoxlab/kyverno/install-v1.19.2.yaml
+  tasks:
+    - name: Retirer les politiques Kyverno
+      ansible.builtin.shell: |
+        {{ kubectl }} delete clusterpolicies.kyverno.io --all --ignore-not-found --wait=true --timeout=60s
+        {{ kubectl }} delete policies.kyverno.io --all --all-namespaces --ignore-not-found --wait=true --timeout=60s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Arrêter les contrôleurs de Kyverno
+      ansible.builtin.shell: |
+        {{ kubectl }} -n kyverno scale deployment --all --replicas=0
+        {{ kubectl }} -n kyverno wait --for=delete pod --all --timeout=120s
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les webhooks que Kyverno a posés lui-même
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get validatingwebhookconfigurations,mutatingwebhookconfigurations -o name \
+          | grep '/kyverno-' | xargs -r {{ kubectl }} delete --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Vérifier la présence du manifeste de Kyverno
+      ansible.builtin.stat:
+        path: "{{ kyverno_manifeste }}"
+      register: manifeste
+
+    - name: Désinstaller Kyverno depuis son manifeste
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f {{ kyverno_manifeste }}
+        --ignore-not-found --wait=true --timeout=300s
+      when: manifeste.stat.exists
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer encore les webhooks de Kyverno, et ses politiques natives générées
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get validatingwebhookconfigurations,mutatingwebhookconfigurations -o name \
+          | grep '/kyverno-' | xargs -r {{ kubectl }} delete --ignore-not-found
+        {{ kubectl }} delete validatingadmissionpolicybindings,validatingadmissionpolicies \
+          -l app.kubernetes.io/managed-by=kyverno --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace livraison kyverno
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer du nœud les clés, la politique, l'application et le manifeste
+      # Une clé privée laissée sur un nœud partagé est exactement ce que le
+      # module apprend à ne pas faire.
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /root/cosign.key
+        - /root/cosign.pub
+        - /root/politique-images-signees.json
+        - /root/inventaire
+        - /var/lib/dsoxlab/kyverno

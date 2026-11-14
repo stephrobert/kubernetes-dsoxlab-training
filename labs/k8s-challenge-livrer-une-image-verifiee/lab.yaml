@@ -1,0 +1,125 @@
+# Le challenge du module Chaîne d'approvisionnement (niveau 5). C'est la
+# preuve sans procédure du module : il croise quatre labs guidés, chacun déjà
+# attesté, sur le cluster kubeadm.
+#
+#   - cks-image-pinned-digest : un Deployment épinglé par son digest ;
+#   - cks-dockerfile-static-analysis : les constats de Trivy sur un Dockerfile ;
+#   - cks-cosign-verify-image : une image signée, la clé publique publiée ;
+#   - cks-image-scanning-trivy : une image remplacée par une moins vulnérable.
+#
+# Ce que le challenge ajoute, et qu'aucun lab guidé ne teste : l'état 10, le
+# cluster qui REFUSE une image non signée. Une ValidatingAdmissionPolicy ne
+# peut pas vérifier une signature, il faut un webhook. Le setup installe le
+# moteur, Kyverno 1.19.2 depuis le manifeste officiel de sa release, réduit à
+# son seul contrôleur d'admission ; poser la politique est le travail de
+# l'apprenant.
+#
+# Dix états, à poids égal. Les états 3, 9 et 10 bloquent, un par pilier du
+# module : une image épinglée qui tourne vraiment, une image analysée qui
+# porte moins de failles, et un cluster qui n'admet que du signé.
+id: k8s-challenge-livrer-une-image-verifiee
+title: "Let only verified images in, without guidance"
+level: supply-chain-security
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, pin a Deployment to its digest, clear a Dockerfile of its
+  static analysis findings, sign an image and publish its public key, replace
+  a vulnerable image with one a new scan proves less exposed, and make the
+  cluster refuse at creation any image whose signature does not verify.
+skills:
+  - image-digest
+  - trivy
+  - dockerfile
+  - cosign
+  - image-signature
+  - kyverno
+  - admission-control
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_le_digest_declare_est_celui_que_le_noeud_execute
+  - test_la_nouvelle_image_porte_moins_de_failles_critiques
+  - test_le_cluster_refuse_l_image_non_signee_et_accepte_la_signee
+estimated_time: 60m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: reference-par-digest
+    label: "The vitrine Deployment references its image by its digest, not by a tag"
+    tests:
+      - test_vitrine_reference_son_image_par_digest
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: meme-image
+    label: "It is still the requested image, nginx:1.27-alpine, and not another version"
+    tests:
+      - test_c_est_toujours_l_image_demandee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: digest-execute
+    label: "The declared digest is the one the node runs, and both replicas run"
+    tests:
+      - test_le_digest_declare_est_celui_que_le_noeud_execute
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: dockerfile-sans-constat
+    label: "The Dockerfile's static analysis findings are gone, and the application still does the same thing"
+    tests:
+      - test_les_constats_du_dockerfile_ont_disparu
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+  - id: cle-publiee
+    label: "The public key is published in the cluster, in the cosign-pub-key ConfigMap, under the cosign.pub key"
+    tests:
+      - test_la_cle_publique_est_publiee_dans_le_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+  - id: signature-poussee
+    label: "The image's signature is pushed to the registry, next to the image"
+    tests:
+      - test_la_signature_est_poussee_dans_le_registre
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+  - id: cle-qui-trie
+    label: "The published key accepts the signed image and refuses the other"
+    tests:
+      - test_la_cle_accepte_l_image_signee_et_refuse_l_autre
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+  - id: image-remplacee
+    label: "The boutique Deployment no longer runs on its original image"
+    tests:
+      - test_l_image_de_boutique_n_est_plus_celle_d_origine
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+  - id: moins-de-failles
+    label: "The new image carries strictly fewer critical vulnerabilities than the old one, measured by a new scan"
+    tests:
+      - test_la_nouvelle_image_porte_moins_de_failles_critiques
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+  - id: admission-signee
+    label: "The cluster refuses at creation a Pod whose image is not signed, and accepts the signed image"
+    tests:
+      - test_le_cluster_refuse_l_image_non_signee_et_accepte_la_signee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/

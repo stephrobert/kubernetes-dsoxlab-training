@@ -1,0 +1,50 @@
+title: "Imposer une règle d'admission et prouver le refus, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/vap-vs-kyverno-gatekeeper/
+description: |
+  Sans procédure, faire refuser par le cluster ce qui enfreint une règle de
+  sécurité : le standard restricted sur un namespace, un Pod privilégié
+  reconstruit sans aucun de ses défauts sur un autre, et une politique
+  d'admission native qui refuse les images désignées par un tag sur un
+  troisième, sans toucher au reste.
+
+criteria:
+  - id: standard-restricted
+    label: "Le namespace vitrine déclare le standard restricted dans les trois modes : enforce, warn et audit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: pod-conforme-tourne
+    label: "Le Pod conforme catalogue tourne dans vitrine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: quatre-exigences
+    label: "Le Pod catalogue satisfait les quatre exigences : non root, pas d'escalade, capabilities retirées, profil seccomp"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: admission-qui-trie
+    label: "L'admission refuse un Pod qui viole le standard et accepte un Pod conforme, lu par deux soumissions réelles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/
+  - id: remplacant-tourne
+    label: "Le Pod caisse-durcie, qui remplace le Pod privilégié, tourne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: aucun-defaut-garde
+    label: "Le nouveau Pod ne conserve aucun des défauts relevés dans l'original"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: original-retire
+    label: "Le Pod privilégié d'origine, caisse, n'existe plus"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: processus-de-l-hote
+    label: "Le conteneur du nouveau Pod ne voit plus les processus de l'hôte et ne tourne pas en root"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: politique-en-refus
+    label: "Une politique d'admission native est liée en mode refus, et pas seulement en avertissement"
+  - id: tag-refuse-digest-accepte
+    label: "Dans production, un Pod dont l'image est un tag est refusé, un Pod épinglé par digest est accepté, et les autres namespaces ne sont pas touchés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/vap-vs-kyverno-gatekeeper/
