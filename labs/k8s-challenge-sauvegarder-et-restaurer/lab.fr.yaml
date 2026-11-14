@@ -1,0 +1,20 @@
+title: "Challenge : sauvegarder, restaurer et remettre un cluster en ordre"
+description: |
+  Sans procédure. Prendre une sauvegarde fraîche d'etcd, restaurer etcd depuis
+  la sauvegarde de la veille sur un répertoire de données neuf, migrer un dépôt
+  de manifestes hors des API retirées, et ne laisser aucun certificat du plan
+  de contrôle près de son échéance. Noté sur l'état du cluster.
+
+criteria:
+  - id: sauvegarde-fraiche
+    label: "Une sauvegarde fraîche d'etcd photographie l'état d'avant la restauration"
+  - id: etcd-restaure
+    label: "etcd tourne sur un répertoire de données restauré, et le cluster est sain"
+  - id: uid-d-origine
+    label: "Les objets supprimés sont revenus avec leurs UID d'origine"
+  - id: objet-posterieur
+    label: "L'objet écrit après la sauvegarde a disparu"
+  - id: api-migrees
+    label: "Les manifestes du dépôt emploient les API courantes et sont appliqués"
+  - id: certificats
+    label: "Aucun certificat du plan de contrôle n'expire dans les trente jours"

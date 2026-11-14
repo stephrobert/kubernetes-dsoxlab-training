@@ -1,0 +1,61 @@
+---
+# Joué par `dsoxlab run`.
+#
+# Ce setup DÉFAIT le cluster, comme celui de cka-kubeadm-upgrade : on n'apprend
+# pas `kubeadm init` sur un plan de contrôle qui existe déjà.
+#
+#   1. le socle d'abord : un cluster entier, ou réparé après un passage
+#      interrompu ;
+#   2. les certificats du cluster mis de côté, puis les deux nœuds remis à zéro
+#      (kubeadm reset), puis les certificats remis : le `kubeadm init` de
+#      l'apprenant les RÉUTILISE, et le cluster garde son autorité. Sans cela,
+#      kube-root-ca.crt et extension-apiserver-authentication changeraient, et
+#      la photographie du validateur verrait le cluster modifié (mesuré sur
+#      cka-kubeadm-upgrade le 2026-09-17) ;
+#   3. la préparation du plan de contrôle défaite (fixtures/defaire-preparation.sh) ;
+#   4. les manifestes Calico du socle copiés dans ~/kubeadm/calico : mêmes
+#      versions, et aucun besoin du réseau.
+- name: Préparer le lab cka-initialiser-un-plan-de-controle
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Mettre les certificats du cluster de côté
+      ansible.builtin.shell: |
+        set -eu
+        test -f /etc/kubernetes/pki/ca.crt || exit 0
+        rm -rf /root/pki-du-cluster-init
+        mkdir -p /root/pki-du-cluster-init
+        cp -a /etc/kubernetes/pki/. /root/pki-du-cluster-init/
+      changed_when: true
+
+    - name: Remettre le worker à zéro
+      ansible.builtin.shell: |
+        kubeadm reset -f > /dev/null 2>&1 || true
+        rm -rf /etc/cni/net.d/*
+      changed_when: true
+      delegate_to: "{{ worker }}"
+
+    - name: Remettre le plan de contrôle à zéro
+      ansible.builtin.shell: |
+        kubeadm reset -f > /dev/null 2>&1 || true
+        rm -rf /etc/cni/net.d/*
+      changed_when: true
+
+    - name: Remettre les certificats, que le kubeadm init de l'apprenant réutilisera
+      ansible.builtin.shell: |
+        set -eu
+        mkdir -p /etc/kubernetes/pki
+        cp -a /root/pki-du-cluster-init/. /etc/kubernetes/pki/
+      changed_when: true
+
+    - name: Défaire la préparation du plan de contrôle
+      ansible.builtin.script: fixtures/defaire-preparation.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

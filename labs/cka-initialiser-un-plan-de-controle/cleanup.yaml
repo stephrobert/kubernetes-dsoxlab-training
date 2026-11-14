@@ -1,0 +1,61 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Le cluster de l'apprenant n'est pas celui du catalogue (son nom, sa
+# configuration). Le cleanup le défait TOUJOURS, puis reconstruit le cluster du
+# catalogue avec le socle, sur les certificats d'origine mis de côté par le
+# setup : la photographie du validateur retrouve le même cluster.
+- name: Nettoyer le lab cka-initialiser-un-plan-de-controle
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+  tasks:
+    - name: Vérifier que les certificats d'origine sont là
+      ansible.builtin.stat:
+        path: /root/pki-du-cluster-init/ca.crt
+      register: pki_origine
+
+    - name: Garder les certificats en place s'il n'y en a pas d'autre copie
+      # Un clean joué sans run préalable : les certificats courants SONT ceux
+      # du catalogue, on les met de côté avant le reset.
+      ansible.builtin.shell: |
+        set -eu
+        test -f /etc/kubernetes/pki/ca.crt || exit 0
+        mkdir -p /root/pki-du-cluster-init
+        cp -a /etc/kubernetes/pki/. /root/pki-du-cluster-init/
+      changed_when: true
+      when: not pki_origine.stat.exists
+
+    - name: Remettre le worker à zéro
+      ansible.builtin.shell: |
+        kubeadm reset -f > /dev/null 2>&1 || true
+        rm -rf /etc/cni/net.d/*
+      changed_when: true
+      delegate_to: "{{ worker }}"
+
+    - name: Remettre le plan de contrôle à zéro, et retirer le swap du lab
+      ansible.builtin.shell: |
+        kubeadm reset -f > /dev/null 2>&1 || true
+        rm -rf /etc/cni/net.d/*
+        swapoff /swapfile-lab 2>/dev/null || true
+        sed -i '\#/swapfile-lab#d' /etc/fstab
+        rm -f /swapfile-lab
+      changed_when: true
+
+    - name: Remettre les certificats d'origine
+      ansible.builtin.shell: |
+        set -eu
+        test -f /root/pki-du-cluster-init/ca.crt
+        mkdir -p /etc/kubernetes/pki
+        cp -a /root/pki-du-cluster-init/. /etc/kubernetes/pki/
+      changed_when: true
+
+    - name: Reconstruire le cluster du catalogue avec le socle
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Retirer la copie des certificats et le répertoire du lab
+      ansible.builtin.shell: |
+        rm -rf /root/pki-du-cluster-init
+        rm -rf "$(getent passwd '{{ ansible_user | default('ansible') }}' | cut -d: -f6)/kubeadm"
+      changed_when: true

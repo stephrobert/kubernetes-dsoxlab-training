@@ -1,0 +1,56 @@
+---
+# Joué par `dsoxlab clean` : ramène etcd sur /var/lib/etcd avec le manifeste
+# d'origine (ou repart de l'instantané de secours si le cluster ne revient
+# pas), remet kubeadm-config et le certificat de l'API server à la normale,
+# puis retire ce que le challenge a écrit.
+- name: Nettoyer le challenge k8s-challenge-sauvegarder-et-restaurer
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Ramener etcd sur /var/lib/etcd, cluster en marche
+      ansible.builtin.script: fixtures/remettre-etcd.sh
+      args:
+        executable: /bin/bash
+
+    # Si l'apprenant a reporté son répertoire restauré dans kubeadm-config, une
+    # régénération du manifeste etcd l'y renverrait : la ConfigMap revient à
+    # /var/lib/etcd, celle du catalogue.
+    - name: Remettre le dataDir de kubeadm-config sur /var/lib/etcd
+      ansible.builtin.shell: |
+        set -o pipefail
+        K="kubectl --kubeconfig /etc/kubernetes/admin.conf"
+        if $K -n kube-system get configmap kubeadm-config -o yaml | grep -q 'dataDir: /var/lib/etcd$'; then
+          echo inchange
+        else
+          $K -n kube-system get configmap kubeadm-config -o yaml \
+            | sed -E 's#dataDir: /.*$#dataDir: /var/lib/etcd#' | $K replace -f -
+        fi
+      args:
+        executable: /bin/bash
+      register: datadir
+      changed_when: "'inchange' not in datadir.stdout"
+
+    - name: Rendre au certificat de l'API server sa durée d'un an
+      ansible.builtin.command: kubeadm certs renew apiserver
+      changed_when: true
+
+    - name: Supprimer les namespaces du challenge
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace facturation depot
+        --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer l'objet écrit après la sauvegarde, s'il est encore là
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n default delete configmap
+        intrus-apres-sauvegarde --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les sauvegardes, l'état noté et le dépôt
+      ansible.builtin.shell: |
+        rm -rf /var/backups/etcd /root/dsoxlab-manifestes-hors-service
+        rm -f /var/lib/dsoxlab/k8s-challenge-sauvegarder-et-restaurer.json /var/lib/dsoxlab/etcd-secours.db
+        rm -rf "$(getent passwd '{{ ansible_user | default('ansible') }}' | cut -d: -f6)/depot"
+      changed_when: true
