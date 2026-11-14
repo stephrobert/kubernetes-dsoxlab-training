@@ -6,15 +6,17 @@ demandé ; chacun échoue sur l'état de départ posé par le setup :
 1. une sauvegarde fraîche d'etcd existe dans /var/backups/etcd/etcd-fraiche.db,
    lisible, et elle photographie l'état d'AVANT la restauration (révision au
    moins égale à celle du cluster à la fin du setup, donc plus récente que la
-   sauvegarde de la veille) ;
+   sauvegarde de la veille), et ce n'est pas une copie de l'instantané de
+   secours que le setup garde pour le cleanup ;
 2. etcd tourne sur un répertoire de données neuf, restauré, et le cluster est
    sain (API et deux nœuds Ready) ;
 3. le namespace facturation et le ConfigMap tarifs sont revenus avec leurs UID
    d'origine : une restauration, pas une recréation ;
 4. le ConfigMap intrus-apres-sauvegarde, écrit après la sauvegarde de la
    veille, n'existe plus ;
-5. les manifestes de ~/depot n'emploient plus d'API retirée, et leurs objets
-   existent dans le namespace depot avec leurs réglages ;
+5. les manifestes de ~/depot n'emploient plus d'API retirée, portent toujours
+   le HPA et le PDB, et leurs objets existent dans le namespace depot avec
+   leurs réglages ;
 6. aucun certificat du plan de contrôle n'expire dans moins de trente jours,
    lu par kubeadm certs check-expiration.
 """
@@ -31,6 +33,7 @@ from conftest import lab_host, lab_target_host, message
 
 ETAT = "/var/lib/dsoxlab/k8s-challenge-sauvegarder-et-restaurer.json"
 FRAICHE = "/var/backups/etcd/etcd-fraiche.db"
+SECOURS = "/var/lib/dsoxlab/etcd-secours.db"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 API_RETIREES = {"autoscaling/v2beta2", "autoscaling/v2beta1", "policy/v1beta1", "extensions/v1beta1",
                 "apps/v1beta1", "apps/v1beta2"}
@@ -92,6 +95,16 @@ def test_une_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration(host
         "you are about to overwrite.",
         fr=f"Aucun instantané etcd lisible dans {FRAICHE}. On ne restaure jamais sans avoir d'abord "
         "sauvegardé ce qu'on s'apprête à écraser.",
+    )
+    # L'instantané de secours, pris par le setup pour le cleanup, est lisible
+    # avec sudo : sa copie n'est pas une sauvegarde faite par l'apprenant. Un
+    # vrai `snapshot save` ne lui est jamais identique, l'API écrivant sans
+    # cesse (baux, statuts).
+    empreintes = host.run(f"sudo sha256sum {FRAICHE} {SECOURS}").stdout.split()[::2]
+    assert len(empreintes) < 2 or empreintes[0] != empreintes[1], message(
+        en=f"{FRAICHE} is a copy of the snapshot the lab took for its own cleanup, not a backup you made.",
+        fr=f"{FRAICHE} est une copie de l'instantané que le lab a pris pour son propre nettoyage, pas une "
+        "sauvegarde faite par vous.",
     )
     revision = json.loads(res.stdout).get("revision", 0)
     assert revision >= etat["revision"], message(
@@ -173,10 +186,21 @@ def test_les_manifestes_du_depot_sont_migres_et_appliques(host):
     maison = host.check_output('getent passwd "${SUDO_USER:-ansible}" | cut -d: -f6').strip()
     fichiers = host.check_output(f"ls {maison}/depot/ 2>/dev/null || true").split()
     retirees = {}
+    # Le dépôt reste la source : supprimer ses manifestes et créer les objets à
+    # la main n'est pas une migration. Il doit porter le HPA et le PDB.
+    dans_le_depot = {}
     for nom in fichiers:
         for doc in yaml.safe_load_all(host.file(f"{maison}/depot/{nom}").content_string) or []:
-            if doc and doc.get("apiVersion") in API_RETIREES:
+            if not doc:
+                continue
+            if doc.get("apiVersion") in API_RETIREES:
                 retirees[nom] = doc["apiVersion"]
+            if (doc.get("metadata") or {}).get("name") == "catalogue":
+                spec = doc.get("spec") or {}
+                if doc.get("kind") == "HorizontalPodAutoscaler":
+                    dans_le_depot["hpa"] = (spec.get("minReplicas"), spec.get("maxReplicas"))
+                elif doc.get("kind") == "PodDisruptionBudget":
+                    dans_le_depot["pdb"] = spec.get("minAvailable")
     hpa = _kubectl(host, "-n depot get hpa catalogue -o json")
     pdb = _kubectl(host, "-n depot get pdb catalogue -o json")
     reglages = {}
@@ -185,12 +209,15 @@ def test_les_manifestes_du_depot_sont_migres_et_appliques(host):
         reglages["hpa"] = (h.get("minReplicas"), h.get("maxReplicas"))
     if pdb.rc == 0:
         reglages["pdb"] = json.loads(pdb.stdout)["spec"].get("minAvailable")
-    ok = not retirees and fichiers and reglages.get("hpa") == (2, 5) and reglages.get("pdb") == 1
+    attendu = {"hpa": (2, 5), "pdb": 1}
+    ok = not retirees and dans_le_depot == attendu and reglages == attendu
     assert ok, message(
         en=f"The repository is not migrated: removed APIs still used {retirees or 'none'}, objects in the "
-        f"cluster {reglages or 'none'} (expected HPA 2 to 5, PDB minAvailable 1).",
+        f"repository {dans_le_depot or 'none'}, in the cluster {reglages or 'none'} (expected, in both, "
+        "HPA 2 to 5 and PDB minAvailable 1).",
         fr=f"Le dépôt n'est pas migré : API retirées encore employées {retirees or 'aucune'}, objets dans "
-        f"le cluster {reglages or 'aucun'} (attendu HPA de 2 à 5, PDB minAvailable 1).",
+        f"le dépôt {dans_le_depot or 'aucun'}, dans le cluster {reglages or 'aucun'} (attendu, des deux "
+        "côtés, HPA de 2 à 5 et PDB minAvailable 1).",
     )
 
 
