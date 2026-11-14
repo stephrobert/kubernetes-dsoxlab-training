@@ -1,0 +1,81 @@
+title: "Examen blanc CKS : 16 tâches en 120 minutes"
+description: |
+  Un examen blanc chronométré au format de la CKS : seize tâches réparties comme
+  les six domaines officiels, sur un cluster kubeadm, chaque tâche sur l'hôte
+  qu'elle désigne, jointe par ssh, noté sur l'état final du cluster, sans indice.
+  Prévoyez 120 minutes.
+
+criteria:
+  - id: t01-zone-fermee
+    label: "Tâche 1 : zone refuse tout par défaut, sauf web vers db sur le port 80 et le DNS"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: t02-ingress-tls
+    label: "Tâche 2 : l'Ingress site sert vitrine.lab en HTTPS avec un certificat qui nomme l'hôte"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: t03-cis-profilage
+    label: "Tâche 3 : un audit kube-bench rejoué passe les trois contrôles de profilage"
+  - id: t04a-dev-sa-reduit
+    label: "Tâche 4 : dev-sa n'administre plus le cluster et garde son travail dans equipe-dev"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: t04b-dev-sa-borne
+    label: "Tâche 4 : dev-sa ne lit aucun Secret, et son droit est lié dans son namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: t05-releveur-sans-jeton
+    label: "Tâche 5 : releveur tourne sous son identité propre, sans jeton d'API monté"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: t06-apparmor
+    label: "Tâche 6 : confine tourne sur le worker, confiné par le profil AppArmor en mode enforce"
+  - id: t07-seccomp
+    label: "Tâche 7 : seccomp refuse chmod à seccomp-pod, et à lui seul"
+  - id: t08a-restricted-applique
+    label: "Tâche 8 : durci applique le standard restricted et refuse un Pod privilégié à l'admission"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: t08b-pod-conforme
+    label: "Tâche 8 : le Pod conforme tourne et satisfait le standard restricted"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: t09-secure-app
+    label: "Tâche 9 : secure-app remplace insecure-app sans aucun de ses défauts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: t10-cle-en-secret
+    label: "Tâche 10 : la clé d'API arrive à facturation par un Secret, en fichier en lecture seule"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: t11a-digest
+    label: "Tâche 11 : pinned-app tourne en nginx 1.30.5 par le digest que le nœud exécute"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: t11b-tags-refuses
+    label: "Tâche 11 : chaine refuse toute image non épinglée par digest, et chaine seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: t12-dockerfile
+    label: "Tâche 12 : trivy config ne reproche plus les cinq constats du Dockerfile d'inventaire"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: t13-cosign
+    label: "Tâche 13 : la clé publiée valide l'image signée et refuse l'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: t14a-audit-secret
+    label: "Tâche 14 : la lecture du Secret est journalisée avec son corps (RequestResponse)"
+  - id: t14b-audit-metadata
+    label: "Tâche 14 : une lecture banale est journalisée au niveau Metadata seulement"
+  - id: t15-immuable
+    label: "Tâche 15 : l'intérieur de vitrine ne s'écrit plus, et le site sert toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: t16-pod-compromis
+    label: "Tâche 16 : le Pod compromis est retiré, et lui seul"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/

@@ -1,0 +1,190 @@
+# Examen blanc CKS, capstone de certification (règle 16), hébergé par la page
+# d'exercices CKS. Décision D53 du site : mêmes règles de forme, de durée et de
+# notation que les examens blancs CKA et CKAD (15 à 17 tâches, 120 minutes,
+# aucun indice). Seize tâches, vingt états à 5 points : dsoxlab note la part de
+# tests réussis, et une tâche de 10 points porte donc deux états. Les poids
+# suivent ceux des six domaines du programme officiel CKS v1.37 (cncf/curriculum,
+# 2026-11-03) : Cluster Setup 15, Cluster Hardening 15, System Hardening 10,
+# Minimize Microservice Vulnerabilities 20, Supply Chain Security 20,
+# Monitoring, Logging and Runtime Security 20.
+#
+# Seuil 67, celui de l'examen réel CKS. Avec des états à 5 points, il faut 14
+# états sur 20 (13 donnent 65). Aucun critère bloquant : l'examen réel n'en a
+# pas.
+#
+# Sur le cluster kubeadm du catalogue. Comme à l'examen réel (D63), chaque tâche
+# désigne un hôte, joint par ssh depuis la base, et écrit son namespace. dsoxlab
+# ne chronomètre pas : la durée est écrite dans le scénario.
+#
+# Le doc_url est DÉFINITIF : la page d'exercices CKS est publiée, et n'a pas de
+# jumelle anglaise dans la table des traductions.
+id: cks-examen-blanc
+title: "CKS mock exam: 16 tasks in 120 minutes"
+level: certification
+section: cks
+difficulty: advanced
+description: |
+  A timed mock exam in the CKS format: sixteen tasks spread like the six official
+  domains, on one kubeadm cluster, each task on the host it names, reached by ssh,
+  graded on the cluster's final state, no hint. Plan for 120 minutes.
+skills:
+  - network-policies
+  - cis-benchmark
+  - rbac
+  - apparmor
+  - seccomp
+  - pod-security-admission
+  - supply-chain
+  - audit-logs
+  - runtime-security
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+lab_type: capstone
+exam_passing_score: 67
+estimated_time: 120m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Les tâches 6 et 16 se jouent sur k8s-w1.lab (profil AppArmor, Pods
+      # surveillés) : `roles` est le champ que le contrat prévoit pour les
+      # hôtes utilisés en même temps.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: t01-zone-fermee
+    label: "Task 1: zone denies everything by default, except web to db on port 80 and DNS"
+    tests:
+      - test_t01_seul_le_flux_prevu_passe_dans_zone
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: t02-ingress-tls
+    label: "Task 2: the Ingress site serves vitrine.lab over HTTPS with a certificate naming the host"
+    tests:
+      - test_t02_le_site_sert_en_https_avec_son_certificat
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: t03-cis-profilage
+    label: "Task 3: a replayed kube-bench audit passes the three profiling checks"
+    tests:
+      - test_t03_l_audit_cis_rejoue_ne_reproche_plus_le_profilage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: t04a-dev-sa-reduit
+    label: "Task 4: dev-sa is no longer cluster admin and keeps its work in equipe-dev"
+    tests:
+      - test_t04a_dev_sa_garde_son_travail_sans_etre_administrateur
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: t04b-dev-sa-borne
+    label: "Task 4: dev-sa reads no Secret, and its right is bound inside its namespace"
+    tests:
+      - test_t04b_dev_sa_ne_lit_plus_les_secrets_et_son_droit_vit_dans_le_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: t05-releveur-sans-jeton
+    label: "Task 5: releveur runs under its own identity, with no API token mounted"
+    tests:
+      - test_t05_releveur_tourne_sans_jeton_d_api
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: t06-apparmor
+    label: "Task 6: confine runs on the worker, confined by the AppArmor profile in enforce mode"
+    tests:
+      - test_t06_confine_est_tenu_par_apparmor_sur_le_worker
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: t07-seccomp
+    label: "Task 7: seccomp refuses chmod to seccomp-pod, and to it alone"
+    tests:
+      - test_t07_seccomp_refuse_chmod_au_seul_pod_vise
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: t08a-restricted-applique
+    label: "Task 8: durci applies the restricted standard and refuses a privileged Pod at admission"
+    tests:
+      - test_t08a_durci_refuse_a_l_admission_ce_que_restricted_interdit
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: t08b-pod-conforme
+    label: "Task 8: the Pod conforme runs and meets the restricted standard"
+    tests:
+      - test_t08b_le_pod_conforme_tourne_sous_restricted
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: t09-secure-app
+    label: "Task 9: secure-app replaces insecure-app without any of its flaws"
+    tests:
+      - test_t09_secure_app_remplace_insecure_app_sans_ses_defauts
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: t10-cle-en-secret
+    label: "Task 10: the API key reaches facturation from a Secret, as a read-only file"
+    tests:
+      - test_t10_la_cle_d_api_arrive_par_un_secret_en_fichier
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+  - id: t11a-digest
+    label: "Task 11: pinned-app runs nginx 1.30.5 by the digest the node executes"
+    tests:
+      - test_t11a_pinned_app_tourne_sur_le_digest_de_nginx_1305
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: t11b-tags-refuses
+    label: "Task 11: chaine refuses any image not pinned by digest, and only chaine"
+    tests:
+      - test_t11b_chaine_refuse_toute_image_non_epinglee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: t12-dockerfile
+    label: "Task 12: trivy config no longer reports the five findings of the inventaire Dockerfile"
+    tests:
+      - test_t12_le_dockerfile_d_inventaire_passe_l_analyse
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: t13-cosign
+    label: "Task 13: the published key verifies the signed image and refuses the other"
+    tests:
+      - test_t13_la_cle_publiee_valide_web_et_refuse_outil
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: t14a-audit-secret
+    label: "Task 14: reading the Secret is logged with its body (RequestResponse)"
+    tests:
+      - test_t14a_la_lecture_du_secret_est_journalisee_avec_son_corps
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: t14b-audit-metadata
+    label: "Task 14: an ordinary read is logged at Metadata level only"
+    tests:
+      - test_t14b_une_lecture_banale_est_journalisee_en_metadata_seulement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+  - id: t15-immuable
+    label: "Task 15: vitrine can no longer be written to inside, and still serves"
+    tests:
+      - test_t15_vitrine_ne_s_ecrit_plus_et_sert_toujours
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: t16-pod-compromis
+    label: "Task 16: the compromised Pod is removed, and it alone"
+    tests:
+      - test_t16_le_pod_compromis_est_retire_et_lui_seul
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/

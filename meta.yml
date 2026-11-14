@@ -389,6 +389,10 @@ sections:
       # nomme plus aucun objet Kubernetes, et ne s'adresse donc qu'à qui a
       # déjà joué les quinze précédents.
       - cks-capstone-enclave
+      # L'examen blanc chronométré, au format et aux poids de la CKS : il vient
+      # après le capstone, quand tout le parcours a été joué, comme ceux du CKA
+      # et du CKAD.
+      - cks-examen-blanc
 
 # Envoi des preuves vers le compte facultatif du site, par `dsoxlab login` puis
 # `dsoxlab push`. Rien ne part sans ces deux gestes de l'apprenant. Toutes ces

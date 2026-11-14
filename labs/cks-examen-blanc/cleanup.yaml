@@ -1,0 +1,169 @@
+---
+# Joué par `dsoxlab clean` : rend le plan de contrôle tel que kubeadm l'a écrit,
+# puis retire tout ce que l'examen a posé ou que l'apprenant a créé : les
+# objets du cluster entier (liaison cluster-admin, politiques d'admission,
+# contrôleur Ingress), les quatorze namespaces, et les fichiers des nœuds
+# (politique et journal d'audit, profils AppArmor et seccomp, clés cosign).
+# trivy, cosign, crane et l'image kube-bench restent posés, comme dans les labs
+# unitaires : ce sont des outils, ils ne changent rien au cluster.
+- name: Nettoyer l'examen blanc CKS
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    maison: "/home/{{ ansible_user | default('ansible') }}"
+  tasks:
+    # Le kubelet recrée un Pod statique dont le manifeste change, mais pas tout
+    # de suite : on relève l'empreinte avant la copie, et on attend qu'elle
+    # change (mesuré sur cks-cis-benchmark-remediate le 2026-11-12).
+    - name: Relever l'empreinte des Pods statiques avant la restauration
+      ansible.builtin.command: >-
+        {{ kubectl }} -n kube-system get pod {{ item }}-{{ inventory_hostname }}
+        -o jsonpath={.metadata.annotations.kubernetes\\.io/config\\.hash}
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      register: empreintes_avant
+      changed_when: false
+      failed_when: false
+
+    - name: Restaurer les manifestes du plan de contrôle
+      ansible.builtin.copy:
+        src: "/var/backups/{{ item }}.avant-cks-examen.yaml"
+        dest: "/etc/kubernetes/manifests/{{ item }}.yaml"
+        remote_src: true
+        mode: "0600"
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      register: restauration
+      failed_when: false
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: >-
+        {{ kubectl }} get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que chaque Pod statique restauré ait changé d'empreinte et soit prêt
+      ansible.builtin.shell: |
+        set -o pipefail
+        K="kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system"
+        pod="{{ item.0.item }}-{{ inventory_hostname }}"
+        empreinte=$($K get pod "$pod" -o jsonpath='{.metadata.annotations.kubernetes\.io/config\.hash}')
+        pret=$($K get pod "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+        [ -n "$empreinte" ] && [ "$empreinte" != "{{ item.0.stdout }}" ] && [ "$pret" = "True" ]
+      args:
+        executable: /bin/bash
+      loop: "{{ empreintes_avant.results | zip(restauration.results) | list }}"
+      when: item.1.changed
+      register: recree
+      until: recree.rc == 0
+      retries: 60
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que les Pods du plan de contrôle soient Running
+      ansible.builtin.command: >-
+        {{ kubectl }} -n kube-system get pods -l tier=control-plane
+        -o jsonpath={.items[*].status.phase}
+      register: phases
+      until: phases.stdout and 'Pending' not in phases.stdout
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    # Une sauvegarde gardée d'un passage à l'autre deviendrait périmée après
+    # une montée de version (cka-kubeadm-upgrade) et rétrograderait le plan de
+    # contrôle au passage suivant. Elle n'est retirée qu'une fois la
+    # restauration faite et le plan de contrôle revenu.
+    - name: Retirer les sauvegardes des manifestes, une fois le plan de contrôle revenu
+      ansible.builtin.file:
+        path: "/var/backups/{{ item }}.avant-cks-examen.yaml"
+        state: absent
+      loop:
+        - kube-apiserver
+        - kube-controller-manager
+        - kube-scheduler
+      when:
+        - sante.rc == 0
+        - phases.stdout is defined
+        - "'Pending' not in phases.stdout"
+        - restauration.results | selectattr('failed', 'defined') | selectattr('failed') | list | length == 0
+
+    - name: Retirer la politique et le journal d'audit du nœud
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes/audit-policy.yaml
+        - /var/log/kubernetes/audit.log
+
+    - name: Retirer la liaison cluster-admin de la tâche 4
+      ansible.builtin.command: >-
+        {{ kubectl }} delete clusterrolebinding dev-admin-binding
+        --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    # La liaison d'abord : une politique sans liaison n'agit sur rien. Une
+    # politique laissée en place refuserait des Pods dans les labs suivants.
+    - name: Retirer les politiques d'admission et leurs liaisons
+      ansible.builtin.shell: |
+        set -eu
+        kubectl get validatingadmissionpolicybinding -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+        kubectl get validatingadmissionpolicy -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les namespaces de l'examen
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace zone vitrine conformite equipe-dev releves
+        confinement durci production tresor chaine chaine-signature coffre
+        catalogue atelier
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le contrôleur Ingress et ses CRD
+      ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
+
+    - name: Décharger le profil AppArmor du worker
+      ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/k8s-refuser-ecriture
+      changed_when: false
+      failed_when: false
+      delegate_to: k8s-w1.lab
+
+    - name: Retirer le fichier du profil AppArmor du worker
+      ansible.builtin.file:
+        path: /etc/apparmor.d/k8s-refuser-ecriture
+        state: absent
+      delegate_to: k8s-w1.lab
+
+    - name: Retirer le profil seccomp, les clés cosign et les fichiers de l'examen
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/lib/kubelet/seccomp/profiles/restrict-chmod.json
+        - /root/cosign.key
+        - /root/cosign.pub
+        - /var/lib/dsoxlab/cks-examen
+        - "{{ maison }}/examen"
+
+    - name: Défaire la mécanique de l'examen réel (D63)
+      ansible.builtin.include_tasks: ../../shared/examen-ssh-nettoyage.yml

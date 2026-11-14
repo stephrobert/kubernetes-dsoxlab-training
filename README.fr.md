@@ -317,7 +317,7 @@ Cinq domaines orientés application. « Application Environment, Configuration a
 
 Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plusieurs compétences y sont invérifiables sur un cluster en conteneur, ce qui est la raison d'être des VM de ce catalogue.
 
-26 lab(s).
+27 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -347,8 +347,9 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 24 | [`k8s-contenir-un-deni-de-service`](labs/k8s-contenir-un-deni-de-service/) | Contenir un déni de service dans son namespace | cluster-hardening | 30m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 25 | [`k8s-challenge-contenir-une-attaque`](labs/k8s-challenge-contenir-une-attaque/) | Détecter et contenir une persistance et un déni de service | cluster-hardening | 45m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 26 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 27 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | Examen blanc CKS : 16 tâches en 120 minutes | capstone, plusieurs domaines | 120m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total : **121 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **122 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

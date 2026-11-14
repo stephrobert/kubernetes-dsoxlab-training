@@ -1,0 +1,100 @@
+---
+# Joué par `dsoxlab run` : l'examen blanc CKS sur le cluster kubeadm du
+# catalogue. Traefik sert la tâche 2, trivy la tâche 12, cosign et crane la
+# tâche 13, tous épinglés. Le profil AppArmor de la tâche 6 est déposé sur le
+# worker, et seulement là. Istio, Falco et gVisor ne sont PAS installés : le
+# nœud de contrôle n'a que 4 Go, et leurs objectifs sont éprouvés autrement ou
+# laissés aux labs unitaires (voir README).
+- name: Préparer l'examen blanc CKS
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Installer Traefik
+      ansible.builtin.include_tasks: ../../shared/traefik.yml
+
+    - name: Poser trivy sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: trivy
+        outil_version: "0.74.0"
+
+    - name: Poser cosign sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: cosign
+        outil_version: "3.1.3"
+        # cosign n'accepte pas --version, seulement la sous-commande.
+        outil_verification: version
+
+    - name: Poser crane sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: crane
+        outil_version: "0.22.1"
+        outil_verification: version
+
+    - name: Vérifier qu'AppArmor est actif sur le worker
+      ansible.builtin.command: aa-status --enabled
+      register: aa_worker
+      changed_when: false
+      failed_when: false
+      delegate_to: k8s-w1.lab
+
+    - name: Refuser de continuer si AppArmor est absent du worker
+      ansible.builtin.fail:
+        msg: >-
+          AppArmor n'est pas actif sur k8s-w1.lab. La tâche 6 exige une vraie
+          machine, pas un nœud en conteneur.
+      when: aa_worker.rc != 0
+
+    # Le profil n'est déposé que sur le worker : la tâche 6 fait placer le Pod
+    # là où le profil est chargé, et c'est une partie de ce qu'elle mesure.
+    - name: Déposer le profil AppArmor de la tâche 6 sur le worker
+      ansible.builtin.copy:
+        dest: /etc/apparmor.d/k8s-refuser-ecriture
+        mode: "0644"
+        content: |
+          #include <tunables/global>
+
+          profile k8s-refuser-ecriture flags=(attach_disconnected) {
+            #include <abstractions/base>
+
+            file,
+            deny /tmp/** w,
+          }
+      delegate_to: k8s-w1.lab
+
+    - name: Décharger le profil s'il est resté chargé d'un passage précédent
+      ansible.builtin.command: apparmor_parser -R /etc/apparmor.d/k8s-refuser-ecriture
+      changed_when: false
+      failed_when: false
+      delegate_to: k8s-w1.lab
+
+    - name: Créer le répertoire des fichiers de l'examen sur le nœud
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/cks-examen
+        state: directory
+        mode: "0755"
+
+    - name: Copier les fichiers de l'examen
+      ansible.builtin.copy:
+        src: "fixtures/{{ item }}"
+        dest: "/var/lib/dsoxlab/cks-examen/{{ item }}"
+        mode: "0644"
+      loop:
+        - kube-bench-job.yaml
+        - Dockerfile
+
+    - name: Poser l'état de départ de chaque tâche
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"
+
+    - name: Poser la mécanique de l'examen réel, un hôte par tâche (D63)
+      ansible.builtin.include_tasks: ../../shared/examen-ssh.yml
