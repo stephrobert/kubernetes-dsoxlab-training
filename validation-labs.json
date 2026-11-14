@@ -4428,6 +4428,73 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-depanner-une-application": {
+  "apres": {
+   "echecs": [],
+   "passed": 10,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 10
+  },
+  "avant": {
+   "echecs": [
+    "test_api_a_ses_deux_replicas_disponibles",
+    "test_api_lit_sa_configuration_au_bon_endroit_et_repond",
+    "test_api_ne_redemarre_plus_en_boucle",
+    "test_chaque_cause_est_consignee_avant_sa_reparation",
+    "test_entrepot_a_ses_trois_replicas_sur_le_worker",
+    "test_l_api_server_repond_et_son_pod_statique_tourne",
+    "test_le_kubelet_est_actif_et_active_au_demarrage",
+    "test_le_manifeste_de_l_api_server_est_sain_et_autorise_node_rbac",
+    "test_le_worker_est_ready_avec_un_kubelet_qui_garde_le_dns",
+    "test_vitrine_tourne_sur_une_image_publique_tiree_et_repond"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 577,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-depanner-une-application.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_api_a_ses_deux_replicas_disponibles",
+    "test_api_lit_sa_configuration_au_bon_endroit_et_repond",
+    "test_api_ne_redemarre_plus_en_boucle",
+    "test_chaque_cause_est_consignee_avant_sa_reparation",
+    "test_entrepot_a_ses_trois_replicas_sur_le_worker",
+    "test_l_api_server_repond_et_son_pod_statique_tourne",
+    "test_le_kubelet_est_actif_et_active_au_demarrage",
+    "test_le_manifeste_de_l_api_server_est_sain_et_autorise_node_rbac",
+    "test_le_worker_est_ready_avec_un_kubelet_qui_garde_le_dns",
+    "test_vitrine_tourne_sur_une_image_publique_tiree_et_repond"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-donnees-qui-survivent": {
   "apres": {
    "echecs": [],
@@ -4545,6 +4612,65 @@
    "skipped": 0,
    "status": "failed",
    "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-garantir-la-disponibilite": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_au_moins_trois_exemplaires_disponibles",
+    "test_le_minimum_tient_pendant_l_evacuation_d_un_noeud",
+    "test_le_rapport_de_routine_dit_l_etat_reel_du_cluster",
+    "test_les_exemplaires_sont_repartis_sur_des_noeuds_differents",
+    "test_les_sondes_sont_declarees_et_le_trafic_attend_d_etre_pret",
+    "test_un_budget_garantit_le_minimum"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 367,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-garantir-la-disponibilite.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_au_moins_trois_exemplaires_disponibles",
+    "test_le_minimum_tient_pendant_l_evacuation_d_un_noeud",
+    "test_le_rapport_de_routine_dit_l_etat_reel_du_cluster",
+    "test_les_exemplaires_sont_repartis_sur_des_noeuds_differents",
+    "test_les_sondes_sont_declarees_et_le_trafic_attend_d_etre_pret",
+    "test_un_budget_garantit_le_minimum"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
