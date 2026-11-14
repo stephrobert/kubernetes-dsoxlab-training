@@ -1,4 +1,5 @@
 title: "Faire monter en charge automatiquement avec un HorizontalPodAutoscaler"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
 description: |
   Poser un HPA sur un Deployment, générer de la charge, voir la montée en
   replicas, puis couper la charge. Les tests lisent le HPA, ses métriques

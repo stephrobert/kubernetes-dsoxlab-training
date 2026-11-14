@@ -1,4 +1,5 @@
 title: "Changer de contexte et fixer le namespace par défaut"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique
 description: |
   Votre kubeconfig contient déjà deux contextes. Basculez sur recette, donnez-lui
   kube-system pour namespace par défaut, et prouvez-le par une ConfigMap créée
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-contexte-actif-est-recette
     label: "Le contexte actif est recette, qui vise le cluster de recette"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
   - id: le-namespace-par-defaut-est-kube-system
     label: "Le namespace par défaut du contexte recette est kube-system"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
   - id: la-preuve-est-au-bon-endroit
     label: "La ConfigMap preuve, créée sans -n ni --context, est dans kube-system du cluster de recette seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
   - id: le-kubeconfig-est-protege
     label: "~/.kube/config n'est lisible et modifiable que par son propriétaire (600)"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/

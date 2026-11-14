@@ -16,7 +16,7 @@ skills:
   - maxunavailable
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
 lab_type: lab
 estimated_time: 15m
 
@@ -42,25 +42,25 @@ criteria:
     tests:
       - test_la_strategie_est_rollingupdate
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: maxsurge-vaut-deux
     label: "maxSurge is 2: at most two extra Pods during the switch"
     tests:
       - test_maxsurge_vaut_deux
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: maxunavailable-vaut-un
     label: "maxUnavailable is 1: at most one Pod unavailable at a time"
     tests:
       - test_maxunavailable_vaut_un
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: l-image-est-la-nouvelle
     label: "The Deployment's image moved to nginx:1.30.6"
     tests:
       - test_l_image_est_la_nouvelle
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   # Le critère « les replicas restent cinq » a disparu le 2026-11-10 : une
   # exigence de non-régression est vraie avant le travail, donc son test ne
   # pouvait pas refuser. Elle est devenue une assertion du critère suivant, qui
@@ -70,26 +70,26 @@ criteria:
     tests:
       - test_les_cinq_replicas_sont_prets_sur_la_nouvelle_image
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: deux-revisions-existent
     label: "Two revisions of webapp exist, the new image coming after the old one"
     tests:
       - test_deux_revisions_existent
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-nouveau-replicaset-porte-cinq-replicas
     label: "The ReplicaSet of the new image carries five ready replicas"
     tests:
       - test_le_nouveau_replicaset_porte_cinq_replicas
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: les-anciens-replicasets-sont-a-zero
     label: "The old ReplicaSets are kept at zero"
     tests:
       - test_les_anciens_replicasets_sont_a_zero
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
 
 feedback: full

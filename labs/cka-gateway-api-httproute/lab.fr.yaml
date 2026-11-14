@@ -1,4 +1,5 @@
 title: "Router avec la Gateway API, et réparer une route que le cluster refuse"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/#mettre-en-pratique
 description: |
   Les deux mêmes applications, le même nom d'hôte unique, et le successeur de
   l'Ingress. Déclarez une Gateway, attachez-lui une route, et prouvez le
@@ -9,13 +10,25 @@ description: |
 criteria:
   - id: gateway-programmee
     label: "Une Gateway existe et le cluster la déclare programmée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-api
     label: "Le chemin /api atteint svc-api"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-web
     label: "Le chemin /web atteint svc-web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-non-declare
     label: "Un chemin non déclaré n'atteint aucune des deux applications"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-catalogue-resolue
     label: "La route catalogue est acceptée et ses références résolues, à jour de sa génération"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: catalogue-servi
     label: "catalogue.local atteint le catalogue du namespace boutique"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/

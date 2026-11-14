@@ -1,4 +1,5 @@
 title: "Ramener un nœud NotReady dans le cluster"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/#mettre-en-pratique
 description: |
   Un worker est passé NotReady, et l'application qui lui est réservée est
   dégradée. Trouver sur le nœud pourquoi il ne parle plus au control plane,
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-noeud-est-ready
     label: "Le Node worker est de nouveau Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: le-kubelet-tourne
     label: "Le service kubelet tourne sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: le-kubelet-est-active
     label: "Le kubelet est activé et survivra à un redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: l-application-est-revenue
     label: "L'application est revenue, trois réplicas sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/

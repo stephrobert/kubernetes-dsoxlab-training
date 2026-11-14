@@ -24,7 +24,7 @@ skills:
   - containerd
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
 lab_type: lab
 estimated_time: 30m
 
@@ -52,34 +52,34 @@ criteria:
     tests:
       - test_le_worker_est_joint_et_ready
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: version-du-kubelet
     label: "Its kubelet reports the cluster's version"
     tests:
       - test_son_kubelet_annonce_la_version_du_cluster
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: swap-coupe
     label: "Swap is off on the worker, and stays off after a reboot"
     tests:
       - test_le_swap_est_coupe_durablement
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: pilote-systemd
     label: "containerd runs with the systemd cgroup driver"
     tests:
       - test_containerd_utilise_le_pilote_systemd
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: paquets-figes
     label: "kubeadm, kubelet and kubectl are held"
     tests:
       - test_les_paquets_sont_figes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: pod-sur-le-worker
     label: "A Pod runs on the worker"
     tests:
       - test_un_pod_tourne_sur_le_worker
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/

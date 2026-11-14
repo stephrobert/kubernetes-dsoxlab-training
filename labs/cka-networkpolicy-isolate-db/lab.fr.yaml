@@ -1,4 +1,5 @@
 title: "Isoler la base de données : seul le backend y accède"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
 description: |
   Écrire la NetworkPolicy qui ne laisse entrer vers la base que le backend
   de son namespace, sur son port, et rien d'autre. Les tests tentent les
@@ -9,17 +10,33 @@ description: |
 criteria:
   - id: la-politique-s-applique-a-la-base
     label: "La politique db-allow-backend s'applique aux Pods de la base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: la-politique-controle-l-entree
     label: "La politique contrôle le trafic entrant"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: la-politique-laisse-entrer-le-backend-du-meme-namespace
     label: "La politique laisse entrer les Pods app=backend du même namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: la-politique-n-ouvre-que-le-port-5432-en-tcp
     label: "La politique n'ouvre que le port 5432 en TCP"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: le-backend-atteint-toujours-la-base
     label: "backend atteint toujours db sur 5432"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: le-frontend-est-bloque
     label: "frontend n'atteint plus db"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: l-intrus-d-un-autre-namespace-est-bloque
     label: "intrus, dans un autre namespace, n'atteint plus db malgré son label"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: la-base-peut-toujours-sortir
     label: "La base peut toujours sortir"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/

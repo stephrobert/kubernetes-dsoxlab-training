@@ -18,7 +18,7 @@ skills:
   - finalizers
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
 lab_type: lab
 estimated_time: 25m
 
@@ -43,31 +43,31 @@ criteria:
     tests:
       - test_la_sauvegarde_quotidienne_existe_avec_les_valeurs_demandees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: hebdomadaire-modifiee
     label: "hebdomadaire keeps 30 days, without having been recreated"
     tests:
       - test_hebdomadaire_garde_trente_jours_sans_avoir_ete_recreee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: groupe-api
     label: "The API group and version of Sauvegarde are recorded"
     tests:
       - test_le_groupe_et_la_version_de_l_api_sont_consignes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: refus-hors-bornes
     label: "The refusal of an out-of-bounds retention is recorded, and the API still refuses it"
     tests:
       - test_le_refus_d_une_retention_hors_bornes_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: ancienne-debloquee
     label: "ancienne is no longer stuck, and the CRD is the one of the start"
     tests:
       - test_ancienne_est_debloquee_sans_toucher_a_la_crd
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
 
 feedback: full

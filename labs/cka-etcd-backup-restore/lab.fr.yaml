@@ -1,4 +1,5 @@
 title: "Sauvegarder etcd, puis restaurer le cluster depuis un instantané"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
 description: |
   Un namespace a disparu. Prendre d'abord une sauvegarde fraîche de l'état
   courant, puis restaurer le cluster depuis l'instantané de la veille, sans
@@ -10,19 +11,46 @@ description: |
 criteria:
   - id: la-sauvegarde-fraiche-existe-et-est-lisible
     label: "Une sauvegarde fraîche existe dans /opt/backup/etcd-snapshot.db et elle est valide"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: la-sauvegarde-fraiche-photographie-l-etat-d-avant-la-restauration
     label: "La sauvegarde fraîche photographie l'état d'avant la restauration"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: etcd-repond-sur-son-port
     label: "Après la restauration, etcd tourne et répond"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: etcd-tourne-sur-un-repertoire-de-donnees-neuf
     label: "etcd tourne sur un répertoire de données neuf, produit par la restauration"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: le-cluster-est-sain-apres-la-restauration
     label: "Après la restauration, l'API répond et les deux nœuds sont Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: le-namespace-important-data-est-revenu-a-l-identique
     label: "Le namespace important-data est de retour, avec son identité d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: le-configmap-mission-critical-est-revenu-a-l-identique
     label: "Le ConfigMap mission-critical est de retour, avec son identité et son contenu d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: l-objet-ecrit-apres-la-sauvegarde-a-disparu
     label: "L'objet écrit après la sauvegarde d'hier soir n'existe plus"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: l-api-server-ne-sert-plus-son-cache-d-avant-la-restauration
     label: "L'API server ne sert plus son cache d'avant la restauration"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/

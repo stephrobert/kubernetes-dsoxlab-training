@@ -1,4 +1,5 @@
 title: "Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/#mettre-en-pratique
 description: |
   Deux applications, un seul nom d'hôte, et aucune règle disant laquelle est
   laquelle. Routez par le chemin, et prouvez-le de la seule façon qui compte :
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: regle-pour-l-hote
     label: "Une règle Ingress dotée d'une classe vise app.local"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-api
     label: "Le chemin /api atteint svc-api"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-web
     label: "Le chemin /web atteint svc-web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-non-declare
     label: "Un chemin non déclaré n'atteint aucune des deux applications"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/

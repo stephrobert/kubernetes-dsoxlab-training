@@ -29,7 +29,7 @@ skills:
   - troubleshooting
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -61,59 +61,59 @@ criteria:
     tests:
       - test_prod_colis_a_ses_trois_replicas_disponibles_sur_le_digest
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
   - id: init-et-sidecar
     label: "An init container completes before the start, a native sidecar passes on the logs"
     tests:
       - test_init_container_et_sidecar_natif_relaient_les_journaux
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
   - id: requests-et-limits
     label: "Every container declares requests and limits, with the requested memory limit"
     tests:
       - test_chaque_conteneur_declare_requests_et_limits
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: sondes-et-ready
     label: "Three probes on port 80, every Pod Ready without restart"
     tests:
       - test_trois_sondes_sur_le_port_80_et_pods_ready_sans_redemarrage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: cronjob-planifie
     label: "The purge-colis CronJob is scheduled as requested"
     tests:
       - test_le_cronjob_purge_colis_est_planifie_comme_demande
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: job-termine
     label: "The inventaire Job completed with three completions"
     tests:
       - test_le_job_inventaire_est_termine_avec_trois_completions
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: meme-base-kustomize
     label: "dev and prod come from one and the same Kustomize base"
     tests:
       - test_dev_et_prod_viennent_d_une_meme_base
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
   - id: cluster-conforme
     label: "The cluster matches the versioned folder"
     tests:
       - test_le_cluster_correspond_aux_overlays
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
   - id: cause-consignee
     label: "The cause of the failure is recorded before the repair"
     tests:
       - test_la_cause_de_la_panne_est_consignee_avant_la_reparation
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: repare-sans-recreer
     label: "etiquettes runs, without having been recreated"
     tests:
       - test_etiquettes_tourne_sans_avoir_ete_recree
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

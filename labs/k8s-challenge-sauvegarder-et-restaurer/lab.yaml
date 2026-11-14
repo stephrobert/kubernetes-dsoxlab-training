@@ -20,7 +20,7 @@ skills:
   - api-migration
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 50m
@@ -45,25 +45,25 @@ criteria:
     tests:
       - test_une_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: etcd-restaure
     label: "etcd runs on a restored data directory, and the cluster is healthy"
     tests:
       - test_etcd_tourne_sur_un_repertoire_restaure_et_le_cluster_est_sain
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: uid-d-origine
     label: "The deleted objects are back with their original UIDs"
     tests:
       - test_les_objets_supprimes_sont_revenus_avec_leurs_uid
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: objet-posterieur
     label: "The object written after the backup is gone"
     tests:
       - test_l_objet_ecrit_apres_la_sauvegarde_n_existe_plus
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: api-migrees
     label: "The repository's manifests use current APIs and are applied"
     tests:
@@ -75,4 +75,4 @@ criteria:
     tests:
       - test_aucun_certificat_n_expire_avant_trente_jours
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/

@@ -1,4 +1,5 @@
 title: "Un Job à complétions parallèles et un CronJob"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique
 description: |
   Exécuter un traitement quatre fois, deux à la fois, avec un Job, et
   prouver que les exécutions se sont bien chevauchées. Puis planifier un
@@ -8,11 +9,21 @@ description: |
 criteria:
   - id: quatre-completions-deux-a-la-fois
     label: "batch-job demande quatre complétions, deux à la fois"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: job-termine
     label: "batch-job s'est terminé avec succès"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: parallelisme-observe
     label: "Deux exécutions se sont réellement chevauchées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: cronjob-planifie
     label: "log-cleanup tourne toutes les cinq minutes, avec un historique borné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: declenche-a-la-main
     label: "Un Job lancé à la main depuis log-cleanup a réussi"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/

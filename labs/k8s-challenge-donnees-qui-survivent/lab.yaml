@@ -26,7 +26,7 @@ skills:
   - troubleshooting
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -59,36 +59,36 @@ criteria:
     tests:
       - test_registre_donnees_est_liee_a_un_volume_cree_par_la_classe
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: temoin-ecrit
     label: "The Pod of registre mounts the claim on the requested path and wrote the witness file there"
     tests:
       - test_registre_monte_la_revendication_et_a_ecrit_le_temoin
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: temoin-intact
     label: "After its Pod was deleted and recreated, the witness file is read again intact"
     tests:
       - test_le_temoin_a_survecu_a_la_recreation_du_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: reclaim-retain
     label: "The volume of registre-donnees has the reclaim policy Retain"
     tests:
       - test_le_volume_de_registre_donnees_est_en_retain
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: cause-consignee
     label: "The cause of the Pending is recorded before the correction"
     tests:
       - test_la_cause_du_pending_est_consignee_avant_la_correction
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: journal-bound
     label: "journal-ancien is Bound after the correction"
     tests:
       - test_journal_ancien_est_bound
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/

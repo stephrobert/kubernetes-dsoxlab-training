@@ -15,7 +15,7 @@ skills:
   - parallelism
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
 lab_type: lab
 estimated_time: 20m
 
@@ -41,28 +41,28 @@ criteria:
     tests:
       - test_batch_job_demande_quatre_completions_deux_a_la_fois
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: job-termine
     label: "batch-job completed successfully"
     tests:
       - test_batch_job_est_termine_avec_succes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: parallelisme-observe
     label: "Two runs really overlapped in time"
     tests:
       - test_deux_executions_se_sont_chevauchees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: cronjob-planifie
     label: "log-cleanup runs every five minutes with a bounded history"
     tests:
       - test_log_cleanup_est_planifie_avec_un_historique_borne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: declenche-a-la-main
     label: "A Job started by hand from log-cleanup succeeded"
     tests:
       - test_un_job_lance_a_la_main_depuis_log_cleanup_a_reussi
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/

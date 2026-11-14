@@ -1,4 +1,5 @@
 title: "Injecter configuration et secrets dans un Pod"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique
 description: |
   Donner à une application sa configuration par des variables d'environnement
   et par un fichier monté, et ses identifiants par un Secret, sans jamais
@@ -8,29 +9,57 @@ description: |
 criteria:
   - id: le-configmap-porte-app-mode
     label: "Le ConfigMap app-settings porte APP_MODE à production"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-configmap-porte-log-level
     label: "Le ConfigMap app-settings porte LOG_LEVEL à info"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-configmap-porte-le-fichier-config-yaml
     label: "Le ConfigMap app-settings porte une clé config.yaml qui contient port: 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-secret-porte-db-host
     label: "Le Secret db-credentials porte DB_HOST à db.internal.svc"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-secret-porte-db-password
     label: "Le Secret db-credentials porte un DB_PASSWORD non vide"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-pod-tourne-avec-la-bonne-image
     label: "Le Pod app tourne avec l'image nginx:1.30.6"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-pod-recoit-les-cles-du-configmap-en-variables
     label: "Le Pod reçoit les clés de app-settings en variables d'environnement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-pod-recoit-db-host-du-secret
     label: "Le Pod reçoit DB_HOST depuis le Secret, par référence"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-pod-recoit-db-password-du-secret
     label: "Le Pod reçoit DB_PASSWORD depuis le Secret, par référence"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: aucun-mot-de-passe-n-est-ecrit-en-clair-dans-le-pod
     label: "Aucun mot de passe n'est écrit en clair dans le manifeste du Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-configmap-est-monte-sous-etc-app-config
     label: "Le Pod monte app-settings sous /etc/app-config"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: dans-le-conteneur-app-mode-vaut-production
     label: "Dans le conteneur, APP_MODE vaut production"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: dans-le-conteneur-db-password-est-defini
     label: "Dans le conteneur, DB_PASSWORD est défini"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-le-fichier-config-yaml-contient-le-port
     label: "Dans le conteneur, /etc/app-config/config.yaml contient port: 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/

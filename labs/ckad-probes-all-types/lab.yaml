@@ -16,7 +16,7 @@ skills:
   - health-check
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
 lab_type: lab
 estimated_time: 20m
 
@@ -42,28 +42,28 @@ criteria:
     tests:
       - test_probed_app_declare_son_port_sur_l_image_demandee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: demarrage-tolerant
     label: "The startup probe tolerates a one-minute slow start"
     tests:
       - test_la_sonde_de_demarrage_tolere_une_minute
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: vivacite-http
     label: "The liveness probe queries port 80 over HTTP"
     tests:
       - test_la_sonde_de_vivacite_interroge_le_port_80_en_http
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: disponibilite-http
     label: "The readiness probe queries port 80 over HTTP"
     tests:
       - test_la_sonde_de_disponibilite_interroge_le_port_80_en_http
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: ready-sans-redemarrage
     label: "probed-app is Ready, without any restart"
     tests:
       - test_probed_app_est_ready_sans_redemarrage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/

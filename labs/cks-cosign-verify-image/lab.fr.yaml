@@ -1,4 +1,5 @@
 title: "Signer une image, et prouver la signature en faisant refuser une autre"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
 description: |
   Un registre local porte deux images, aucune signée. Signez-en une avec
   cosign, publiez la clé publique, et prouvez que la chaîne fonctionne : la

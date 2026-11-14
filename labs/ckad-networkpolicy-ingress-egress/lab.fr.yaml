@@ -1,4 +1,5 @@
 title: "Cloisonner trois tiers avec des NetworkPolicy ingress et egress"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
 description: |
   Frontend, backend, base de données : n'autoriser que les flux prévus,
   dans les deux sens, DNS compris, et interdire tout le reste. Prouver
@@ -8,13 +9,25 @@ description: |
 criteria:
   - id: backend-policy
     label: "backend-policy vise tier=backend, en entrée et en sortie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: database-policy
     label: "database-policy vise tier=database, en entrée et en sortie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: backend-entree
     label: "backend n'accepte que frontend"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: backend-sortie
     label: "backend joint database et résout les noms"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: base-entree
     label: "database refuse intrus"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: base-sans-sortie
     label: "database ne joint rien, pas même le DNS"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/

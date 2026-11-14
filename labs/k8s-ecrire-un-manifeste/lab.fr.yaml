@@ -1,4 +1,5 @@
 title: "Écrire et valider un manifeste"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/#mettre-en-pratique
 description: |
   Écrivez dans un même fichier multi-documents une ConfigMap, un Deployment et
   un Service qui nomment leur namespace, faites-le valider par le serveur
@@ -8,13 +9,25 @@ description: |
 criteria:
   - id: fichier-multi-documents
     label: "api.yaml porte les trois objets et le serveur d'API l'accepte"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: namespace-dans-le-fichier
     label: "Le fichier nomme son namespace et rien n'a atterri dans default"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: deployment-disponible
     label: "api a deux réplicas disponibles sur l'image demandée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: service-relie
     label: "Le Service api trouve les deux Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: configuration-par-configmap
     label: "Le conteneur reçoit sa configuration de api-config"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: corrige-sans-recreer
     label: "rapport est corrigé en place, sans avoir été recréé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/

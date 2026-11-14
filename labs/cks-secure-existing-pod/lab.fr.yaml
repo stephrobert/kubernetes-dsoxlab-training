@@ -1,4 +1,5 @@
 title: "Reprendre un Pod privilégié en production, sans le priver de son travail"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
 description: |
   Un Pod tourne avec le namespace de processus de l'hôte, en root, privilégié,
   depuis un tag flottant. Reconstruisez-le sans rien de tout cela, et prouvez

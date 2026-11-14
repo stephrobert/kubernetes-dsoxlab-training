@@ -1,4 +1,5 @@
 title: "Déployer, exposer et mettre à l'échelle une première application"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique
 description: |
   Dans un namespace dédié demo-app, déployez nginx sur l'image épinglée avec un
   réplica, exposez-le par un Service ClusterIP, mettez-le à l'échelle à trois
@@ -7,9 +8,17 @@ description: |
 criteria:
   - id: le-deployment-tourne-sur-l-image-epinglee
     label: "Le Deployment nginx de demo-app tourne sur l'image épinglée par digest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: la-mise-a-l-echelle-donne-trois-replicas
     label: "nginx a été mis à l'échelle après sa création et a trois réplicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: le-service-compte-trois-endpoints
     label: "Le Service nginx compte trois endpoints prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: la-reponse-est-consignee
     label: "La réponse HTTP consignée est la page que sert vraiment nginx"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/

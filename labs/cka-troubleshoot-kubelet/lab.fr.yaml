@@ -1,4 +1,5 @@
 title: "Réparer un kubelet qui refuse de démarrer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/#mettre-en-pratique
 description: |
   Le kubelet d'un worker s'arrête aussitôt lancé, et le nœud est NotReady.
   Lire dans le journal ce qu'il reproche à sa configuration, corriger le
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-noeud-est-ready
     label: "Le Node worker est de nouveau Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: le-kubelet-tourne
     label: "Le service kubelet tourne sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: la-configuration-garde-son-dns
     label: "La configuration du kubelet est réparée et garde l'adresse de kube-dns"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: l-application-est-revenue
     label: "L'application est revenue, trois réplicas sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/

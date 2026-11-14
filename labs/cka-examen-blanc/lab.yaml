@@ -32,7 +32,7 @@ skills:
   - networking
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
 lab_type: capstone
 exam_passing_score: 66
 estimated_time: 120m
@@ -62,121 +62,121 @@ criteria:
     tests:
       - test_t01_la_classe_rapide
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: t02-revendication-donnees
     label: "Task 2: the claim donnees is Bound on rapide and the Pod ecrivain wrote into it"
     tests:
       - test_t02_la_revendication_donnees_sert_ecrivain
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: t03a-worker-ready
     label: "Task 3: the worker k8s-w1.lab is Ready"
     tests:
       - test_t03a_le_worker_est_ready
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
   - id: t03b-kubelet-au-boot
     label: "Task 3: the kubelet of the worker runs and starts at boot"
     tests:
       - test_t03b_le_kubelet_du_worker_demarre_au_boot
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: t04-facture
     label: "Task 4: facture runs its two replicas, ready"
     tests:
       - test_t04_facture_tourne_sans_redemarrer
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
   - id: t05a-endpoints-annuaire
     label: "Task 5: the Service annuaire has the annuaire Pods as endpoints"
     tests:
       - test_t05a_l_annuaire_a_ses_endpoints
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t05b-client-joint-annuaire
     label: "Task 5: the Pod client reaches annuaire by its name"
     tests:
       - test_t05b_le_client_joint_l_annuaire_par_son_nom
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t06-erreurs-du-journal
     label: "Task 6: the ERROR lines of the journal Pod are recorded"
     tests:
       - test_t06_les_erreurs_du_journal_sont_consignees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t07-vitrine-retour-arriere
     label: "Task 7: vitrine is back on 1.30.5 after an update to 1.30.6"
     tests:
       - test_t07_vitrine_est_revenue_en_1305
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: t08-configuration-api
     label: "Task 8: api reads MODE from a ConfigMap and MOT_DE_PASSE from a Secret"
     tests:
       - test_t08_api_lit_sa_configuration_et_son_secret
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: t09-placement-rapport
     label: "Task 9: rapport runs only on the worker, through toleration and node affinity"
     tests:
       - test_t09_rapport_tourne_seulement_sur_le_worker
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
   - id: t10a-lecteur-lit
     label: "Task 10: the ServiceAccount lecteur can list and watch Pods"
     tests:
       - test_t10a_lecteur_peut_lister_les_pods
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: t10b-lecteur-limite
     label: "Task 10: lecteur is bound, and can do nothing beyond reading Pods"
     tests:
       - test_t10b_lecteur_ne_peut_rien_de_plus
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: t11-snapshot-etcd
     label: "Task 11: a valid etcd snapshot is saved"
     tests:
       - test_t11_le_snapshot_etcd_est_valide
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/
   - id: t12-crd-sauvegarde
     label: "Task 12: the CRD is installed and the Sauvegarde quotidienne exists"
     tests:
       - test_t12_la_sauvegarde_quotidienne_existe
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: t13-overlay-prod
     label: "Task 13: the prod overlay is applied"
     tests:
       - test_t13_l_overlay_prod_est_applique
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
   - id: t14-networkpolicy
     label: "Task 14: only front reaches the database"
     tests:
       - test_t14_seul_front_joint_la_base
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: t15-ingress
     label: "Task 15: the Ingress boutique routes /api"
     tests:
       - test_t15_l_ingress_boutique_route_l_api
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: t16-gateway
     label: "Task 16: the HTTPRoute magasin is accepted and serves web"
     tests:
       - test_t16_la_route_du_magasin_sert_le_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: t17-nodeport
     label: "Task 17: accueil answers on its NodePort"
     tests:
       - test_t17_accueil_repond_sur_son_nodeport
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/

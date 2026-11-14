@@ -1,4 +1,5 @@
 title: "Refuser un Pod privilégié à l'admission, avec Pod Security Admission"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
 description: |
   Un namespace qui accepte tout, y compris un Pod qui partage le namespace PID
   de l'hôte et tourne en root. Activez le standard restricted pour que le

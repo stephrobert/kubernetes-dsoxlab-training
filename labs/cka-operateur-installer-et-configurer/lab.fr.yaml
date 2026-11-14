@@ -1,4 +1,5 @@
 title: "Installer un opérateur et configurer ce qu'il fait tourner"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/#mettre-en-pratique
 description: |
   Installez l'opérateur MongoDB par ses manifestes versionnés, images épinglées,
   confiez-lui un replica set à un membre, puis changez un réglage de mongod en
@@ -7,13 +8,25 @@ description: |
 criteria:
   - id: crd-etablie
     label: "La CRD MongoDBCommunity est établie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: operateur-disponible
     label: "L'opérateur est disponible, sur son image épinglée par digest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: ressource-running
     label: "La ressource registre est en phase Running"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: objets-possedes
     label: "Le StatefulSet et le Service appartiennent à registre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: serveur-epingle
     label: "mongod tourne sur l'image du serveur épinglée par digest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: reglage-applique
     label: "mongod démarre avec le seuil de 250 ms posé par la ressource"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/

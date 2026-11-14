@@ -1,4 +1,5 @@
 title: "Prioriser des Pods et observer une préemption"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/#mettre-en-pratique
 description: |
   Créer une PriorityClass basse et une haute, faire tourner sous la basse les
   Pods qui remplissent un nœud, puis lancer un Pod urgent sous la haute et voir
@@ -7,11 +8,21 @@ description: |
 criteria:
   - id: deux-classes
     label: "Les PriorityClass basse (1000) et haute (100000) existent, aucune n'étant la classe par défaut"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
   - id: remplissage-basse
     label: "Les Pods de remplissage tournent sous la classe basse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
   - id: urgent-tourne
     label: "Le Pod urgent tourne sur le worker plein"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
   - id: preemption
     label: "Un Pod de remplissage a été préempté pour lui faire de la place"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
   - id: urgent-haute
     label: "Le Pod urgent porte la classe haute"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/

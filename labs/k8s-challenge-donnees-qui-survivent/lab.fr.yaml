@@ -1,4 +1,5 @@
 title: "Garder des données au-delà de la vie d'un Pod"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
 description: |
   Sans guidage, obtenez un volume d'une StorageClass, écrivez un fichier témoin
   depuis un Pod, prouvez qu'il survit à la recréation de ce Pod, gardez les
@@ -8,13 +9,27 @@ description: |
 criteria:
   - id: volume-cree-par-la-classe
     label: "registre-donnees est Bound à un volume que la classe conserve a créé pour elle, avec la taille et le mode d'accès demandés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: temoin-ecrit
     label: "Le Pod de registre monte la revendication au chemin demandé et y a écrit le fichier témoin"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: temoin-intact
     label: "Après suppression et recréation de son Pod, le fichier témoin est relu intact"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: reclaim-retain
     label: "Le volume de registre-donnees a la reclaim policy Retain"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: cause-consignee
     label: "La cause du Pending est consignée avant la correction"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: journal-bound
     label: "journal-ancien est Bound après la correction"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/

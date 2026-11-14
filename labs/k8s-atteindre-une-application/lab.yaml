@@ -22,7 +22,7 @@ skills:
   - target-port
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
 lab_type: lab
 estimated_time: 15m
 
@@ -46,22 +46,22 @@ criteria:
     tests:
       - test_le_service_echo_expose_80_vers_8080
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: le-service-compte-ses-endpoints
     label: "The echo Service counts the two ready echo Pods as endpoints"
     tests:
       - test_le_service_echo_compte_deux_endpoints_prets
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: le-tunnel-repond
     label: "A port-forward tunnel to the echo Service answers on local port 18080 during the check"
     tests:
       - test_un_tunnel_vers_le_service_repond_sur_18080
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: la-reponse-du-tunnel-est-consignee
     label: "The Pod answering through that tunnel is recorded"
     tests:
       - test_le_pod_qui_repond_par_le_tunnel_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/

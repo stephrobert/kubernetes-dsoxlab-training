@@ -1,4 +1,5 @@
 title: "Donner un accès humain par une CertificateSigningRequest"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
 description: |
   Donner à l'utilisatrice camille un accès au cluster par l'API
   CertificateSigningRequest : sa clé et sa demande, l'approbation, le
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: demande-delivree
     label: "La CertificateSigningRequest camille est approuvée et délivrée, pour l'authentification d'un client"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: kubeconfig-de-camille
     label: "Le kubeconfig de camille porte le certificat que l'API a délivré, et l'identifie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: lecture-autorisee
     label: "camille lit les Pods d'equipe-web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: rien-de-plus
     label: "camille ne peut rien de plus : aucune modification, aucun Secret, aucun autre namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/

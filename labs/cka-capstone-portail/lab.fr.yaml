@@ -1,4 +1,5 @@
 title: "Capstone : remettre le portail en service, sans personne à qui demander"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
 description: |
   Un namespace laissé par une équipe partie, un portail qui ne répond rien, et
   aucun ticket pour dire pourquoi. Trois défauts indépendants à trouver, deux

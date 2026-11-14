@@ -1,4 +1,5 @@
 title: "Servir un site en HTTPS avec son propre certificat, et non celui du contrôleur"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/#mettre-en-pratique
 description: |
   Le site répond déjà en HTTPS, et c'est précisément le piège : le contrôleur
   Ingress sert son propre certificat par défaut à qui le demande. Terminez le
@@ -7,9 +8,17 @@ description: |
 criteria:
   - id: secret-tls
     label: "Le certificat est déposé dans un Secret de type kubernetes.io/tls"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: ingress-declare-tls
     label: "L'Ingress déclare le TLS de vitrine.lab avec ce Secret"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: certificat-de-l-hote
     label: "Le serveur présente un certificat qui nomme vitrine.lab"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: https-verifie
     label: "Le site répond en HTTPS vérifié contre ce certificat"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/

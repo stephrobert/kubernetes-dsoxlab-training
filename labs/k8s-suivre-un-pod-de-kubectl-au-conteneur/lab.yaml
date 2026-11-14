@@ -24,7 +24,7 @@ skills:
   - kubelet
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
 lab_type: lab
 estimated_time: 20m
 
@@ -49,22 +49,22 @@ criteria:
     tests:
       - test_le_deployment_suivi_a_un_replica_disponible
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-placement-est-attribue-au-scheduler
     label: "The Scheduled step is attributed to the scheduler"
     tests:
       - test_l_etape_scheduled_est_attribuee_au_scheduler
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: les-etapes-du-conteneur-sont-attribuees-au-kubelet
     label: "The Pulled, Created and Started steps are attributed to the kubelet"
     tests:
       - test_les_etapes_du_conteneur_sont_attribuees_au_kubelet
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-kubelet-est-celui-du-node-du-pod
     label: "The kubelet that acted is the one of the Node running the Pod"
     tests:
       - test_le_kubelet_qui_agit_est_celui_du_node_du_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/

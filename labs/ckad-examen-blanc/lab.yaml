@@ -29,7 +29,7 @@ skills:
   - networking
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercises/
 lab_type: capstone
 exam_passing_score: 66
 estimated_time: 120m
@@ -58,56 +58,56 @@ criteria:
     tests:
       - test_d01_le_cronjob_purge
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: d02a-sidecar-partage
     label: "Task 2: the sidecar lecteur shares an emptyDir with app"
     tests:
       - test_d02a_le_sidecar_partage_le_volume_du_journal
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: d02b-sidecar-relit
     label: "Task 2: the sidecar replays the log written by app"
     tests:
       - test_d02b_le_sidecar_relit_le_journal_de_l_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: d03-pvc-cache
     label: "Task 3: the Pod stockage writes into the claim cache"
     tests:
       - test_d03_le_pod_stockage_ecrit_dans_cache
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
   - id: d04a-bascule-verte
     label: "Task 4: the Service vitrine sends to the green Pods only"
     tests:
       - test_d04a_la_vitrine_sert_la_version_verte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: d04b-vert-en-1306
     label: "Task 4: vitrine-vert runs three replicas on 1.30.6"
     tests:
       - test_d04b_le_deploiement_vert_tourne_en_1306
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: d05-rolling-update
     label: "Task 5: catalogue is rolled out to 1.30.6 with maxSurge 1 and maxUnavailable 0"
     tests:
       - test_d05_catalogue_est_mis_a_jour_sans_perte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: d06-overlay-boutique
     label: "Task 6: the boutique overlay is applied"
     tests:
       - test_d06_l_overlay_de_la_boutique_est_applique
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
   - id: d07-sondes-api
     label: "Task 7: api carries its readiness and liveness probes, its Pods ready"
     tests:
       - test_d07_les_sondes_de_api
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: d08-pdb-policy-v1
     label: "Task 8: the PodDisruptionBudget is rewritten in policy/v1 and applied"
     tests:
@@ -125,53 +125,53 @@ criteria:
     tests:
       - test_d10_la_configuration_arrive_en_fichier
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: d11-secret-variable
     label: "Task 11: the token arrives as a variable from a Secret"
     tests:
       - test_d11_le_jeton_arrive_depuis_le_secret
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: d12-pod-durci
     label: "Task 12: the Pod durci runs unprivileged, read-only, without capabilities"
     tests:
       - test_d12_le_pod_durci
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/
   - id: d13-quota
     label: "Task 13: the quota plafond is set and the Pod mesure fits in it"
     tests:
       - test_d13_le_quota_et_le_pod_qui_y_tient
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
   - id: d14-serviceaccount
     label: "Task 14: the Pod outil-sa runs as deployeur, with no token mounted"
     tests:
       - test_d14_le_compte_deployeur_sans_jeton_monte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
   - id: d15-networkpolicy
     label: "Task 15: only front reaches interne"
     tests:
       - test_d15_seul_front_joint_interne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: d16a-endpoints-stock
     label: "Task 16: the Service stock has the stock Pods as endpoints, on the right port"
     tests:
       - test_d16a_le_service_stock_a_ses_endpoints
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: d16b-front-joint-stock
     label: "Task 16: front reaches stock by its name"
     tests:
       - test_d16b_front_joint_stock_par_son_nom
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: d17-ingress-infos
     label: "Task 17: the Ingress infos routes /infos"
     tests:
       - test_d17_l_ingress_infos_route
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/

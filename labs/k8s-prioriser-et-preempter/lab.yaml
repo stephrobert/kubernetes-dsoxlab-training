@@ -21,7 +21,7 @@ skills:
   - scheduling
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
 lab_type: lab
 estimated_time: 25m
 
@@ -45,28 +45,28 @@ criteria:
     tests:
       - test_les_deux_classes_existent
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
   - id: remplissage-basse
     label: "The Pods of remplissage run under the class basse"
     tests:
       - test_le_remplissage_tourne_sous_la_classe_basse
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
   - id: urgent-tourne
     label: "The Pod urgent runs on the full worker"
     tests:
       - test_le_pod_urgent_tourne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
   - id: preemption
     label: "A Pod of remplissage was preempted to make room for it"
     tests:
       - test_un_pod_de_basse_priorite_a_ete_preempte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
   - id: urgent-haute
     label: "The Pod urgent carries the class haute"
     tests:
       - test_le_pod_urgent_porte_la_classe_haute
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/

@@ -1,4 +1,5 @@
 title: "Vérifier et renouveler les certificats d'un cluster kubeadm"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
 description: |
   Lire l'échéance de chaque certificat d'un cluster kubeadm, renouveler ceux du
   plan de contrôle, les faire recharger par les composants, puis recopier
@@ -7,9 +8,17 @@ description: |
 criteria:
   - id: echeance-de-la-ca
     label: "La réponse donne la date d'échéance de l'autorité de certification du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: certificats-renouveles
     label: "Les certificats du plan de contrôle ont été renouvelés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: composants-recharges
     label: "Le controller-manager et le scheduler ont redémarré depuis le renouvellement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: kubeconfig-a-jour
     label: "Le kubeconfig de l'utilisateur porte le certificat d'administration renouvelé, et kubectl répond"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/

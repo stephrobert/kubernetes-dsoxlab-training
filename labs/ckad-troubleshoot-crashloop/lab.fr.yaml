@@ -1,4 +1,5 @@
 title: "Trois Pods en CrashLoopBackOff, trois causes"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
 description: |
   Trois Pods redémarrent en boucle pour trois raisons différentes : une
   commande qui n'existe pas, une variable d'environnement absente, une

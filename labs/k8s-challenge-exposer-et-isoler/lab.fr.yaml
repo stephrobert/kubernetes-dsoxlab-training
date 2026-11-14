@@ -1,4 +1,5 @@
 title: "Exposer une application et isoler ses flux"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
 description: |
   Sans guidage, routez deux applications par hôte et par chemin, réparez un
   Service hérité, rendez à un Pod client sa résolution de noms, puis isolez une
@@ -7,15 +8,33 @@ description: |
 criteria:
   - id: chemins-routes
     label: "Chaque chemin de comptoir.local atteint son application, et rien d'autre ne répond"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-prise-en-charge
     label: "La route vitrine est prise en charge par son contrôleur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: service-ancien
     label: "Le Service ancien atteint ses Pods sur le port où leur conteneur écoute"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: sonde-resout
     label: "Le Pod sonde résout le Service catalogue et le joint en HTTP"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: refus-par-defaut
     label: "Un refus par défaut vise le Pod base, et lui seul"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: seul-le-backend
     label: "Seul le backend joint la base ; le frontend et le Pod de voisinage sont refusés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: dns-ouvert
     label: "La base résout toujours des noms, et ne joint rien d'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/

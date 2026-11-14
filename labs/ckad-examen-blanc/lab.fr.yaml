@@ -1,4 +1,5 @@
 title: "Examen blanc CKAD : 17 tâches en 120 minutes"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
 description: |
   Un examen blanc chronométré au format de la CKAD : dix-sept tâches réparties
   comme les domaines officiels, sur un cluster kubeadm, chaque tâche sur l'hôte qu'elle désigne,
@@ -7,41 +8,79 @@ description: |
 criteria:
   - id: d01-cronjob-purge
     label: "Tâche 1 : le CronJob purge tourne toutes les dix minutes, deux succès gardés, sans chevauchement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: d02a-sidecar-partage
     label: "Tâche 2 : le sidecar lecteur partage un emptyDir avec app"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: d02b-sidecar-relit
     label: "Tâche 2 : le sidecar relit le journal écrit par app"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: d03-pvc-cache
     label: "Tâche 3 : le Pod stockage écrit dans la revendication cache"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
   - id: d04a-bascule-verte
     label: "Tâche 4 : le Service vitrine envoie vers les seuls Pods verts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: d04b-vert-en-1306
     label: "Tâche 4 : vitrine-vert fait tourner trois réplicas en 1.30.6"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: d05-rolling-update
     label: "Tâche 5 : catalogue est passé en 1.30.6 avec maxSurge 1 et maxUnavailable 0"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: d06-overlay-boutique
     label: "Tâche 6 : l'overlay de la boutique est appliqué"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: d07-sondes-api
     label: "Tâche 7 : api porte ses sondes de disponibilité et de vie, ses Pods prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: d08-pdb-policy-v1
     label: "Tâche 8 : le PodDisruptionBudget est réécrit en policy/v1 et appliqué"
   - id: d09-image-outil
     label: "Tâche 9 : le Pod outil tourne sur son image"
   - id: d10-configmap-fichier
     label: "Tâche 10 : la configuration arrive en fichier depuis une ConfigMap"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: d11-secret-variable
     label: "Tâche 11 : le jeton arrive en variable depuis un Secret"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: d12-pod-durci
     label: "Tâche 12 : le Pod durci tourne sans privilège, en lecture seule, sans capacités"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
   - id: d13-quota
     label: "Tâche 13 : le quota plafond est posé et le Pod mesure y tient"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
   - id: d14-serviceaccount
     label: "Tâche 14 : le Pod outil-sa tourne sous deployeur, sans jeton monté"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
   - id: d15-networkpolicy
     label: "Tâche 15 : seul front joint interne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: d16a-endpoints-stock
     label: "Tâche 16 : le Service stock a les Pods de stock pour endpoints, sur le bon port"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: d16b-front-joint-stock
     label: "Tâche 16 : front joint stock par son nom"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: d17-ingress-infos
     label: "Tâche 17 : l'Ingress infos route /infos"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/

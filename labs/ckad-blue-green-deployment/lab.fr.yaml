@@ -1,4 +1,5 @@
 title: "Basculer le trafic d'une version à l'autre : blue-green"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
 description: |
   Faire tourner deux versions d'une application côte à côte, et basculer tout
   le trafic de l'une à l'autre en changeant le selector d'un Service. Prouver
@@ -8,21 +9,41 @@ description: |
 criteria:
   - id: blue-tourne-en-deux-replicas
     label: "Le Deployment app-blue a ses 2 replicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: blue-porte-les-labels-de-version
     label: "Les Pods blue portent les labels app=myapp et version=blue"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: blue-sert-sa-version
     label: "Chaque Pod blue répond blue en HTTP sur le port 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: green-tourne-en-deux-replicas
     label: "Le Deployment app-green a ses 2 replicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: green-porte-les-labels-de-version
     label: "Les Pods green portent les labels app=myapp et version=green"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: green-sert-sa-version
     label: "Chaque Pod green répond green en HTTP sur le port 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: le-service-ecoute-sur-8080
     label: "Le Service app-prod écoute sur le port 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-selector-vise-la-version-green
     label: "Le selector de app-prod nomme app=myapp et version=green"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-endpoints-sont-exactement-les-pods-green
     label: "Les endpoints de app-prod sont exactement les Pods green prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: toutes-les-requetes-atteignent-green
     label: "Depuis le client, les six requêtes vers app-prod répondent green"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/

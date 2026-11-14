@@ -14,7 +14,7 @@ skills:
   - multi-container
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
 lab_type: lab
 estimated_time: 15m
 
@@ -43,22 +43,22 @@ criteria:
     tests:
       - test_multi_app_tourne_avec_ses_deux_conteneurs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: budget-de-web
     label: "web declares its requests and limits"
     tests:
       - test_web_a_son_budget
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: budget-de-logger
     label: "logger declares its requests and limits"
     tests:
       - test_logger_a_son_budget
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: limite-appliquee-par-le-noyau
     label: "The kernel enforces the memory limit of each container"
     tests:
       - test_le_noyau_applique_la_limite_de_memoire_de_chaque_conteneur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/

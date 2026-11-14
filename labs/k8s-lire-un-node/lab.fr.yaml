@@ -1,4 +1,5 @@
 title: "Lire ce que déclare un Node worker"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique
 description: |
   Sur le cluster kind multi-nœuds, consigner pour le worker
   architecture-worker2 son runtime de conteneurs, la version de son kubelet,
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-runtime-du-worker-est-consigne
     label: "Le runtime de conteneurs d'architecture-worker2 et sa version sont consignés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: la-version-du-kubelet-est-consignee
     label: "La version du kubelet d'architecture-worker2 est consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: la-capacite-du-worker-est-consignee
     label: "La capacité en CPU et en mémoire d'architecture-worker2 est consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: la-condition-ready-est-consignee
     label: "La condition Ready d'architecture-worker2 est consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/

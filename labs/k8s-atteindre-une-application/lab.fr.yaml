@@ -1,4 +1,5 @@
 title: "Atteindre une application : expose et port-forward"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/#mettre-en-pratique
 description: |
   Dans le namespace acces, exposez le Deployment echo par un Service sur le
   port 80 vers le port 8080 de ses Pods, vérifiez qu'il compte ses endpoints,
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-service-a-les-bons-ports
     label: "Le Service echo expose le port 80 vers le port 8080 des Pods echo"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
   - id: le-service-compte-ses-endpoints
     label: "Le Service echo compte les deux Pods echo prêts comme endpoints"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
   - id: le-tunnel-repond
     label: "Un tunnel port-forward vers le Service echo répond sur le port local 18080 pendant la vérification"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/
   - id: la-reponse-du-tunnel-est-consignee
     label: "Le Pod qui répond par ce tunnel est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/

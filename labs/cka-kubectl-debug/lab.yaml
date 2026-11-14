@@ -14,7 +14,7 @@ skills:
   - distroless
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
 lab_type: lab
 estimated_time: 10m
 
@@ -43,10 +43,10 @@ criteria:
     tests:
       - test_debugger_partage_les_processus_de_l_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: processus-vus-de-l-interieur
     label: "The process list written from debugger shows coredns"
     tests:
       - test_la_liste_des_processus_montre_coredns
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

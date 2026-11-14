@@ -1,4 +1,5 @@
 title: "Exposer un Deployment par un Service ClusterIP"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
 description: |
   Déployer trois replicas d'un serveur et les exposer par un Service
   interne. Prouver depuis un client que le Service répond par son nom, et
@@ -7,23 +8,47 @@ description: |
 criteria:
   - id: le-deployment-demande-trois-replicas
     label: "Le Deployment web demande trois replicas"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles
     label: "Les trois replicas de web sont disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-pods-portent-le-label-app-web
     label: "Les Pods de web portent le label app=web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-pods-tournent-avec-l-image-demandee
     label: "Les Pods de web tournent avec l'image busybox:1.38.0"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-service-est-de-type-clusterip
     label: "Le Service web-svc est de type ClusterIP"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-ecoute-sur-80-vers-8080
     label: "Le Service web-svc écoute sur 80 et vise le port 8080 des Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-selectionne-app-web
     label: "Le selector de web-svc vaut app=web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-a-trois-endpoints-prets
     label: "Le Service web-svc a exactement trois endpoints prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repond-sous-son-nom-depuis-le-client
     label: "http://web-svc/ répond depuis le Pod client"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: chaque-pod-repond-son-propre-nom
     label: "Chaque Pod sert son propre nom d'hôte, comparé à la liste réelle des Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repartit-entre-plusieurs-pods
     label: "Sur dix requêtes, au moins deux Pods différents répondent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/

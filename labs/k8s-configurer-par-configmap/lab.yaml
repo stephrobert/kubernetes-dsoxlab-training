@@ -24,7 +24,7 @@ skills:
   - kubectl-rollout-restart
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
 lab_type: lab
 estimated_time: 20m
 
@@ -48,22 +48,22 @@ criteria:
     tests:
       - test_les_variables_viennent_du_configmap_app_config
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-fichier-vient-du-volume
     label: "app.properties comes from the app-fichier ConfigMap through a volume, up to date inside the Pod"
     tests:
       - test_le_fichier_monte_depuis_app_fichier_est_a_jour
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-redemarrage-rafraichit-les-variables
     label: "After the change, the Deployment was restarted and the variables carry the new value"
     tests:
       - test_le_rollout_restart_a_rafraichi_les_variables
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: aucune-valeur-en-dur
     label: "No value is written directly in the Deployment"
     tests:
       - test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/

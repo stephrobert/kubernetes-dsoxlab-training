@@ -21,7 +21,7 @@ skills:
   - calico
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
 lab_type: lab
 estimated_time: 30m
 
@@ -53,36 +53,36 @@ criteria:
     tests:
       - test_les_plages_du_cluster_sont_consignees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: adresse-cible
     label: "The current address of the Pod cible is recorded"
     tests:
       - test_l_adresse_de_cible_est_consignee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: worker-ready
     label: "The worker is Ready again"
     tests:
       - test_le_worker_est_ready
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: cible-sur-le-worker
     label: "cible runs on the worker"
     tests:
       - test_cible_tourne_sur_le_worker
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: d-un-noeud-a-l-autre
     label: "sonde, on the control plane, reaches cible on the worker"
     tests:
       - test_sonde_joint_cible_depuis_l_autre_noeud
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: refus-ou-delai
     label: "The immediate refusal and the timeout are told apart"
     tests:
       - test_le_refus_et_le_delai_sont_distingues
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
 
 feedback: full

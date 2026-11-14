@@ -1,4 +1,5 @@
 title: "Tout interdire, puis rouvrir le strict nécessaire, DNS compris"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
 description: |
   Un namespace où tout parle à tout. Fermez-le entièrement dans les deux
   directions, puis rouvrez exactement deux choses : le seul flux dont

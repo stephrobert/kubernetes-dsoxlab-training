@@ -24,7 +24,7 @@ skills:
   - tls
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/
 lab_type: lab
 estimated_time: 25m
 
@@ -48,16 +48,16 @@ criteria:
     tests:
       - test_le_membre_et_sa_sante_sont_ceux_d_etcd
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/
   - id: quota
     label: "The answer gives the space quota etcd actually applies"
     tests:
       - test_le_quota_est_celui_qu_etcd_applique
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/
   - id: defragmentation
     label: "The etcd database has been defragmented: it gave back the space the setup freed"
     tests:
       - test_la_base_a_ete_defragmentee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/

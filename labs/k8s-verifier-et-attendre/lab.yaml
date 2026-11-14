@@ -18,7 +18,7 @@ skills:
   - deployment-script
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
 lab_type: lab
 estimated_time: 25m
 
@@ -42,22 +42,22 @@ criteria:
     tests:
       - test_le_cluster_correspond_au_dossier
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
   - id: codes-de-diff
     label: "The record gives the three exit codes of kubectl diff"
     tests:
       - test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
   - id: nouvelle-version-en-place
     label: "Every Pod runs version 2 and the migration is complete"
     tests:
       - test_la_version_2_tourne_et_la_migration_est_terminee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
   - id: script-qui-sait-s-arreter
     label: "deployer.sh exits in 0 without differences, and stops on error before applying"
     tests:
       - test_deployer_sh_sait_s_arreter
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/

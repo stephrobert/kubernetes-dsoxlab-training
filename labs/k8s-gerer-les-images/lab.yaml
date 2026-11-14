@@ -21,7 +21,7 @@ skills:
   - serviceaccount
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
 lab_type: lab
 estimated_time: 30m
 
@@ -45,16 +45,16 @@ criteria:
     tests:
       - test_affiche_est_figee_par_le_digest_qu_elle_faisait_tourner
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
   - id: cause-du-pull-consignee
     label: "The cause of the refused pull is recorded before the repair"
     tests:
       - test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
   - id: registre-prive-par-serviceaccount
     label: "vignettes pulls its private image thanks to its ServiceAccount"
     tests:
       - test_vignettes_tire_son_image_grace_a_son_serviceaccount
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/

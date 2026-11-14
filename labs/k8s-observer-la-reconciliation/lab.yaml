@@ -22,7 +22,7 @@ skills:
   - reconciliation
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
 lab_type: lab
 estimated_time: 20m
 
@@ -47,22 +47,22 @@ criteria:
     tests:
       - test_le_pod_supprime_a_ete_recree_par_son_replicaset
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
   - id: le-replicaset-supprime-est-remplace
     label: "The deleted ReplicaSet was replaced and vitrine is back to three available replicas"
     tests:
       - test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
   - id: le-controleur-du-pod-est-consigne
     label: "The controller that recreated the Pod is recorded"
     tests:
       - test_le_controleur_qui_recree_le_pod_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
   - id: le-controleur-du-replicaset-est-consigne
     label: "The controller that recreated the ReplicaSet is recorded"
     tests:
       - test_le_controleur_qui_recree_le_replicaset_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/

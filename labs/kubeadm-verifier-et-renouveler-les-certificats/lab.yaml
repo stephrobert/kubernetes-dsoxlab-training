@@ -28,7 +28,7 @@ skills:
   - certificates
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
 lab_type: lab
 estimated_time: 30m
 
@@ -52,22 +52,22 @@ criteria:
     tests:
       - test_l_echeance_de_la_ca_est_la_bonne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: certificats-renouveles
     label: "The control plane certificates have been renewed"
     tests:
       - test_les_certificats_du_plan_de_controle_sont_renouveles
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: composants-recharges
     label: "The controller manager and the scheduler have restarted since the renewal"
     tests:
       - test_le_controller_manager_et_le_scheduler_ont_redemarre
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: kubeconfig-a-jour
     label: "The user's kubeconfig carries the renewed admin certificate, and kubectl answers"
     tests:
       - test_le_kubeconfig_porte_le_nouveau_certificat_et_kubectl_repond
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/

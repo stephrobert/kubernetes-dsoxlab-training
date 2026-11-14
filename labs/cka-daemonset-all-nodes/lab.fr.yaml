@@ -1,4 +1,5 @@
 title: "Un agent sur chaque nœud, control plane compris"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/#mettre-en-pratique
 description: |
   Déployer un DaemonSet qui pose un agent sur tous les nœuds du cluster, y
   compris le control plane, protégé par son taint. Les tests comptent un Pod
@@ -8,11 +9,22 @@ description: |
 criteria:
   - id: image-demandee
     label: "Le DaemonSet monitor-agent fait tourner l'image demandée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: label-app-monitor
     label: "Ses Pods portent le label app: monitor"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: un-pod-par-noeud
     label: "Un Pod prêt sur chaque nœud, control plane compris"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: taint-tolere
     label: "Le taint du control plane est toujours là, et l'agent le tolère"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
   - id: heartbeat
     label: "Chaque agent écrit heartbeat dans ses logs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/

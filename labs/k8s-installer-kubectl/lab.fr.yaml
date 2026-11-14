@@ -1,4 +1,5 @@
 title: "Installer et configurer kubectl"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique
 description: |
   Téléchargez le binaire officiel de kubectl en version 1.37 épinglée, vérifiez
   son empreinte contre celle qui est publiée, installez-le dans /usr/local/bin,
@@ -8,13 +9,25 @@ description: |
 criteria:
   - id: installe-pour-tout-le-systeme
     label: "kubectl est installé dans /usr/local/bin, appartient à root, et le PATH le trouve en premier"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
   - id: version-1-37
     label: "Le client kubectl est en version 1.37"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
   - id: empreinte-officielle
     label: "Le binaire installé a l'empreinte officielle de sa version"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
   - id: completion-active
     label: "La complétion bash de kubectl est active dans chaque nouveau shell"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
   - id: alias-k
     label: "L'alias k lance kubectl et se complète comme lui"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/
   - id: atteint-le-serveur
     label: "kubectl atteint le serveur du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/

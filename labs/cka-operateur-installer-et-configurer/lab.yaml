@@ -25,7 +25,7 @@ skills:
   - image-pinning
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
 lab_type: lab
 estimated_time: 40m
 
@@ -57,36 +57,36 @@ criteria:
     tests:
       - test_la_crd_mongodbcommunity_est_etablie
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: operateur-disponible
     label: "The operator is available, on its image pinned by digest"
     tests:
       - test_l_operateur_est_disponible_sur_son_image_epinglee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: ressource-running
     label: "The resource registre is in phase Running"
     tests:
       - test_registre_est_running
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: objets-possedes
     label: "The StatefulSet and the Service belong to registre"
     tests:
       - test_le_statefulset_et_le_service_appartiennent_a_registre
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: serveur-epingle
     label: "mongod runs on the server image pinned by digest"
     tests:
       - test_mongod_tourne_sur_le_serveur_epingle
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: reglage-applique
     label: "mongod starts with the 250 ms threshold set through the resource"
     tests:
       - test_mongod_demarre_avec_un_seuil_de_250_ms
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
 
 feedback: full

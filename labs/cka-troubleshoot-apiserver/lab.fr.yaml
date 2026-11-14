@@ -1,4 +1,5 @@
 title: "Remettre l'API server en service"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique
 description: |
   kubectl ne répond plus : l'API server du control plane sort en erreur au
   démarrage. Sans API, diagnostiquer sur le nœud, dans les conteneurs et les
@@ -8,7 +9,13 @@ description: |
 criteria:
   - id: l-api-repond
     label: "L'API server répond de nouveau"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-pod-statique-de-l-api-tourne
     label: "Le Pod statique kube-apiserver est Running"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-manifeste-est-sain-et-autorise
     label: "Le manifeste est réparé et déclare toujours l'autorisation Node,RBAC"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/

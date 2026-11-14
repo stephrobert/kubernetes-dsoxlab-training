@@ -10,6 +10,14 @@ projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Modifié
 
+- **Chaque langue renvoie à sa leçon** (dsoxlab 0.9.3). `lab.yaml` porte
+  désormais la page anglaise du site et `lab.fr.yaml` la page française, pour
+  `doc_url` comme pour `criteria[].lessons` : 96 `doc_url` et 436 critères
+  passent en anglais. Les 15 labs dont la page n'a pas de version anglaise
+  gardent leur `doc_url` français, de même que 23 leçons. La table anglaise du
+  README renvoie aux leçons anglaises, la table française aux françaises. La CI
+  exige `dsoxlab>=0.9.3`, qui lit ces clés dans `lab.fr.yaml`.
+
 - Le README ne recopie plus la documentation du moteur dsoxlab (contrat, cycle
   de vie d'un lab) : il renvoie aux pages où le moteur se documente lui-même
   (dsoxlab#201). Le CONTRIBUTING ne dit plus que le moteur n'a aucun point

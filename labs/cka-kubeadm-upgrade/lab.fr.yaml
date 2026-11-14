@@ -1,4 +1,5 @@
 title: "Monter un cluster d'une version mineure, sans interrompre ce qui tourne"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
 description: |
   Un cluster en retard d'une version mineure, une application qui doit continuer
   à servir, et la montée à conduire : le plan de contrôle d'abord, le nœud

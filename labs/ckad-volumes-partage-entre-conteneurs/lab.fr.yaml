@@ -1,4 +1,5 @@
 title: "Faire lire à un conteneur ce qu'un autre écrit, et pas le reste"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/#mettre-en-pratique
 description: |
   Deux conteneurs dans un Pod, l'un qui écrit et l'autre qui lit, et rien de
   partagé entre eux. Donnez-leur un volume dont la durée de vie est celle du
@@ -8,7 +9,13 @@ description: |
 criteria:
   - id: volume-ephemere-commun
     label: "Un volume éphémère est monté au même chemin dans les deux conteneurs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
   - id: le-lecteur-voit
     label: "Le lecteur voit le fichier du producteur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
   - id: le-reste-reste-invisible
     label: "Ce qui est écrit hors du volume reste invisible au lecteur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/

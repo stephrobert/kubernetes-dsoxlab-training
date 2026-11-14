@@ -1,4 +1,5 @@
 title: "Corriger un Dockerfile que l'analyse statique refuse, sans changer l'application"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
 description: |
   Un Dockerfile qui construit et qui tourne, et que l'analyse statique refuse
   sur cinq points. Corrigez-les tous sans changer ce que fait l'image, et

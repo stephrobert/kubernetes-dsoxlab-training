@@ -1,4 +1,5 @@
 title: "Un sidecar natif qui suit les logs de l'application"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
 description: |
   Faire lire par un second conteneur les logs qu'une application écrit dans
   un fichier, avec un sidecar natif, déclaré comme init container à
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: sidecar-natif
     label: "log-shipper est un sidecar natif"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: volume-partage
     label: "Le volume logs est partagé par les deux conteneurs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: application-ecrit
     label: "app écrit dans le fichier partagé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: sidecar-transmet
     label: "Le sidecar transmet les lignes de l'application"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/

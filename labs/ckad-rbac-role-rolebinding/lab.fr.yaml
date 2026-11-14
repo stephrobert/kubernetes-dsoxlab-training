@@ -1,4 +1,5 @@
 title: "Donner un accès en lecture seule aux Pods avec RBAC"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
 description: |
   Permettre à une utilisatrice de lire les Pods d'un namespace et leurs logs,
   et rien de plus : ni créer, ni supprimer, ni voir les autres namespaces.

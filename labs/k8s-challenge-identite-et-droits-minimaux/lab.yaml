@@ -33,7 +33,7 @@ skills:
   - least-privilege
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -62,34 +62,34 @@ criteria:
     tests:
       - test_collecte_tourne_sous_sa_propre_identite
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
   - id: journaux-de-production
     label: "From its Pod, with its own token, collecte reads the logs of the Pods of production"
     tests:
       - test_collecte_lit_les_journaux_de_production
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: rien-de-plus
     label: "The identity collecte holds no other right, anywhere: nothing more in production, nothing elsewhere, nothing on the cluster"
     tests:
       - test_collecte_n_a_aucun_autre_droit
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: jeton-coupe
     label: "The running Pod of tableau, which never calls the API, carries no token"
     tests:
       - test_tableau_ne_porte_aucun_jeton
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
   - id: compte-par-defaut
     label: "The default account of observatoire keeps no right, anywhere, beyond what every account receives"
     tests:
       - test_le_compte_par_defaut_n_a_plus_aucun_droit
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: collecte-durcie
     label: "The Pod of collecte runs non-root under a numeric UID, without privilege escalation, with a read-only root and no capability, and still reads the logs"
     tests:
       - test_collecte_est_durcie_et_travaille
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/

@@ -1,4 +1,5 @@
 title: "Sortir un Deployment du CrashLoopBackOff"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
 description: |
   Les Pods d'un Deployment redémarrent en boucle depuis la dernière livraison.
   Lire ce que le processus a dit avant de mourir, comprendre ce qui lui

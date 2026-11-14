@@ -1,4 +1,5 @@
 title: "Plafonner un namespace sans bloquer ceux qui oublient de se déclarer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
 description: |
   Un namespace sans plafond ni valeurs par défaut : une équipe peut prendre tout
   le cluster, et un Pod sans `requests` est placé à l'aveugle. Posez les deux, et

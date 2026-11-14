@@ -1,4 +1,5 @@
 title: "Réserver un nœud : taint, tolérance et nodeSelector"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
 description: |
   Réserver le worker à la production par un taint et un label, puis placer
   un Pod qui doit y aller, tolérance et nodeSelector, et un Pod qui ne doit

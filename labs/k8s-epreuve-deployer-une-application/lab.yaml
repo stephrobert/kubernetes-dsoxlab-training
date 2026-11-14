@@ -36,7 +36,7 @@ skills:
   - crd
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/deployer-une-application/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-deploy-an-application/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -69,60 +69,60 @@ criteria:
     tests:
       - test_p01_livree_depuis_une_base_et_un_overlay_sans_ecart
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
   - id: p02-vitrine-disponible
     label: "P02 (critical): the storefront has all its replicas available on the image by digest, and no Pod of the magasin space restarted"
     tests:
       - test_p02_vitrine_disponible_sur_le_digest_sans_redemarrage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
   - id: p03-ressources-et-sondes
     label: "P03: every container of the storefront, preparation step and companion included, is budgeted, and the three probes are on its port"
     tests:
       - test_p03_ressources_et_trois_sondes_declarees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: p04-init-et-sidecar
     label: "P04: a preparation step completes, and a companion ready before the server, active next to it for the whole life of the Pod, passes on the lines of the shared volume"
     tests:
       - test_p04_init_container_et_sidecar_relaient_le_volume_partage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: p05-identite-stable
     label: "P05 (critical): the database has a stable identity, its replicas are created in order and all ready, each with its own reserved volume"
     tests:
       - test_p05_base_a_identite_stable_avec_une_revendication_par_replica
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: p06-donnee-survit
     label: "P06 (critical): data written by the grader survives the deletion of its Pod"
     tests:
       - test_p06_la_donnee_du_correcteur_survit_a_son_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: p07-volumes-retain
     label: "P07 (critical): the database volumes are created on demand by the storage class, and kept when their claim goes away"
     tests:
       - test_p07_volumes_crees_par_la_classe_en_retain
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: p08-sauvegarde
     label: "P08: the backup is scheduled, and a run started by hand completed and wrote on its volume"
     tests:
       - test_p08_sauvegarde_planifiee_et_lancee_a_la_main
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
   - id: p09-agent-partout
     label: "P09: the agent runs on every node, control plane included, taint kept"
     tests:
       - test_p09_agent_sur_chaque_noeud_taint_garde
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: p10-ressource-personnalisee
     label: "P10: the requested custom resource exists with its values, and an out-of-bounds value is refused"
     tests:
       - test_p10_ressource_personnalisee_conforme_et_borne_refusee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/

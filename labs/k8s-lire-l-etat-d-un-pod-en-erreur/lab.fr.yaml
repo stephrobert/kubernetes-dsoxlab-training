@@ -1,4 +1,5 @@
 title: "Lire l'état d'un Pod en erreur"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
 description: |
   Deux applications refusent de démarrer dans le namespace diagnostic. Dites
   pourquoi, preuves lues dans le cluster, sans rien réparer : la raison pour
@@ -9,11 +10,21 @@ description: |
 criteria:
   - id: la-cause-de-api-est-consignee
     label: "api.txt nomme pourquoi le conteneur de api attend, et l'image fautive"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
   - id: l-erreur-de-batch-est-consignee
     label: "batch.txt cite l'erreur écrite par l'exécution précédente de batch"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
   - id: le-code-de-sortie-de-batch-est-consigne
     label: "batch.txt donne le code de sortie du dernier conteneur terminé de batch"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
   - id: le-pod-le-plus-gourmand-est-consigne
     label: "top.txt nomme le Pod du namespace qui consomme le plus de mémoire"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
   - id: rien-n-a-ete-repare
     label: "Rien n'a été réparé : api et batch gardent leur image et leur commande d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/

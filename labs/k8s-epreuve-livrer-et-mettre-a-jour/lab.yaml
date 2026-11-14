@@ -41,7 +41,7 @@ skills:
   - troubleshooting
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-et-mettre-a-jour/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-and-update-an-application/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -74,42 +74,42 @@ criteria:
     tests:
       - test_c1_trois_exemplaires_disponibles_en_version_2
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: c2-une-adresse-stable
     label: "C2 (critical): the storefront answers at a stable address in the cluster, served by its three copies"
     tests:
       - test_c2_une_adresse_stable_servie_par_les_trois_exemplaires
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: c3-configuration-hors-de-l-image
     label: "C3 (critical): the configuration and the password live outside the image and outside the storefront's description, the password handled as sensitive data"
     tests:
       - test_c3_configuration_et_mot_de_passe_hors_de_l_image_et_du_manifeste
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: c4-une-revision-de-retour
     label: "C4 (critical): an update keeps a way back to version 1"
     tests:
       - test_c4_une_revision_de_retour_sur_la_version_1
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: c5-aucune-coupure
     label: "C5: an update never leaves the storefront short of an available copy"
     tests:
       - test_c5_une_mise_a_jour_ne_prive_d_aucun_exemplaire
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: c6-son-propre-espace
     label: "C6: the application lives in its own space, and nothing of it is left in the default one"
     tests:
       - test_c6_l_application_vit_dans_son_propre_espace
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
   - id: c7-stock-repare-cause-consignee
     label: "C7 (critical): the stock component runs again, and the cause of its failure was recorded before the repair"
     tests:
       - test_c7_stock_tourne_et_sa_cause_a_ete_consignee_avant
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/

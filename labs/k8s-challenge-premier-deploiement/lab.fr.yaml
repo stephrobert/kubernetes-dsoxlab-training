@@ -1,4 +1,5 @@
 title: "Livrer la vitrine et remettre le stock en marche"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/
 description: |
   Sur un cluster kind, régler kubectl sur le bon cluster et le bon namespace,
   livrer la vitrine à trois réplicas derrière un Service qui répond, consigner
@@ -8,15 +9,29 @@ description: |
 criteria:
   - id: le-contexte-vise-la-boutique-et-la-vitrine
     label: "Le contexte actif est kind-boutique et son namespace par défaut est vitrine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
   - id: la-vitrine-a-trois-replicas-disponibles
     label: "Le Deployment vitrine a trois réplicas disponibles sur l'image demandée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: le-service-compte-trois-endpoints-prets
     label: "Le Service vitrine compte trois endpoints prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: la-vitrine-repond
     label: "La vitrine répond en HTTP 200 depuis un Pod du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: la-cause-de-stock-est-consignee-avant-reparation
     label: "cause-stock.txt nomme la raison et l'image fautive, écrit avant la réparation"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
   - id: stock-est-repare-par-son-manifeste
     label: "stock tourne sur l'image corrigée, posée dans stock.yaml et appliquée avec kubectl apply"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
   - id: le-kubeconfig-est-protege
     label: "~/.kube/boutique.yaml n'est lisible que par son propriétaire (droits 600)"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/

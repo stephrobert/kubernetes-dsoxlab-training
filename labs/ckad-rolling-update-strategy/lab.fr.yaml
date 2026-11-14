@@ -1,4 +1,5 @@
 title: "Régler une mise à jour progressive : maxSurge et maxUnavailable"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/#mettre-en-pratique
 description: |
   Un Deployment réglé en Recreate doit passer au remplacement progressif :
   jamais plus de deux Pods en trop ni plus d'un indisponible. Puis
@@ -8,17 +9,35 @@ description: |
 criteria:
   - id: la-strategie-est-rollingupdate
     label: "Le Deployment webapp utilise la stratégie RollingUpdate"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: maxsurge-vaut-deux
     label: "maxSurge vaut 2 : au plus deux Pods en trop pendant la bascule"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: maxunavailable-vaut-un
     label: "maxUnavailable vaut 1 : au plus un Pod indisponible à la fois"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: l-image-est-la-nouvelle
     label: "L'image du Deployment est passée à nginx:1.30.6"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: les-cinq-replicas-sont-prets-sur-la-nouvelle-image
     label: "Les cinq replicas sont prêts, à jour et sur la nouvelle image"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: deux-revisions-existent
     label: "Deux révisions de webapp existent, la nouvelle image venant après l'ancienne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-nouveau-replicaset-porte-cinq-replicas
     label: "Le ReplicaSet de la nouvelle image porte cinq replicas prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: les-anciens-replicasets-sont-a-zero
     label: "Les anciens ReplicaSets sont conservés à zéro"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/

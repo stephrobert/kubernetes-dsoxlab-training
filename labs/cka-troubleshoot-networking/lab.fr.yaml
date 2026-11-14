@@ -1,4 +1,5 @@
 title: "Réparer le réseau des Pods d'un nœud et lire ce que dit le réseau"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/#mettre-en-pratique
 description: |
   Un worker a perdu le réseau de ses Pods : le nœud est NotReady et un Pod reste
   en ContainerCreating. Consignez les plages d'adresses du cluster, réparez le
@@ -8,13 +9,25 @@ description: |
 criteria:
   - id: plages
     label: "Les plages des Pods et des Services du cluster sont consignées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: adresse-cible
     label: "L'adresse actuelle du Pod cible est consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: worker-ready
     label: "Le worker est de nouveau Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: cible-sur-le-worker
     label: "cible tourne sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: d-un-noeud-a-l-autre
     label: "sonde, sur le control plane, joint cible sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: refus-ou-delai
     label: "Le refus immédiat et le délai dépassé sont distingués"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
