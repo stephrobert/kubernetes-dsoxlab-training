@@ -1,0 +1,122 @@
+# Le challenge du module Politiques d'admission (niveau 5). C'est la preuve
+# sans procédure du module : il croise quatre labs guidés, chacun déjà
+# attesté, sur le cluster kubeadm.
+#
+#   - cks-pod-security-admission : le standard restricted sur un namespace,
+#     un Pod conforme, et le refus lu par deux soumissions réelles ;
+#   - cks-secure-existing-pod : un Pod privilégié à reconstruire sans aucun de
+#     ses défauts, l'original retiré ;
+#   - cks-validating-admission-policy et cks-image-pinned-digest : une
+#     politique native qui refuse une image désignée par un tag.
+#
+# Ce que le challenge ajoute : les trois règles vivent côte à côte, chacune
+# dans son namespace, et aucune ne doit déborder sur les autres. L'état 10
+# l'exige explicitement, avec un namespace témoin où une image par tag doit
+# toujours passer.
+#
+# Dix états, à poids égal. Les états 4 et 10 bloquent : ce sont les deux
+# refus prouvés par de vraies soumissions, la raison d'être du module.
+id: k8s-challenge-faire-refuser-par-admission
+title: "Enforce an admission rule and prove the refusal, without guidance"
+level: minimize-vulnerabilities
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, make the cluster refuse what breaks a security rule: the
+  restricted Pod Security Standard on one namespace, a privileged Pod rebuilt
+  without any of its flaws on another, and a native admission policy that
+  refuses images designated by a tag on a third, without touching the rest.
+skills:
+  - pod-security-admission
+  - security-context
+  - validating-admission-policy
+  - cel
+  - image-digest
+  - admission-control
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/vap-vs-kyverno-gatekeeper/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_l_admission_refuse_l_interdit_et_accepte_le_conforme
+  - test_le_tag_est_refuse_le_digest_passe_et_les_autres_namespaces_non_touches
+estimated_time: 45m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: standard-restricted
+    label: "The vitrine namespace declares the restricted standard in all three modes: enforce, warn and audit"
+    tests:
+      - test_vitrine_declare_restricted_dans_les_trois_modes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: pod-conforme-tourne
+    label: "The compliant Pod catalogue runs in vitrine"
+    tests:
+      - test_le_pod_catalogue_tourne_dans_vitrine
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: quatre-exigences
+    label: "The Pod catalogue meets the four requirements: non-root, no privilege escalation, capabilities dropped, a seccomp profile"
+    tests:
+      - test_le_pod_catalogue_satisfait_les_quatre_exigences
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: admission-qui-trie
+    label: "Admission refuses a Pod that breaks the standard and accepts a compliant one, read from two real submissions"
+    tests:
+      - test_l_admission_refuse_l_interdit_et_accepte_le_conforme
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/
+  - id: remplacant-tourne
+    label: "The Pod caisse-durcie, which replaces the privileged Pod, runs"
+    tests:
+      - test_le_pod_de_remplacement_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: aucun-defaut-garde
+    label: "The new Pod keeps none of the flaws found in the original"
+    tests:
+      - test_le_pod_de_remplacement_ne_garde_aucun_defaut
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: original-retire
+    label: "The original privileged Pod caisse no longer exists"
+    tests:
+      - test_le_pod_privilegie_d_origine_n_existe_plus
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: processus-de-l-hote
+    label: "The new Pod's container no longer sees the host's processes and does not run as root"
+    tests:
+      - test_le_conteneur_ne_voit_plus_les_processus_de_l_hote
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: politique-en-refus
+    label: "A native admission policy is bound in deny mode, not only in warning"
+    tests:
+      - test_une_politique_native_est_liee_en_mode_refus
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+  - id: tag-refuse-digest-accepte
+    label: "In production a Pod whose image is a tag is refused, a Pod pinned by digest is accepted, and other namespaces are untouched"
+    tests:
+      - test_le_tag_est_refuse_le_digest_passe_et_les_autres_namespaces_non_touches
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/vap-vs-kyverno-gatekeeper/

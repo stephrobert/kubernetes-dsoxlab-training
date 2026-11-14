@@ -1,0 +1,23 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, le Job kube-bench
+# déposé sur le nœud, puis la situation du challenge (fixtures/prepare.sh),
+# fausse sur les sept états par construction.
+- name: Préparer le challenge k8s-challenge-durcir-le-plan-de-controle
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Déposer le Job kube-bench sur le nœud
+      ansible.builtin.copy:
+        src: fixtures/kube-bench-job.yaml
+        dest: /root/kube-bench-job.yaml
+        mode: "0644"
+
+    - name: Restaurer le plan de contrôle, mesurer l'audit CIS de départ
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

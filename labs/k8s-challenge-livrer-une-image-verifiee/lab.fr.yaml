@@ -1,0 +1,41 @@
+title: "Ne laisser entrer que des images vérifiées, sans guidage"
+description: |
+  Sans procédure, épingler un Deployment sur son digest, débarrasser un
+  Dockerfile des constats de l'analyse statique, signer une image et publier
+  sa clé publique, remplacer une image vulnérable par une image qu'un nouveau
+  scan prouve moins exposée, et faire refuser par le cluster, dès la
+  création, toute image dont la signature ne se vérifie pas.
+
+criteria:
+  - id: reference-par-digest
+    label: "Le Deployment vitrine référence son image par son digest, et non par un tag"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: meme-image
+    label: "C'est toujours l'image demandée, nginx:1.27-alpine, et pas une autre version"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: digest-execute
+    label: "Le digest déclaré est celui que le nœud exécute, et les deux réplicas tournent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: dockerfile-sans-constat
+    label: "Les constats de l'analyse statique du Dockerfile ont disparu, et l'application fait toujours la même chose"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+  - id: cle-publiee
+    label: "La clé publique est publiée dans le cluster, dans le ConfigMap cosign-pub-key, sous la clé cosign.pub"
+  - id: signature-poussee
+    label: "La signature de l'image est poussée dans le registre, à côté de l'image"
+  - id: cle-qui-trie
+    label: "La clé publiée accepte l'image signée et refuse l'autre"
+  - id: image-remplacee
+    label: "Le Deployment boutique ne tourne plus sur son image d'origine"
+  - id: moins-de-failles
+    label: "La nouvelle image porte strictement moins de failles critiques que l'ancienne, mesuré par un nouveau scan"
+  - id: admission-signee
+    label: "Le cluster refuse à la création un Pod dont l'image n'est pas signée, et accepte l'image signée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
