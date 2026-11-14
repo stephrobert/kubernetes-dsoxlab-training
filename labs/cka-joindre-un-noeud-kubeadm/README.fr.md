@@ -3,7 +3,7 @@
 Lab guidé de la leçon « Joindre un nœud », module Installer un cluster du niveau
 4 : préparer un worker réinitialisé (swap, pilote de cgroup de containerd,
 paquets figés), le joindre avec la commande du plan de contrôle, vérifier qu'il
-est Ready avec le bon kubelet, puis y forcer un Pod. Le nettoyage rend le
+est Ready avec le bon kubelet, puis y faire tourner un Pod. Le nettoyage rend le
 worker au cluster, quel que soit l'état laissé.
 
 | | |

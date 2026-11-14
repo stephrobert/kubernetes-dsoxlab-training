@@ -114,7 +114,7 @@ def test_les_paquets_sont_figes(w1):
     )
 
 
-def test_un_pod_force_sur_le_worker_tourne(cp):
+def test_un_pod_tourne_sur_le_worker(cp):
     res = cp.run(f"{KUBECTL} -n jonction get pods -o json")
     pods = json.loads(res.stdout).get("items", []) if res.rc == 0 else []
     sur_le_worker = [p for p in pods if p["spec"].get("nodeName") == WORKER]

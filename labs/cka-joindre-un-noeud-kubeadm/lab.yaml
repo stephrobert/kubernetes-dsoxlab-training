@@ -2,7 +2,7 @@
 # un cluster du niveau 4 (règle 17). Le geste : préparer un worker réinitialisé
 # (swap coupé durablement, containerd sur le pilote de cgroup systemd, paquets
 # figés), le joindre au cluster avec la commande que donne le plan de contrôle,
-# vérifier qu'il est Ready avec le kubelet attendu, puis y forcer un Pod.
+# vérifier qu'il est Ready avec le kubelet attendu, puis y faire tourner un Pod.
 #
 # Le setup retire k8s-w1.lab du cluster, le réinitialise (kubeadm reset) et
 # défait sa préparation : swap actif et inscrit dans fstab, containerd revenu
@@ -17,7 +17,7 @@ description: |
   Prepare a reset worker for Kubernetes 1.37 (swap off for good, containerd on
   the systemd cgroup driver, packages held), join it to the cluster with the
   command the control plane issues, check that it is Ready with the expected
-  kubelet, then prove it runs workloads with a Pod forced onto it.
+  kubelet, then prove it runs workloads with a Pod running on it.
 skills:
   - kubeadm
   - kubelet
@@ -78,8 +78,8 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: pod-sur-le-worker
-    label: "A Pod forced onto the worker runs there"
+    label: "A Pod runs on the worker"
     tests:
-      - test_un_pod_force_sur_le_worker_tourne
+      - test_un_pod_tourne_sur_le_worker
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/

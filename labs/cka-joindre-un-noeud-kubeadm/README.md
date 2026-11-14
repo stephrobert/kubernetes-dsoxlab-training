@@ -3,7 +3,7 @@
 Guided lab of the lesson « Join a node », module Install a cluster of level 4:
 prepare a reset worker (swap, containerd's cgroup driver, held packages), join
 it with the control plane's command, check that it is Ready with the right
-kubelet, then force a Pod onto it. The cleanup gives the worker back to the
+kubelet, then run a Pod on it. The cleanup gives the worker back to the
 cluster, whatever state is left.
 
 | | |

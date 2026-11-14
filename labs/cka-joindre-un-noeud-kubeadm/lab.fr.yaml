@@ -18,4 +18,4 @@ criteria:
   - id: paquets-figes
     label: "kubeadm, kubelet et kubectl sont figés"
   - id: pod-sur-le-worker
-    label: "Un Pod forcé sur le worker y tourne"
+    label: "Un Pod tourne sur le worker"
