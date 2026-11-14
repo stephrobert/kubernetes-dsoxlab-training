@@ -4367,6 +4367,67 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-contenir-une-attaque": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_l_application_legitime_a_tous_ses_replicas",
+    "test_la_persistance_est_supprimee_et_l_acces_ne_revient_pas",
+    "test_le_constat_nomme_l_objet_de_persistance",
+    "test_le_namespace_de_la_charge_porte_un_resourcequota",
+    "test_un_limitrange_donne_des_valeurs_par_defaut",
+    "test_une_application_d_un_autre_namespace_repond_pendant_la_charge",
+    "test_une_creation_hors_quota_est_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 844,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-contenir-une-attaque.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_application_legitime_a_tous_ses_replicas",
+    "test_la_persistance_est_supprimee_et_l_acces_ne_revient_pas",
+    "test_le_constat_nomme_l_objet_de_persistance",
+    "test_le_namespace_de_la_charge_porte_un_resourcequota",
+    "test_un_limitrange_donne_des_valeurs_par_defaut",
+    "test_une_application_d_un_autre_namespace_repond_pendant_la_charge",
+    "test_une_creation_hors_quota_est_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-donnees-qui-survivent": {
   "apres": {
    "echecs": [],
@@ -4959,6 +5020,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-contenir-un-deni-de-service": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_l_application_d_un_autre_namespace_repond_pendant_la_charge",
+    "test_la_charge_abusive_est_bornee",
+    "test_le_namespace_porte_un_resourcequota",
+    "test_un_conteneur_sans_limites_recoit_les_valeurs_par_defaut",
+    "test_une_creation_hors_quota_est_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 410,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-contenir-un-deni-de-service.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_application_d_un_autre_namespace_repond_pendant_la_charge",
+    "test_la_charge_abusive_est_bornee",
+    "test_le_namespace_porte_un_resourcequota",
+    "test_un_conteneur_sans_limites_recoit_les_valeurs_par_defaut",
+    "test_une_creation_hors_quota_est_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-creer-ou-appliquer": {
   "apres": {
    "echecs": [],
@@ -5121,6 +5239,63 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-detecter-une-persistance": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_l_acces_de_l_attaquant_est_retire",
+    "test_l_acces_ne_revient_pas",
+    "test_l_application_legitime_est_intacte",
+    "test_la_charge_planifiee_est_supprimee",
+    "test_le_constat_nomme_l_objet_de_persistance"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 362,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-detecter-une-persistance.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_acces_de_l_attaquant_est_retire",
+    "test_l_acces_ne_revient_pas",
+    "test_l_application_legitime_est_intacte",
+    "test_la_charge_planifiee_est_supprimee",
+    "test_le_constat_nomme_l_objet_de_persistance"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
