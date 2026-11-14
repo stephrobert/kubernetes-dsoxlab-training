@@ -39,9 +39,16 @@ Vous êtes sur **`k8s-cp.lab`**, le plan de contrôle du cluster kubeadm, avec
 
 ## Comment vous saurez que c'est bon
 
-Les tests comparent le numéro de série de chaque certificat à celui relevé au
-lancement du lab, puis interrogent l'API server et etcd pour voir quel
-certificat ils servent.
+Les tests lisent l'état du nœud, pas les commandes tapées :
+
+- la date notée dans `~/pki/reponses.yaml` est celle de l'autorité de
+  certification du cluster ;
+- le numéro de série de chaque certificat du plan de contrôle a changé depuis
+  le lancement du lab ;
+- le controller-manager et le scheduler ont démarré après la réécriture de
+  leur kubeconfig ;
+- votre `~/.kube/config` porte le même certificat que le nouvel
+  `admin.conf`, et `kubectl` répond avec lui.
 
 ```bash
 dsoxlab check kubeadm-verifier-et-renouveler-les-certificats

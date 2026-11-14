@@ -38,9 +38,16 @@ You are on **`k8s-cp.lab`**, the control plane of the kubeadm cluster, with
 
 ## How you will know it works
 
-The tests compare each certificate's serial number with the one recorded when
-the lab started, then query the API server and etcd to see which certificate
-they serve.
+The tests read the state of the node, not the commands you typed:
+
+- the date written in `~/pki/reponses.yaml` is the expiry date of the
+  cluster's certificate authority;
+- the serial number of each control plane certificate has changed since the
+  lab started;
+- the controller manager and the scheduler started after their kubeconfig was
+  rewritten;
+- your `~/.kube/config` carries the same certificate as the new
+  `admin.conf`, and `kubectl` answers with it.
 
 ```bash
 dsoxlab check kubeadm-verifier-et-renouveler-les-certificats
