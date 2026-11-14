@@ -8,7 +8,7 @@ ReplicaSet why a Deployment creates no Pod, then repair it.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37), namespace `replicasets` |
 | Duration | about 20 minutes |
-| Related page | [ReplicaSets, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/#mettre-en-pratique) |
+| Related page | [ReplicaSets, section Mettre en pratique](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/replicasets/) |
 
 ```bash
 dsoxlab run   k8s-lire-les-replicasets

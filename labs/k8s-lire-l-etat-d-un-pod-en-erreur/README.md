@@ -11,7 +11,7 @@ anything, with `get`, `describe`, `logs` and `top`.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `lab` (Kubernetes 1.37) |
 | Duration | about 20 minutes |
-| Paired lesson | [Read the cluster state](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/) (in French) |
+| Paired lesson | [Read the cluster state](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/) |
 
 ```bash
 dsoxlab run   k8s-lire-l-etat-d-un-pod-en-erreur

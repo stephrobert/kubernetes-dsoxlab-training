@@ -8,7 +8,7 @@ urgent high-priority Pod that gets one of them preempted.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `multi` (one control plane, two workers); the lab sets up the `ordonnancement` namespace |
 | Duration | about 25 minutes |
-| Related page | [Advanced scheduling, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/#mettre-en-pratique) |
+| Related page | [Advanced scheduling, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/) |
 
 On kind, every node advertises all the host's CPUs: the setup computes the
 filling from the worker's actual allocatable. The `cleanup.yaml` removes the

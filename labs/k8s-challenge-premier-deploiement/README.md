@@ -9,7 +9,7 @@ Concepts) and the setup of the `kubectl` client.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37) |
 | Duration | about 30 minutes |
-| Paired page | [Module knowledge check](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/) (in French) |
+| Paired page | [Module knowledge check](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/knowledge-check/) |
 
 ```bash
 dsoxlab run   k8s-challenge-premier-deploiement

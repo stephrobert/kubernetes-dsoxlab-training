@@ -9,7 +9,7 @@ environment, and a cluster that matches the folder.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 30 minutes |
-| Related page | [Kustomize, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/#mettre-en-pratique) |
+| Related page | [Kustomize, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/) |
 
 ```bash
 dsoxlab run   ckad-kustomize-overlays

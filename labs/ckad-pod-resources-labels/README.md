@@ -9,7 +9,7 @@ in the container's cgroup, where the kernel enforces it.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Related page | [Requests et Limits, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique) |
+| Related page | [Requests et Limits, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/) |
 
 ```bash
 dsoxlab run   ckad-pod-resources-labels

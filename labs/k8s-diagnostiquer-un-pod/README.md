@@ -8,7 +8,7 @@ container that exits with an error, then repair each Pod with the right gesture.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37), namespace `pods-en-panne` |
 | Duration | about 20 minutes |
-| Related page | [Pods, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/#mettre-en-pratique) |
+| Related page | [Pods, section Mettre en pratique](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/) |
 
 ```bash
 dsoxlab run   k8s-diagnostiquer-un-pod

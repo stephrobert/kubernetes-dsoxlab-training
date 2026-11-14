@@ -10,7 +10,7 @@ its cause. Graded on the final state: seven criteria of equal weight, pass mark
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37), spaces `livraison` and `entrepot` |
 | Duration | about 60 minutes |
-| Related page | [Épreuve du niveau 1](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-et-mettre-a-jour/) |
+| Related page | [Épreuve du niveau 1](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-and-update-an-application/) |
 
 ```bash
 dsoxlab run    k8s-epreuve-livrer-et-mettre-a-jour

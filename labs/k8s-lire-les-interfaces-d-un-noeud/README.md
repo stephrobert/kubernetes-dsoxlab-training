@@ -9,7 +9,7 @@ drivers. Each answer is compared with the real value, read on the node.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster |
 | Duration | about 20 minutes |
-| Related page | [CNI, CSI and CRI, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/#mettre-en-pratique) |
+| Related page | [CNI, CSI and CRI, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/#mettre-en-pratique) (in French) |
 
 ```bash
 dsoxlab run   k8s-lire-les-interfaces-d-un-noeud

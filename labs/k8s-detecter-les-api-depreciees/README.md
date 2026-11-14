@@ -9,7 +9,7 @@ migrate without changing what they describe, and apply.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `migration` namespace |
 | Duration | about 30 minutes |
-| Related page | [API deprecations, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique) |
+| Related page | [API deprecations, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique) (in French) |
 
 ```bash
 dsoxlab run   k8s-detecter-les-api-depreciees

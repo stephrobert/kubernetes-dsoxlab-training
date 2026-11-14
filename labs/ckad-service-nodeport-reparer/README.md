@@ -16,7 +16,7 @@ stays out of the lab: without a provider, its external address stays
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster; the worker `k8s-w1.lab` is queried too |
 | Duration | about 20 minutes |
-| Companion lesson | [Services](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique) |
+| Companion lesson | [Services](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 
 ```bash
 dsoxlab run   ckad-service-nodeport-reparer

@@ -9,7 +9,7 @@ plane components, container runtime and events.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `architecture`, one control plane and three workers (Kubernetes 1.37) |
 | Duration | about 30 minutes |
-| Paired page | [Worker nodes, hands-on section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique) (in French) |
+| Paired page | [Worker nodes, hands-on section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/) |
 
 ```bash
 dsoxlab run   k8s-challenge-lire-un-cluster

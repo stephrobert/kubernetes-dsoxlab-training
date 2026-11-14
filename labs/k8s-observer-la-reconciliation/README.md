@@ -7,7 +7,7 @@ Pod, then a ReplicaSet, and read which controller brings each one back.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `architecture`, one control plane and three workers (Kubernetes 1.37) |
 | Duration | about 20 minutes |
-| Paired page | [The control plane, hands-on section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/#mettre-en-pratique) (in French) |
+| Paired page | [The control plane, hands-on section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/) |
 
 ```bash
 dsoxlab run   k8s-observer-la-reconciliation

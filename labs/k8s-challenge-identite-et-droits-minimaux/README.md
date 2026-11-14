@@ -11,7 +11,7 @@ harden. Six states, threshold 70, two blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `observatoire` and `production` namespaces |
 | Duration | about 40 minutes |
-| Related page | [ServiceAccounts, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/#mettre-en-pratique) |
+| Related page | [ServiceAccounts, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/) |
 
 ```bash
 dsoxlab run    k8s-challenge-identite-et-droits-minimaux

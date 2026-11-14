@@ -8,7 +8,7 @@ of the CKAD *Application Environment, Configuration and Security* domain.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37) |
 | Duration | about 30 minutes |
-| Paired page | [Module knowledge check, hands-on section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique) (in French) |
+| Paired page | [Module knowledge check, hands-on section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/basic-resources-knowledge-check/) |
 
 ```bash
 dsoxlab run   k8s-challenge-relier-config-et-service

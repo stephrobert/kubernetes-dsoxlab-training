@@ -10,7 +10,7 @@ lets you look inside anyway.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Related page | [Débugger une application, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
+| Related page | [Débugger une application, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/) |
 
 ```bash
 dsoxlab run   cka-kubectl-debug

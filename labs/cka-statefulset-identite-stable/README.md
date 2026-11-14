@@ -9,7 +9,7 @@ survives its Pod.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `lab`; the lab sets up the annuaire as a Deployment in the `identites` namespace |
 | Duration | about 30 minutes |
-| Related page | [Les StatefulSets, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/#mettre-en-pratique) |
+| Related page | [Les StatefulSets, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/) |
 
 ```bash
 dsoxlab run   cka-statefulset-identite-stable

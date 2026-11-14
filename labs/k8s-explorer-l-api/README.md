@@ -9,7 +9,7 @@ full inventory of a namespace.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `lab`; the lab installs a CRD and the `archives` namespace |
 | Duration | about 25 minutes |
-| Related page | [kubectl api-resources and explain, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/#mettre-en-pratique) |
+| Related page | [kubectl api-resources and explain, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/) |
 
 ```bash
 dsoxlab run   k8s-explorer-l-api

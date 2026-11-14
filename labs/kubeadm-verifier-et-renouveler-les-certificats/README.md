@@ -9,7 +9,7 @@ serial numbers, recorded when the lab starts.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster |
 | Duration | about 30 minutes |
-| Related page | [Cluster PKI, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
+| Related page | [Cluster PKI, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/) |
 
 ```bash
 dsoxlab run   kubeadm-verifier-et-renouveler-les-certificats

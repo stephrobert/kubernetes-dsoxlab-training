@@ -10,7 +10,7 @@ pass mark 70, three blocking.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `multi` (one control plane, two workers); the lab sets up the `entrepot` namespace and the CRD to install |
 | Duration | about 50 minutes |
-| Related page | [Operators et CRDs pour développeurs, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique) |
+| Related page | [Operators et CRDs pour développeurs, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/) |
 
 ```bash
 dsoxlab run    k8s-challenge-choisir-le-bon-workload

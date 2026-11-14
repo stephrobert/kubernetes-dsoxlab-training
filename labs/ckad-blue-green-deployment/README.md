@@ -15,7 +15,7 @@ serving, which is the only reason a blue-green rollback is instant.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Rolling updates and rollbacks](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/) |
+| Companion lesson | [Rolling updates and rollbacks](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/) |
 
 Ten criteria, one per state the statement asks for: two Deployments (replicas,
 labels, served version), the Service (port, selector, endpoints), and the six

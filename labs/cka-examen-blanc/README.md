@@ -26,7 +26,7 @@ everything, cluster-wide objects included.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster; the worker `k8s-w1.lab` is down at the start |
 | Duration | 120 minutes |
-| Related page | [CKA exercises](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| Related page | [CKA exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) |
 
 ```bash
 dsoxlab run    cka-examen-blanc

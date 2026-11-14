@@ -8,7 +8,7 @@ qualified name, and see that the short name is not enough there.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37), namespaces `equipe-api` and `equipe-front` |
 | Duration | about 15 minutes |
-| Related page | [Namespaces, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique) |
+| Related page | [Namespaces, section Mettre en pratique](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/) |
 
 ```bash
 dsoxlab run   k8s-isoler-par-namespace

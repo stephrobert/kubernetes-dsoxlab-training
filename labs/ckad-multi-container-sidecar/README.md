@@ -10,7 +10,7 @@ form the exam expects, and this lab rejects a plain second container.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Init Containers and Sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique) |
+| Companion lesson | [Init Containers and Sidecars](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/) |
 
 ```bash
 dsoxlab run   ckad-multi-container-sidecar

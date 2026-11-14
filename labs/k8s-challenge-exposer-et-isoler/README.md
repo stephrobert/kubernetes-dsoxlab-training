@@ -10,7 +10,7 @@ requirements, threshold 70, three blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster (Calico, Traefik); the lab sets up the `comptoir` and `voisinage` namespaces |
 | Duration | about 45 minutes |
-| Related page | [Network Policies, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique) |
+| Related page | [Network Policies, Put into practice section](https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/) |
 
 ```bash
 dsoxlab run    k8s-challenge-exposer-et-isoler

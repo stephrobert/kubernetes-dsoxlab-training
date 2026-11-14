@@ -8,7 +8,7 @@ their node, with JSONPath and with custom-columns.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `boutique` (Kubernetes 1.37), namespace `extraction` |
 | Duration | about 15 minutes |
-| Related page | [Aide-mémoire kubectl, section Mettre en pratique](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/#mettre-en-pratique) |
+| Related page | [Aide-mémoire kubectl, section Mettre en pratique](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/) |
 
 ```bash
 dsoxlab run   k8s-extraire-avec-kubectl

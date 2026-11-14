@@ -21,7 +21,7 @@ nodes.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 40 minutes, several of them pulling the server image (433 MB) |
-| Companion lesson | [Operators](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/#mettre-en-pratique) |
+| Companion lesson | [Operators](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/) |
 
 ```bash
 dsoxlab run   cka-operateur-installer-et-configurer

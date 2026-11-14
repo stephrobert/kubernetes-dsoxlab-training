@@ -35,7 +35,7 @@ on the node.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 30 minutes |
-| Companion lesson | [StorageClass](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique) |
+| Companion lesson | [StorageClass](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/) |
 
 ```bash
 dsoxlab run   cka-storageclass-provisionnement-dynamique

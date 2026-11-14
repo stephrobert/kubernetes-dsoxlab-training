@@ -16,7 +16,7 @@ constraints, and nothing can say it after the fact.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 15 minutes |
-| Companion lesson | [Rolling Updates and Rollbacks](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/) |
+| Companion lesson | [Rolling Updates and Rollbacks](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/) |
 
 ```bash
 dsoxlab run   ckad-rolling-update-strategy

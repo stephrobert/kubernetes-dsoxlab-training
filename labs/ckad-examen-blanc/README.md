@@ -25,7 +25,7 @@ kubeconfig, the `k` alias and completion on both task hosts.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster |
 | Duration | 120 minutes |
-| Related page | [CKAD exercises](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) |
+| Related page | [CKAD exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercises/) |
 
 ```bash
 dsoxlab run    ckad-examen-blanc

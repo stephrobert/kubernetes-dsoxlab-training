@@ -14,7 +14,7 @@ identifier is refused.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 10 minutes |
-| Companion lesson | [Services](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/) |
+| Companion lesson | [Services](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/) |
 
 ```bash
 dsoxlab run   ckad-expose-service

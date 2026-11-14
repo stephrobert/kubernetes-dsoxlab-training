@@ -10,7 +10,7 @@ cluster, worker included, whatever state is left.
 |---|---|
 | Target | `k8s-cp.lab` (and `k8s-w1.lab`, reset then given back to the cluster), the catalogue's kubeadm cluster |
 | Duration | about 45 minutes |
-| Related page | [kubeadm, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/#mettre-en-pratique) |
+| Related page | [kubeadm, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-kubernetes-with-kubeadm/) |
 
 ```bash
 dsoxlab run   cka-initialiser-un-plan-de-controle

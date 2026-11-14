@@ -9,7 +9,7 @@ Pod evicted.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab installs metrics-server v0.9.1 and VPA 1.8.1, and sets up the `dimensionnement` namespace |
 | Duration | about 25 minutes |
-| Related page | [Vertical Pod Scaling, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/#mettre-en-pratique) |
+| Related page | [Vertical Pod Scaling, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/) |
 
 The `cleanup.yaml` removes the namespace, then the VPA with its official script
 (`hack/vpa-down.sh`) and metrics-server: the cluster returns to the foundation's state.
