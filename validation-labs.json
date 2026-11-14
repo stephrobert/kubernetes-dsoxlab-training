@@ -271,8 +271,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 406,
+  "date": "2026-11-14",
+  "duree_s": 437,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -553,6 +553,124 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-initialiser-un-plan-de-controle": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_calico_tourne_sur_le_plan_de_controle",
+    "test_la_preparation_du_noeud_survit_au_redemarrage",
+    "test_le_cluster_est_initialise_par_le_fichier_de_configuration",
+    "test_le_kubeconfig_de_l_utilisateur_vise_le_nouveau_cluster",
+    "test_le_noeud_est_ready_et_coredns_tourne",
+    "test_les_paquets_sont_figes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 847,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-initialiser-un-plan-de-controle.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_calico_tourne_sur_le_plan_de_controle",
+    "test_la_preparation_du_noeud_survit_au_redemarrage",
+    "test_le_cluster_est_initialise_par_le_fichier_de_configuration",
+    "test_le_kubeconfig_de_l_utilisateur_vise_le_nouveau_cluster",
+    "test_le_noeud_est_ready_et_coredns_tourne",
+    "test_les_paquets_sont_figes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-joindre-un-noeud-kubeadm": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_containerd_utilise_le_pilote_systemd",
+    "test_le_swap_est_coupe_durablement",
+    "test_le_worker_est_joint_et_ready",
+    "test_les_paquets_sont_figes",
+    "test_son_kubelet_annonce_la_version_du_cluster",
+    "test_un_pod_tourne_sur_le_worker"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 338,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-joindre-un-noeud-kubeadm.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_containerd_utilise_le_pilote_systemd",
+    "test_le_swap_est_coupe_durablement",
+    "test_le_worker_est_joint_et_ready",
+    "test_les_paquets_sont_figes",
+    "test_son_kubelet_annonce_la_version_du_cluster",
+    "test_un_pod_tourne_sur_le_worker"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
@@ -4672,6 +4790,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-sauvegarder-et-restaurer": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_aucun_certificat_n_expire_avant_trente_jours",
+    "test_etcd_tourne_sur_un_repertoire_restaure_et_le_cluster_est_sain",
+    "test_l_objet_ecrit_apres_la_sauvegarde_n_existe_plus",
+    "test_les_manifestes_du_depot_sont_migres_et_appliques",
+    "test_les_objets_supprimes_sont_revenus_avec_leurs_uid",
+    "test_une_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 272,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-sauvegarder-et-restaurer.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_aucun_certificat_n_expire_avant_trente_jours",
+    "test_etcd_tourne_sur_un_repertoire_restaure_et_le_cluster_est_sain",
+    "test_l_objet_ecrit_apres_la_sauvegarde_n_existe_plus",
+    "test_les_manifestes_du_depot_sont_migres_et_appliques",
+    "test_les_objets_supprimes_sont_revenus_avec_leurs_uid",
+    "test_une_sauvegarde_fraiche_photographie_l_etat_d_avant_la_restauration"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-changer-de-contexte": {
   "apres": {
    "echecs": [],
@@ -4992,6 +5169,61 @@
     "test_la_raison_d_attente_de_image_fausse_est_consignee",
     "test_le_code_de_sortie_de_plante_est_consigne",
     "test_plante_tourne_avec_sa_commande_corrigee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-donner-un-acces-par-csr": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_camille_lit_les_pods_d_equipe_web",
+    "test_camille_ne_peut_rien_de_plus",
+    "test_la_demande_camille_est_approuvee_et_delivree",
+    "test_le_kubeconfig_porte_le_certificat_delivre_et_l_identifie"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 307,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-donner-un-acces-par-csr.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_camille_lit_les_pods_d_equipe_web",
+    "test_camille_ne_peut_rien_de_plus",
+    "test_la_demande_camille_est_approuvee_et_delivree",
+    "test_le_kubeconfig_porte_le_certificat_delivre_et_l_identifie"
    ],
    "passed": 0,
    "recorded": true,
@@ -6059,6 +6291,61 @@
     "test_la_version_2_tourne_et_la_migration_est_terminee",
     "test_le_cluster_correspond_au_dossier",
     "test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "kubeadm-verifier-et-renouveler-les-certificats": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_echeance_de_la_ca_est_la_bonne",
+    "test_le_controller_manager_et_le_scheduler_ont_redemarre",
+    "test_le_kubeconfig_porte_le_nouveau_certificat_et_kubectl_repond",
+    "test_les_certificats_du_plan_de_controle_sont_renouveles"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 190,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-kubeadm-verifier-et-renouveler-les-certificats.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_echeance_de_la_ca_est_la_bonne",
+    "test_le_controller_manager_et_le_scheduler_ont_redemarre",
+    "test_le_kubeconfig_porte_le_nouveau_certificat_et_kubectl_repond",
+    "test_les_certificats_du_plan_de_controle_sont_renouveles"
    ],
    "passed": 0,
    "recorded": true,
