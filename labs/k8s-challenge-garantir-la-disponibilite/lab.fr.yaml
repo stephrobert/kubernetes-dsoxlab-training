@@ -1,0 +1,25 @@
+title: "Garantir la disponibilité d'une application pendant une maintenance"
+description: |
+  Sans procédure, faire tourner une application en trois exemplaires répartis
+  sur les nœuds, protégés par un budget de perturbation, avec des sondes qui
+  tiennent le trafic à l'écart tant qu'un exemplaire n'est pas prêt, garder
+  son minimum pendant l'évacuation d'un nœud, et écrire un rapport de routine
+  conforme à l'état réel du cluster.
+
+criteria:
+  - id: trois-exemplaires
+    label: "L'application paiement tourne en au moins trois exemplaires disponibles"
+  - id: budget-minimum
+    label: "Un seul budget de perturbation cible les Pods de paiement, en garantit au moins deux et laisse une maintenance possible"
+  - id: repartition
+    label: "Les exemplaires sont répartis sur autant de nœuds différents que le cluster peut en offrir, par une règle déclarée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/fiabiliser-kubernetes/
+  - id: sondes-et-trafic
+    label: "Les sondes de disponibilité et de vivacité sont déclarées, et un exemplaire ne reçoit du trafic qu'une fois prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/fiabiliser-kubernetes/
+  - id: minimum-pendant-l-evacuation
+    label: "Pendant que le test évacue k8s-w1.lab, paiement ne descend jamais sous deux exemplaires disponibles, et l'évacuation aboutit"
+  - id: rapport-de-routine
+    label: "~/routine/rapport.txt liste les nœuds, les Pods en erreur, les Jobs terminés qui restent et l'échéance des certificats, tels que le cluster est vraiment"

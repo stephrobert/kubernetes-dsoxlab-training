@@ -1,0 +1,129 @@
+# Le challenge du module « Diagnostiquer » du niveau 4 (fiche
+# E-depanner-une-application, hébergée par KUBERN-14-09B). C'est la preuve sans
+# procédure du module : quatre pannes en même temps, deux côté application et
+# deux côté cluster, sur le cluster kubeadm du catalogue.
+#
+# Il assemble des pièces attestées, sans en refaire une à l'identique :
+#   - cka-troubleshoot-crashloopbackoff et ckad-troubleshoot-crashloop : un
+#     Deployment qui ne trouve pas sa configuration ;
+#   - cka-troubleshoot-imagepullbackoff : un Pod dont l'image n'existe pas ;
+#   - cka-troubleshoot-apiserver et cka-static-pod : un flag mal orthographié
+#     dans le manifeste statique de l'API server ;
+#   - cka-troubleshoot-kubelet et cka-troubleshoot-node-notready : un kubelet
+#     arrêté, désactivé, ET dont la configuration ne se lit plus.
+# Ce qui est neuf : les pannes sont cumulées (l'API server tombé rend kubectl
+# aveugle sur tout le reste), et la cause de CHAQUE panne se consigne dans un
+# fichier avant sa réparation, comme dans k8s-epreuve-livrer-et-mettre-a-jour.
+#
+# Dix états, à poids égal (dsoxlab note par test). Deux sont bloquants : la
+# cause consignée avant la réparation (la méthode, raison d'être du module) et
+# l'API server rétabli (sans lui, rien d'autre ne se diagnostique).
+id: k8s-challenge-depanner-une-application
+title: "Bring a broken application and its cluster back into service"
+level: troubleshooting
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, repair four failures at once on a kubeadm cluster: a
+  Deployment that restarts in a loop, a Pod whose image cannot be pulled, an
+  API server that no longer starts and a worker whose kubelet is down,
+  recording the cause of each failure before repairing it.
+skills:
+  - troubleshooting
+  - crashloopbackoff
+  - imagepullbackoff
+  - static-pod
+  - kube-apiserver
+  - kubelet
+  - systemd
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/troubleshoot-a-node/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_chaque_cause_est_consignee_avant_sa_reparation
+  - test_l_api_server_repond_et_son_pod_statique_tourne
+estimated_time: 60m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le lab casse le kubelet de k8s-w1.lab et l'interroge : il lui faut ce
+      # nœud en même temps que le control plane, ce que dit `roles`.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: true
+
+criteria:
+  - id: api-disponible
+    label: "The Deployment api, which restarted in a loop, has its two replicas available"
+    tests:
+      - test_api_a_ses_deux_replicas_disponibles
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: api-sans-boucle
+    label: "No Pod of api restarts in a loop any more"
+    tests:
+      - test_api_ne_redemarre_plus_en_boucle
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: api-configuration
+    label: "api reads its configuration under /etc/config, as the team's convention says, and answers"
+    tests:
+      - test_api_lit_sa_configuration_au_bon_endroit_et_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/incidents-applicatifs/
+  - id: vitrine-image
+    label: "The Pod vitrine runs a public nginx image really pulled by the node, and answers in HTTP"
+    tests:
+      - test_vitrine_tourne_sur_une_image_publique_tiree_et_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+  - id: causes-consignees
+    label: "The cause of each failure is recorded in its file under ~/incident, before that failure is repaired"
+    tests:
+      - test_chaque_cause_est_consignee_avant_sa_reparation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/methode-diagnostic-incident-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
+  - id: api-server-retabli
+    label: "The API server answers again, and its static Pod runs without restarting in a loop"
+    tests:
+      - test_l_api_server_repond_et_son_pod_statique_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: manifeste-sain
+    label: "The API server manifest no longer carries the faulty flag, and still authorizes with Node,RBAC"
+    tests:
+      - test_le_manifeste_de_l_api_server_est_sain_et_autorise_node_rbac
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: worker-ready
+    label: "The worker k8s-w1.lab is Ready, and its kubelet runs with a valid configuration that keeps the cluster DNS"
+    tests:
+      - test_le_worker_est_ready_avec_un_kubelet_qui_garde_le_dns
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/troubleshoot-a-node/
+  - id: kubelet-persistant
+    label: "The kubelet of the worker is active and will start again after a reboot of the machine"
+    tests:
+      - test_le_kubelet_est_actif_et_active_au_demarrage
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/troubleshoot-a-node/
+  - id: entrepot-revenu
+    label: "The application entrepot, reserved for the worker, has its three replicas available on it again"
+    tests:
+      - test_entrepot_a_ses_trois_replicas_sur_le_worker
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/troubleshoot-a-node/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/

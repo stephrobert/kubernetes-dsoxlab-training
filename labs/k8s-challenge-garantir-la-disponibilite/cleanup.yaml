@@ -1,0 +1,36 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : le check de ce challenge vide
+# lui-même k8s-w1.lab puis le remet en service ; un check interrompu au mauvais
+# moment peut le laisser cordonné, d'où l'uncordon. Tout le reste vit dans les
+# deux namespaces du challenge, budget de perturbation compris, et dans
+# ~/routine. Rien n'est posé à l'échelle du cluster.
+- name: Défaire le challenge k8s-challenge-garantir-la-disponibilite
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Arrêter une évacuation lancée par un check interrompu
+      ansible.builtin.shell: >-
+        systemctl stop 'dsoxlab-evacuation-*.service' 2>/dev/null || true
+      changed_when: false
+
+    - name: Remettre le worker dans le scheduling
+      ansible.builtin.command: "{{ kubectl }} uncordon k8s-w1.lab"
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les deux namespaces du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace paiement exploitation --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le rapport de routine et les traces d'évacuation
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/routine"
+        - /var/lib/dsoxlab/evacuation.log
+        - /var/lib/dsoxlab/evacuation.rc

@@ -1,0 +1,44 @@
+title: "Remettre en service une application en panne et son cluster"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+description: |
+  Sans procédure, réparer quatre pannes à la fois sur un cluster kubeadm : un
+  Deployment qui redémarre en boucle, un Pod dont l'image ne se télécharge pas,
+  un API server qui ne démarre plus et un worker dont le kubelet est tombé, en
+  consignant la cause de chaque panne avant de la réparer.
+
+criteria:
+  - id: api-disponible
+    label: "Le Deployment api, qui redémarrait en boucle, a ses deux replicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: api-sans-boucle
+    label: "Plus aucun Pod d'api ne redémarre en boucle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: api-configuration
+    label: "api lit sa configuration sous /etc/config, comme le veut la charte de l'équipe, et répond"
+  - id: vitrine-image
+    label: "Le Pod vitrine tourne sur une image nginx publique réellement tirée par le nœud, et répond en HTTP"
+  - id: causes-consignees
+    label: "La cause de chaque panne est consignée dans son fichier sous ~/incident, avant la réparation de cette panne"
+  - id: api-server-retabli
+    label: "L'API server répond de nouveau, et son Pod statique tourne sans redémarrer en boucle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: manifeste-sain
+    label: "Le manifeste de l'API server ne porte plus le flag fautif, et autorise toujours avec Node,RBAC"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: worker-ready
+    label: "Le worker k8s-w1.lab est Ready, et son kubelet tourne avec une configuration valide qui garde le DNS du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+  - id: kubelet-persistant
+    label: "Le kubelet du worker est actif et redémarrera après un redémarrage de la machine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+  - id: entrepot-revenu
+    label: "L'application entrepot, réservée au worker, a de nouveau ses trois replicas disponibles sur lui"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/
