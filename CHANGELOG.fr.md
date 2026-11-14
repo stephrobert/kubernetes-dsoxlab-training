@@ -10,6 +10,12 @@ projet suit le [versionnage sémantique](https://semver.org/lang/fr/).
 
 ### Modifié
 
+- Le README ne recopie plus la documentation du moteur dsoxlab (contrat, cycle
+  de vie d'un lab) : il renvoie aux pages où le moteur se documente lui-même
+  (dsoxlab#201). Le CONTRIBUTING ne dit plus que le moteur n'a aucun point
+  d'accroche après le provisionnement : il en a un, `infra.bootstrap`, que ce
+  catalogue ne déclare pas ; chaque `setup.yaml` inclut donc toujours le socle.
+
 - **Calico est installé par l'opérateur Tigera**, comme sur la page kubeadm de
   la formation (décision D64), au lieu du manifeste `calico.yaml`. Même
   version, v3.32.2, et même CIDR des Pods, `10.244.0.0/16`. Le nouveau

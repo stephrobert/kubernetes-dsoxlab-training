@@ -127,8 +127,11 @@ from discovering them through a hook.
 - **Every `fixtures/prepare.sh` logs on the node.** dsoxlab only returns
   "non-zero return code" when a fixture script fails; without the log, the
   diagnosis starts from nothing. Copy the header of an existing lab.
-- **Every `setup.yaml` includes the foundation.** There is no hook after
-  provisioning: the cluster exists only because each lab installs it. A lab that
+- **Every `setup.yaml` includes the foundation.** The engine can play a
+  catalogue foundation once at the end of `provision` (`infra.bootstrap`, see
+  the [contract](https://github.com/stephrobert/dsoxlab/blob/main/docs/contract-v1.md)),
+  but this catalogue does not declare one: the cluster exists only because each
+  lab installs it. A lab that
   forgets the include works as long as another lab ran before it, and fails
   alone on a fresh cluster.
 - **Every namespace created is deleted on cleanup.** The cluster itself stays:

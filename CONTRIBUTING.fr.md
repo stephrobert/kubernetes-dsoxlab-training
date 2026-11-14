@@ -104,8 +104,11 @@ d'attendre le hook pour les découvrir.
 - **Tout `fixtures/prepare.sh` trace sur le nœud.** dsoxlab ne rend que
   « non-zero return code » quand un script de fixture échoue ; sans le journal,
   le diagnostic repart de zéro. Reprenez l'en-tête d'un lab existant.
-- **Tout `setup.yaml` inclut le socle.** Il n'y a aucun point d'accroche après
-  le provisionnement : le cluster n'existe que parce que chaque lab l'installe.
+- **Tout `setup.yaml` inclut le socle.** Le moteur sait jouer un socle de
+  catalogue une fois, à la fin de `provision` (`infra.bootstrap`, voir le
+  [contrat](https://github.com/stephrobert/dsoxlab/blob/main/docs/contract-v1.fr.md)),
+  mais ce catalogue n'en déclare pas : le cluster n'existe que parce que chaque
+  lab l'installe.
   Un lab qui oublie l'inclusion tourne tant qu'un autre est passé avant, et
   échoue seul sur un cluster neuf.
 - **Tout namespace créé est supprimé au nettoyage.** Le cluster, lui, reste en
