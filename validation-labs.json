@@ -4731,6 +4731,69 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-placer-et-plafonner": {
+  "apres": {
+   "echecs": [],
+   "passed": 8,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 8
+  },
+  "avant": {
+   "echecs": [
+    "test_galerie_repartie_sur_des_noeuds_differents",
+    "test_le_hpa_d_accueil_lit_une_metrique",
+    "test_le_namespace_refuse_un_pod_au_dela_du_quota",
+    "test_le_noeud_reserve_porte_son_taint_et_son_label",
+    "test_rendu_sur_le_noeud_reserve_et_accueil_ailleurs",
+    "test_sous_charge_les_replicas_depassent_le_minimum",
+    "test_stockage_affinite_obligatoire_et_preferee",
+    "test_un_pod_sans_requests_recoit_les_valeurs_par_defaut"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-14",
+  "duree_s": 447,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/8",
+   "après la solution : 8/8",
+   "après clean et run : 0/8",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-placer-et-plafonner.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_galerie_repartie_sur_des_noeuds_differents",
+    "test_le_hpa_d_accueil_lit_une_metrique",
+    "test_le_namespace_refuse_un_pod_au_dela_du_quota",
+    "test_le_noeud_reserve_porte_son_taint_et_son_label",
+    "test_rendu_sur_le_noeud_reserve_et_accueil_ailleurs",
+    "test_sous_charge_les_replicas_depassent_le_minimum",
+    "test_stockage_affinite_obligatoire_et_preferee",
+    "test_un_pod_sans_requests_recoit_les_valeurs_par_defaut"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 8
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-premier-deploiement": {
   "apres": {
    "echecs": [],
@@ -5648,6 +5711,75 @@
    "skipped": 0,
    "status": "failed",
    "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-epreuve-livrer-une-application": {
+  "apres": {
+   "echecs": [],
+   "passed": 11,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 11
+  },
+  "avant": {
+   "echecs": [
+    "test_c10_identite_dediee_sans_jeton_et_droit_minimal",
+    "test_c11_programme_durci_et_qui_repond",
+    "test_c1_les_deux_applications_joignables_par_hote_et_chemin",
+    "test_c2_caisse_repond_et_sa_cause_a_ete_consignee_avant",
+    "test_c3_un_client_d_un_autre_namespace_resout_et_joint_programme",
+    "test_c4_seul_le_frontend_joint_la_base",
+    "test_c5_la_base_resout_les_noms_et_ne_sort_vers_rien_d_autre",
+    "test_c6_la_base_sur_le_noeud_reserve_et_le_frontend_reparti",
+    "test_c7_le_namespace_refuse_une_charge_qui_depasse_son_plafond",
+    "test_c8_valeurs_par_defaut_et_affiches_tourne",
+    "test_c9_la_mise_a_l_echelle_lit_une_metrique"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 11
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-14",
+  "duree_s": 519,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/11",
+   "après la solution : 11/11",
+   "après clean et run : 0/11",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-epreuve-livrer-une-application.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_c10_identite_dediee_sans_jeton_et_droit_minimal",
+    "test_c11_programme_durci_et_qui_repond",
+    "test_c1_les_deux_applications_joignables_par_hote_et_chemin",
+    "test_c2_caisse_repond_et_sa_cause_a_ete_consignee_avant",
+    "test_c3_un_client_d_un_autre_namespace_resout_et_joint_programme",
+    "test_c4_seul_le_frontend_joint_la_base",
+    "test_c5_la_base_resout_les_noms_et_ne_sort_vers_rien_d_autre",
+    "test_c6_la_base_sur_le_noeud_reserve_et_le_frontend_reparti",
+    "test_c7_le_namespace_refuse_une_charge_qui_depasse_son_plafond",
+    "test_c8_valeurs_par_defaut_et_affiches_tourne",
+    "test_c9_la_mise_a_l_echelle_lit_une_metrique"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 11
   },
   "verdict": "VALIDE"
  },
