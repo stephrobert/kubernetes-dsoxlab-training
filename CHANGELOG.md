@@ -10,6 +10,12 @@ follows [semantic versioning](https://semver.org/).
 
 ### Changed
 
+- The README no longer copies the dsoxlab engine documentation (contract,
+  lab life cycle): it links to the pages where the engine documents itself
+  (dsoxlab#201). CONTRIBUTING no longer says the engine has no hook after
+  provisioning: it has one, `infra.bootstrap`, which this catalogue does not
+  declare, so every `setup.yaml` still includes the foundation.
+
 - **Calico is installed by the Tigera operator**, as on the training's
   kubeadm page (decision D64), instead of the `calico.yaml` manifest. Same
   version, v3.32.2, and same Pod CIDR, `10.244.0.0/16`. The new

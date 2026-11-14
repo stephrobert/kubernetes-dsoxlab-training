@@ -106,36 +106,23 @@ the contract version matches.
 
 ## How it works
 
-### The declarative contract (two levels)
+### The engine, documented where it lives
 
-The catalogue is described by data, not code, which is what keeps the `dsoxlab`
-engine domain-agnostic:
+This catalog is played by `dsoxlab`, which documents its own contract and
+commands. This README does not repeat them, so that it cannot drift when the
+engine changes (dsoxlab issue #201):
 
-- **`meta.yml`** at the root declares the repository identity, the
-  **infrastructure** (provider, network `lab-k8s`, `10.10.50.0/24`, and the three
-  hosts with their roles) and the **order** of the sections shown by
-  `list-labs`;
-- **`lab.yaml`** per lab declares its `skills`, `level`, `runtime` (type and
-  targets), `distros`, `doc_url`, its `certification_tags` and a `validation`
-  block. A `lab.fr.yaml` overrides `title` and `description` in French, and
-  nothing else.
+- the contract: `meta.yml`, `lab.yaml`, `lab.<lang>.yaml`, the runtimes and
+  their fields: [contract](https://github.com/stephrobert/dsoxlab/blob/main/docs/contract-v1.md);
+- the commands and the life of a lab, from `run` to `check`:
+  [commands](https://github.com/stephrobert/dsoxlab/blob/main/docs/commands.md) and [playing a lab](https://github.com/stephrobert/dsoxlab/blob/main/docs/learner.md);
+- writing a lab, and what `validate-structure` checks:
+  [catalog author guide](https://github.com/stephrobert/dsoxlab/blob/main/docs/catalog-author.md).
 
-The Terraform and cloud-init templates are **packaged inside dsoxlab**, not
-here: this repository declares only its `infra:` block and its public key in
-`ssh/`.
-
-### The lab lifecycle
-
-```bash
-dsoxlab list-labs              # browse the catalogue
-dsoxlab show      <id>         # metadata and status of one lab
-dsoxlab run       <id>         # set the starting state
-dsoxlab challenge <id>         # read the mission, no step-by-step
-dsoxlab hint      <id>         # reveal a hint (deducted from the score)
-dsoxlab check     <id>         # run the tests, compute and record the score
-dsoxlab clean     <id>         # undo what the lab set up
-dsoxlab progress               # per-section progress, average score
-```
+This repository declares only its `infra:` block in `meta.yml` (network
+`lab-k8s`, `10.10.50.0/24`, and the three hosts with their roles) and its
+public key in `ssh/`. The Terraform and cloud-init templates are **packaged
+inside dsoxlab**, not here.
 
 ### Runtimes
 
