@@ -1,0 +1,51 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire tout ce que le challenge
+# et sa solution posent. L'ordre compte : le DaemonSet part d'abord, avec ses
+# Pods, sinon il recréerait maintenance et sa liaison après leur suppression.
+# Viennent ensuite les deux namespaces, puis les objets de l'échelle du
+# cluster, que la suppression d'un namespace n'emporte pas.
+- name: Défaire le challenge k8s-challenge-contenir-une-attaque
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le DaemonSet de l'attaquant, Pods compris
+      ansible.builtin.command: >-
+        {{ kubectl }} -n reservations delete daemonset collecteur-noeuds
+        --ignore-not-found --cascade=foreground --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les deux namespaces du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace reservations calcul-lots --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer les ClusterRoleBindings de l'attaquant
+      ansible.builtin.command: >-
+        {{ kubectl }} delete clusterrolebinding maintenance collecteur-noeuds --ignore-not-found
+      changed_when: true
+
+    - name: Retirer le ClusterRole de l'attaquant
+      ansible.builtin.command: >-
+        {{ kubectl }} delete clusterrole collecteur-noeuds --ignore-not-found
+      changed_when: true
+
+    - name: Retirer toute autre liaison de cluster qui nomme un compte de reservations
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get clusterrolebindings -o json \
+          | python3 -c 'import json,sys; [print(b["metadata"]["name"]) for b in json.load(sys.stdin)["items"] if any(s.get("kind") == "ServiceAccount" and s.get("namespace") == "reservations" for s in b.get("subjects") or [])]' \
+          | xargs -r {{ kubectl }} delete clusterrolebinding
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Retirer le constat et la référence posés sur le nœud
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /root/constat-attaque.yaml
+        - /var/lib/dsoxlab-labs/k8s-challenge-contenir-une-attaque.uid

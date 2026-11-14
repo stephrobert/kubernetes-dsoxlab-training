@@ -1,0 +1,21 @@
+title: "Repérer et retirer ce qu'un attaquant a laissé derrière lui"
+# Page provisoire, comme dans lab.yaml. URL cible (fiche KUBERN-S-05) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Dans un namespace où une charge planifiée recrée en silence l'accès d'un
+  attaquant, lister ce qui est planifié, qui a quels droits et ce qui a changé
+  récemment, consigner le coupable, le retirer sans toucher à l'application
+  légitime, et prouver que l'accès ne revient pas.
+
+criteria:
+  - id: constat-avant-suppression
+    label: "La charge planifiée qui recrée l'accès est consignée dans /root/constat-persistance.yaml, exportée de l'objet vivant avant sa suppression"
+  - id: charge-planifiee-supprimee
+    label: "Le CronJob rotation-journaux est supprimé, avec ses Jobs et leurs Pods"
+  - id: acces-retire
+    label: "Les identités de l'attaquant et leurs liaisons à l'échelle du cluster ont disparu : support-n2 ne lit plus les Secrets du cluster"
+  - id: acces-ne-revient-pas
+    label: "Le Pod d'origine supprimé, l'accès ne revient pas après la minute de planification suivante"
+  - id: application-intacte
+    label: "L'application légitime de facturation est intacte : réplicas, identité, liaison, son propre CronJob, et elle répond"

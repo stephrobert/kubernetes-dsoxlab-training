@@ -312,7 +312,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 
 Six domains. Three of them weigh 20 % each, so 60 % between them. Several of their skills cannot be checked on a containerised cluster, which is the reason this catalogue uses virtual machines.
 
-20 lab(s).
+23 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -335,9 +335,12 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 17 | [`cks-ingress-tls`](labs/cks-ingress-tls/) | Serve a site over HTTPS with its own certificate, not the controller's | cluster-setup | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/) |
 | 18 | [`k8s-emettre-un-certificat-avec-cert-manager`](labs/k8s-emettre-un-certificat-avec-cert-manager/) | Issue certificates with cert-manager and an internal CA | cluster-hardening | 35m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/#mettre-en-pratique) |
 | 19 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
-| 20 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 20 | [`k8s-detecter-une-persistance`](labs/k8s-detecter-une-persistance/) | Find and remove what an attacker left behind | cluster-hardening | 30m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 21 | [`k8s-contenir-un-deni-de-service`](labs/k8s-contenir-un-deni-de-service/) | Contain a denial of service inside its namespace | cluster-hardening | 30m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 22 | [`k8s-challenge-contenir-une-attaque`](labs/k8s-challenge-contenir-une-attaque/) | Detect and contain a persistence and a denial of service | cluster-hardening | 45m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 23 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **111 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **114 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

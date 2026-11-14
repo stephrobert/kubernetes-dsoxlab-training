@@ -1,0 +1,90 @@
+# Lab guidé de la leçon KUBERN-S-05, « Persistance : ce qu'un attaquant laisse
+# derrière lui », module Modèle de menaces et cadres (niveau 5, objectif KCSA
+# « Persistence » du domaine Kubernetes Threat Model).
+#
+# La situation : dans le namespace facturation, un attaquant a laissé un accès
+# (le compte support-n2, lié au ClusterRole edit pour tout le cluster) et une
+# charge planifiée qui le recrée chaque minute (le CronJob rotation-journaux,
+# qui porte un nom d'apparence banale et tourne sous une identité capable de
+# créer le compte et sa liaison). Le Pod d'origine, outil-debug, tourne sous le
+# compte volé. À côté vit l'application légitime, avec sa propre identité, sa
+# liaison et un CronJob légitime qu'il ne faut pas toucher.
+#
+# Briques attestées réutilisées : ckad-job-cronjob (CronJob, Jobs et leurs
+# Pods), cka-rbac-serviceaccount et cks-rbac-least-privilege (identités,
+# liaisons, auth can-i), cks-audit-log-policy (le journal d'audit comme
+# source de preuve, cité dans le README sans être exigé : le cluster du
+# catalogue n'audite rien par défaut).
+id: k8s-detecter-une-persistance
+title: "Find and remove what an attacker left behind"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  In a namespace where a scheduled workload quietly recreates an attacker's
+  access, list what is scheduled, who holds which rights and what changed
+  recently, record the culprit, remove it without touching the legitimate
+  application, and prove the access does not come back.
+skills:
+  - threat-model
+  - persistence
+  - cronjob
+  - rbac
+  - serviceaccount
+  - incident-response
+distros:
+  - ubuntu24
+# Page provisoire : la leçon n'existe pas encore. URL cible (fiche KUBERN-S-05) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cks
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: constat-avant-suppression
+    label: "The scheduled workload that recreates the access is recorded in /root/constat-persistance.yaml, exported from the live object before its deletion"
+    tests:
+      - test_le_constat_nomme_l_objet_de_persistance
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+  - id: charge-planifiee-supprimee
+    label: "The CronJob rotation-journaux is deleted, with its Jobs and their Pods"
+    tests:
+      - test_la_charge_planifiee_est_supprimee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+  - id: acces-retire
+    label: "The attacker's identities and their cluster-wide bindings are gone: support-n2 can no longer read the Secrets of the cluster"
+    tests:
+      - test_l_acces_de_l_attaquant_est_retire
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/scenarios-attaque-cluster/
+  - id: acces-ne-revient-pas
+    label: "With the original Pod deleted, the access does not come back after the next minute of scheduling"
+    tests:
+      - test_l_acces_ne_revient_pas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+  - id: application-intacte
+    label: "The legitimate application of facturation is intact: replicas, identity, binding, its own CronJob, and it answers"
+    tests:
+      - test_l_application_legitime_est_intacte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/frontieres-de-confiance/

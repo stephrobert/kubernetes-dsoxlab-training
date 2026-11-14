@@ -1,0 +1,106 @@
+# Le challenge du module Modèle de menaces et cadres (niveau 5, KCSA), hébergé
+# par la leçon KUBERN-S-06. C'est la preuve sans procédure du module : il croise
+# la persistance (KUBERN-S-05) et le déni de service (KUBERN-S-06).
+#
+# Il ne refait aucun des deux labs guidés à l'identique. Dans
+# k8s-detecter-une-persistance, un CronJob recrée un compte et sa liaison
+# chaque minute ; ici, c'est un DaemonSet déguisé en collecteur de métriques,
+# présent sur chaque nœud, étiqueté comme une pièce de l'application légitime,
+# qui recrée toutes les 20 secondes un compte, son jeton longue durée et sa
+# liaison au ClusterRole edit. Dans k8s-contenir-un-deni-de-service, le refus
+# hors quota se prouve par une seule sonde ; ici, par des sondes modestes
+# créées jusqu'au dépassement, qu'aucun maximum raisonnable ne refuse à lui seul.
+#
+# Sept états, à poids égal (dsoxlab note par test). Les états 2 et 6, la
+# persistance retirée pour de bon et le plafond qui refuse vraiment, sont la
+# raison d'être du challenge : ils bloquent, aucune moyenne ne les compense.
+id: k8s-challenge-contenir-une-attaque
+title: "Detect and contain a persistence and a denial of service"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, find what an attacker left to keep their access, record it
+  and remove it for good without harming the legitimate application, then cap
+  the namespace where an abusive workload runs, and prove that the cluster
+  refuses what exceeds the cap while another application keeps answering.
+skills:
+  - threat-model
+  - persistence
+  - denial-of-service
+  - daemonset
+  - rbac
+  - resourcequota
+  - limitrange
+distros:
+  - ubuntu24
+# Page provisoire : la leçon hôte KUBERN-S-06 n'existe pas encore. URL cible :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_la_persistance_est_supprimee_et_l_acces_ne_revient_pas
+  - test_une_creation_hors_quota_est_refusee
+estimated_time: 45m
+
+certification_tags:
+  - cks
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: constat
+    label: "The persistence object is named in /root/constat-attaque.yaml, exported from the live object before any deletion"
+    tests:
+      - test_le_constat_nomme_l_objet_de_persistance
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+  - id: persistance-retiree
+    label: "The persistence object is deleted and the attacker's access does not come back, even with the original Pod deleted"
+    tests:
+      - test_la_persistance_est_supprimee_et_l_acces_ne_revient_pas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/scenarios-attaque-cluster/
+  - id: application-intacte
+    label: "The legitimate application of reservations still has all its replicas available"
+    tests:
+      - test_l_application_legitime_a_tous_ses_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
+  - id: quota
+    label: "The namespace of the abusive workload carries a ResourceQuota capping requested memory and CPU"
+    tests:
+      - test_le_namespace_de_la_charge_porte_un_resourcequota
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: valeurs-par-defaut
+    label: "A LimitRange gives default requests and limits to containers that declare none"
+    tests:
+      - test_un_limitrange_donne_des_valeurs_par_defaut
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: hors-quota-refuse
+    label: "A creation beyond the quota is refused by the cluster, read on a real attempt"
+    tests:
+      - test_une_creation_hors_quota_est_refusee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: autre-namespace-repond
+    label: "While the abusive workload runs, an application of another namespace keeps answering"
+    tests:
+      - test_une_application_d_un_autre_namespace_repond_pendant_la_charge
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/frontieres-de-confiance/
