@@ -44,8 +44,8 @@ The tests read the state of the node, not the commands you typed:
   cluster's certificate authority;
 - the serial number of each control plane certificate has changed since the
   lab started;
-- the controller manager and the scheduler started after their kubeconfig was
-  rewritten;
+- the kubeconfig of the controller manager and of the scheduler carry a new
+  client certificate, and both started after it was rewritten;
 - your `~/.kube/config` carries the same certificate as the new
   `admin.conf`, and `kubectl` answers with it.
 

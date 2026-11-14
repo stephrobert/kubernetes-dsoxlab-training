@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Relève le numéro de série de chaque certificat du plan de contrôle et du
-# certificat client d'admin.conf, dans /var/lib/dsoxlab/pki-series.json : c'est
+# certificat client d'admin.conf, de controller-manager.conf et de
+# scheduler.conf, dans /var/lib/dsoxlab/pki-series.json : c'est
 # la référence du renouvellement. Pose ensuite le fichier de réponses vide.
 # Rejouable : le relevé est refait, il prend les certificats du moment.
 set -euo pipefail
@@ -18,9 +19,10 @@ series = {}
 for nom in ['apiserver', 'apiserver-kubelet-client', 'apiserver-etcd-client', 'front-proxy-client', 'etcd/server', 'etcd/peer', 'etcd/healthcheck-client']:
     series[nom] = serie_pem(open(f"/etc/kubernetes/pki/{nom}.crt").read())
 import yaml
-admin = yaml.safe_load(open("/etc/kubernetes/admin.conf"))
-pem = base64.b64decode(admin["users"][0]["user"]["client-certificate-data"]).decode()
-series["admin.conf"] = serie_pem(pem)
+for conf in ("admin.conf", "controller-manager.conf", "scheduler.conf"):
+    contenu = yaml.safe_load(open(f"/etc/kubernetes/{conf}"))
+    pem = base64.b64decode(contenu["users"][0]["user"]["client-certificate-data"]).decode()
+    series[conf] = serie_pem(pem)
 json.dump(series, open("/var/lib/dsoxlab/pki-series.json", "w"), indent=2)
 print(json.dumps(series, indent=2))
 PY

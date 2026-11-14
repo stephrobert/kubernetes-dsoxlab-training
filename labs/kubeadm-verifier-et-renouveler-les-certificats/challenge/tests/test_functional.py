@@ -4,8 +4,8 @@
    certificat au moment du check ;
 2. les sept certificats du plan de contrôle portent un autre numéro de série
    que celui relevé par le setup ;
-3. kube-controller-manager et kube-scheduler ont redémarré après le
-   renouvellement de leur kubeconfig (l'API server et etcd, eux, rechargent
+3. le kubeconfig de kube-controller-manager et de kube-scheduler porte un
+   nouveau certificat client, et les deux ont redémarré après sa réécriture (l'API server et etcd, eux, rechargent
    seuls leur certificat de service : mesuré sur 1.37) ;
 4. le kubeconfig de l'utilisateur porte le certificat client renouvelé
    d'admin.conf, et kubectl répond avec lui.
@@ -95,13 +95,25 @@ def test_le_controller_manager_et_le_scheduler_ont_redemarre(host):
     # qu'au démarrage : sans redémarrage, ils tomberont à l'échéance de l'ancien.
     # Le kubeconfig doit avoir été réécrit pendant le lab (après le relevé du
     # setup), et le conteneur avoir démarré APRÈS cette réécriture.
+    # La date seule ne suffit pas : un touch la change. Le numéro de série du
+    # certificat client porté par le kubeconfig doit lui aussi avoir changé.
+    releve = _releve(host)
     depart = _date_fichier(host, "/var/lib/dsoxlab/pki-series.json")
     ecarts = {}
     for nom, conf in (("kube-controller-manager", "controller-manager.conf"),
                       ("kube-scheduler", "scheduler.conf")):
+        assert conf in releve, message(
+            en="The serial numbers recorded by the setup predate this version of the lab: run it again with "
+            "dsoxlab run.",
+            fr="Les numéros de série relevés par le setup datent d'une version antérieure du lab : rejouez-le "
+            "avec dsoxlab run.",
+        )
+        contenu = yaml.safe_load(host.check_output(f"sudo cat /etc/kubernetes/{conf}")) or {}
+        donnees = ((contenu.get("users") or [{}])[0].get("user") or {}).get("client-certificate-data", "")
+        serie = _serie_pem(host, base64.b64decode(donnees).decode()) if donnees else ""
         ecrit = _date_fichier(host, f"/etc/kubernetes/{conf}")
         demarre = _demarrage_conteneur(host, nom)
-        if ecrit <= depart:
+        if ecrit <= depart or serie in ("", releve[conf]):
             ecarts[nom] = message(en=f"{conf} has not been renewed", fr=f"{conf} n'a pas été renouvelé")
         elif demarre is None or demarre <= ecrit:
             ecarts[nom] = message(en=f"still runs with the client certificate read before the renewal of {conf}",

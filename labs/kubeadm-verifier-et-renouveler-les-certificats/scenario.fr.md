@@ -45,8 +45,8 @@ Les tests lisent l'état du nœud, pas les commandes tapées :
   certification du cluster ;
 - le numéro de série de chaque certificat du plan de contrôle a changé depuis
   le lancement du lab ;
-- le controller-manager et le scheduler ont démarré après la réécriture de
-  leur kubeconfig ;
+- le kubeconfig du controller-manager et celui du scheduler portent un
+  nouveau certificat client, et les deux ont démarré après sa réécriture ;
 - votre `~/.kube/config` porte le même certificat que le nouvel
   `admin.conf`, et `kubectl` répond avec lui.
 
