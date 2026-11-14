@@ -1,0 +1,30 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Le cluster du catalogue doit être rendu entier, quel que soit l'état où
+# l'apprenant l'a laissé : worker joint ou non, swap coupé ou non. Le fichier de
+# swap du lab est retiré du worker, puis le socle est rejoué : il prépare le
+# worker (swap, pilote systemd, paquets figés) et le joint s'il manque.
+- name: Nettoyer le lab cka-joindre-un-noeud-kubeadm
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace jonction
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le fichier de swap du lab sur le worker
+      ansible.builtin.shell: |
+        swapoff /swapfile-lab 2>/dev/null || true
+        sed -i '\#/swapfile-lab#d' /etc/fstab
+        rm -f /swapfile-lab
+      changed_when: true
+      delegate_to: "{{ worker }}"
+
+    - name: Rejouer le socle, qui prépare le worker et le joint s'il manque
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml

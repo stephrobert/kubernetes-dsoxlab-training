@@ -1,0 +1,21 @@
+title: "Initialiser un plan de contrôle avec kubeadm"
+description: |
+  Préparer un plan de contrôle remis à zéro pour Kubernetes 1.37 (modules
+  noyau et routage IP rendus persistants, swap coupé durablement, paquets
+  figés), l'initialiser avec un fichier de configuration kubeadm, donner à
+  l'utilisateur un kubeconfig qui fonctionne, puis poser Calico par son
+  opérateur jusqu'au nœud Ready.
+
+criteria:
+  - id: init-par-fichier
+    label: "Le cluster a été initialisé par un fichier de configuration, sous le nom catalogue"
+  - id: kubeconfig-utilisateur
+    label: "Le kubeconfig de l'utilisateur joint le nouveau cluster sans sudo"
+  - id: calico-sur-le-noeud
+    label: "Calico tourne sur le plan de contrôle"
+  - id: noeud-ready
+    label: "Le nœud est Ready et CoreDNS tourne"
+  - id: preparation-durable
+    label: "Modules, routage IP et swap survivent à un redémarrage"
+  - id: paquets-figes
+    label: "kubeadm, kubelet et kubectl sont figés"

@@ -207,6 +207,10 @@ sections:
       - cka-troubleshoot-node-notready
       - cka-troubleshoot-kubelet
       - cka-troubleshoot-apiserver
+      # Niveau 4, lot A (vague 2) : initialiser le plan de contrôle, puis
+      # joindre un worker au cluster kubeadm.
+      - cka-initialiser-un-plan-de-controle
+      - cka-joindre-un-noeud-kubeadm
       # Niveau 4, lot A (vague 1) : les interfaces d'un nœud (CNI, CSI et CRI),
       # puis la santé d'etcd avant sa sauvegarde.
       - k8s-lire-les-interfaces-d-un-noeud
@@ -219,6 +223,8 @@ sections:
       # restaurer l'état. C'est aussi le seul lab du catalogue qui reconstruit
       # le cluster, d'où sa place tardive.
       - cka-kubeadm-upgrade
+      # Niveau 4, lot A (vague 2) : le challenge du module Administrer le cluster.
+      - k8s-challenge-sauvegarder-et-restaurer
       # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
       # puisqu'il ne dit plus quel est le sujet de la panne.
       - cka-capstone-portail

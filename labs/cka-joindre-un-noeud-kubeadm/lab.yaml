@@ -1,0 +1,85 @@
+# Lab guidé de la leçon « Joindre un nœud » (KUBERN-12-03B), module Installer
+# un cluster du niveau 4 (règle 17). Le geste : préparer un worker réinitialisé
+# (swap coupé durablement, containerd sur le pilote de cgroup systemd, paquets
+# figés), le joindre au cluster avec la commande que donne le plan de contrôle,
+# vérifier qu'il est Ready avec le kubelet attendu, puis y faire tourner un Pod.
+#
+# Le setup retire k8s-w1.lab du cluster, le réinitialise (kubeadm reset) et
+# défait sa préparation : swap actif et inscrit dans fstab, containerd revenu
+# au pilote cgroupfs, paquets dégelés. Le cleanup rejoue le socle, qui prépare
+# le worker et le joint s'il manque : le cluster du catalogue est rendu entier.
+id: cka-joindre-un-noeud-kubeadm
+title: "Join a worker node to a kubeadm cluster"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  Prepare a reset worker for Kubernetes 1.37 (swap off for good, containerd on
+  the systemd cgroup driver, packages held), join it to the cluster with the
+  command the control plane issues, check that it is Ready with the expected
+  kubelet, then prove it runs workloads with a Pod running on it.
+skills:
+  - kubeadm
+  - kubelet
+  - containerd
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/#mettre-en-pratique
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le worker est réinitialisé puis joint pendant le lab : `roles` est le
+      # champ que le contrat prévoit pour les hôtes utilisés en même temps.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: noeud-joint
+    label: "The worker has joined the cluster and is Ready"
+    tests:
+      - test_le_worker_est_joint_et_ready
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: version-du-kubelet
+    label: "Its kubelet reports the cluster's version"
+    tests:
+      - test_son_kubelet_annonce_la_version_du_cluster
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: swap-coupe
+    label: "Swap is off on the worker, and stays off after a reboot"
+    tests:
+      - test_le_swap_est_coupe_durablement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: pilote-systemd
+    label: "containerd runs with the systemd cgroup driver"
+    tests:
+      - test_containerd_utilise_le_pilote_systemd
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: paquets-figes
+    label: "kubeadm, kubelet and kubectl are held"
+    tests:
+      - test_les_paquets_sont_figes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: pod-sur-le-worker
+    label: "A Pod runs on the worker"
+    tests:
+      - test_un_pod_tourne_sur_le_worker
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/

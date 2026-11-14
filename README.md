@@ -225,7 +225,7 @@ Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster 
 
 Five domains. Troubleshooting weighs 30 %, more than any other, and it is the one that separates those who know Kubernetes from those who can operate it.
 
-37 lab(s).
+40 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -259,13 +259,16 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 | 28 | [`cka-troubleshoot-node-notready`](labs/cka-troubleshoot-node-notready/) | Bring a NotReady node back into the cluster | troubleshooting | 15m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/#mettre-en-pratique) |
 | 29 | [`cka-troubleshoot-kubelet`](labs/cka-troubleshoot-kubelet/) | Repair a kubelet that refuses to start | troubleshooting | 15m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/#mettre-en-pratique) |
 | 30 | [`cka-troubleshoot-apiserver`](labs/cka-troubleshoot-apiserver/) | Bring the API server back into service | troubleshooting | 15m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique) |
-| 31 | [`k8s-lire-les-interfaces-d-un-noeud`](labs/k8s-lire-les-interfaces-d-un-noeud/) | Read the CRI, CNI and CSI interfaces of a node | cluster-architecture-installation-configuration | 20m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/#mettre-en-pratique) |
-| 32 | [`cka-etcd-sante-et-defragmentation`](labs/cka-etcd-sante-et-defragmentation/) | Check etcd health and defragment its database | cluster-architecture-installation-configuration | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/#mettre-en-pratique) |
-| 33 | [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) | Back up etcd, then restore the cluster from a snapshot | cluster-architecture-installation-configuration | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
-| 34 | [`k8s-detecter-les-api-depreciees`](labs/k8s-detecter-les-api-depreciees/) | Detect and migrate removed APIs | cluster-architecture-installation-configuration | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique) |
-| 35 | [`cka-kubeadm-upgrade`](labs/cka-kubeadm-upgrade/) | Upgrade a cluster one minor version, without interrupting what runs on it | cluster-architecture | 40m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
-| 36 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
-| 37 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 31 | [`cka-initialiser-un-plan-de-controle`](labs/cka-initialiser-un-plan-de-controle/) | Initialise a control plane with kubeadm | cluster-architecture-installation-configuration | 45m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/#mettre-en-pratique) |
+| 32 | [`cka-joindre-un-noeud-kubeadm`](labs/cka-joindre-un-noeud-kubeadm/) | Join a worker node to a kubeadm cluster | cluster-architecture-installation-configuration | 30m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/#mettre-en-pratique) |
+| 33 | [`k8s-lire-les-interfaces-d-un-noeud`](labs/k8s-lire-les-interfaces-d-un-noeud/) | Read the CRI, CNI and CSI interfaces of a node | cluster-architecture-installation-configuration | 20m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/#mettre-en-pratique) |
+| 34 | [`cka-etcd-sante-et-defragmentation`](labs/cka-etcd-sante-et-defragmentation/) | Check etcd health and defragment its database | cluster-architecture-installation-configuration | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/#mettre-en-pratique) |
+| 35 | [`cka-etcd-backup-restore`](labs/cka-etcd-backup-restore/) | Back up etcd, then restore the cluster from a snapshot | cluster-architecture-installation-configuration | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
+| 36 | [`k8s-detecter-les-api-depreciees`](labs/k8s-detecter-les-api-depreciees/) | Detect and migrate removed APIs | cluster-architecture-installation-configuration | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique) |
+| 37 | [`cka-kubeadm-upgrade`](labs/cka-kubeadm-upgrade/) | Upgrade a cluster one minor version, without interrupting what runs on it | cluster-architecture | 40m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
+| 38 | [`k8s-challenge-sauvegarder-et-restaurer`](labs/k8s-challenge-sauvegarder-et-restaurer/) | Challenge: back up, restore and put a cluster back in order | cluster-architecture-installation-configuration | 50m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
+| 39 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 40 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 ### CKAD, Certified Kubernetes Application Developer
 
@@ -345,7 +348,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 19 | [`cks-cis-benchmark-remediate`](labs/cks-cis-benchmark-remediate/) | Bring down a CIS audit count, and prove it with a second audit | cluster-setup | 30m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/) |
 | 20 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **106 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **109 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
