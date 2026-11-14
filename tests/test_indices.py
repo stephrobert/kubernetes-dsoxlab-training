@@ -67,6 +67,7 @@ SANS_INDICE = {
     "k8s-epreuve-livrer-une-application": "D36, épreuve du niveau 3 sans indice",
     "cka-examen-blanc": "examen blanc CKA sans indice, décision du 2026-11-12",
     "ckad-examen-blanc": "examen blanc CKAD sans indice, décision du 2026-11-12",
+    "cks-examen-blanc": "examen blanc CKS sans indice, mêmes règles que CKA et CKAD (D53)",
 }
 
 

@@ -316,7 +316,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 
 Six domains. Three of them weigh 20 % each, so 60 % between them. Several of their skills cannot be checked on a containerised cluster, which is the reason this catalogue uses virtual machines.
 
-26 lab(s).
+27 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -346,8 +346,9 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 24 | [`k8s-contenir-un-deni-de-service`](labs/k8s-contenir-un-deni-de-service/) | Contain a denial of service inside its namespace | cluster-hardening | 30m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 25 | [`k8s-challenge-contenir-une-attaque`](labs/k8s-challenge-contenir-une-attaque/) | Detect and contain a persistence and a denial of service | cluster-hardening | 45m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 26 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 27 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **121 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **122 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
