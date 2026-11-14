@@ -11,7 +11,7 @@ application, and prove the access does not come back.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `facturation` namespace and three cluster-wide objects of the attacker |
 | Duration | about 30 minutes |
-| Related page | [Kubernetes course](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/), until the lesson is published |
+| Related page | [Persistence: what an attacker leaves behind](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/) (in French) |
 
 The method is in `scenario.md`: list the scheduled objects, the rights and the
 webhooks, read the events and, where the API server writes one, the audit log.

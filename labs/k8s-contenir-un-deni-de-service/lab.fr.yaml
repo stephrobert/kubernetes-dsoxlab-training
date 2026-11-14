@@ -1,7 +1,6 @@
 title: "Contenir un déni de service dans son namespace"
 # Page provisoire, comme dans lab.yaml. URL cible (fiche KUBERN-S-06) :
 # https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
 description: |
   Une charge sans limites tourne dans un namespace de test. Plafonner ce
   namespace par un quota et des valeurs par défaut, prouver qu'une création

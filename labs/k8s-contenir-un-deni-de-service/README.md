@@ -11,7 +11,7 @@ that an application of another namespace keeps answering.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `bac-a-sable` and `annuaire` namespaces |
 | Duration | about 30 minutes |
-| Related page | [Kubernetes course](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/), until the lesson is published |
+| Related page | [Denial of service: exhausting a cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) (in French) |
 
 The abusive workload is safe for the shared node by construction: each of its
 two Pods writes a fixed 96 MiB block into a memory-backed `emptyDir` capped at

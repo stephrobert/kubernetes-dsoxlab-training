@@ -11,7 +11,7 @@ answering. Seven states, threshold 70, two blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `reservations` and `calcul-lots` namespaces and three cluster-wide objects of the attacker |
 | Duration | about 45 minutes |
-| Related page | [Kubernetes course](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/), until the lesson is published |
+| Related page | [Denial of service: exhausting a cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) (in French) |
 
 The persistence differs from the guided lab `k8s-detecter-une-persistance`,
 and so do the names: play the two guided labs of the module first.
