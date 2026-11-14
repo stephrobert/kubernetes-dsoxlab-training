@@ -1,0 +1,55 @@
+---
+# Joué par `dsoxlab run` : installe le socle kind sur k8s-kind.lab avec le
+# cluster « capacite » (un control plane et TROIS workers, étiquetés zone-a,
+# zone-b et zone-c), réserve capacite-worker3, installe Traefik, puis pose la
+# situation de l'épreuve.
+#
+# POURQUOI CE CLUSTER. Le critère de placement exige un nœud réservé ET deux
+# nœuds ordonnançables où répartir le frontend : le cluster kubeadm n'a que deux
+# nœuds, le cluster kind « multi » un control plane et deux workers. Le cluster
+# « capacite » est partagé avec le challenge k8s-challenge-placer-et-plafonner.
+#
+# Le nœud est réservé AVANT Traefik et metrics-server : aucun d'eux ne tolère
+# le taint, aucun ne s'y place, et le critère « rien d'autre que la base sur le
+# nœud réservé » ne regarde de toute façon que le namespace festival.
+- name: Préparer l'épreuve k8s-epreuve-livrer-une-application
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/capacite.kubeconfig
+  tasks:
+    - name: Installer le socle kind à quatre nœuds
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: capacite
+        kind_workers: 3
+
+    - name: Étiqueter le nœud réservé
+      ansible.builtin.command: "{{ kubectl }} label node capacite-worker3 reserve=registre --overwrite"
+      changed_when: true
+
+    - name: Poser le taint du nœud réservé
+      ansible.builtin.command: "{{ kubectl }} taint node capacite-worker3 reserve=registre:NoSchedule --overwrite"
+      changed_when: true
+
+    - name: Lire l'adresse du control plane, où répond le NodePort de Traefik
+      ansible.builtin.command: >-
+        {{ kubectl }} get node capacite-control-plane
+        -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}'
+      register: adresse_cp
+      changed_when: false
+
+    - name: Installer le contrôleur, l'Ingress et la Gateway API
+      ansible.builtin.include_tasks: ../../shared/traefik.yml
+      vars:
+        traefik_kubeconfig: /etc/kind/capacite.kubeconfig
+        traefik_adresse: "{{ adresse_cp.stdout | trim }}"
+        traefik_gateway_api: true
+
+    - name: Poser la situation de l'épreuve
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/capacite.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

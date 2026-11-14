@@ -1,0 +1,34 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire le namespace atelier,
+# les taints et labels que le challenge fait poser (dedie, disque) sur tous les
+# nœuds, et metrics-server. Le cluster kind « capacite » reste, il est le socle.
+- name: Défaire le challenge k8s-challenge-placer-et-plafonner
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/capacite.kubeconfig
+  tasks:
+    - name: Supprimer le namespace du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace atelier --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les taints et labels du challenge de tous les nœuds
+      ansible.builtin.shell: |
+        for noeud in $({{ kubectl }} get nodes -o name); do
+          {{ kubectl }} taint nodes "${noeud#node/}" dedie- 2>/dev/null || true
+          {{ kubectl }} label "$noeud" dedie- 2>/dev/null || true
+          {{ kubectl }} label "$noeud" disque- 2>/dev/null || true
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Retirer metrics-server, installé par le setup
+      ansible.builtin.command: >-
+        {{ kubectl }} delete
+        -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.9.1/components.yaml
+        --ignore-not-found
+      changed_when: true
+      failed_when: false

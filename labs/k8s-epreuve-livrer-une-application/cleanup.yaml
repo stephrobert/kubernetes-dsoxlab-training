@@ -1,0 +1,56 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire les trois namespaces de
+# l'épreuve, tout ClusterRoleBinding qui nommerait un compte de festival, la
+# réservation du nœud, metrics-server, Traefik avec ses CRD, et le répertoire
+# de l'apprenant. Le cluster kind « capacite » reste, il est le socle.
+- name: Nettoyer l'épreuve k8s-epreuve-livrer-une-application
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kind/capacite.kubeconfig
+  tasks:
+    - name: Retirer tout ClusterRoleBinding qui nomme un compte de festival
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get clusterrolebindings -o json \
+          | python3 -c 'import json,sys; [print(b["metadata"]["name"]) for b in json.load(sys.stdin)["items"] if any(s.get("kind") == "ServiceAccount" and s.get("namespace") == "festival" for s in b.get("subjects") or [])]' \
+          | xargs -r {{ kubectl }} delete clusterrolebinding
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les namespaces de l'épreuve
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace festival paiement partenaires
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer la réservation de tous les nœuds
+      ansible.builtin.shell: |
+        for noeud in $({{ kubectl }} get nodes -o name); do
+          {{ kubectl }} taint nodes "${noeud#node/}" reserve- 2>/dev/null || true
+          {{ kubectl }} label "$noeud" reserve- 2>/dev/null || true
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Retirer metrics-server, installé par le setup
+      ansible.builtin.command: >-
+        {{ kubectl }} delete
+        -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.9.1/components.yaml
+        --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le contrôleur, les CRD et la politique d'admission
+      ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
+      vars:
+        traefik_kubeconfig: /etc/kind/capacite.kubeconfig
+
+    - name: Retirer le répertoire de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/epreuve"
+        state: absent
