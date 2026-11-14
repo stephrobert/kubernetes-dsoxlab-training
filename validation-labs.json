@@ -4554,6 +4554,67 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-durcir-le-plan-de-controle": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_kube_bench_relance_compte_moins_d_echecs",
+    "test_l_api_server_porte_les_reglages_de_durcissement",
+    "test_l_api_server_tourne_avec_l_audit_monte",
+    "test_la_politique_d_audit_distingue_les_secrets_du_reste",
+    "test_le_journal_trace_les_secrets_en_entier_et_le_reste_en_metadonnees",
+    "test_le_profileur_est_ferme_et_l_api_repond_toujours",
+    "test_les_trois_composants_portent_la_correction_cis"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 431,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-durcir-le-plan-de-controle.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_kube_bench_relance_compte_moins_d_echecs",
+    "test_l_api_server_porte_les_reglages_de_durcissement",
+    "test_l_api_server_tourne_avec_l_audit_monte",
+    "test_la_politique_d_audit_distingue_les_secrets_du_reste",
+    "test_le_journal_trace_les_secrets_en_entier_et_le_reste_en_metadonnees",
+    "test_le_profileur_est_ferme_et_l_api_repond_toujours",
+    "test_les_trois_composants_portent_la_correction_cis"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-exposer-et-isoler": {
   "apres": {
    "echecs": [],
@@ -4612,6 +4673,73 @@
    "skipped": 0,
    "status": "failed",
    "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-faire-refuser-par-admission": {
+  "apres": {
+   "echecs": [],
+   "passed": 10,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 10
+  },
+  "avant": {
+   "echecs": [
+    "test_l_admission_refuse_l_interdit_et_accepte_le_conforme",
+    "test_le_conteneur_ne_voit_plus_les_processus_de_l_hote",
+    "test_le_pod_catalogue_satisfait_les_quatre_exigences",
+    "test_le_pod_catalogue_tourne_dans_vitrine",
+    "test_le_pod_de_remplacement_ne_garde_aucun_defaut",
+    "test_le_pod_de_remplacement_tourne",
+    "test_le_pod_privilegie_d_origine_n_existe_plus",
+    "test_le_tag_est_refuse_le_digest_passe_et_les_autres_namespaces_non_touches",
+    "test_une_politique_native_est_liee_en_mode_refus",
+    "test_vitrine_declare_restricted_dans_les_trois_modes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 468,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-faire-refuser-par-admission.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_admission_refuse_l_interdit_et_accepte_le_conforme",
+    "test_le_conteneur_ne_voit_plus_les_processus_de_l_hote",
+    "test_le_pod_catalogue_satisfait_les_quatre_exigences",
+    "test_le_pod_catalogue_tourne_dans_vitrine",
+    "test_le_pod_de_remplacement_ne_garde_aucun_defaut",
+    "test_le_pod_de_remplacement_tourne",
+    "test_le_pod_privilegie_d_origine_n_existe_plus",
+    "test_le_tag_est_refuse_le_digest_passe_et_les_autres_namespaces_non_touches",
+    "test_une_politique_native_est_liee_en_mode_refus",
+    "test_vitrine_declare_restricted_dans_les_trois_modes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
   },
   "verdict": "VALIDE"
  },
@@ -4787,6 +4915,73 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-livrer-une-image-verifiee": {
+  "apres": {
+   "echecs": [],
+   "passed": 10,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 10
+  },
+  "avant": {
+   "echecs": [
+    "test_c_est_toujours_l_image_demandee",
+    "test_l_image_de_boutique_n_est_plus_celle_d_origine",
+    "test_la_cle_accepte_l_image_signee_et_refuse_l_autre",
+    "test_la_cle_publique_est_publiee_dans_le_cluster",
+    "test_la_nouvelle_image_porte_moins_de_failles_critiques",
+    "test_la_signature_est_poussee_dans_le_registre",
+    "test_le_cluster_refuse_l_image_non_signee_et_accepte_la_signee",
+    "test_le_digest_declare_est_celui_que_le_noeud_execute",
+    "test_les_constats_du_dockerfile_ont_disparu",
+    "test_vitrine_reference_son_image_par_digest"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-14",
+  "duree_s": 719,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/10",
+   "après la solution : 10/10",
+   "après clean et run : 0/10",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-livrer-une-image-verifiee.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_c_est_toujours_l_image_demandee",
+    "test_l_image_de_boutique_n_est_plus_celle_d_origine",
+    "test_la_cle_accepte_l_image_signee_et_refuse_l_autre",
+    "test_la_cle_publique_est_publiee_dans_le_cluster",
+    "test_la_nouvelle_image_porte_moins_de_failles_critiques",
+    "test_la_signature_est_poussee_dans_le_registre",
+    "test_le_cluster_refuse_l_image_non_signee_et_accepte_la_signee",
+    "test_le_digest_declare_est_celui_que_le_noeud_execute",
+    "test_les_constats_du_dockerfile_ont_disparu",
+    "test_vitrine_reference_son_image_par_digest"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 10
   },
   "verdict": "VALIDE"
  },
