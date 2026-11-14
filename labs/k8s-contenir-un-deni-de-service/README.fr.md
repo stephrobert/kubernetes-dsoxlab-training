@@ -11,7 +11,7 @@ vérifier qu'une application d'un autre namespace continue de répondre.
 |---|---|
 | Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab pose les namespaces `bac-a-sable` et `annuaire` |
 | Durée | environ 30 minutes |
-| Page associée | [Formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/), en attendant la publication de la leçon |
+| Page associée | [Déni de service : épuiser un cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 
 La charge abusive est sûre pour le nœud partagé, par construction : chacun de
 ses deux Pods écrit un bloc fixe de 96 Mio dans un `emptyDir` en mémoire borné

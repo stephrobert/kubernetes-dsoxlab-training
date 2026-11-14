@@ -11,7 +11,7 @@ continue de répondre. Sept états, seuil 70, deux bloquants.
 |---|---|
 | Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab pose les namespaces `reservations` et `calcul-lots` et trois objets de l'attaquant à l'échelle du cluster |
 | Durée | environ 45 minutes |
-| Page associée | [Formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/), en attendant la publication de la leçon |
+| Page associée | [Déni de service : épuiser un cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 
 La persistance diffère de celle du lab guidé `k8s-detecter-une-persistance`,
 les noms aussi : jouez d'abord les deux labs guidés du module.

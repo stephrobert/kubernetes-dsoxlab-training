@@ -11,7 +11,7 @@ l'application légitime, et prouver que l'accès ne revient pas.
 |---|---|
 | Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab pose le namespace `facturation` et trois objets de l'attaquant à l'échelle du cluster |
 | Durée | environ 30 minutes |
-| Page associée | [Formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/), en attendant la publication de la leçon |
+| Page associée | [Persistance : ce qu'un attaquant laisse derrière lui](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/) |
 
 La méthode est dans `scenario.fr.md` : lister les objets planifiés, les droits
 et les webhooks, lire les événements et, quand l'API server en écrit un, le

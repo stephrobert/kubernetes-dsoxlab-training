@@ -1,7 +1,6 @@
 title: "Repérer et retirer ce qu'un attaquant a laissé derrière lui"
 # Page provisoire, comme dans lab.yaml. URL cible (fiche KUBERN-S-05) :
 # https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
 description: |
   Dans un namespace où une charge planifiée recrée en silence l'accès d'un
   attaquant, lister ce qui est planifié, qui a quels droits et ce qui a changé

@@ -34,9 +34,7 @@ skills:
   - limitrange
 distros:
   - ubuntu24
-# Page provisoire : la leçon hôte KUBERN-S-06 n'existe pas encore. URL cible :
-# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
