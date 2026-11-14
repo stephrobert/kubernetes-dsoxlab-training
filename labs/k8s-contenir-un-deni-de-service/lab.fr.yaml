@@ -1,0 +1,22 @@
+title: "Contenir un déni de service dans son namespace"
+# Page provisoire, comme dans lab.yaml. URL cible (fiche KUBERN-S-06) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Une charge sans limites tourne dans un namespace de test. Plafonner ce
+  namespace par un quota et des valeurs par défaut, prouver qu'une création
+  hors quota est refusée et qu'un conteneur qui ne déclare rien est complété,
+  borner la charge en marche, et vérifier qu'une application d'un autre
+  namespace continue de répondre pendant qu'elle tourne.
+
+criteria:
+  - id: quota-pose
+    label: "bac-a-sable porte un ResourceQuota qui plafonne le processeur et la mémoire demandés et leurs limites aux valeurs demandées"
+  - id: valeurs-par-defaut
+    label: "Un conteneur qui ne déclare aucune ressource dans bac-a-sable reçoit les requests et les limits par défaut"
+  - id: hors-quota-refuse
+    label: "Une création au-delà du quota est refusée par le cluster, sur une tentative réelle"
+  - id: charge-bornee
+    label: "Les Pods en marche de gourmand portent des requests et des limits"
+  - id: autre-namespace-repond
+    label: "Pendant que la charge bornée tourne, l'application d'annuaire garde tous ses réplicas et répond"

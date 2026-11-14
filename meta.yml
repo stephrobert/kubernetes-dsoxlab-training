@@ -349,6 +349,16 @@ sections:
       # une CA interne, juste après le TLS d'un Ingress.
       - k8s-emettre-un-certificat-avec-cert-manager
       - cks-cis-benchmark-remediate
+      # Module Modèle de menaces et cadres (niveau 5, KCSA), sur le cluster
+      # kubeadm : le lab guidé de la leçon Persistance. Il suppose joués les
+      # labs RBAC et audit ci-dessus.
+      - k8s-detecter-une-persistance
+      # Le lab guidé de la leçon Déni de service, qui suit la Persistance dans
+      # le module et s'appuie sur cka-resourcequota-limitrange.
+      - k8s-contenir-un-deni-de-service
+      # Le challenge du module, posé dans la leçon Déni de service : il croise
+      # les deux labs guidés précédents sur un autre scénario.
+      - k8s-challenge-contenir-une-attaque
 
       # Le capstone vient en dernier, comme ceux du CKA et du CKAD : il ne
       # nomme plus aucun objet Kubernetes, et ne s'adresse donc qu'à qui a

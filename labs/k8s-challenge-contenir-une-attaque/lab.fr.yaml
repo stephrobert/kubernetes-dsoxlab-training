@@ -1,0 +1,26 @@
+title: "Détecter et contenir une persistance et un déni de service"
+# Page provisoire, comme dans lab.yaml. URL cible (leçon hôte KUBERN-S-06) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Sans procédure, trouver ce qu'un attaquant a laissé pour garder son accès, le
+  consigner et le retirer pour de bon sans abîmer l'application légitime, puis
+  plafonner le namespace où tourne une charge abusive, et prouver que le
+  cluster refuse ce qui dépasse le plafond pendant qu'une autre application
+  continue de répondre.
+
+criteria:
+  - id: constat
+    label: "L'objet de persistance est nommé dans /root/constat-attaque.yaml, exporté de l'objet vivant avant toute suppression"
+  - id: persistance-retiree
+    label: "L'objet de persistance est supprimé et l'accès de l'attaquant ne revient pas, même une fois le Pod d'origine supprimé"
+  - id: application-intacte
+    label: "L'application légitime de reservations a toujours tous ses réplicas disponibles"
+  - id: quota
+    label: "Le namespace de la charge abusive porte un ResourceQuota qui plafonne la mémoire et le processeur demandés"
+  - id: valeurs-par-defaut
+    label: "Un LimitRange donne des requests et des limits par défaut aux conteneurs qui n'en déclarent pas"
+  - id: hors-quota-refuse
+    label: "Une création au-delà du quota est refusée par le cluster, lue sur une tentative réelle"
+  - id: autre-namespace-repond
+    label: "Pendant que la charge abusive tourne, une application d'un autre namespace continue de répondre"

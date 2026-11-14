@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis la situation du
+# lab (fixtures/prepare.sh), fausse sur les cinq états par construction.
+- name: Préparer le lab k8s-contenir-un-deni-de-service
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la charge sans limites et l'application à protéger
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

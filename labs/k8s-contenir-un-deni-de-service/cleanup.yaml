@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : tout ce que le lab et sa
+# solution posent vit dans ses deux namespaces, quota et LimitRange compris.
+# Rien n'est posé à l'échelle du cluster.
+- name: Défaire le lab k8s-contenir-un-deni-de-service
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les deux namespaces du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace bac-a-sable annuaire
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true

@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, puis la situation du
+# challenge (fixtures/prepare.sh), fausse sur les sept états par construction.
+- name: Préparer le challenge k8s-challenge-contenir-une-attaque
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'application, la persistance de l'attaquant et la charge abusive
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

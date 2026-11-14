@@ -1,0 +1,51 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire tout ce que le lab et sa
+# solution posent. L'ordre compte : le CronJob part d'abord, avec ses Jobs et
+# leurs Pods, sinon un passage en cours recréerait support-n2 et sa liaison
+# après leur suppression. Viennent ensuite le namespace, puis les objets de
+# l'échelle du cluster, que la suppression du namespace n'emporte pas.
+- name: Défaire le lab k8s-detecter-une-persistance
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le CronJob de l'attaquant, Jobs et Pods compris
+      ansible.builtin.command: >-
+        {{ kubectl }} -n facturation delete cronjob rotation-journaux
+        --ignore-not-found --cascade=foreground --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace facturation --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer les ClusterRoleBindings de l'attaquant
+      ansible.builtin.command: >-
+        {{ kubectl }} delete clusterrolebinding support-n2 rotation-journaux --ignore-not-found
+      changed_when: true
+
+    - name: Retirer le ClusterRole de l'attaquant
+      ansible.builtin.command: >-
+        {{ kubectl }} delete clusterrole rotation-journaux --ignore-not-found
+      changed_when: true
+
+    - name: Retirer toute autre liaison de cluster qui nomme un compte de facturation
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ kubectl }} get clusterrolebindings -o json \
+          | python3 -c 'import json,sys; [print(b["metadata"]["name"]) for b in json.load(sys.stdin)["items"] if any(s.get("kind") == "ServiceAccount" and s.get("namespace") == "facturation" for s in b.get("subjects") or [])]' \
+          | xargs -r {{ kubectl }} delete clusterrolebinding
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Retirer le constat et la référence posés sur le nœud
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /root/constat-persistance.yaml
+        - /var/lib/dsoxlab-labs/k8s-detecter-une-persistance.uid

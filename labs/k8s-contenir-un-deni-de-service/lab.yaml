@@ -1,0 +1,92 @@
+# Lab guidé de la leçon KUBERN-S-06, « Déni de service : épuiser un cluster »,
+# module Modèle de menaces et cadres (niveau 5, objectif KCSA « Denial of
+# Service » du domaine Kubernetes Threat Model).
+#
+# La situation : dans le namespace de test bac-a-sable, le Deployment gourmand
+# tourne sans requests ni limits. Sa charge est SÛRE pour le nœud partagé, par
+# construction : chaque Pod écrit un bloc fixe de 96 Mio dans un emptyDir en
+# mémoire (borné à 128 Mio), puis fait tourner un processeur par rafales de
+# 20 secondes séparées de 10 secondes de pause. Deux Pods, soit moins de
+# 200 Mio en tout : jamais assez pour mettre un nœud en NotReady. Dans le
+# namespace annuaire tourne une application qui doit continuer de répondre.
+#
+# Le geste : un ResourceQuota et un LimitRange sur bac-a-sable, les Pods de
+# gourmand recréés pour recevoir les valeurs par défaut, et quatre preuves
+# actives : une création hors quota refusée, un conteneur sans limites
+# complété, la charge bornée, l'autre namespace qui répond.
+#
+# Briques attestées réutilisées : cka-resourcequota-limitrange (les deux sondes
+# actives et le message « exceeded quota »), ckad-pod-resources-labels
+# (requests et limits par conteneur).
+id: k8s-contenir-un-deni-de-service
+title: "Contain a denial of service inside its namespace"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  A workload with no limits runs in a test namespace. Cap that namespace with
+  a quota and default values, prove that a creation beyond the quota is
+  refused and that a container declaring nothing is completed, bound the
+  running workload, and check that an application of another namespace keeps
+  answering while it runs.
+skills:
+  - threat-model
+  - denial-of-service
+  - resourcequota
+  - limitrange
+  - requests-limits
+distros:
+  - ubuntu24
+# Page provisoire : la leçon n'existe pas encore. URL cible (fiche KUBERN-S-06) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cks
+  - kcsa
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: quota-pose
+    label: "bac-a-sable carries a ResourceQuota capping requested CPU and memory and their limits at the values asked"
+    tests:
+      - test_le_namespace_porte_un_resourcequota
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: valeurs-par-defaut
+    label: "A container declaring no resources in bac-a-sable receives the default requests and limits"
+    tests:
+      - test_un_conteneur_sans_limites_recoit_les_valeurs_par_defaut
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: hors-quota-refuse
+    label: "A creation beyond the quota is refused by the cluster, on a real attempt"
+    tests:
+      - test_une_creation_hors_quota_est_refusee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: charge-bornee
+    label: "The running Pods of gourmand carry requests and limits"
+    tests:
+      - test_la_charge_abusive_est_bornee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+  - id: autre-namespace-repond
+    label: "While the bounded workload runs, the application of annuaire keeps all its replicas and answers"
+    tests:
+      - test_l_application_d_un_autre_namespace_repond_pendant_la_charge
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/frontieres-de-confiance/
