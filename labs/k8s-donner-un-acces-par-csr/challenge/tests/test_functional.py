@@ -99,11 +99,23 @@ def test_camille_ne_peut_rien_de_plus(host):
     _kubeconfig(host)
     essais = [("delete", "pods", NS), ("create", "deployments", NS), ("get", "secrets", NS),
               ("list", "pods", "default"), ("list", "pods", "kube-system"), ("list", "nodes", "")]
-    accordes = []
+    # Seul un « no » explicite de l'API vaut refus. Un kubeconfig vide ou
+    # invalide fait échouer can-i sans rien répondre : ce n'est pas un refus,
+    # c'est une question qui n'a pas été posée.
+    accordes, sans_reponse = [], []
     for verbe, ressource, ns in essais:
         option = f"-n {ns}" if ns else ""
-        if _comme_camille(host, f"auth can-i {verbe} {ressource} {option}").stdout.strip() == "yes":
-            accordes.append(f"{verbe} {ressource}" + (f" -n {ns}" if ns else ""))
+        essai = f"{verbe} {ressource}" + (f" -n {ns}" if ns else "")
+        reponse = _comme_camille(host, f"auth can-i {verbe} {ressource} {option}").stdout.strip()
+        if reponse == "yes":
+            accordes.append(essai)
+        elif reponse != "no":
+            sans_reponse.append(essai)
+    assert not sans_reponse, message(
+        en=f"The API gave no answer for camille on {sans_reponse}: her kubeconfig does not let her ask.",
+        fr=f"L'API n'a rien répondu pour camille sur {sans_reponse} : son kubeconfig ne lui permet pas de "
+        "poser la question.",
+    )
     assert not accordes, message(
         en=f"camille can do more than read the Pods of {NS}: {accordes}.",
         fr=f"camille peut plus que lire les Pods d'{NS} : {accordes}.",
