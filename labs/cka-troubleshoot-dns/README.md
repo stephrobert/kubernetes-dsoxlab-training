@@ -19,7 +19,7 @@ restored. The setup keeps the original Corefile on the node, and the
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the vanilla kubeadm cluster |
 | Duration | about 20 minutes |
-| Companion lesson | [CoreDNS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
+| Companion lesson | [CoreDNS](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-dns

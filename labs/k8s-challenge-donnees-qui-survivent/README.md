@@ -10,7 +10,7 @@ three blocking.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `lab`; the lab sets up the `archives` namespace and a Pending claim |
 | Duration | about 40 minutes |
-| Related page | [StorageClass, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique) |
+| Related page | [StorageClass, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/) |
 
 ```bash
 dsoxlab run    k8s-challenge-donnees-qui-survivent

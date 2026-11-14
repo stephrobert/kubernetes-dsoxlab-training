@@ -9,7 +9,7 @@ node and a custom resource. Ten criteria, pass mark 70, five critical.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `multi` (one control plane, two workers); the lab sets up the `magasin` namespace and the `Sauvegarde` CRD |
 | Duration | about 90 minutes |
-| Related page | [Épreuve du niveau 2](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/deployer-une-application/) |
+| Related page | [Épreuve du niveau 2](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-deploy-an-application/) |
 
 ```bash
 dsoxlab run    k8s-epreuve-deployer-une-application

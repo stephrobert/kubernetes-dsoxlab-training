@@ -9,7 +9,7 @@ cluster.
 |---|---|
 | Target | `k8s-kind.lab`; the lab prepares a kind cluster and your kubeconfig, then removes kubectl |
 | Duration | about 20 minutes |
-| Related page | [Install and configure kubectl, Mettre en pratique section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-installation-configuration/#mettre-en-pratique) |
+| Related page | [Install and configure kubectl, Mettre en pratique section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-and-configure-kubectl/) |
 
 ```bash
 dsoxlab run   k8s-installer-kubectl

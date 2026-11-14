@@ -8,7 +8,7 @@ acts at each step.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `architecture`, one control plane and three workers (Kubernetes 1.37) |
 | Duration | about 20 minutes |
-| Paired page | [Kubernetes architecture, hands-on section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/#mettre-en-pratique) (in French) |
+| Paired page | [Kubernetes architecture, hands-on section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/) |
 
 ```bash
 dsoxlab run   k8s-suivre-un-pod-de-kubectl-au-conteneur

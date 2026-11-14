@@ -9,7 +9,7 @@ state of the cluster; the cleanup brings etcd back to `/var/lib/etcd`.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster |
 | Duration | about 50 minutes |
-| Companion lesson | [Cluster PKI, Practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
+| Companion lesson | [Cluster PKI, Practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/) |
 
 ```bash
 dsoxlab run   k8s-challenge-sauvegarder-et-restaurer

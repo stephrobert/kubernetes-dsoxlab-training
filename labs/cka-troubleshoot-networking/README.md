@@ -20,7 +20,7 @@ namespace.
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster; the failure is on `k8s-w1.lab` |
 | Duration | about 30 minutes |
-| Companion lesson | [Pod Networking](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/#mettre-en-pratique) |
+| Companion lesson | [Pod Networking](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/) |
 
 ```bash
 dsoxlab run   cka-troubleshoot-networking

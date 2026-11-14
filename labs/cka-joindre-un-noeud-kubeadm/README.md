@@ -10,7 +10,7 @@ cluster, whatever state is left.
 |---|---|
 | Target | `k8s-cp.lab` and `k8s-w1.lab`, the catalogue's kubeadm cluster |
 | Duration | about 30 minutes |
-| Companion lesson | [Join a node, Practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/#mettre-en-pratique) |
+| Companion lesson | [Join a node, Practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/) |
 
 ```bash
 dsoxlab run   cka-joindre-un-noeud-kubeadm

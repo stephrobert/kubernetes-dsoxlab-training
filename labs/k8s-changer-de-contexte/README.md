@@ -14,7 +14,7 @@ recette cluster, and nowhere in `boutique`.
 |---|---|
 | Target | `k8s-kind.lab`, kind clusters `boutique` (starting context) and `lab` (the `recette` context) |
 | Duration | about 20 minutes |
-| Related page | [Kubeconfig and contexts, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique) |
+| Related page | [Kubeconfig and contexts, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/) |
 
 ```bash
 dsoxlab run   k8s-changer-de-contexte

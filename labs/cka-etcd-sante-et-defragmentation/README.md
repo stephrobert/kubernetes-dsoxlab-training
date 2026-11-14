@@ -9,7 +9,7 @@ defragment a database the setup bloated. Backup and restore stay with the
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster |
 | Duration | about 25 minutes |
-| Related page | [etcd, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/#mettre-en-pratique) |
+| Related page | [etcd, Put into practice section](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/etcd/) |
 
 ```bash
 dsoxlab run   cka-etcd-sante-et-defragmentation
