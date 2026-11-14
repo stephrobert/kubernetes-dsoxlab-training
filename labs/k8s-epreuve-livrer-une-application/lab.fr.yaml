@@ -1,0 +1,60 @@
+title: "Épreuve du niveau 3 : exposer, configurer et livrer une application"
+# Page cible de la fiche, encore à créer :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  D'après un cahier des charges qui ne nomme aucun objet Kubernetes, livrez et
+  remettez en état l'application d'un festival : routez deux applications web
+  par hôte et chemin, réparez un composant hérité en panne après avoir
+  consigné sa cause, isolez la base, placez les charges, plafonnez le
+  namespace, mettez l'application à l'échelle sur une métrique, et donnez-lui
+  sa propre identité et un conteneur durci.
+
+criteria:
+  - id: c1-routage-par-hote-et-chemin
+    label: "C1 (critique) : les deux applications web sont joignables de l'extérieur par l'hôte demandé, chacune sur son chemin"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: c2-caisse-reparee-cause-consignee
+    label: "C2 (critique) : le composant hérité caisse répond de nouveau, et la cause de sa panne a été consignée avant la réparation"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: c3-nom-complet-depuis-un-autre-namespace
+    label: "C3 : un client d'un autre namespace résout le nom complet du programme et le joint"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: c4-seul-le-frontend-joint-la-base
+    label: "C4 (critique) : seul le frontend joint la base ; le programme et un client d'un autre namespace sont refusés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: c5-la-base-ne-sort-que-vers-le-dns
+    label: "C5 : la base résout toujours les noms, et toute autre sortie lui est refusée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: c6-placement
+    label: "C6 : la base tourne sur le nœud réservé et rien d'autre du namespace n'y tourne, et les exemplaires du frontend sont sur des nœuds différents"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: c7-plafond-du-namespace
+    label: "C7 (critique) : le namespace porte le plafond demandé et refuse une charge qui le dépasse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: c8-valeurs-par-defaut
+    label: "C8 : une charge qui ne déclare pas ses ressources reçoit les valeurs par défaut demandées, et la charge affiches bloquée tourne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: c9-mise-a-l-echelle
+    label: "C9 : la mise à l'échelle du programme porte les bornes demandées et lit une valeur de métrique"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+  - id: c10-identite-et-droit-minimal
+    label: "C10 (critique) : le programme tourne sous une identité dédiée, sans jeton, avec le seul droit demandé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: c11-conteneur-durci
+    label: "C11 (critique) : le conteneur du programme tourne sans root, racine en lecture seule et sans capacités, et répond toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/

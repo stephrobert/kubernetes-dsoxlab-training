@@ -42,6 +42,14 @@
 # qu'il cessera de les livrer : « Gateway API CRDs will no longer be shipped
 # with this chart in a future major version ».
 #
+# SUR UN CLUSTER KIND.
+#
+# Par défaut, le contrôleur se pose sur le cluster kubeadm. Un lab kind passe
+# `traefik_kubeconfig` (le kubeconfig d'administration de son cluster, sous
+# /etc/kind) et `traefik_adresse` (l'adresse d'un nœud du cluster, où le
+# NodePort répond : sur kind, ce n'est pas l'adresse de la VM). Le même
+# `traefik_kubeconfig` se passe alors à `shared/traefik-retirer.yml`.
+#
 # Le lab qui inclut ce fichier appelle `shared/traefik-retirer.yml` dans son
 # `cleanup.yaml` : le chart pose une IngressClass et des CRD, qui sont des
 # objets de CLUSTER et que la photographie du validateur compterait comme une
@@ -62,7 +70,7 @@
   # ce sont toutes des objets de CLUSTER.
   ansible.builtin.command:
     cmd: >-
-      kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f
+      kubectl --kubeconfig {{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }} apply -f
       https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.2/standard-install.yaml
   changed_when: true
   when: traefik_gateway_api | default(false) | bool
@@ -114,7 +122,7 @@
       --set ports.web.port=80
       --set ports.websecure.nodePort=30443
       --set providers.kubernetesIngress.publishedService.enabled=false
-      --set providers.kubernetesIngress.ingressEndpoint.ip={{ ansible_default_ipv4.address }}
+      --set providers.kubernetesIngress.ingressEndpoint.ip={{ traefik_adresse | default(ansible_default_ipv4.address) }}
       --set deployment.replicas=1
       --set image.digest=sha256:9c437ac4f09ce6f4980a8544902d3475fdf70a1a7c578729581d2535dfa7d635
       --set versionOverride=v3.7.18
@@ -124,12 +132,12 @@
       --set gateway.enabled=false
       --wait --timeout 6m
   environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
+    KUBECONFIG: "{{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }}"
   changed_when: true
 
 - name: Attendre que le contrôleur soit prêt
   ansible.builtin.command:
     cmd: >-
-      kubectl --kubeconfig /etc/kubernetes/admin.conf -n traefik
+      kubectl --kubeconfig {{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }} -n traefik
       rollout status deployment/traefik --timeout=300s
   changed_when: false

@@ -199,6 +199,13 @@ sections:
       # cluster kubeadm.
       - k8s-appliquer-une-recommandation-vpa
       - cka-resourcequota-limitrange
+      # Le challenge du module Scheduling et capacité, posé dans la leçon
+      # « Ajuster les ressources d'un Pod », sur le cluster kind « capacite ».
+      - k8s-challenge-placer-et-plafonner
+      # L'épreuve de fin du niveau 3 (fiche KUBERN-EPREUVE-N3), qui suppose
+      # les modules RBAC, Réseau, Scheduling et capacité, et Sécurité des
+      # workloads joués, sur le cluster kind « capacite » (trois workers).
+      - k8s-epreuve-livrer-une-application
       - cka-troubleshoot-imagepullbackoff
       - cka-troubleshoot-crashloopbackoff
       - cka-kubectl-debug

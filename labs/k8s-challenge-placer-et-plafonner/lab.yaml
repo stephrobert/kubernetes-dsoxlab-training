@@ -1,0 +1,115 @@
+# Le challenge du module Scheduling et capacité (fiche E-placer-et-plafonner,
+# posée dans la leçon « Ajuster les ressources d'un Pod », KUBERN-10-06). C'est
+# la preuve sans procédure du module : placer par taint, tolérance, sélection
+# et affinité de nœud, répartir des réplicas, plafonner un namespace, donner
+# des valeurs par défaut, et mettre à l'échelle sur une métrique.
+#
+# Il ne refait aucun lab guidé à l'identique. cka-taints-tolerations-placement
+# et cka-node-affinity posent un Pod sur le worker du cluster kubeadm ; ici, un
+# nœud réservé sur trois, des Deployments à replacer sans les recréer à la main,
+# et une répartition qu'un des nœuds ne peut plus accueillir. cka-hpa-autoscaling
+# fait générer la charge par l'apprenant ; ici, c'est le test qui la génère.
+#
+# Huit états, à poids égal (dsoxlab note par test). Seuil 70 ; deux états
+# bloquent, qu'aucune moyenne ne compense : l'application réservée sur son nœud
+# (état 2) et le plafond du namespace (état 5).
+#
+# Le huitième état, « sous charge, le nombre de réplicas dépasse le minimum »,
+# est écrit avec une charge générée PAR LE TEST (une boucle de calcul dans chaque
+# Pod d'accueil, bornée à 130 s) et une attente bornée à 120 s.
+#
+# Il tourne sur le cluster kind « capacite » (un control plane, trois workers),
+# partagé avec l'épreuve du niveau 3.
+id: k8s-challenge-placer-et-plafonner
+title: "Place Pods, cap a namespace and scale, without guidance"
+level: workloads-scheduling
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, reserve a node for one application, keep the others
+  away from it, place an application by required and preferred node
+  affinity, spread replicas across nodes, cap the namespace and give its
+  containers default values, then scale an application on its CPU load.
+skills:
+  - taints-tolerations
+  - node-affinity
+  - pod-anti-affinity
+  - resourcequota
+  - limitrange
+  - hpa
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_rendu_sur_le_noeud_reserve_et_accueil_ailleurs
+  - test_le_namespace_refuse_un_pod_au_dela_du_quota
+estimated_time: 50m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: noeud-reserve
+    label: "The reserved node carries the requested taint and label"
+    tests:
+      - test_le_noeud_reserve_porte_son_taint_et_son_label
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: application-reservee
+    label: "The reserved application runs on that node, by toleration and by selection, and the ordinary application runs elsewhere"
+    tests:
+      - test_rendu_sur_le_noeud_reserve_et_accueil_ailleurs
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: affinite-de-noeud
+    label: "The application asks for a required and a preferred node affinity, and runs on the labelled node"
+    tests:
+      - test_stockage_affinite_obligatoire_et_preferee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: repartition
+    label: "The replicas of the application are spread across different nodes"
+    tests:
+      - test_galerie_repartie_sur_des_noeuds_differents
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/priority-and-preemption/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: plafond
+    label: "The namespace refuses a Pod that asks for more than the ResourceQuota, checked in a server-side dry run"
+    tests:
+      - test_le_namespace_refuse_un_pod_au_dela_du_quota
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: valeurs-par-defaut
+    label: "A Pod without requests is accepted and completed with the LimitRange defaults"
+    tests:
+      - test_un_pod_sans_requests_recoit_les_valeurs_par_defaut
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: hpa-lit-une-metrique
+    label: "The HPA of the application has the requested bounds and reads a metric value"
+    tests:
+      - test_le_hpa_d_accueil_lit_une_metrique
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/autoscaling/
+  - id: montee-sous-charge
+    label: "Under load, the number of replicas goes beyond the requested minimum"
+    tests:
+      - test_sous_charge_les_replicas_depassent_le_minimum
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/

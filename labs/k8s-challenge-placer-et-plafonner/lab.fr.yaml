@@ -1,0 +1,44 @@
+title: "Placer des Pods, plafonner un namespace et dimensionner, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+description: |
+  Sans procédure, réserver un nœud à une application, en écarter les autres,
+  placer une application par affinité de nœud obligatoire et préférée,
+  répartir des réplicas sur plusieurs nœuds, plafonner le namespace et donner
+  des valeurs par défaut à ses conteneurs, puis mettre une application à
+  l'échelle sur sa charge CPU.
+
+criteria:
+  - id: noeud-reserve
+    label: "Le nœud réservé porte le taint et le label demandés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: application-reservee
+    label: "L'application réservée tourne sur ce nœud, par tolérance et par sélection, et l'application ordinaire tourne ailleurs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: affinite-de-noeud
+    label: "L'application demande une affinité de nœud obligatoire et une préférée, et tourne sur le nœud étiqueté"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: repartition
+    label: "Les réplicas de l'application sont répartis sur des nœuds différents"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/scheduling-avance/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: plafond
+    label: "Le namespace refuse un Pod qui demande plus que le ResourceQuota, vérifié en dry-run serveur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: valeurs-par-defaut
+    label: "Un Pod sans requests est accepté et complété avec les valeurs par défaut du LimitRange"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: hpa-lit-une-metrique
+    label: "Le HPA de l'application est déclaré avec les bornes demandées et lit une valeur de métrique"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/autoscaling/
+  - id: montee-sous-charge
+    label: "Sous charge, le nombre de réplicas dépasse le minimum demandé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/

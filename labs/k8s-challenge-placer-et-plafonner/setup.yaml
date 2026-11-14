@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run` : le socle kind sur k8s-kind.lab avec le cluster
+# « capacite » (un control plane et trois workers, étiquetés zone-a, zone-b et
+# zone-c), partagé avec l'épreuve du niveau 3, puis la situation du challenge
+# (fixtures/prepare.sh), fausse sur les huit états par construction.
+#
+# Trois workers parce que le challenge demande un nœud réservé ET des réplicas
+# répartis sur des nœuds différents hors de ce nœud : le control plane de kind
+# porte son taint dès qu'un worker existe, il ne compte pas.
+- name: Préparer le challenge k8s-challenge-placer-et-plafonner
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind à quatre nœuds
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: capacite
+        kind_workers: 3
+
+    - name: Poser metrics-server, le namespace atelier et ses applications
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/capacite.kubeconfig

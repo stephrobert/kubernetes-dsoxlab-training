@@ -1,0 +1,150 @@
+# Épreuve de fin du niveau 3 de la formation Kubernetes (fiche
+# KUBERN-EPREUVE-N3), sur le modèle des épreuves des niveaux 1 et 2.
+#
+# D34 : le cahier des charges ne nomme aucun type d'objet Kubernetes. Il nomme
+# les composants du festival (billets, programme, registre, affiches, caisse)
+# et dit ce qu'il faut obtenir ; les tests retrouvent sur le cluster ce que
+# l'apprenant a choisi. Onze états, C1 à C11, un test chacun.
+#
+# D57 : un fil distinct du challenge E-placer-et-plafonner et de la boutique du
+# capstone CKAD. L'état hérité contient un composant en panne dont la cause se
+# consigne avant la réparation (C2), une charge bloquée par le taint du nœud
+# réservé (C6), une charge que le plafond du namespace empêche de démarrer
+# (C8), et une mise à l'échelle qui ne lit aucune métrique faute de requests
+# (C9). Le critère « sous charge » de la fiche est retiré (test instable).
+#
+# `lab_type: challenge`, seuil 70 (D06). Six critères critiques, qu'aucune
+# moyenne ne compense : C1, C2, C4, C7, C10 et C11. dsoxlab note par test, à
+# poids égal : onze critères, environ 9,1 points chacun, donc huit critères
+# réussis au moins, dont les six critiques. Aucun indice (D36).
+#
+# Il tourne sur le cluster kind « capacite » (un control plane, trois workers) :
+# le placement exige un nœud réservé et deux nœuds où répartir le frontend.
+id: k8s-epreuve-livrer-une-application
+title: "Level 3 test: expose, configure and ship an application"
+level: services-networking
+section: cka
+difficulty: advanced
+description: |
+  From requirements that name no Kubernetes object, ship and repair a festival
+  application: route two web applications by host and path, repair an
+  inherited failing component after recording its cause, isolate the
+  database, place the workloads, cap the namespace, scale the application on
+  a metric, and give it its own identity and a hardened container.
+skills:
+  - ingress
+  - service
+  - dns
+  - networkpolicy
+  - taints-tolerations
+  - pod-anti-affinity
+  - resourcequota
+  - limitrange
+  - hpa
+  - serviceaccount
+  - rbac
+  - security-context
+  - troubleshooting
+distros:
+  - debian13
+# Page cible de la fiche, encore à créer :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/
+# En attendant, l'index de la formation, PROVISOIREMENT.
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les six critères critiques de la fiche, sans compensation (D06).
+  - test_c1_les_deux_applications_joignables_par_hote_et_chemin
+  - test_c2_caisse_repond_et_sa_cause_a_ete_consignee_avant
+  - test_c4_seul_le_frontend_joint_la_base
+  - test_c7_le_namespace_refuse_une_charge_qui_depasse_son_plafond
+  - test_c10_identite_dediee_sans_jeton_et_droit_minimal
+  - test_c11_programme_durci_et_qui_repond
+estimated_time: 120m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: c1-routage-par-hote-et-chemin
+    label: "C1 (critical): both web applications are reachable from outside by the requested host, each on its own path"
+    tests:
+      - test_c1_les_deux_applications_joignables_par_hote_et_chemin
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+  - id: c2-caisse-reparee-cause-consignee
+    label: "C2 (critical): the inherited caisse component answers again, and the cause of its failure was recorded before the repair"
+    tests:
+      - test_c2_caisse_repond_et_sa_cause_a_ete_consignee_avant
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: c3-nom-complet-depuis-un-autre-namespace
+    label: "C3: a client of another namespace resolves the full name of the programme and reaches it"
+    tests:
+      - test_c3_un_client_d_un_autre_namespace_resout_et_joint_programme
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: c4-seul-le-frontend-joint-la-base
+    label: "C4 (critical): only the frontend reaches the database; the programme and a client of another namespace are refused"
+    tests:
+      - test_c4_seul_le_frontend_joint_la_base
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: c5-la-base-ne-sort-que-vers-le-dns
+    label: "C5: the database still resolves names, and every other outbound flow is refused"
+    tests:
+      - test_c5_la_base_resout_les_noms_et_ne_sort_vers_rien_d_autre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+  - id: c6-placement
+    label: "C6: the database runs on the reserved node and nothing else of the namespace does, and the frontend copies are on distinct nodes"
+    tests:
+      - test_c6_la_base_sur_le_noeud_reserve_et_le_frontend_reparti
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: c7-plafond-du-namespace
+    label: "C7 (critical): the namespace carries the requested ceiling and refuses a workload beyond it"
+    tests:
+      - test_c7_le_namespace_refuse_une_charge_qui_depasse_son_plafond
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: c8-valeurs-par-defaut
+    label: "C8: a workload that declares no resources receives the requested defaults, and the blocked affiches workload runs"
+    tests:
+      - test_c8_valeurs_par_defaut_et_affiches_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: c9-mise-a-l-echelle
+    label: "C9: the scaling of the programme has the requested bounds and reads a metric value"
+    tests:
+      - test_c9_la_mise_a_l_echelle_lit_une_metrique
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+  - id: c10-identite-et-droit-minimal
+    label: "C10 (critical): the programme runs under its own identity, without a token, holding only the requested right"
+    tests:
+      - test_c10_identite_dediee_sans_jeton_et_droit_minimal
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: c11-conteneur-durci
+    label: "C11 (critical): the programme container runs non-root, with a read-only root and no capability, and still answers"
+    tests:
+      - test_c11_programme_durci_et_qui_repond
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/security-context/

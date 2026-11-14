@@ -6,6 +6,8 @@
 #     - name: Retirer le contrôleur Ingress
 #       ansible.builtin.include_tasks: ../../shared/traefik-retirer.yml
 #
+# Sur un cluster kind, passer le même `traefik_kubeconfig` qu'à traefik.yml.
+#
 # `helm uninstall` ne suffit PAS. Helm laisse derrière lui les CRD qu'il a
 # posées, délibérément, parce que les supprimer détruirait les objets qui en
 # dépendent. Ces CRD sont des objets de CLUSTER : la photographie du
@@ -16,14 +18,14 @@
   ansible.builtin.command:
     cmd: /usr/local/bin/helm uninstall traefik --namespace traefik --wait --timeout 5m
   environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
+    KUBECONFIG: "{{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }}"
   changed_when: true
   failed_when: false
 
 - name: Supprimer le namespace du contrôleur
   ansible.builtin.command:
     cmd: >-
-      kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace traefik
+      kubectl --kubeconfig {{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }} delete namespace traefik
       --ignore-not-found --wait=true --timeout=180s
   changed_when: true
   failed_when: false
@@ -39,7 +41,7 @@
       | grep -E 'traefik\.io$|gateway\.networking\.k8s\.io$' \
       | xargs -r kubectl delete --ignore-not-found >/dev/null
   environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
+    KUBECONFIG: "{{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }}"
   changed_when: true
   failed_when: false
 
@@ -56,6 +58,6 @@
     kubectl delete validatingadmissionpolicy \
       safe-upgrades.gateway.networking.k8s.io --ignore-not-found >/dev/null
   environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
+    KUBECONFIG: "{{ traefik_kubeconfig | default('/etc/kubernetes/admin.conf') }}"
   changed_when: true
   failed_when: false
