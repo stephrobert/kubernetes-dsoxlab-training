@@ -1,4 +1,5 @@
 title: "Durcir un Pod avec un securityContext"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
 description: |
   Faire tourner un serveur web sans privilège : utilisateur non root,
   aucune escalade, racine en lecture seule, toutes les capabilities retirées.

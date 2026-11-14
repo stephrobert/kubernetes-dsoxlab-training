@@ -1,4 +1,5 @@
 title: "Capstone : livrer la boutique, à partir du seul cahier des charges"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
 description: |
   Une livraison complète, donnée comme un cahier des charges et non comme un
   mode d'emploi. Six exigences à satisfaire dans un namespace : configuration,

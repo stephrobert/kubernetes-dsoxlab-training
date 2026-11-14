@@ -21,7 +21,7 @@ skills:
   - readiness-probe
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
 lab_type: lab
 estimated_time: 25m
 
@@ -45,22 +45,22 @@ criteria:
     tests:
       - test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: objet-de-la-crd
     label: "The commandes-nuit backup exists, with the fields the schema requires"
     tests:
       - test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: sonde-trouvee-par-explain
     label: "catalogue carries an HTTP readiness probe and its Pods are Ready"
     tests:
       - test_catalogue_porte_une_sonde_de_disponibilite_http
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: inventaire-complet
     label: "The record names every type of object present in the namespace"
     tests:
       - test_le_releve_dresse_l_inventaire_complet_du_namespace
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/

@@ -24,7 +24,7 @@ skills:
   - pod-template
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/
 lab_type: lab
 estimated_time: 15m
 
@@ -48,16 +48,16 @@ criteria:
     tests:
       - test_l_image_du_modele_de_web_est_consignee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/
   - id: la-liste-jsonpath-est-juste
     label: "pods-jsonpath.txt lists each web Pod with its node, one per line, without header"
     tests:
       - test_la_liste_jsonpath_donne_chaque_pod_et_son_noeud
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/
   - id: la-liste-custom-columns-est-juste
     label: "pods-colonnes.txt lists each web Pod with its node, under a header line"
     tests:
       - test_la_liste_custom_columns_donne_chaque_pod_et_son_noeud
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/

@@ -1,4 +1,5 @@
 title: "Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/#mettre-en-pratique
 description: |
   Une mise à jour est partie avec un nom d'image faux et le déploiement est
   bloqué. Remettre en service la révision qui marchait, puis livrer l'image
@@ -10,17 +11,33 @@ description: |
 criteria:
   - id: le-deploiement-demande-la-bonne-image
     label: "Le Deployment webapp demande l'image nginx:1.30.6"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles-et-a-jour
     label: "Les trois replicas sont disponibles et à jour"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: aucun-pod-n-est-en-erreur-d-image
     label: "Aucun Pod de webapp n'est resté en erreur d'image"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: l-historique-du-deploiement-est-intact
     label: "Une fois la livraison faite, l'historique garde encore la version qui marchait et la fautive"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-retour-arriere-a-ete-fait-avant-la-livraison
     label: "La version qui marchait est remise en service en révision 3, avant la livraison finale"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-version-fautive-est-conservee-a-zero
     label: "La révision fautive est conservée, réduite à zéro"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-revision-finale-est-celle-de-la-bonne-image
     label: "La révision finale 4 est celle de nginx:1.30.6, avec les trois replicas conservés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-deploiement-porte-la-cause-de-changement
     label: "Le Deployment webapp porte l'annotation kubernetes.io/change-cause"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/

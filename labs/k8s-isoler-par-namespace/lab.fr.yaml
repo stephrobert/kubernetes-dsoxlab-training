@@ -1,4 +1,5 @@
 title: "Isoler une application dans un namespace"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique
 description: |
   Rangez l'application api et son Service dans leur namespace equipe-api, rien
   dans default, puis depuis un Pod client de equipe-front joignez le Service par
@@ -8,7 +9,14 @@ description: |
 criteria:
   - id: l-application-est-dans-son-namespace
     label: "Le Deployment et le Service api sont dans equipe-api, et rien ne s'appelle api dans default"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
   - id: le-nom-qualifie-repond
     label: "Un Pod client de equipe-front joint api par son nom qualifié, réponse consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-nom-court-echoue
     label: "Depuis equipe-front, le nom court api échoue, et le constat est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/

@@ -24,7 +24,7 @@ skills:
   - kubectl-exec
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
 lab_type: lab
 estimated_time: 15m
 
@@ -48,17 +48,17 @@ criteria:
     tests:
       - test_api_est_dans_equipe_api_et_rien_dans_default
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
   - id: le-nom-qualifie-repond
     label: "A client Pod in equipe-front reaches api by its namespace-qualified name, answer recorded"
     tests:
       - test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-nom-court-echoue
     label: "From equipe-front, the short name api fails, and the observation is recorded"
     tests:
       - test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/

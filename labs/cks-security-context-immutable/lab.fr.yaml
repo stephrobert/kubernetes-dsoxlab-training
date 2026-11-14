@@ -1,4 +1,5 @@
 title: "Rendre un conteneur immuable sans le faire tomber"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
 description: |
   Un Deployment qui tourne peut encore être modifié de l'intérieur. Rendez sa
   racine non inscriptible, retirez-lui toutes les capacités, interdisez

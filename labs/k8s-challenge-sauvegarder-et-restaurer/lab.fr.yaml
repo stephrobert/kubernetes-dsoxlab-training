@@ -1,4 +1,5 @@
 title: "Challenge : sauvegarder, restaurer et remettre un cluster en ordre"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
 description: |
   Sans procédure. Prendre une sauvegarde fraîche d'etcd, restaurer etcd depuis
   la sauvegarde de la veille sur un répertoire de données neuf, migrer un dépôt
@@ -8,13 +9,23 @@ description: |
 criteria:
   - id: sauvegarde-fraiche
     label: "Une sauvegarde fraîche d'etcd photographie l'état d'avant la restauration"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: etcd-restaure
     label: "etcd tourne sur un répertoire de données restauré, et le cluster est sain"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: uid-d-origine
     label: "Les objets supprimés sont revenus avec leurs UID d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: objet-posterieur
     label: "L'objet écrit après la sauvegarde a disparu"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
   - id: api-migrees
     label: "Les manifestes du dépôt emploient les API courantes et sont appliqués"
   - id: certificats
     label: "Aucun certificat du plan de contrôle n'expire dans les trente jours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/

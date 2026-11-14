@@ -1,4 +1,5 @@
 title: "Remonter d'un Pod à son Deployment"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/#mettre-en-pratique
 description: |
   Dans le namespace replicasets, un Deployment mis à jour une fois garde deux
   ReplicaSets, et un second Deployment ne crée aucun Pod. Consignez quel
@@ -9,9 +10,17 @@ description: |
 criteria:
   - id: le-replicaset-actif-est-consigne
     label: "Le ReplicaSet actif de api est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: l-ancien-replicaset-est-consigne
     label: "L'ancien ReplicaSet de api, gardé à zéro, est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: la-cause-du-failedcreate-est-consignee
     label: "La cause du FailedCreate de compte-absent est consignée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: le-deployment-bloque-est-repare
     label: "compte-absent, réparé sans être recréé, a ses deux réplicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/replicasets/

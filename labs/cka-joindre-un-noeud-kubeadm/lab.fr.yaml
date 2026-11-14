@@ -1,4 +1,5 @@
 title: "Joindre un worker à un cluster kubeadm"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/#mettre-en-pratique
 description: |
   Préparer un worker réinitialisé pour Kubernetes 1.37 (swap coupé durablement,
   containerd sur le pilote de cgroup systemd, paquets figés), le joindre au
@@ -9,13 +10,25 @@ description: |
 criteria:
   - id: noeud-joint
     label: "Le worker a rejoint le cluster et il est Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: version-du-kubelet
     label: "Son kubelet annonce la version du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: swap-coupe
     label: "Le swap est coupé sur le worker, et le reste après un redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: pilote-systemd
     label: "containerd tourne avec le pilote de cgroup systemd"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: paquets-figes
     label: "kubeadm, kubelet et kubectl sont figés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: pod-sur-le-worker
     label: "Un Pod tourne sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/

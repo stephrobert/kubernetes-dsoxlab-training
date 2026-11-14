@@ -10,6 +10,14 @@ follows [semantic versioning](https://semver.org/).
 
 ### Changed
 
+- **Each language links to its own lesson** (dsoxlab 0.9.3). `lab.yaml` now
+  carries the English page of the site and `lab.fr.yaml` the French one, for
+  `doc_url` and for `criteria[].lessons`: 96 `doc_url` and 436 criteria switch
+  to English. The 15 labs whose page has no English version keep their French
+  `doc_url`, as do 23 lessons. The English table of the README links to the
+  English lessons, the French table to the French ones. CI requires
+  `dsoxlab>=0.9.3`, which reads these keys from `lab.fr.yaml`.
+
 - The README no longer copies the dsoxlab engine documentation (contract,
   lab life cycle): it links to the pages where the engine documents itself
   (dsoxlab#201). CONTRIBUTING no longer says the engine has no hook after

@@ -1,4 +1,5 @@
 title: "Livrer un manifeste robuste à partir d'un cahier des charges"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
 description: |
   Sans guidage, livrez une application depuis une base Kustomize unique en deux
   variantes, avec init container, sidecar natif, budgets et sondes, planifiez
@@ -8,21 +9,42 @@ description: |
 criteria:
   - id: application-disponible
     label: "prod-colis a ses trois réplicas disponibles, sur l'image référencée par digest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
   - id: init-et-sidecar
     label: "Un init container se termine avant le démarrage, un sidecar natif relaie les journaux"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
   - id: requests-et-limits
     label: "Chaque conteneur déclare requests et limits, avec la limite de mémoire demandée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: sondes-et-ready
     label: "Trois sondes sur le port 80, chaque Pod Ready sans redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/
   - id: cronjob-planifie
     label: "Le CronJob purge-colis est planifié comme demandé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: job-termine
     label: "Le Job inventaire est terminé avec trois complétions"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
   - id: meme-base-kustomize
     label: "dev et prod viennent d'une même base Kustomize"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: cluster-conforme
     label: "Le cluster correspond au dossier versionné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
   - id: cause-consignee
     label: "La cause de la panne est consignée avant la réparation"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: repare-sans-recreer
     label: "etiquettes tourne, sans avoir été recréé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

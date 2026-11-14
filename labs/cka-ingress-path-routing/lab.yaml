@@ -13,7 +13,7 @@ skills:
   - routage
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
 lab_type: lab
 estimated_time: 20m
 
@@ -42,24 +42,24 @@ criteria:
     tests:
       - test_une_regle_de_routage_existe_pour_l_hote
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-api
     label: "Path /api reaches svc-api"
     tests:
       - test_le_chemin_api_atteint_svc_api
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-web
     label: "Path /web reaches svc-web"
     tests:
       - test_le_chemin_web_atteint_svc_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: chemin-non-declare
     label: "An undeclared path reaches neither application"
     tests:
       - test_un_chemin_non_declare_n_atteint_aucune_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
 
 feedback: full

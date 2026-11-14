@@ -1,4 +1,5 @@
 title: "Redimensionner un Pod en place, sans le redémarrer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique
 description: |
   Augmenter le CPU et la mémoire d'un Pod qui tourne, sans le recréer ni
   redémarrer son conteneur, par la sous-ressource resize. Prouver que le
@@ -7,7 +8,13 @@ description: |
 criteria:
   - id: nouvelles-ressources-demandees
     label: "scaling-pod demande ses nouvelles ressources"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: redimensionne-en-place
     label: "Le redimensionnement s'est fait en place, sans recréer ni redémarrer"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: limite-appliquee
     label: "La nouvelle limite est appliquée par le kubelet et le noyau"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/

@@ -15,7 +15,7 @@ skills:
   - three-tier
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
 lab_type: lab
 estimated_time: 20m
 
@@ -43,36 +43,36 @@ criteria:
     tests:
       - test_backend_policy_vise_le_backend_dans_les_deux_sens
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: database-policy
     label: "database-policy targets tier=database, inbound and outbound"
     tests:
       - test_database_policy_vise_la_base_dans_les_deux_sens
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: backend-entree
     label: "backend accepts frontend only"
     tests:
       - test_le_backend_n_accepte_que_le_frontend
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: backend-sortie
     label: "backend reaches database and resolves names"
     tests:
       - test_le_backend_joint_la_base_et_resout_des_noms
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: base-entree
     label: "database refuses intrus"
     tests:
       - test_la_base_refuse_l_intrus
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: base-sans-sortie
     label: "database reaches nothing, not even DNS"
     tests:
       - test_la_base_ne_sort_pas
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
 
 feedback: full

@@ -1,4 +1,5 @@
 title: "Examen blanc CKA : 17 tâches en 120 minutes"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
 description: |
   Un examen blanc chronométré au format de la CKA : dix-sept tâches réparties
   comme les domaines officiels, sur un cluster kubeadm, chaque tâche sur l'hôte qu'elle désigne,
@@ -7,41 +8,84 @@ description: |
 criteria:
   - id: t01-classe-rapide
     label: "Tâche 1 : StorageClass rapide, provisionneur local-path, Retain, WaitForFirstConsumer"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: t02-revendication-donnees
     label: "Tâche 2 : la revendication donnees est Bound sur rapide et le Pod ecrivain y a écrit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
   - id: t03a-worker-ready
     label: "Tâche 3 : le worker k8s-w1.lab est Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
   - id: t03b-kubelet-au-boot
     label: "Tâche 3 : le kubelet du worker tourne et démarre au boot"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: t04-facture
     label: "Tâche 4 : facture fait tourner ses deux réplicas, prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
   - id: t05a-endpoints-annuaire
     label: "Tâche 5 : le Service annuaire a les Pods d'annuaire pour endpoints"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t05b-client-joint-annuaire
     label: "Tâche 5 : le Pod client joint annuaire par son nom"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t06-erreurs-du-journal
     label: "Tâche 6 : les lignes ERROR du Pod journal sont consignées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: t07-vitrine-retour-arriere
     label: "Tâche 7 : vitrine est revenue en 1.30.5 après une mise à jour en 1.30.6"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
   - id: t08-configuration-api
     label: "Tâche 8 : api lit MODE dans une ConfigMap et MOT_DE_PASSE dans un Secret"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: t09-placement-rapport
     label: "Tâche 9 : rapport tourne seulement sur le worker, par toleration et affinité de nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
   - id: t10a-lecteur-lit
     label: "Tâche 10 : le ServiceAccount lecteur peut lister et surveiller les Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: t10b-lecteur-limite
     label: "Tâche 10 : lecteur est lié, et ne peut rien de plus que lire les Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: t11-snapshot-etcd
     label: "Tâche 11 : un snapshot etcd valide est enregistré"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
   - id: t12-crd-sauvegarde
     label: "Tâche 12 : la CRD est installée et la Sauvegarde quotidienne existe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: t13-overlay-prod
     label: "Tâche 13 : l'overlay prod est appliqué"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: t14-networkpolicy
     label: "Tâche 14 : seul front joint la base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: t15-ingress
     label: "Tâche 15 : l'Ingress boutique route /api"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: t16-gateway
     label: "Tâche 16 : la HTTPRoute magasin est acceptée et sert web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: t17-nodeport
     label: "Tâche 17 : accueil répond sur son NodePort"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/

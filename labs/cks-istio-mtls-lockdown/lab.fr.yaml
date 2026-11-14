@@ -1,4 +1,5 @@
 title: "Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
 description: |
   Un maillage de services accepte du trafic en clair, de n'importe qui, du
   maillage ou du dehors. Exigez le TLS mutuel, et prouvez-le de la seule façon

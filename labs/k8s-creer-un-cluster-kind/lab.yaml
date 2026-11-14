@@ -24,7 +24,7 @@ skills:
   - node-image-digest
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/
 lab_type: lab
 estimated_time: 15m
 
@@ -48,22 +48,22 @@ criteria:
     tests:
       - test_le_fichier_de_configuration_decrit_un_control_plane_et_deux_workers
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/
   - id: le-cluster-porte-son-nom
     label: "A kind cluster named atelier exists"
     tests:
       - test_le_cluster_porte_le_nom_atelier
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/
   - id: les-noeuds-sont-prets-a-la-bonne-version
     label: "The three nodes of atelier are Ready, on Kubernetes v1.37.0"
     tests:
       - test_les_trois_noeuds_sont_ready_en_v1_37_0
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/
   - id: les-roles-sont-les-bons
     label: "atelier has one control-plane node and two workers"
     tests:
       - test_les_noeuds_ont_un_control_plane_et_deux_workers
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/

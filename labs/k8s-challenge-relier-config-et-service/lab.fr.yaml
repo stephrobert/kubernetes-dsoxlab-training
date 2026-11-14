@@ -1,4 +1,5 @@
 title: "Relier un ConfigMap, un Secret et un Service à un Deployment"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique
 description: |
   Dans un namespace dédié, faire tourner la vitrine à trois réplicas, lui
   donner une valeur de configuration depuis un ConfigMap et un mot de passe
@@ -9,13 +10,25 @@ description: |
 criteria:
   - id: tout-est-dans-le-namespace-magasin
     label: "Les objets de la vitrine sont dans le namespace magasin, aucun dans default"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
   - id: la-vitrine-a-trois-replicas-disponibles
     label: "Le Deployment vitrine a trois réplicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-configuration-vient-du-configmap
     label: "MESSAGE_ACCUEIL vient du ConfigMap, lu depuis l'intérieur du Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-mot-de-passe-vient-du-secret
     label: "DB_PASSWORD vient du Secret, lu depuis l'intérieur du Pod, jamais en clair dans le Deployment"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-service-repond
     label: "Le Service vitrine compte trois endpoints prêts et répond en HTTP depuis un Pod client"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: la-mise-a-jour-garde-l-ancien-replicaset
     label: "Après la mise à jour, trois réplicas tournent sur la nouvelle image et l'ancien ReplicaSet est gardé à zéro"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/

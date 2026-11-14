@@ -1,4 +1,5 @@
 title: "Rétablir la résolution DNS du cluster"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/#mettre-en-pratique
 description: |
   Plus aucun Pod ne résout de nom de service. Trouver pourquoi le DNS du
   cluster ne répond plus, le remettre en service, puis trouver pourquoi il
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: coredns-retabli
     label: "CoreDNS tourne de nouveau comme kubeadm le pose, deux réplicas prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: corefile-zone
     label: "La configuration de CoreDNS sert la zone du cluster, cluster.local"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: client-resout
     label: "Le Pod client résout web-svc.app.svc.cluster.local"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: client-joint-en-http
     label: "Le Pod client joint web-svc en HTTP par ce nom"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/

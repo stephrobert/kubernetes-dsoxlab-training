@@ -27,7 +27,7 @@ skills:
   - deployment
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
 lab_type: lab
 estimated_time: 25m
 
@@ -51,29 +51,29 @@ criteria:
     tests:
       - test_le_vpa_existe_en_mode_off
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
   - id: recommandation
     label: "The VPA has produced a recommendation for the container catalogue"
     tests:
       - test_le_vpa_a_produit_une_recommandation
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
   - id: requests-dans-les-bornes
     label: "The Deployment's requests fit: CPU between the lower and the upper bound, memory between the measured usage and the upper bound"
     tests:
       - test_les_requests_sont_dans_les_bornes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: pods-a-jour
     label: "The running Pods carry these requests"
     tests:
       - test_les_pods_tournent_avec_ces_requests
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: aucune-eviction
     label: "The VPA evicted no Pod"
     tests:
       - test_le_vpa_n_a_evince_aucun_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/

@@ -1,4 +1,5 @@
 title: "Appliquer une recommandation du VPA"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/#mettre-en-pratique
 description: |
   Poser un Vertical Pod Autoscaler en mode Off sur un Deployment sous-dimensionné,
   lire sa recommandation (borne basse, cible, borne haute), puis reporter
@@ -8,11 +9,22 @@ description: |
 criteria:
   - id: vpa-en-mode-off
     label: "Le VPA catalogue vise le Deployment catalogue, en mode Off"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
   - id: recommandation
     label: "Le VPA a produit une recommandation pour le conteneur catalogue"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
   - id: requests-dans-les-bornes
     label: "Les requests du Deployment conviennent : le CPU entre la borne basse et la borne haute, la mémoire entre la consommation mesurée et la borne haute"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: pods-a-jour
     label: "Les Pods en marche portent ces requests"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: aucune-eviction
     label: "Le VPA n'a évincé aucun Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/

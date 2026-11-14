@@ -1,4 +1,5 @@
 title: "Donner une identité stable à chaque réplica avec un StatefulSet"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/#mettre-en-pratique
 description: |
   Remplacez un Deployment dont les Pods portent des noms tirés au hasard et ne
   gardent rien par un StatefulSet derrière un Service headless : des réplicas
@@ -8,13 +9,26 @@ description: |
 criteria:
   - id: trois-replicas-ready
     label: "Le StatefulSet annuaire a ses trois réplicas, annuaire-0 à annuaire-2, tous Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: service-headless
     label: "Un Service headless annuaire sélectionne les Pods et gouverne le StatefulSet"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: noms-stables
     label: "Chaque Pod se résout par son nom stable depuis un autre Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: volume-par-replica
     label: "Chaque réplica a sa propre revendication Bound, montée sur /data"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: donnee-survit
     label: "La donnée du réplica 1 survit à la suppression de son Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: deployment-remplace
     label: "Le Deployment annuaire a laissé la place au StatefulSet"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/

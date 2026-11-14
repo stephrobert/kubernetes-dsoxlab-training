@@ -25,7 +25,7 @@ skills:
   - namespaces
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/
 lab_type: lab
 estimated_time: 20m
 
@@ -49,22 +49,22 @@ criteria:
     tests:
       - test_le_contexte_actif_est_recette
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/
   - id: le-namespace-par-defaut-est-kube-system
     label: "The default namespace of the recette context is kube-system"
     tests:
       - test_le_namespace_par_defaut_de_recette_est_kube_system
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/
   - id: la-preuve-est-au-bon-endroit
     label: "The ConfigMap preuve, created without -n nor --context, is in kube-system of the recette cluster only"
     tests:
       - test_la_preuve_est_dans_kube_system_du_cluster_recette
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/
   - id: le-kubeconfig-est-protege
     label: "~/.kube/config is readable and writable by its owner only (600)"
     tests:
       - test_le_kubeconfig_n_est_accessible_qu_a_son_proprietaire
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeconfig-and-contexts/

@@ -16,7 +16,7 @@ skills:
   - control-plane
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
 lab_type: lab
 estimated_time: 15m
 
@@ -44,16 +44,16 @@ criteria:
     tests:
       - test_l_api_repond
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-pod-statique-de-l-api-tourne
     label: "The kube-apiserver static Pod is Running"
     tests:
       - test_le_pod_statique_tourne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-manifeste-est-sain-et-autorise
     label: "The manifest is repaired and still declares Node,RBAC authorization"
     tests:
       - test_le_manifeste_est_sain_et_autorise_toujours
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/

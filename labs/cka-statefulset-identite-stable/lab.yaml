@@ -19,7 +19,7 @@ skills:
   - dns
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
 lab_type: lab
 estimated_time: 30m
 
@@ -44,37 +44,37 @@ criteria:
     tests:
       - test_le_statefulset_annuaire_a_trois_replicas_ready
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: service-headless
     label: "A headless Service annuaire selects the Pods and governs the StatefulSet"
     tests:
       - test_le_service_annuaire_est_headless_et_gouverne_le_statefulset
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: noms-stables
     label: "Each Pod resolves by its stable name from another Pod"
     tests:
       - test_chaque_pod_se_resout_par_son_nom_stable
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: volume-par-replica
     label: "Each replica has its own Bound claim, mounted on /data"
     tests:
       - test_chaque_replica_a_sa_propre_revendication
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: donnee-survit
     label: "The data of replica 1 survives the deletion of its Pod"
     tests:
       - test_la_donnee_du_replica_1_survit_a_son_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: deployment-remplace
     label: "The Deployment annuaire has made way for the StatefulSet"
     tests:
       - test_le_deployment_annuaire_a_laisse_la_place
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
 
 feedback: full

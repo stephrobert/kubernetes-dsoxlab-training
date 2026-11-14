@@ -17,7 +17,7 @@ skills:
   - revision-history
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
 lab_type: lab
 estimated_time: 15m
 
@@ -45,48 +45,48 @@ criteria:
     tests:
       - test_le_deploiement_demande_la_bonne_image
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles-et-a-jour
     label: "The three replicas are available and up to date"
     tests:
       - test_les_trois_replicas_sont_disponibles_et_a_jour
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: aucun-pod-n-est-en-erreur-d-image
     label: "No Pod of webapp is left in image error"
     tests:
       - test_aucun_pod_n_est_en_erreur_d_image
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: l-historique-du-deploiement-est-intact
     label: "Once the delivery is done, the history still keeps the version that worked and the faulty one"
     tests:
       - test_l_historique_du_deploiement_est_intact
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-retour-arriere-a-ete-fait-avant-la-livraison
     label: "The version that worked is back in service as revision 3, before the final delivery"
     tests:
       - test_le_retour_arriere_a_ete_fait_avant_la_livraison
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-version-fautive-est-conservee-a-zero
     label: "The faulty revision is kept, scaled down to zero"
     tests:
       - test_la_version_fautive_est_conservee_a_zero
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-revision-finale-est-celle-de-la-bonne-image
     label: "The final revision 4 is the one of nginx:1.30.6, with the three replicas kept"
     tests:
       - test_la_revision_finale_est_celle_de_la_bonne_image
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-deploiement-porte-la-cause-de-changement
     label: "The Deployment webapp carries the kubernetes.io/change-cause annotation"
     tests:
       - test_le_deploiement_porte_la_cause_de_changement
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
 
 feedback: full

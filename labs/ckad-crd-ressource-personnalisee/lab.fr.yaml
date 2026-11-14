@@ -1,4 +1,5 @@
 title: "Utiliser une ressource personnalisée, lire les refus de son schéma, la débloquer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
 description: |
   Découvrez le groupe d'API d'une CRD, créez et modifiez des ressources
   personnalisées, lisez le refus de l'API pour une valeur hors bornes, et
@@ -7,11 +8,22 @@ description: |
 criteria:
   - id: quotidienne-creee
     label: "La Sauvegarde quotidienne existe avec la source et la rétention demandées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: hebdomadaire-modifiee
     label: "hebdomadaire garde 30 jours, sans avoir été recréée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: groupe-api
     label: "Le groupe et la version d'API de Sauvegarde sont consignés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: refus-hors-bornes
     label: "Le refus d'une rétention hors bornes est consigné, et l'API la refuse toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: ancienne-debloquee
     label: "ancienne n'est plus bloquée, et la CRD est celle du départ"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/

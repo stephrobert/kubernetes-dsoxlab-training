@@ -1,4 +1,5 @@
 title: "Une base Kustomize et deux overlays, dev et prod"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/#mettre-en-pratique
 description: |
   Décrire une application une seule fois, dans une base Kustomize avec une
   ConfigMap générée, et la déployer dans deux namespaces avec des overlays qui
@@ -9,19 +10,37 @@ description: |
 criteria:
   - id: dev-un-replica
     label: "dev-app tourne avec un réplica disponible dans dev"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: prod-trois-replicas
     label: "prod-app tourne avec trois réplicas disponibles dans prod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: label-sur-les-pods
     label: "Les Pods de chaque environnement portent son label env"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: service-trouve-ses-pods
     label: "Chaque Service trouve les Pods de son environnement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: meme-structure
     label: "Les deux environnements ont le même conteneur et le même port"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: image-changee-par-l-overlay
     label: "Seul dev passe en version 2, par son overlay, sans modifier la base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: configmap-generee
     label: "La configuration vient d'une ConfigMap générée par Kustomize"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: une-base-commune
     label: "Les deux overlays dérivent d'une même base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: cluster-conforme-au-dossier
     label: "Le cluster correspond aux overlays du dossier"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/

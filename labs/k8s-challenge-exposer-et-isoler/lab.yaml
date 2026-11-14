@@ -30,7 +30,7 @@ skills:
   - troubleshooting
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -62,44 +62,44 @@ criteria:
     tests:
       - test_chaque_chemin_atteint_son_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-prise-en-charge
     label: "The route vitrine is taken over by its controller"
     tests:
       - test_la_route_vitrine_est_prise_en_charge
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ingress/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: service-ancien
     label: "The Service ancien reaches its Pods on the port their container listens on"
     tests:
       - test_le_service_ancien_atteint_ses_pods_sur_le_bon_port
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
   - id: sonde-resout
     label: "The Pod sonde resolves the Service catalogue and reaches it over HTTP"
     tests:
       - test_sonde_resout_et_joint_catalogue
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: refus-par-defaut
     label: "A default refusal targets the base Pod, and it alone"
     tests:
       - test_un_refus_par_defaut_vise_la_base
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: seul-le-backend
     label: "Only the backend reaches the database; the frontend and the Pod from voisinage are refused"
     tests:
       - test_seul_le_backend_joint_la_base
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: dns-ouvert
     label: "The database still resolves names, and reaches nothing else"
     tests:
       - test_la_base_ne_sort_que_vers_le_dns
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/

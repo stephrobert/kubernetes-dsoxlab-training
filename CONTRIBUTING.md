@@ -71,7 +71,8 @@ both sides, what is forbidden and what remains allowed.
 labs/<exam>-<subject>/
 ├── lab.yaml                          # the contract: level = blueprint domain,
 │                                     # doc_url = the companion lesson
-├── lab.fr.yaml                       # French override of title and description ONLY
+├── lab.fr.yaml                       # French override: title, description,
+│                                     # doc_url, criteria[].label and .lessons
 ├── scenario.md / scenario.fr.md      # the situation and the goal, not the solution
 ├── README.md / README.fr.md          # the lab's fact sheet
 ├── setup.yaml                        # sets the initial state, includes the foundation
@@ -102,7 +103,8 @@ without a suffix:
 
 | Content | English | French |
 | --- | --- | --- |
-| Lab title and description | `lab.yaml` | `lab.fr.yaml` (these two keys only) |
+| Lab title and description | `lab.yaml` | `lab.fr.yaml` |
+| Companion lesson (`doc_url`, `criteria[].lessons`) | `lab.yaml`: the English page | `lab.fr.yaml`: the French page (dsoxlab 0.9.3). A page with no English version keeps its French URL in `lab.yaml`, and `lab.fr.yaml` does not repeat it |
 | Situation | `scenario.md` | `scenario.fr.md` |
 | Fact sheet | `README.md` | `README.fr.md` |
 | Hints | `text_en` | `text_fr` |

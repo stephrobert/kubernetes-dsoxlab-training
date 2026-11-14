@@ -27,7 +27,7 @@ skills:
   - kubeconfig
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
 lab_type: lab
 estimated_time: 25m
 
@@ -52,22 +52,22 @@ criteria:
     tests:
       - test_la_demande_camille_est_approuvee_et_delivree
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: kubeconfig-de-camille
     label: "Camille's kubeconfig carries the certificate the API issued, and identifies her"
     tests:
       - test_le_kubeconfig_porte_le_certificat_delivre_et_l_identifie
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: lecture-autorisee
     label: "Camille can read the Pods of equipe-web"
     tests:
       - test_camille_lit_les_pods_d_equipe_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
   - id: rien-de-plus
     label: "Camille can do nothing more: no change, no Secret, no other namespace"
     tests:
       - test_camille_ne_peut_rien_de_plus
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/

@@ -1,4 +1,5 @@
 title: "Donner une identité à une application : ServiceAccount, Role, RoleBinding"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
 description: |
   Une application refuse de démarrer parce que son ServiceAccount n'existe
   pas. Le créer, lui accorder le droit de lire les Pods de son namespace et

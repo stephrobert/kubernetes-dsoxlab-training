@@ -29,7 +29,7 @@ skills:
   - replicaset-controller
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 30m
@@ -58,32 +58,32 @@ criteria:
     tests:
       - test_le_noeud_du_control_plane_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
   - id: les-composants-du-control-plane-sont-consignes
     label: "The Pods of the four control plane components are recorded with their role"
     tests:
       - test_les_quatre_composants_du_control_plane_sont_consignes_avec_leur_role
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-runtime-de-chaque-worker-est-consigne
     label: "The container runtime of every worker Node is recorded"
     tests:
       - test_le_runtime_de_chaque_worker_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: le-placement-du-pod-temoin-est-prouve
     label: "The Node that received the temoin Pod is recorded, with the Scheduled event"
     tests:
       - test_le_noeud_du_pod_temoin_est_prouve_par_l_evenement_scheduled
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: le-maillon-qui-n-agit-pas-est-identifie
     label: "For file-attente, the component that acted and the one that does not act are recorded"
     tests:
       - test_le_maillon_qui_n_agit_pas_est_identifie
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/

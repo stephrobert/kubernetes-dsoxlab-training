@@ -13,7 +13,7 @@ skills:
   - vertical-scaling
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
 lab_type: lab
 estimated_time: 15m
 
@@ -42,16 +42,16 @@ criteria:
     tests:
       - test_scaling_pod_demande_ses_nouvelles_ressources
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: redimensionne-en-place
     label: "The resize happened in place, without recreating or restarting"
     tests:
       - test_le_redimensionnement_s_est_fait_sans_recreer_ni_redemarrer
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: limite-appliquee
     label: "The new limit is applied by the kubelet and the kernel"
     tests:
       - test_la_nouvelle_limite_est_appliquee_par_le_kubelet_et_le_noyau
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/

@@ -1,4 +1,5 @@
 title: "Placer avec nodeAffinity : contrainte obligatoire et préférence"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
 description: |
   Placer un Deployment par une affinité de nœud obligatoire sur un label à
   plusieurs valeurs, y ajouter une préférence pondérée, puis débloquer un

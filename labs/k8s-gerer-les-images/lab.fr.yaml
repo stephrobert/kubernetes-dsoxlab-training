@@ -1,4 +1,5 @@
 title: "Figer une image par digest et tirer d'un registre privé"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/#mettre-en-pratique
 description: |
   Figez par son digest l'image qu'un Deployment fait tourner sur un tag
   mutable, consignez pourquoi un Pod reste en ImagePullBackOff avant toute
@@ -8,7 +9,13 @@ description: |
 criteria:
   - id: image-par-digest
     label: "affiche est figée par le digest de l'image qu'elle faisait tourner"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
   - id: cause-du-pull-consignee
     label: "La cause du pull refusé est consignée avant la réparation"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/
   - id: registre-prive-par-serviceaccount
     label: "vignettes tire son image privée grâce à son ServiceAccount"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/

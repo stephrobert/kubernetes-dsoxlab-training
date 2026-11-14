@@ -1,4 +1,5 @@
 title: "Poser un Pod statique sur un worker, sans passer par l'API"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/#mettre-en-pratique
 description: |
   Faire tourner un Pod que le kubelet du worker gère seul, à partir d'un
   manifeste déposé sur le nœud, et le voir apparaître dans l'API sous son
@@ -9,9 +10,17 @@ description: |
 criteria:
   - id: le-manifeste-est-ou-le-kubelet-le-cherche
     label: "Le manifeste static-web est dans le staticPodPath du kubelet du worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-pod-miroir-vient-d-un-fichier
     label: "Le Pod miroir vient d'un fichier et appartient au Node worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-pod-statique-tourne
     label: "Le Pod statique est Running avec l'image et le port demandés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: le-runtime-du-worker-execute-le-conteneur
     label: "Le runtime du worker exécute réellement le conteneur web"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/

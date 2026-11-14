@@ -16,7 +16,7 @@ skills:
   - routage
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
 lab_type: lab
 estimated_time: 35m
 
@@ -46,36 +46,36 @@ criteria:
     tests:
       - test_la_gateway_est_programmee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-api
     label: "Path /api reaches svc-api"
     tests:
       - test_le_chemin_api_atteint_svc_api
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-web
     label: "Path /web reaches svc-web"
     tests:
       - test_le_chemin_web_atteint_svc_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: chemin-non-declare
     label: "An undeclared path reaches neither application"
     tests:
       - test_un_chemin_non_declare_n_atteint_aucune_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-catalogue-resolue
     label: "The route catalogue is Accepted and its references Resolved, up to date with its generation"
     tests:
       - test_la_route_catalogue_est_acceptee_et_resolue
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: catalogue-servi
     label: "catalogue.local reaches the catalogue of the boutique namespace"
     tests:
       - test_catalogue_local_atteint_le_catalogue
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
 
 feedback: full

@@ -19,7 +19,7 @@ skills:
   - kubectl-patch
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
 lab_type: lab
 estimated_time: 30m
 
@@ -43,34 +43,34 @@ criteria:
     tests:
       - test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: namespace-dans-le-fichier
     label: "The file names its namespace and nothing landed in default"
     tests:
       - test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: deployment-disponible
     label: "api has two available replicas on the requested image"
     tests:
       - test_api_a_deux_replicas_disponibles_sur_l_image_demandee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: service-relie
     label: "The api Service finds the two Pods"
     tests:
       - test_le_service_api_trouve_les_deux_pods
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: configuration-par-configmap
     label: "The container receives its configuration from api-config"
     tests:
       - test_le_conteneur_recoit_sa_configuration_de_api_config
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: corrige-sans-recreer
     label: "rapport is corrected in place, without being recreated"
     tests:
       - test_rapport_est_corrige_sans_avoir_ete_recree
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/

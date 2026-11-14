@@ -1,4 +1,5 @@
 title: "Un volume persistant : PersistentVolume, PersistentVolumeClaim et un Pod qui écrit"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/#mettre-en-pratique
 description: |
   Sur un cluster sans provisionnement dynamique, créer un PersistentVolume
   sur le disque d'un nœud, le réclamer par un PersistentVolumeClaim, le
@@ -9,23 +10,56 @@ description: |
 criteria:
   - id: le-volume-a-une-capacite-de-1gi
     label: "Le PersistentVolume lab-pv a une capacité de 1Gi"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-volume-est-en-readwriteonce
     label: "Le PersistentVolume lab-pv est en ReadWriteOnce"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-volume-a-la-storageclass-manual
     label: "Le PersistentVolume lab-pv a la StorageClass manual"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-volume-est-adosse-au-repertoire-du-noeud
     label: "Le PersistentVolume lab-pv est adossé au répertoire /mnt/lab-data du nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: la-reclamation-demande-500mi
     label: "La réclamation lab-pvc demande 500Mi"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: la-reclamation-demande-readwriteonce
     label: "La réclamation lab-pvc demande ReadWriteOnce"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: la-reclamation-demande-la-storageclass-manual
     label: "La réclamation lab-pvc demande la StorageClass manual"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: la-reclamation-est-liee-a-lab-pv
     label: "La réclamation lab-pvc est Bound à lab-pv"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-pod-monte-la-reclamation-sur-data
     label: "Le Pod data-pod monte la réclamation sur /data"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-pod-a-ecrit-hello-dans-data-test-txt
     label: "Le Pod a écrit hello dans /data/test.txt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: le-fichier-est-sur-le-disque-du-noeud
     label: "Le fichier est sur le disque du nœud, dans /mnt/lab-data"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storage/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/

@@ -6,7 +6,9 @@ README annonce un identifiant qui n'existe plus. Ici la source de vérité est
 `labs/*/lab.yaml`, et le hook `pre-push` refuse un README périmé.
 
 Les deux langues sont générées : `README.md` depuis `lab.yaml`, `README.fr.md`
-depuis `lab.fr.yaml`, qui surcharge le titre et la description. Un lab dont le
+depuis `lab.fr.yaml`, qui surcharge le titre, la description et le `doc_url`
+(dsoxlab 0.9.3 : `lab.yaml` porte la leçon anglaise, `lab.fr.yaml` la
+française, et la table de chaque langue renvoie à sa leçon). Un lab dont le
 `lab.fr.yaml` manque apparaîtrait en anglais dans la table française, ce qui se
 verrait : `dsoxlab validate-structure` le refuse d'ailleurs avant, avec
 `content_missing_english`.
@@ -254,8 +256,10 @@ def _labs_sans_cache() -> list[dict]:
                 print(f"  {fichier.parent.name}/{exc}", file=sys.stderr)
                 fr = {}
             donnees["_titre_fr"] = str(fr.get("title", donnees["_titre_en"])).strip('"')
+            donnees["_doc_url_fr"] = str(fr.get("doc_url") or donnees.get("doc_url", ""))
         else:
             donnees["_titre_fr"] = donnees["_titre_en"]
+            donnees["_doc_url_fr"] = str(donnees.get("doc_url", ""))
         trouves.append(donnees)
     return trouves
 
@@ -307,7 +311,7 @@ def _cellule_validation(lab: dict, mesures: dict[str, dict], mots: dict) -> str:
 
 
 def _ligne(rang: int, lab: dict, langue: str, mesures: dict, mots: dict) -> str:
-    url = str(lab.get("doc_url", ""))
+    url = str(lab["_doc_url_fr"] if langue == "fr" else lab.get("doc_url", ""))
     # Un capstone ne vise pas UN domaine du blueprint, il en croise plusieurs :
     # afficher son `level` seul laisserait croire qu'il n'éprouve que celui-là.
     capstone = lab.get("lab_type") == "capstone"

@@ -15,7 +15,7 @@ skills:
   - securite-applicative
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
 lab_type: lab
 estimated_time: 20m
 
@@ -46,57 +46,57 @@ criteria:
     tests:
       - test_le_secret_porte_le_mot_de_passe
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: db-password-vient-du-secret-par-reference
     label: "DB_PASSWORD takes its value from that Secret, by reference"
     tests:
       - test_db_password_vient_du_secret_par_reference
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-secret-est-monte-sous-etc-passerelle
     label: "That same Secret is mounted as a volume under /etc/passerelle"
     tests:
       - test_le_secret_est_monte_sous_etc_passerelle
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-mot-de-passe-a-quitte-le-manifeste
     label: "The password no longer appears in the Deployment manifest"
     tests:
       - test_le_mot_de_passe_a_quitte_le_manifeste
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-mot-de-passe-n-est-en-clair-nulle-part-ailleurs
     label: "The password is carried by a Secret and is in clear text nowhere else in the namespace, in no ConfigMap in particular"
     tests:
       - test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-deployment-a-ete-modifie-pas-remplace
     label: "The Deployment was updated in place and its rollout completed"
     tests:
       - test_le_deployment_a_ete_modifie_pas_remplace
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-rollbacks/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rolling-updates-and-rollbacks/
   - id: un-pod-a-jour-porte-la-projection-du-secret
     label: "The Pod that is running is the one born from the modified template: it carries the Secret projection under /etc/passerelle"
     tests:
       - test_un_pod_a_jour_porte_la_projection_du_secret
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-db-password-vient-du-secret-et-vaut-la-valeur
     label: "Inside the container, DB_PASSWORD carries the expected value, and the running Pod takes it from the Secret by reference"
     tests:
       - test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-le-fichier-porte-la-valeur
     label: "Inside the container, the file under /etc/passerelle carries the expected value"
     tests:
       - test_dans_le_conteneur_le_fichier_porte_la_valeur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/secrets/
 
 feedback: full

@@ -1,4 +1,5 @@
 title: "Entrer dans un conteneur sans shell avec kubectl debug"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
 description: |
   Un Pod dont l'image ne contient aucun shell n'offre rien à kubectl exec.
   Lui adjoindre un conteneur éphémère qui partage ses processus, et lire de là
@@ -7,5 +8,9 @@ description: |
 criteria:
   - id: conteneur-ephemere-partage
     label: "debugger est un conteneur éphémère qui partage les processus de l'application"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
   - id: processus-vus-de-l-interieur
     label: "La liste des processus écrite depuis debugger montre coredns"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/

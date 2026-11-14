@@ -1,4 +1,5 @@
 title: "Explorer l'API avec api-resources et explain"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/#mettre-en-pratique
 description: |
   Trouvez avec api-resources l'apiVersion et le kind d'une CRD que vous n'avez
   jamais vue, créez un objet de ce type avec les champs que seul explain
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: groupe-et-kind
     label: "Le relevé donne l'apiVersion et le kind de la CRD installée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: objet-de-la-crd
     label: "La sauvegarde commandes-nuit existe, avec les champs que le schéma exige"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: sonde-trouvee-par-explain
     label: "catalogue porte une sonde de disponibilité HTTP et ses Pods sont Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: inventaire-complet
     label: "Le relevé nomme chaque type d'objet présent dans le namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/

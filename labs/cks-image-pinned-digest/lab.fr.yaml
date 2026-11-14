@@ -1,4 +1,5 @@
 title: "Épingler une image par son digest, et prouver que le tag ne suffit pas"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
 description: |
   Un Deployment qui fait confiance à un tag mutable. Épinglez-le sur le digest
   immuable de l'image qu'il exécute réellement, et prouvez que l'épinglage

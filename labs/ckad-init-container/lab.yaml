@@ -14,7 +14,7 @@ skills:
   - services
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
 lab_type: lab
 estimated_time: 20m
 
@@ -42,22 +42,22 @@ criteria:
     tests:
       - test_app_a_un_init_container_qui_attend_config_svc
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: dependance-derriere-le-service
     label: "config-server answers behind config-svc"
     tests:
       - test_config_server_repond_derriere_config_svc
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: init-termine-avec-succes
     label: "The init container completed successfully"
     tests:
       - test_l_init_container_s_est_termine_avec_succes
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: running-seul-quand-la-dependance-repond
     label: "app went Running on its own once the dependency answered"
     tests:
       - test_app_est_passe_seul_en_running_quand_la_dependance_a_repondu
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/

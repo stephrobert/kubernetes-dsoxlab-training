@@ -1,4 +1,5 @@
 title: "Créer un cluster kind multi-nœuds"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/#mettre-en-pratique
 description: |
   Écrivez un fichier de configuration kind pour un control plane et deux
   workers, puis créez depuis ce fichier le cluster atelier, sur l'image de nœud
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: le-fichier-decrit-la-topologie
     label: "Le fichier de configuration décrit un control plane et deux workers"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
   - id: le-cluster-porte-son-nom
     label: "Un cluster kind nommé atelier existe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
   - id: les-noeuds-sont-prets-a-la-bonne-version
     label: "Les trois nœuds de atelier sont Ready, en Kubernetes v1.37.0"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/
   - id: les-roles-sont-les-bons
     label: "atelier a un nœud control-plane et deux workers"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/

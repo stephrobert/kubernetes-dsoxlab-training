@@ -1,4 +1,5 @@
 title: "Un Pod à deux conteneurs et ses budgets de ressources"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/#mettre-en-pratique
 description: |
   Écrire à la main un Pod à deux conteneurs, chacun avec ses requests et ses
   limits, et prouver depuis l'intérieur de chaque conteneur que la limite de
@@ -7,9 +8,17 @@ description: |
 criteria:
   - id: deux-conteneurs-en-marche
     label: "multi-app tourne avec ses deux conteneurs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: budget-de-web
     label: "web déclare ses requests et ses limits"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: budget-de-logger
     label: "logger déclare ses requests et ses limits"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/
   - id: limite-appliquee-par-le-noyau
     label: "Le noyau applique la limite de mémoire de chaque conteneur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/requests-limits/

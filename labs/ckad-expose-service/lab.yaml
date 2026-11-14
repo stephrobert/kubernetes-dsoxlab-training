@@ -14,7 +14,7 @@ skills:
   - dns
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
 lab_type: lab
 estimated_time: 10m
 
@@ -41,68 +41,68 @@ criteria:
     tests:
       - test_le_deployment_demande_trois_replicas
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles
     label: "The three replicas of web are available"
     tests:
       - test_les_trois_replicas_sont_disponibles
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-pods-portent-le-label-app-web
     label: "The Pods of web carry the label app=web"
     tests:
       - test_les_pods_portent_le_label_app_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-pods-tournent-avec-l-image-demandee
     label: "The Pods of web run busybox:1.38.0"
     tests:
       - test_les_pods_tournent_avec_l_image_demandee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-service-est-de-type-clusterip
     label: "The Service web-svc is of type ClusterIP"
     tests:
       - test_le_service_est_de_type_clusterip
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-ecoute-sur-80-vers-8080
     label: "The Service web-svc listens on 80 and targets port 8080 of the Pods"
     tests:
       - test_le_service_ecoute_sur_80_vers_8080
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-selectionne-app-web
     label: "The selector of web-svc is app=web"
     tests:
       - test_le_service_selectionne_app_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-a-trois-endpoints-prets
     label: "The Service web-svc has exactly three ready endpoints"
     tests:
       - test_le_service_a_trois_endpoints_prets
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repond-sous-son-nom-depuis-le-client
     label: "http://web-svc/ answers from the client Pod"
     tests:
       - test_le_service_repond_sous_son_nom_depuis_le_client
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/coredns/
   - id: chaque-pod-repond-son-propre-nom
     label: "Each Pod serves its own hostname, checked against the real Pod list"
     tests:
       - test_chaque_pod_repond_son_propre_nom
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repartit-entre-plusieurs-pods
     label: "Over ten requests, at least two different Pods answer"
     tests:
       - test_le_service_repartit_entre_plusieurs_pods
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
 
 feedback: full

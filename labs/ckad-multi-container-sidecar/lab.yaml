@@ -15,7 +15,7 @@ skills:
   - emptydir
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
 lab_type: lab
 estimated_time: 20m
 
@@ -42,22 +42,22 @@ criteria:
     tests:
       - test_log_shipper_est_un_sidecar_natif
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: volume-partage
     label: "The logs volume is shared by both containers"
     tests:
       - test_le_volume_logs_est_partage_par_les_deux_conteneurs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: application-ecrit
     label: "app writes into the shared file"
     tests:
       - test_app_ecrit_dans_le_fichier_partage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: sidecar-transmet
     label: "The sidecar passes on the lines of the application"
     tests:
       - test_le_sidecar_transmet_les_lignes_de_l_application
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/

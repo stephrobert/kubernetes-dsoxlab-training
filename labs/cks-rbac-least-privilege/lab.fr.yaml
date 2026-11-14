@@ -1,4 +1,5 @@
 title: "Retirer cluster-admin à un compte de service, sans le priver de son travail"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
 description: |
   Un ServiceAccount détient cluster-admin parce que c'était plus rapide.
   Reprenez ce pouvoir et donnez-lui exactement ce dont son application a

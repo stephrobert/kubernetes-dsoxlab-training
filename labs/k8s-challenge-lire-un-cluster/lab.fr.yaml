@@ -1,4 +1,5 @@
 title: "Lire un cluster : quel composant fait quoi"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique
 description: |
   Sur un cluster kind à quatre nœuds, trouver quel Node porte le control plane,
   nommer les Pods de ses quatre composants avec leur rôle, lire le runtime de
@@ -9,11 +10,25 @@ description: |
 criteria:
   - id: le-noeud-du-control-plane-est-consigne
     label: "Le Node qui porte le control plane est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
   - id: les-composants-du-control-plane-sont-consignes
     label: "Les Pods des quatre composants du control plane sont consignés avec leur rôle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-runtime-de-chaque-worker-est-consigne
     label: "Le runtime de conteneurs de chaque Node worker est consigné"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: le-placement-du-pod-temoin-est-prouve
     label: "Le Node qui a reçu le Pod temoin est consigné, avec l'événement Scheduled"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
   - id: le-maillon-qui-n-agit-pas-est-identifie
     label: "Pour file-attente, le composant qui a agi et celui qui n'agit pas sont consignés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/

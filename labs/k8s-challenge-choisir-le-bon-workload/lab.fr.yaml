@@ -1,4 +1,5 @@
 title: "Choisir et déployer le bon workload pour trois besoins"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
 description: |
   Sans guidage, servez trois besoins décrits sans nommer d'objet : une base dont
   les réplicas gardent une identité stable et leurs données, un agent sur chaque
@@ -8,15 +9,30 @@ description: |
 criteria:
   - id: replicas-ordonnes
     label: "inventaire a ses trois réplicas ordonnés, tous Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: noms-stables
     label: "Les noms stables d'inventaire se résolvent derrière un Service headless"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
   - id: donnee-survit
     label: "La donnée du réplica 1 survit à la suppression de son Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/statefulsets/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/
   - id: agent-partout
     label: "L'agent collecteur est Ready sur chaque nœud, control plane compris"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: taint-tolere
     label: "Le taint du control plane est toujours là, et l'agent le tolère"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/daemonsets/
   - id: collecte-conforme
     label: "La Collecte journaux est conforme au cahier des charges, et sa CRD est Established"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/
   - id: borne-refusee
     label: "Une rétention hors bornes est refusée par l'API"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/

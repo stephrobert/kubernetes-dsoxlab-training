@@ -1,4 +1,5 @@
 title: "Créer ou appliquer : apply, server-side apply et prune"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/#mettre-en-pratique
 description: |
   Appliquez un dossier entier avec ses sous-dossiers, empêchez un apply
   d'écraser les réplicas choisis par un autoscaler, reprenez un champ par
@@ -8,9 +9,17 @@ description: |
 criteria:
   - id: dossier-applique
     label: "Le dossier entier est appliqué, sous-dossiers compris"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
   - id: hpa-respecte
     label: "Réappliquer suivi.yaml garde les réplicas choisis par l'autoscaler"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
   - id: proprietaire-de-champ
     label: "L'image de tarifs appartient au gestionnaire de champs equipe-tarifs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
   - id: prune-maitrise
     label: "L'élagage a retiré suivi-ancien et épargné journal"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/

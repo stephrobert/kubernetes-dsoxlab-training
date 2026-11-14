@@ -18,7 +18,7 @@ skills:
   - troubleshooting
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
 lab_type: lab
 estimated_time: 20m
 
@@ -49,24 +49,24 @@ criteria:
     tests:
       - test_le_service_est_nodeport_sur_30091
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: endpoints-accueil
     label: "Its endpoints are the Pods of accueil, on their container's port"
     tests:
       - test_les_endpoints_sont_les_pods_d_accueil
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: control-plane-repond
     label: "The control plane answers accueil on port 30091"
     tests:
       - test_le_control_plane_sert_accueil_sur_30091
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: worker-repond
     label: "The worker answers accueil on port 30091"
     tests:
       - test_le_worker_sert_accueil_sur_30091
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
 
 feedback: full

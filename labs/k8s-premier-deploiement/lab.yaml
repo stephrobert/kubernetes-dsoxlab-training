@@ -23,7 +23,7 @@ skills:
   - endpointslices
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-deployment/
 lab_type: lab
 estimated_time: 20m
 
@@ -47,22 +47,22 @@ criteria:
     tests:
       - test_le_deployment_nginx_tourne_sur_l_image_epinglee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-deployment/
   - id: la-mise-a-l-echelle-donne-trois-replicas
     label: "nginx was scaled after its creation and has three available replicas"
     tests:
       - test_nginx_a_ete_mis_a_l_echelle_a_trois_replicas_disponibles
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-deployment/
   - id: le-service-compte-trois-endpoints
     label: "The nginx Service counts three ready endpoints"
     tests:
       - test_le_service_nginx_compte_trois_endpoints_prets
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-deployment/
   - id: la-reponse-est-consignee
     label: "The recorded HTTP answer is the page nginx really serves"
     tests:
       - test_la_reponse_consignee_est_la_page_que_sert_nginx
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-deploiement/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-deployment/

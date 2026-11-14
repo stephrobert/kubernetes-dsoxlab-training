@@ -26,7 +26,7 @@ skills:
   - kubectl-apply
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/
 lab_type: lab
 estimated_time: 20m
 
@@ -50,22 +50,22 @@ criteria:
     tests:
       - test_la_raison_d_attente_de_image_fausse_est_consignee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: le-code-de-sortie-est-consigne
     label: "The exit code of plante's container is recorded"
     tests:
       - test_le_code_de_sortie_de_plante_est_consigne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: l-image-est-corrigee-en-place
     label: "image-fausse runs, its image corrected in place on the same Pod"
     tests:
       - test_image_fausse_tourne_avec_son_image_corrigee_en_place
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: la-commande-est-corrigee
     label: "plante runs without restarting, same name and same image, its command corrected"
     tests:
       - test_plante_tourne_avec_sa_commande_corrigee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pods/

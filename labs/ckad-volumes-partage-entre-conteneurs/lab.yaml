@@ -15,7 +15,7 @@ skills:
   - sidecar
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
 lab_type: lab
 estimated_time: 20m
 
@@ -45,16 +45,16 @@ criteria:
     tests:
       - test_un_volume_ephemere_est_monte_dans_les_deux_conteneurs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
   - id: le-lecteur-voit
     label: "The reader sees the producer's file"
     tests:
       - test_le_lecteur_voit_le_fichier_du_producteur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
   - id: le-reste-reste-invisible
     label: "What is written outside the volume stays invisible to the reader"
     tests:
       - test_ce_qui_est_ecrit_hors_du_volume_reste_invisible_au_lecteur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/

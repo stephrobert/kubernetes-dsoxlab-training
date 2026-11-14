@@ -24,7 +24,7 @@ skills:
   - pod-template
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
 lab_type: lab
 estimated_time: 15m
 
@@ -48,16 +48,16 @@ criteria:
     tests:
       - test_env_prod_est_dans_le_modele_de_pod_de_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
   - id: l-annotation-decrit-web
     label: "The web Deployment carries a description annotation"
     tests:
       - test_une_annotation_description_est_posee_sur_web
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
   - id: la-selection-rend-les-pods-de-api
     label: "The recorded selector, with a negation, returns exactly the Pods of api"
     tests:
       - test_le_selecteur_consigne_rend_exactement_les_pods_de_api
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
