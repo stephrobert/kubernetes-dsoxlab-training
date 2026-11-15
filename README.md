@@ -211,7 +211,7 @@ multiple-choice: there is no exam lab for them, and the labs of the modules
 are there to understand, not to pass the exam.
 
 The training is organised in levels: each level ends with a test, and each
-module with a challenge, without hints. [KAIA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kaia/) and
+module with a challenge, without hints, delivered as the modules are written. [KAIA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kaia/) and
 [CKIE](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckie/) have an overview page on the site, and no
 labs.
 

@@ -212,7 +212,7 @@ La KCNA et la KCSA sont des QCM : elles n'ont pas de lab d'examen, et les labs
 des modules servent à comprendre, pas à passer l'examen.
 
 La formation est organisée en niveaux : chaque niveau se clôt par une épreuve,
-et chaque module par un challenge, sans indice. [KAIA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/kaia/)
+et chaque module par un challenge, sans indice, livrés au fil des modules. [KAIA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/kaia/)
 et [CKIE](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckie/) ont une page de présentation sur le site,
 et aucun lab.
 
