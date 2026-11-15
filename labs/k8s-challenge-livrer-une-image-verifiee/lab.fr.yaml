@@ -1,4 +1,5 @@
 title: "Ne laisser entrer que des images vérifiées, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
 description: |
   Sans procédure, épingler un Deployment sur son digest, débarrasser un
   Dockerfile des constats de l'analyse statique, signer une image et publier
@@ -38,8 +39,12 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: image-remplacee
     label: "Le Deployment boutique ne tourne plus sur son image d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
   - id: moins-de-failles
     label: "La nouvelle image porte strictement moins de failles critiques que l'ancienne, mesuré par un nouveau scan"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
   - id: admission-signee
     label: "Le cluster refuse à la création un Pod dont l'image n'est pas signée, et accepte l'image signée"
     lessons:

@@ -10,7 +10,7 @@ whose trace must appear in the log. Seven states, threshold 70, two blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `conformite` namespace and restores the three control plane manifests at each run |
 | Duration | about 50 minutes |
-| Related page | [Audit Logs](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/) |
+| Related page | [Audit Logs](https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/) |
 
 ```bash
 dsoxlab run    k8s-challenge-durcir-le-plan-de-controle

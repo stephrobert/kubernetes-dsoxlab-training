@@ -34,7 +34,7 @@ skills:
   - static-pod
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -62,43 +62,43 @@ criteria:
     tests:
       - test_l_api_server_porte_les_reglages_de_durcissement
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
       - https://www.stephane-robert.info/docs/securiser/kubernetes/
   - id: profileur-ferme
     label: "The /debug/pprof/ profiler no longer answers, and the API server still answers on /version"
     tests:
       - test_le_profileur_est_ferme_et_l_api_repond_toujours
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: trois-composants-corriges
     label: "The API server, the controller manager and the scheduler all carry the fix for the CIS finding"
     tests:
       - test_les_trois_composants_portent_la_correction_cis
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: audit-cis-relance
     label: "kube-bench, run again, counts fewer failures than at the start, and the three targeted checks pass"
     tests:
       - test_kube_bench_relance_compte_moins_d_echecs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: politique-a-deux-niveaux
     label: "The audit policy records Secret accesses in full and everything else as metadata"
     tests:
       - test_la_politique_d_audit_distingue_les_secrets_du_reste
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
       - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/
   - id: audit-actif
     label: "The API server runs with the audit on, its policy file and its log mounted from the node"
     tests:
       - test_l_api_server_tourne_avec_l_audit_monte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
   - id: journal-qui-trace
     label: "The log holds a Secret read recorded in full and an ordinary read recorded as metadata only"
     tests:
       - test_le_journal_trace_les_secrets_en_entier_et_le_reste_en_metadonnees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
       - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/

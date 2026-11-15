@@ -88,25 +88,25 @@ criteria:
     tests:
       - test_p01_le_profileur_est_ferme_et_l_api_repond
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: p02-audit-cis
     label: "P02: a new CIS audit counts fewer failures than at the start, and the profiling checks pass"
     tests:
       - test_p02_un_audit_cis_rejoue_compte_moins_d_echecs
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: p03-audit-active
     label: "P03: the API server runs with auditing on, following the requested policy, and writes its log on the node"
     tests:
       - test_p03_l_api_server_tourne_avec_l_audit_monte
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
   - id: p04-journal-d-audit
     label: "P04 (critical): the log records a Secret read in full and an ordinary read as metadata only"
     tests:
       - test_p04_le_journal_trace_un_secret_en_entier_et_le_reste_en_metadonnees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
   - id: p05-standard-restricted
     label: "P05 (critical): the shop's space refuses a Pod that breaks the restricted standard and accepts a compliant one"
     tests:
@@ -184,7 +184,7 @@ criteria:
     tests:
       - test_p17_l_image_de_production_porte_moins_de_failles_critiques
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/scan-kubernetes-images/
   - id: p18-dockerfile
     label: "P18: the static analysis findings of the Dockerfile are gone and the application does the same thing"
     tests:

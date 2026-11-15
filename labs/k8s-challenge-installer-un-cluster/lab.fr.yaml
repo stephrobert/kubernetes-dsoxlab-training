@@ -1,4 +1,5 @@
 title: "Installer un cluster kubeadm, y joindre un nœud et rendre le plan de contrôle hautement disponible"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
 description: |
   Sans procédure, préparer un worker réinitialisé et le joindre au cluster
   kubeadm de façon qu'il survive à un redémarrage, prouver qu'il fait tourner
@@ -32,5 +33,9 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/installation/
   - id: etcd-trois-membres
     label: "etcd compte trois membres votants et sains"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: api-survit-a-un-plan-de-controle
     label: "L'API répond par l'adresse du répartiteur pendant que le correcteur tient un plan de contrôle à l'arrêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/

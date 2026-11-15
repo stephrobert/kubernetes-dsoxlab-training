@@ -1,4 +1,5 @@
 title: "Corriger les écarts CIS d'un cluster, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
 description: |
   Sans procédure, durcir l'API server d'un cluster kubeadm, corriger l'écart
   que l'audit CIS reproche à trois composants du plan de contrôle, le prouver
@@ -8,15 +9,32 @@ description: |
 criteria:
   - id: reglages-de-l-api-server
     label: "Le manifeste de l'API server porte les réglages de durcissement : profileur coupé, vérification des comptes de service, plancher TLS"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/docs/securiser/kubernetes/
   - id: profileur-ferme
     label: "Le profileur /debug/pprof/ ne répond plus, et l'API server répond toujours sur /version"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: trois-composants-corriges
     label: "L'API server, le controller manager et le scheduler portent tous trois la correction de l'écart CIS"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: audit-cis-relance
     label: "kube-bench, relancé, compte moins d'échecs qu'au départ, et les trois contrôles visés passent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: politique-a-deux-niveaux
     label: "La politique d'audit enregistre en entier les accès aux Secrets, et le reste en métadonnées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/
   - id: audit-actif
     label: "L'API server tourne avec l'audit, son fichier de politique et son journal montés depuis le nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: journal-qui-trace
     label: "Le journal contient une lecture de Secret enregistrée en entier et une lecture banale enregistrée en métadonnées seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/

@@ -1,4 +1,5 @@
 title: "Fermer le profileur de l'API server, sans fermer l'API"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
 description: |
   L'API server expose son profileur Go à qui sait l'atteindre, et un cluster
   kubeadm le laisse actif. Fermez-le et relevez le plancher TLS, puis prouvez
