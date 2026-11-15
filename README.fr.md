@@ -20,11 +20,13 @@ son titre. Un **capstone** n'en nomme aucune : il remet une situation, le seuil
 de réussite de son examen (66 % pour la CKA et la CKAD, 67 % pour la CKS), et
 laisse choisir les outils.
 
-**Les trois examens que préparent ces labs, CKA, CKAD et CKS, sont
-entièrement pratiques.** Le candidat
-répare ou construit sur un vrai cluster : il ne choisit pas la bonne réponse
-parmi quatre. Un quiz prépare au vocabulaire, pas à l'examen. Ce catalogue
-donne à l'apprenant les moyens de **prouver** qu'il sait faire.
+**La CKA, la CKAD et la CKS sont des examens pratiques.** Le candidat répare
+ou construit sur un vrai cluster : il ne choisit pas la bonne réponse parmi
+quatre. Pour ces trois-là, un quiz ne suffit pas, et ce catalogue donne à
+l'apprenant les moyens de **prouver** qu'il sait faire. La **KCNA** et la
+**KCSA** sont des examens à choix multiples : le site les prépare avec ses
+pages et ses examens blancs, et les labs d'ici aident à comprendre ce dont
+parlent les questions.
 
 Chaque lab pose un état initial, énonce un objectif, et valide en lisant
 **l'état du système**, jamais les commandes tapées.

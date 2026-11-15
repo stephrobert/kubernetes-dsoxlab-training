@@ -20,11 +20,12 @@ its title. A **capstone** names none: it hands over a situation, the pass
 mark of its exam (66 % for the CKA and the CKAD, 67 % for the CKS), and
 leaves you to pick the tools.
 
-**The three exams these labs prepare for, CKA, CKAD and CKS, are entirely
-hands-on.** The candidate
-repairs or builds on a real cluster: they do not pick the right answer out of
-four. A quiz prepares you for the vocabulary, not for the exam. This catalogue
-gives the learner the means to **prove** they can do the work.
+**The CKA, the CKAD and the CKS are hands-on exams.** The candidate repairs or
+builds on a real cluster: they do not pick the right answer out of four. For
+these three, a quiz is not enough, and this catalogue gives the learner the
+means to **prove** they can do the work. The **KCNA** and the **KCSA** are
+multiple-choice exams: the site prepares them with its pages and its mock
+exams, and the labs here help understand what the questions are about.
 
 Every lab sets an initial state, states a goal, and validates by reading **the
 state of the system**, never the commands typed.
