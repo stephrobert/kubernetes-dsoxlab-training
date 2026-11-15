@@ -11,7 +11,9 @@
 Catalogue de **labs et de capstones vérifiables** pour la
 [formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/)
 du blog de Stéphane Robert. Joué par la CLI
-[dsoxlab](https://github.com/stephrobert/dsoxlab).
+[dsoxlab](https://github.com/stephrobert/dsoxlab). Le site les présente, par
+certification et par type de lab, sur sa
+[page des labs Kubernetes](https://www.stephane-robert.info/labs/kubernetes/).
 
 ## Ce que c'est
 
