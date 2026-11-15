@@ -1,4 +1,4 @@
-# Kubernetes DevSecOps Training : labs CKA, CKAD et CKS
+# Kubernetes DevSecOps Training : labs pour les certifications Kubernetes
 
 **Langue :** [English](./README.md) · [Français](./README.fr.md)
 
@@ -16,10 +16,12 @@ du blog de Stéphane Robert. Joué par la CLI
 ## Ce que c'est
 
 Un **micro-lab** exerce une compétence nommée par le blueprint, et le dit dans
-son titre. Un **capstone** n'en nomme aucune : il remet une situation, un seuil
-de réussite de 66 % comme à l'examen, et laisse choisir les outils.
+son titre. Un **capstone** n'en nomme aucune : il remet une situation, le seuil
+de réussite de son examen (66 % pour la CKA et la CKAD, 67 % pour la CKS), et
+laisse choisir les outils.
 
-**Les trois certifications Kubernetes sont entièrement pratiques.** Le candidat
+**Les trois examens que préparent ces labs, CKA, CKAD et CKS, sont
+entièrement pratiques.** Le candidat
 répare ou construit sur un vrai cluster : il ne choisit pas la bonne réponse
 parmi quatre. Un quiz prépare au vocabulaire, pas à l'examen. Ce catalogue
 donne à l'apprenant les moyens de **prouver** qu'il sait faire.
@@ -161,7 +163,8 @@ révélés). Les indices sont **en base64** dans `challenge/hints.yaml`, pour qu
 n'y accède pas en ouvrant le fichier, et leur coût croît avec leur précision.
 L'historique vit dans une base SQLite **locale à ce dépôt**.
 
-Un capstone déclare un **seuil de 66 %**, comme à l'examen, et `submit` traduit
+Un capstone déclare le **seuil de son examen** (66 % pour la CKA et la CKAD,
+67 % pour la CKS), et `submit` traduit
 la note en verdict. Une exécution qui n'a rien mesuré n'est ni une réussite ni
 un échec : si tous les tests collectés skippent, `check` n'enregistre aucune
 note et dit pourquoi. Un 0 accuserait le lab de ce qui manque au cluster, qui
@@ -184,6 +187,34 @@ pas dans un conteneur. Sur un nœud kind, le kubelet refuse un Pod AppArmor avec
 `Cannot enforce AppArmor: AppArmor is not enabled on the host`. Les labs qui
 éprouvent ces faits exigent de vraies machines ; ceux qui enseignent les gestes
 de base se jouent là où ces gestes s'apprennent.
+
+## Certifications préparées par la formation
+
+La [formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) prépare six certifications de la Linux
+Foundation. Format, seuil et version de Kubernetes suivent l'examen : les pages
+du site font foi et s'y tiennent à jour, pas ici. Pour choisir, partez de
+[quelle certification Kubernetes choisir](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/).
+
+| Certification | Format | Préparation | Labs d'examen de ce dépôt |
+| --- | --- | --- | --- |
+| KCNA | QCM surveillé, 90 min | [KCNA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcna/) · [examen blanc](https://www.stephane-robert.info/examens/kcna/) | aucun : examen à choix multiples |
+| KCSA | QCM surveillé, sans terminal, 90 min | [KCSA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcsa/) · [examen blanc](https://www.stephane-robert.info/examens/kcsa/) | aucun : examen à choix multiples |
+| CKAD | pratique, 2 h, 66 % | [CKAD](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/) · [commandes essentielles](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/commandes-essentielles/) · [exercices](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/) · [quiz](https://www.stephane-robert.info/examens/ckad/) | `ckad-capstone-boutique`, `ckad-examen-blanc` |
+| CKA | pratique, 2 h, 66 % | [CKA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/) · [commandes essentielles](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/commandes-essentielles/) · [exercices](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) · [quiz](https://www.stephane-robert.info/examens/cka/) | `cka-capstone-portail`, `cka-examen-blanc` |
+| CKS | pratique, 2 h, 67 %, CKA exigée | [CKS](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/) · [commandes essentielles](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/commandes-essentielles/) · [exercices](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) · [quiz](https://www.stephane-robert.info/examens/cks/) | `cks-capstone-enclave`, `cks-examen-blanc` |
+| CKNE | pratique, 2 h, bureau Linux distant | [CKNE](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/) | en préparation : le niveau de la formation qui la couvre est en cours d'écriture |
+
+Chaque examen pratique a, dans ce dépôt, un **capstone** et un **examen blanc
+chronométré**, tous deux hébergés par la page d'exercices de la certification.
+Les examens blancs durent 120 minutes, ne donnent aucun indice, appliquent le
+seuil de l'examen réel (66 ou 67 %) et vous laissent tenir votre chronomètre.
+La KCNA et la KCSA sont des QCM : elles n'ont pas de lab d'examen, et les labs
+des modules servent à comprendre, pas à passer l'examen.
+
+La formation est organisée en niveaux : chaque niveau se clôt par une épreuve,
+et chaque module par un challenge, sans indice, livrés au fil des modules. [KAIA](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/kaia/)
+et [CKIE](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckie/) ont une page de présentation sur le site,
+et aucun lab.
 
 ## Le catalogue
 
