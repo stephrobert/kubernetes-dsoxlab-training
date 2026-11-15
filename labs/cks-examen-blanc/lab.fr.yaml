@@ -78,4 +78,5 @@ criteria:
   - id: t16-pod-compromis
     label: "Tâche 16 : le Pod compromis est retiré, et lui seul"
     lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/

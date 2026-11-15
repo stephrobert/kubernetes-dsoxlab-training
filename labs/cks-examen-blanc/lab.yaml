@@ -187,4 +187,5 @@ criteria:
     tests:
       - test_t16_le_pod_compromis_est_retire_et_lui_seul
     lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/
