@@ -82,7 +82,7 @@ criteria:
     tests:
       - test_t03_l_audit_cis_rejoue_ne_reproche_plus_le_profilage
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
   - id: t04a-dev-sa-reduit
     label: "Task 4: dev-sa is no longer cluster admin and keeps its work in equipe-dev"
     tests:
@@ -169,13 +169,13 @@ criteria:
     tests:
       - test_t14a_la_lecture_du_secret_est_journalisee_avec_son_corps
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
   - id: t14b-audit-metadata
     label: "Task 14: an ordinary read is logged at Metadata level only"
     tests:
       - test_t14b_une_lecture_banale_est_journalisee_en_metadata_seulement
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
   - id: t15-immuable
     label: "Task 15: vitrine can no longer be written to inside, and still serves"
     tests:

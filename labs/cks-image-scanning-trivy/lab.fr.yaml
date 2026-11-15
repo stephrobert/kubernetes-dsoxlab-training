@@ -1,4 +1,5 @@
 title: "Remplacer une image criblée de failles, et le prouver par un second scan"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
 description: |
   Un Deployment tourne sur une image vieille de trois ans. Analysez-la,
   choisissez son remplacement, et prouvez ce choix : le test analyse les deux

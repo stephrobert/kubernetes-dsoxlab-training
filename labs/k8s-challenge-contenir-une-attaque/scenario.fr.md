@@ -46,8 +46,7 @@ refuse vraiment. Réussir les autres ne compense pas l'échec de l'un d'eux.
 Les tests comparent le constat à l'objet posé par le setup, attendent un cycle
 complet du mécanisme avant de juger que l'accès a disparu, créent des Pods
 sondes dans `calcul-lots` pour voir ce que le cluster accepte et refuse, et
-envoient de vraies requêtes HTTP à `reservations`. Le retour se limite à la
-première ligne de chaque échec.
+envoient de vraies requêtes HTTP à `reservations`. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-contenir-une-attaque

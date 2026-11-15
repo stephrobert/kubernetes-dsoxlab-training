@@ -54,6 +54,7 @@ sections:
   - id: ckne
     title: "Réseau avancé (CKNE)"
     description: >-
-      Cinq domaines au programme de la CKNE. Service
-      Networking and DNS et Network Security and Policy pèsent 25 % chacun.
-      Les labs tournent sur un cluster Cilium dédié, sans kube-proxy.
+      Cinq domaines au programme de la CKNE. Service Networking and DNS et
+      Network Security and Policy pèsent 25 % chacun. Les labs tournent sur
+      un cluster Cilium dédié, sans kube-proxy, ou font tourner Istio en mode
+      ambient sur le cluster kubeadm, agrandi d'un second worker.

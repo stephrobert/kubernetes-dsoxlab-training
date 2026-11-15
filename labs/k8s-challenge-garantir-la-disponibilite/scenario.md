@@ -53,7 +53,7 @@ Each check **acts on the cluster**, and says so here: it evicts one copy of
 ready; then it **evacuates `k8s-w1.lab` itself**, measures the available copies
 during the evacuation, puts the node back into service and spreads the copies
 again. The report is compared with the state of the cluster at the time of the
-check. The feedback is limited to the verdict: passed or not, and the score.
+check. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-garantir-la-disponibilite

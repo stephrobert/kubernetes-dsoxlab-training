@@ -53,7 +53,7 @@ submit test Pods in server-side dry run, which creates nothing. For state 8,
 Deployment to grow. You have nothing to start for it, and a check can last
 that long.
 
-The feedback is limited to the verdict: passed or not, and the score.
+The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-placer-et-plafonner

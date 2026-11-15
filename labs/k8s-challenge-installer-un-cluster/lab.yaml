@@ -44,7 +44,7 @@ skills:
 distros:
   - ubuntu24
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -103,17 +103,17 @@ criteria:
     tests:
       - test_trois_plans_de_controle_ready_par_le_repartiteur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/choose-how-to-install-kubernetes/
   - id: etcd-trois-membres
     label: "etcd has three healthy voting members"
     tests:
       - test_etcd_compte_trois_membres_sains
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: api-survit-a-un-plan-de-controle
     label: "The API answers through the load balancer while the grader holds one control plane down"
     tests:
       - test_l_api_repond_par_le_repartiteur_apres_l_arret_d_un_plan_de_controle
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/

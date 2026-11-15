@@ -48,8 +48,7 @@ Passing the others does not make up for missing one of them.
 
 The tests read the admitted Pods, enter the new Pod to count what it sees, and
 submit real Pods: in `vitrine` without creating anything, in `production` and
-`recette` by creating them and removing them at once. The feedback is limited
-to the verdict: passed or not, and the score.
+`recette` by creating them and removing them at once. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-faire-refuser-par-admission

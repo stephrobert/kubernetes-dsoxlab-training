@@ -1,0 +1,103 @@
+# Lab guidé de la leçon L8 du niveau 6 « Réseau avancé » (CKNE), « Servir une
+# Gateway en HTTPS avec cert-manager ». Objectif du programme CKNE « Managing
+# TLS Certificates for Gateway API », domaine Network Security and Policy
+# (25 %).
+#
+# La situation : Istio 1.32 en mode ambient (D90), la Gateway API v1.6.1 et
+# cert-manager v1.21.3 sont posés par le setup, avec une CA interne exposée par
+# le ClusterIssuer ca-formation. L'application vitrine répond en HTTP dans son
+# namespace. L'apprenant demande un certificat à cert-manager DANS le namespace
+# de la Gateway (le Secret TLS doit y vivre, sinon il faudrait un
+# ReferenceGrant), déclare une Gateway d'Istio avec un listener HTTPS qui le
+# référence, et y attache une route.
+#
+# La validation lit le certificat que le listener PRÉSENTE (openssl s_client),
+# le compare au Secret émis par cert-manager, vérifie son émetteur par
+# `openssl verify` contre la CA, et lit la condition Programmed de la Gateway.
+#
+# Briques attestées réutilisées : k8s-emettre-un-certificat-avec-cert-manager
+# (manifeste cert-manager v1.21.3, installation et retrait, CA interne par un
+# émetteur auto-signé), cka-gateway-api-httproute (Gateway, HTTPRoute,
+# conditions Programmed et ResolvedRefs), cks-ingress-tls (certificat présenté
+# lu par openssl), cks-istio-mtls-lockdown (Istio par istioctl, retrait
+# complet).
+#
+# Topologie du cadrage : un control plane et deux workers. k8s-w2.lab est un
+# hôte optionnel (meta.yml), monté par le `run` de ce lab parce que ses `roles`
+# le citent, joint au cluster par le setup et retiré du cluster au cleanup.
+id: k8s-servir-une-gateway-en-https
+title: "Serve an Istio Gateway over HTTPS with a cert-manager certificate"
+level: network-security-policy
+section: ckne
+difficulty: advanced
+description: |
+  On a cluster running Istio in ambient mode, request a certificate from
+  cert-manager in the namespace of the Gateway, declare an HTTPS listener that
+  presents it, attach a route, and prove that the listener serves the issued
+  certificate, signed by the internal CA, to a real HTTPS client.
+skills:
+  - gateway-api
+  - istio
+  - cert-manager
+  - tls
+distros:
+  - ubuntu24
+# Page provisoire : la leçon n'existe pas encore. URL cible (cadrage CKNE, L8) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: certificat-emis
+    label: "A cert-manager Certificate for vitrine.formation.test, issued by the ClusterIssuer ca-formation, is Ready in the namespace vitrine"
+    tests:
+      - test_le_certificat_est_emis_par_la_ca_de_la_formation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
+  - id: gateway-programmee
+    label: "A Gateway of class istio in vitrine has an HTTPS listener on port 443 whose certificate reference is resolved, and the cluster declares it Programmed"
+    tests:
+      - test_la_gateway_https_est_programmee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: certificat-presente
+    label: "The listener presents the certificate stored by cert-manager, for the name vitrine.formation.test"
+    tests:
+      - test_le_listener_presente_le_certificat_emis
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+  - id: emetteur-verifie
+    label: "The presented certificate is issued by the internal CA and its chain verifies against it"
+    tests:
+      - test_l_emetteur_du_certificat_presente_est_la_ca
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
+  - id: vitrine-en-https
+    label: "An HTTPS client that trusts only the internal CA reaches the application vitrine through the Gateway"
+    tests:
+      - test_la_vitrine_repond_en_https
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+
+feedback: full

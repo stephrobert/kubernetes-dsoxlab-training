@@ -1,0 +1,50 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, le second worker
+# optionnel joint au cluster, cert-manager v1.21.3 depuis le manifeste
+# officiel, Istio 1.32 ambient et la Gateway API v1.6.1, puis la situation du
+# lab (fixtures/prepare.sh).
+#
+# Le second worker est joint AVANT Istio : les DaemonSets istio-cni et ztunnel
+# doivent couvrir les trois nœuds dès leur premier déploiement.
+- name: Préparer le lab k8s-servir-une-gateway-en-https
+  hosts: lab_target
+  become: true
+  vars:
+    cert_manager_version: "1.21.3"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    - name: Récupérer le manifeste de cert-manager {{ cert_manager_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/cert-manager/cert-manager/releases/download/v{{ cert_manager_version }}/cert-manager.yaml"
+        dest: "/root/cert-manager-v{{ cert_manager_version }}.yaml"
+        mode: "0644"
+
+    - name: Installer cert-manager
+      ansible.builtin.command: >-
+        {{ kubectl }} apply --server-side --force-conflicts -f /root/cert-manager-v{{ cert_manager_version }}.yaml
+      register: installation
+      changed_when: "'serverside-applied' in installation.stdout"
+
+    - name: Attendre que cert-manager et son webhook soient disponibles
+      ansible.builtin.command: >-
+        {{ kubectl }} -n cert-manager wait --for=condition=Available deployment --all --timeout=300s
+      changed_when: false
+
+    - name: Installer Istio ambient et la Gateway API
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+
+    - name: Poser la CA interne, l'application et le namespace de travail
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

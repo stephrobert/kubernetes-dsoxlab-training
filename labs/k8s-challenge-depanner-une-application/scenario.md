@@ -53,8 +53,7 @@ the API server back in service (state 6). Passing the others does not make up
 for missing one of them.
 
 The tests read the cluster through its API, the state of the services and the
-files on the nodes, and the dates of your files in `~/incident/`. The feedback
-is limited to the verdict: passed or not, and the score.
+files on the nodes, and the dates of your files in `~/incident/`. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-depanner-une-application

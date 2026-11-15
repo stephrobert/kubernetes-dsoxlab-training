@@ -25,8 +25,12 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: p03-trois-plans-de-controle
     label: "P03 (critique) : les trois nœuds control-plane sont Ready, lus par l'adresse du répartiteur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: p04-api-survit
     label: "P04 (critique) : l'API répond par l'adresse du répartiteur pendant que le correcteur tient un plan de contrôle à l'arrêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: p05-sauvegarde-fraiche
     label: "P05 : une sauvegarde fraîche d'etcd existe, elle est vérifiée et plus récente que celle de la veille"
     lessons:

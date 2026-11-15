@@ -11,7 +11,7 @@ states, threshold 70, three blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab sets up the `livraison` namespace, a local registry on port 5000 of the node, and Kyverno 1.19.2 with no policy |
 | Duration | about 60 minutes |
-| Related page | [Image Scanning (Grype/Trivy)](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/) |
+| Related page | [Image Scanning (Grype/Trivy)](https://www.stephane-robert.info/en/docs/devsecops/runtime/scan-kubernetes-images/) |
 
 ```bash
 dsoxlab run    k8s-challenge-livrer-une-image-verifiee

@@ -53,7 +53,7 @@ tourner une boucle de calcul dans chaque Pod d'`accueil` pendant environ deux
 minutes, et attend au plus deux minutes que le Deployment grossisse. Vous
 n'avez rien à lancer pour cela, et une vérification peut durer ce temps-là.
 
-Le retour se limite au verdict : réussi ou non, et la note.
+Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-placer-et-plafonner

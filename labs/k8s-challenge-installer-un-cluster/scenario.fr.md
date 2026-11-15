@@ -48,7 +48,7 @@ plan de contrôle. Réussir les autres ne compense pas l'un d'eux manqué.
 Pour l'état 7, le correcteur **arrête lui-même** un plan de contrôle de `ha`
 (il gèle son conteneur), interroge `/readyz` par le répartiteur, puis le
 **remet en marche**. Chaque check agit donc sur le cluster `ha` pendant une
-bonne minute. Le retour se limite au verdict : réussi ou non, et la note.
+bonne minute. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-installer-un-cluster

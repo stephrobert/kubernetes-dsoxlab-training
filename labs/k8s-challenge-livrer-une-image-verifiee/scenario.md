@@ -52,8 +52,7 @@ Passing the others does not make up for missing one of them.
 
 The tests ask the node's runtime what runs, run the static analysis and the
 vulnerability scans again, verify the signatures with the key taken from the
-ConfigMap, then submit two Pods to admission without creating them. The
-feedback is limited to the verdict: passed or not, and the score.
+ConfigMap, then submit two Pods to admission without creating them. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-livrer-une-image-verifiee

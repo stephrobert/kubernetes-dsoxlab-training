@@ -1,0 +1,278 @@
+---
+# Istio en mode AMBIENT, la Gateway API et, sur demande, la Gateway API
+# Inference Extension : la pile des labs du niveau 6 « Réseau avancé » (CKNE).
+# Le même fichier installe (`istio_etat: present`, défaut) et retire
+# (`istio_etat: absent`), pour que l'installation et son inverse ne divergent
+# jamais.
+#
+#     - name: Installer Istio ambient
+#       ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+#       vars:
+#         istio_inference: false            # true : CRD et drapeaux de pilot
+#
+#     - name: Retirer Istio ambient            # dans cleanup.yaml
+#       ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+#       vars:
+#         istio_etat: absent
+#
+# Inclus depuis le play `lab_target` (le control plane), APRÈS le socle.
+#
+# LES VERSIONS, et d'où elles viennent (relevées le 2026-11-14).
+# - Istio 1.32.0, sortie le 2026-11-09 : la première qui déclare Kubernetes
+#   1.37, celle du catalogue (page « supported releases » d'Istio).
+# - Gateway API v1.6.1, canal standard : la version que le go.mod d'Istio
+#   1.32.0 embarque (`sigs.k8s.io/gateway-api v1.6.1`). Le socle Traefik pose
+#   la v1.6.2 ; les deux ne cohabitent jamais, chaque cleanup retirant les CRD.
+# - Inference Extension v1.5.0 : là aussi la version du go.mod d'Istio 1.32.0
+#   (`sigs.k8s.io/gateway-api-inference-extension v1.5.0`). La page de tâche
+#   d'Istio pose les CRD v1.0.1 et la dernière publiée est la v1.6.2 : on
+#   épingle sur la bibliothèque contre laquelle pilot est COMPILÉ, la seule
+#   combinaison qu'Istio exerce forcément. `manifests.yaml` et non
+#   `v1-manifests.yaml` : le sélecteur d'endpoints (EPP) v1.5.0 lit aussi les
+#   InferenceObjective du groupe x-k8s.io, et son rôle RBAC les demande.
+#
+# LE PROFIL LE PLUS LÉGER QUE L'AMBIENT PERMETTE.
+# L'ambient exige trois composants : istiod, l'agent CNI istio-cni et ztunnel
+# (un Pod par nœud pour les deux derniers). Le profil `ambient` n'y ajoute
+# aucune passerelle d'entrée : les Gateway des labs sont créées par l'apprenant,
+# et istiod déploie leur Envoy à la demande. Les DEMANDES de ressources sont
+# abaissées, pas les limites : les valeurs par défaut réservent 2 Gio pour
+# istiod et 512 Mio par ztunnel, taillées pour des milliers de Pods, ce qui
+# saturerait l'ordonnanceur d'un cluster de lab sans rien dire de la mémoire
+# réellement consommée.
+#
+# ESTIMATION MÉMOIRE (non mesurée, à confirmer par la campagne) : istiod
+# 200 à 300 Mo (le profil minimal mesuré à 194 Mo le 2026-09-16 par
+# cks-istio-mtls-lockdown, l'ambient y ajoute la découverte des workloads),
+# ztunnel 30 à 60 Mo et istio-cni 30 à 50 Mo PAR NŒUD, une passerelle ou un
+# waypoint Envoy 50 à 80 Mo chacun. Soit 450 à 650 Mo pour le cluster, dont
+# 300 à 450 Mo sur k8s-cp si istiod y est placé.
+
+- name: Installer Istio ambient
+  when: istio_etat | default('present') == 'present'
+  block:
+    - name: Poser istioctl {{ istio_version | default('1.32.0') }} avec mise
+      ansible.builtin.include_tasks: outil-par-mise.yml
+      vars:
+        outil_nom: istioctl
+        outil_version: "{{ istio_version | default('1.32.0') }}"
+        # istioctl n'accepte pas --version seul : il attend une sous-commande.
+        outil_verification: version --remote=false
+
+    # Le fichier pose dix CRD ET une ValidatingAdmissionPolicy avec son binding,
+    # `safe-upgrades.gateway.networking.k8s.io`, que le retrait reprend.
+    # `--server-side` : la CRD des HTTPRoute dépasse la taille d'annotation
+    # qu'un apply client écrit.
+    - name: Installer les CRD de la Gateway API v{{ gateway_api_version | default('1.6.1') }}
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf apply --server-side --force-conflicts -f
+        https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ gateway_api_version | default('1.6.1') }}/standard-install.yaml
+      register: _crd_gateway
+      changed_when: "'serverside-applied' in _crd_gateway.stdout"
+
+    - name: Installer les CRD de l'Inference Extension v{{ inference_extension_version | default('1.5.0') }}
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf apply --server-side --force-conflicts -f
+        https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/download/v{{ inference_extension_version | default('1.5.0') }}/manifests.yaml
+      register: _crd_inference
+      changed_when: "'serverside-applied' in _crd_inference.stdout"
+      when: istio_inference | default(false) | bool
+
+    # Le fichier reste sur le nœud : c'est lui que l'apprenant relance avec
+    # `istioctl install -f` quand il modifie la configuration du maillage
+    # (fournisseur de traces du lab de traçage), sans perdre ces réglages.
+    - name: Écrire la configuration d'installation d'Istio
+      ansible.builtin.copy:
+        dest: /root/istio-ambient.yaml
+        mode: "0644"
+        content: |
+          # Istio {{ istio_version | default('1.32.0') }} en mode ambient, posé par le lab.
+          # Réinstaller : istioctl install -y -f /root/istio-ambient.yaml
+          apiVersion: install.istio.io/v1alpha1
+          kind: IstioOperator
+          spec:
+            profile: ambient
+            components:
+              pilot:
+                k8s:
+                  resources:
+                    requests:
+                      cpu: 100m
+                      memory: 256Mi
+            values:
+              pilot:
+                autoscaleEnabled: false
+          {% if istio_inference | default(false) | bool %}
+                # Gateway API Inference Extension : désactivée par défaut dans
+                # pilot, ces deux variables l'activent (bêta depuis Istio 1.29).
+                env:
+                  SUPPORT_GATEWAY_API_INFERENCE_EXTENSION: "true"
+                  ENABLE_GATEWAY_API_INFERENCE_EXTENSION: "true"
+          {% endif %}
+              ztunnel:
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 128Mi
+              cni:
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 64Mi
+
+    # Joué à CHAQUE setup, et non seulement quand istiod manque : `istioctl
+    # install` ramène le maillage à ce fichier, ce qui efface une configuration
+    # laissée par un passage précédent (un fournisseur de traces déclaré par
+    # l'apprenant, par exemple). Sans cela, un `run` rejoué sans `clean`
+    # rendrait un test vrai avant le travail.
+    - name: Installer ou ramener Istio au profil ambient du lab
+      ansible.builtin.command: >-
+        /usr/local/bin/istioctl install -y -f /root/istio-ambient.yaml
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+
+    - name: Attendre istiod
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n istio-system
+        rollout status deployment/istiod --timeout=300s
+      changed_when: false
+
+    - name: Attendre l'agent CNI et ztunnel sur chaque nœud
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n istio-system
+        rollout status daemonset/{{ item }} --timeout=300s
+      changed_when: false
+      loop:
+        - istio-cni-node
+        - ztunnel
+
+    # istiod crée les GatewayClass `istio` et `istio-waypoint` quelques
+    # secondes après son démarrage. Un lab qui créerait une Gateway avant les
+    # verrait rester sans classe.
+    - name: Attendre les GatewayClass d'Istio
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get gatewayclass {{ item }} -o name
+      register: _classe
+      until: _classe.rc == 0
+      retries: 30
+      delay: 5
+      changed_when: false
+      loop:
+        - istio
+        - istio-waypoint
+
+# ---------------------------------------------------------------------------
+# Le retrait. L'ordre compte : le cleanup du lab supprime d'abord SES
+# namespaces (Gateway, waypoint, Pods inscrits dans le maillage), puis inclut
+# ce retrait.
+# ---------------------------------------------------------------------------
+- name: Retirer Istio ambient
+  when: istio_etat | default('present') == 'absent'
+  block:
+    # `--purge` reprend les objets de CLUSTER : CRD d'Istio, webhooks, rôles.
+    - name: Désinstaller Istio en entier
+      ansible.builtin.command: >-
+        /usr/local/bin/istioctl uninstall --purge -y
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace d'Istio
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace istio-system
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    # Trouvé par le validateur sur cks-istio-mtls-lockdown (2026-09-16, puis
+    # 2026-10-12) : istiod pousse ses ConfigMaps `istio-ca-*` dans CHAQUE
+    # namespace, kube-system compris, et `uninstall --purge` ne les retire pas.
+    # Leur contenu change à chaque installation (nouvelle CA) : la photographie
+    # les verrait. Retrait par PRÉFIXE, pour suivre les versions d'Istio.
+    - name: Retirer les ConfigMaps qu'istiod distribue dans tous les namespaces
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+          kubectl get namespace -o name | sed 's|namespace/||' | while read -r ns; do
+            kubectl get configmap -n "$ns" -o name 2>/dev/null \
+              | grep -E '^configmap/istio-ca-' \
+              | xargs -r kubectl delete -n "$ns" --ignore-not-found >/dev/null
+          done
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    # Les CRD de la Gateway API et de l'Inference Extension sont posées par le
+    # setup, pas par istioctl : le purge les laisse. Le motif couvre aussi les
+    # groupes x-k8s.io, et les CRD d'Istio qu'un purge interrompu laisserait.
+    - name: Supprimer les CRD de la Gateway API, de l'Inference Extension et d'Istio
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          kubectl get crd -o name \
+            | grep -E '(gateway|inference)\.networking\.(x-)?k8s\.io$|istio\.io$' \
+            | xargs -r kubectl delete --ignore-not-found --wait=true --timeout=180s >/dev/null
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la politique d'admission de la Gateway API
+      ansible.builtin.shell:
+        cmd: |
+          set -eu
+          kubectl delete validatingadmissionpolicybinding \
+            safe-upgrades.gateway.networking.k8s.io --ignore-not-found >/dev/null
+          kubectl delete validatingadmissionpolicy \
+            safe-upgrades.gateway.networking.k8s.io --ignore-not-found >/dev/null
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    # L'agent istio-cni s'INSÈRE dans la chaîne CNI de Calico
+    # (/etc/cni/net.d/10-calico.conflist) et dépose son propre kubeconfig à
+    # côté. Il les retire en s'arrêtant quand son DaemonSet est supprimé, mais
+    # s'il en laissait une trace, chaque création de Pod sur ce nœud
+    # appellerait un plugin dont l'agent n'existe plus : tous les labs suivants
+    # casseraient. Ce filet le vérifie sur chaque nœud du cluster, et retire
+    # l'entrée `istio-cni` restée dans une chaîne. Le kind (k8s-kind.lab) n'est
+    # pas un nœud de ce cluster et n'est pas visité.
+    - name: Retirer toute trace de istio-cni de la configuration CNI des nœuds
+      ansible.builtin.shell:
+        cmd: |
+          import glob, json, os
+          touche = []
+          for chemin in glob.glob("/etc/cni/net.d/*.conflist"):
+              with open(chemin, encoding="utf-8") as f:
+                  conf = json.load(f)
+              plugins = conf.get("plugins", [])
+              gardes = [p for p in plugins if p.get("type") != "istio-cni"]
+              if len(gardes) != len(plugins):
+                  conf["plugins"] = gardes
+                  with open(chemin, "w", encoding="utf-8") as f:
+                      json.dump(conf, f, indent=2)
+                  touche.append(chemin)
+          for chemin in glob.glob("/etc/cni/net.d/*istio-cni*"):
+              os.remove(chemin)
+              touche.append(chemin)
+          print("retire : " + ", ".join(touche) if touche else "rien a retirer")
+        executable: /usr/bin/python3
+      register: _cni_istio
+      changed_when: _cni_istio.stdout | default('') is match('retire :')
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      ignore_unreachable: true
+      loop: >-
+        {{ groups['labenv'] | default([])
+           | select('in', hostvars | dict2items
+                          | selectattr('value.role', 'defined')
+                          | selectattr('value.role', 'in', ['control-plane', 'worker', 'worker-optionnel'])
+                          | map(attribute='key') | list)
+           | list }}
+      loop_control:
+        loop_var: noeud

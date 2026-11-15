@@ -12,12 +12,20 @@ description: |
 criteria:
   - id: p01-profileur-ferme
     label: "P01 (critique) : le profileur de l'API server ne répond plus, et l'API répond toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: p02-audit-cis
     label: "P02 : un nouvel audit CIS compte moins d'échecs qu'au départ, et les contrôles de profilage passent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: p03-audit-active
     label: "P03 : l'API server tourne avec l'audit activé, selon la politique demandée, et écrit son journal sur le nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: p04-journal-d-audit
     label: "P04 (critique) : le journal enregistre une lecture de Secret en entier et une lecture banale en métadonnées seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: p05-standard-restricted
     label: "P05 (critique) : l'espace de la boutique refuse un Pod qui viole le standard restricted et accepte un Pod conforme"
     lessons:
@@ -62,6 +70,8 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: p17-moins-de-failles
     label: "P17 : l'image de production porte strictement moins de failles critiques que l'image d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
   - id: p18-dockerfile
     label: "P18 : les constats de l'analyse statique du Dockerfile ont disparu et l'application fait toujours la même chose"
     lessons:

@@ -48,8 +48,7 @@ of them.
 
 For state 7, the grader **stops a control plane of `ha` itself** (it freezes
 its container), queries `/readyz` through the load balancer, then **starts it
-again**. Every check therefore acts on cluster `ha` for a good minute. The
-feedback is limited to the verdict: passed or not, and the score.
+again**. Every check therefore acts on cluster `ha` for a good minute. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-installer-un-cluster

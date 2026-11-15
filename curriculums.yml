@@ -90,15 +90,13 @@ certifications:
       "Cloud Native Architecture": 12
 
   # Ajoutée le 2026-11-14 avec la section ckne du niveau 6 « Réseau avancé »
-  # (décision D84). CKNE_Curriculum.pdf ne porte AUCUN numéro de version, ni
-  # de Kubernetes : il se date par sa publication dans cncf/curriculum, le
-  # 2026-11-10. Poids relevés le 2026-11-14 dans le cadrage CKNE de la
-  # formation (todo/ckne-cadrage.md du site), qui précise que le PDF a été lu
-  # par l'orchestrateur et non relu par le cadrage : à confronter au PDF avec
-  # la procédure en tête de ce fichier avant de s'en servir comme source.
+  # (décision D84). CKNE_Curriculum.pdf ne porte AUCUN numéro de version : il
+  # se date par son dernier commit dans cncf/curriculum, f423fa4 du
+  # 2026-10-01 (CreationDate du PDF : 2026-09-04). Relu ce jour-là avec
+  # pdftotext ; les cinq domaines totalisent 100 %.
   ckne:
-    version: "PDF 2026-11-10"
-    titre: "CKNE"
+    version: "PDF 2026-10-01 (f423fa4)"
+    titre: "CKNE, Certified Kubernetes Network Engineer"
     verifie_le: 2026-11-14
     domaines:
       "Service Networking and DNS": 25

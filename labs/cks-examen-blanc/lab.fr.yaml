@@ -17,6 +17,8 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ingress/
   - id: t03-cis-profilage
     label: "Tâche 3 : un audit kube-bench rejoué passe les trois contrôles de profilage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: t04a-dev-sa-reduit
     label: "Tâche 4 : dev-sa n'administre plus le cluster et garde son travail dans equipe-dev"
     lessons:
@@ -70,8 +72,12 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: t14a-audit-secret
     label: "Tâche 14 : la lecture du Secret est journalisée avec son corps (RequestResponse)"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: t14b-audit-metadata
     label: "Tâche 14 : une lecture banale est journalisée au niveau Metadata seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: t15-immuable
     label: "Tâche 15 : l'intérieur de vitrine ne s'écrit plus, et le site sert toujours"
     lessons:

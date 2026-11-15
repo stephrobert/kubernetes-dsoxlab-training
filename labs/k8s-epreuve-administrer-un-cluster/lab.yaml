@@ -106,13 +106,13 @@ criteria:
     tests:
       - test_p03_trois_plans_de_controle_ready_par_le_repartiteur
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: p04-api-survit
     label: "P04 (critical): the API answers through the load balancer while the grader holds one control plane down"
     tests:
       - test_p04_l_api_repond_par_le_repartiteur_apres_l_arret_d_un_plan_de_controle
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
   - id: p05-sauvegarde-fraiche
     label: "P05: a fresh, checked etcd backup exists and is more recent than the previous day's"
     tests:

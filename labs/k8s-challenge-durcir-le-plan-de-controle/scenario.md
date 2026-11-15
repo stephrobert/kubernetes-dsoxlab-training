@@ -47,8 +47,7 @@ Passing the others does not make up for missing one of them.
 
 The tests read the manifests on the node, run kube-bench themselves and
 compare its count with the one setup measured, then make two real reads and
-read back what the API server has just written. The feedback is limited to
-the verdict: passed or not, and the score.
+read back what the API server has just written. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-durcir-le-plan-de-controle

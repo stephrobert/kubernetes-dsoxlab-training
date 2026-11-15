@@ -1,4 +1,5 @@
 title: "Enregistrer qui lit les Secrets, et seulement les métadonnées du reste"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
 description: |
   Le cluster ne garde aucune trace de qui lit quoi. Donnez à l'API server une
   politique d'audit à deux niveaux, corps complets pour les Secrets et
@@ -8,15 +9,29 @@ description: |
 criteria:
   - id: la-politique-enregistre-les-secrets-en-requestresponse
     label: "La politique d'audit enregistre les Secrets au niveau RequestResponse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: la-politique-enregistre-le-reste-en-metadata
     label: "La politique d'audit enregistre tout le reste au niveau Metadata"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: l-api-server-applique-la-politique
     label: "L'API server est lancé avec le fichier de politique d'audit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: le-journal-est-ecrit-dans-un-fichier-du-noeud
     label: "Le journal d'audit est écrit dans un fichier du nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: l-api-server-repond-apres-la-modification
     label: "L'API server répond toujours après la modification"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: le-journal-enregistre-la-lecture-du-secret-en-requestresponse
     label: "Le journal contient une lecture de Secret au niveau RequestResponse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
   - id: le-journal-enregistre-une-lecture-banale-en-metadata-seulement
     label: "Le journal contient une lecture banale au niveau Metadata seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/

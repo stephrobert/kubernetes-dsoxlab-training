@@ -1,0 +1,180 @@
+---
+# Joint au cluster, ou en retire, un worker déclaré dans `infra.optional_hosts`
+# du meta.yml (dsoxlab 0.9.0). Inclus depuis le play `lab_target` (le control
+# plane), APRÈS le socle shared/kubeadm-cluster.yml, comme lui par délégation.
+#
+#     - name: Joindre le second worker au cluster
+#       ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+#       vars:
+#         noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+#         noeud_optionnel_etat: present      # absent dans cleanup.yaml
+#
+# POURQUOI LE SOCLE NE LE FAIT PAS LUI-MÊME.
+# Le socle joint tout hôte `role: worker` présent dans l'inventaire. Or un hôte
+# optionnel reste monté après le lab qui l'a fait monter : `clean` et `reset`
+# le gardent, pour ne pas reconstruire une VM à chaque essai. S'il portait
+# `role: worker`, le premier lab joué ensuite, qui ne le cite pas, le
+# rejoindrait au cluster et tournerait sur trois nœuds au lieu de deux. Ses
+# Pods, ses DaemonSets et la photographie du validateur changeraient avec.
+#
+# Le nœud optionnel porte donc `role: worker-optionnel`, que le socle ignore,
+# et c'est le lab qui le cite qui le joint (présent) puis le retire (absent).
+# Le retrait remet le cluster à l'identique : nœud drainé, supprimé de l'API,
+# `kubeadm reset` sur la machine. La VM, elle, reste debout pour le prochain
+# lab qui la citera : la rejoindre coûte une minute, pas un provisionnement.
+#
+# Le nom de nœud vaut le FQDN d'inventaire, comme pour k8s-w1 : le socle
+# compare déjà `kubectl get nodes` aux noms d'inventaire.
+#
+# `noeud | default(inventory_hostname)` dans chaque delegate_to : ansible-core
+# évalue delegate_to même quand la tâche est sautée par son `when` (bloc
+# « présent » joué au cleanup, et l'inverse), avant que la variable de boucle
+# existe. Sans le défaut, le cleanup échoue sur « 'noeud' is undefined ».
+
+- name: Préparer chaque nœud optionnel comme un nœud Kubernetes
+  ansible.builtin.include_tasks:
+    file: noeud-kubernetes.yml
+    apply:
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+  loop: "{{ noeuds_optionnels }}"
+  loop_control:
+    loop_var: noeud
+  when: noeud_optionnel_etat | default('present') == 'present'
+
+- name: Joindre les nœuds optionnels
+  when: noeud_optionnel_etat | default('present') == 'present'
+  block:
+    - name: Lister les nœuds déjà joints
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+        -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+      register: _noeuds_joints
+      changed_when: false
+
+    - name: Retenir les nœuds optionnels qui manquent encore au cluster
+      ansible.builtin.set_fact:
+        _optionnels_manquants: "{{ noeuds_optionnels | reject('in', _noeuds_joints.stdout_lines) | list }}"
+
+    - name: Fabriquer une commande de jointure
+      ansible.builtin.command: kubeadm token create --print-join-command --ttl 30m
+      register: _jointure_optionnelle
+      changed_when: true
+      when: _optionnels_manquants | length > 0
+
+    # `kubeadm reset` (au retrait) efface kubelet.conf : la garde `creates`
+    # reste donc juste d'un cycle à l'autre.
+    - name: Joindre chaque nœud optionnel manquant
+      ansible.builtin.command:
+        cmd: "{{ _jointure_optionnelle.stdout }}"
+        creates: /etc/kubernetes/kubelet.conf
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      loop: "{{ _optionnels_manquants }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Attendre que les nœuds optionnels soient Ready
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+        node/{{ noeud }} --timeout=300s
+      changed_when: false
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    # Un retrait interrompu après le drain laisse le nœud cordonné : sans cette
+    # tâche, il resterait joint mais ne recevrait plus aucun Pod.
+    - name: Rendre les nœuds optionnels ordonnançables
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf uncordon {{ noeud }}
+      changed_when: false
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    # Comme le socle pour k8s-w1 : `ssh k8s-w2` depuis le control plane, sans
+    # mot de passe.
+    - name: Lire la clé publique de l'utilisateur du lab
+      ansible.builtin.slurp:
+        src: /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519.pub
+      register: _cle_lab_optionnel
+
+    - name: Autoriser cette clé sur chaque nœud optionnel
+      ansible.builtin.lineinfile:
+        path: /home/{{ ansible_user | default('ubuntu') }}/.ssh/authorized_keys
+        line: "{{ _cle_lab_optionnel.content | b64decode | trim }}"
+        create: true
+        owner: "{{ ansible_user | default('ubuntu') }}"
+        mode: "0600"
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Attendre que Typha ait suivi l'arrivée du nœud
+      ansible.builtin.include_tasks: typha-stable.yml
+
+- name: Retirer les nœuds optionnels du cluster
+  when: noeud_optionnel_etat | default('present') == 'absent'
+  block:
+    - name: Chercher les nœuds optionnels dans le cluster
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get node {{ noeud }} -o name
+      register: _optionnels_presents
+      changed_when: false
+      failed_when: false
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    # Le drain évacue les Pods de travail avant la suppression : supprimer un
+    # nœud qui porte encore des Pods les laisse Terminating jusqu'à ce que le
+    # contrôleur de nœuds les ramasse, plusieurs minutes plus tard.
+    - name: Drainer chaque nœud optionnel joint
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf drain {{ item.noeud }}
+        --ignore-daemonsets --delete-emptydir-data --force --timeout=180s
+      changed_when: true
+      failed_when: false
+      loop: "{{ _optionnels_presents.results | selectattr('rc', 'equalto', 0) | list }}"
+      loop_control:
+        label: "{{ item.noeud }}"
+
+    - name: Supprimer chaque nœud optionnel de l'API
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete node {{ item.noeud }}
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      loop: "{{ _optionnels_presents.results | selectattr('rc', 'equalto', 0) | list }}"
+      loop_control:
+        label: "{{ item.noeud }}"
+
+    # `removes` : sans kubelet.conf, la machine n'a jamais été jointe, ou elle
+    # a déjà été remise à zéro. `ignore_unreachable` : une VM retirée par
+    # `dsoxlab destroy --optional-hosts` n'a plus rien à remettre à zéro, et le
+    # cleanup ne doit pas échouer pour autant.
+    - name: Remettre à zéro kubeadm sur chaque nœud optionnel
+      ansible.builtin.command:
+        cmd: kubeadm reset -f
+        removes: /etc/kubernetes/kubelet.conf
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      ignore_unreachable: true
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    # kubeadm reset le dit lui-même : il ne touche pas à /etc/cni/net.d. Une
+    # configuration Calico restée là servirait au prochain kubelet avant que
+    # Calico ne la réécrive.
+    - name: Vider la configuration CNI des nœuds optionnels
+      ansible.builtin.command:
+        cmd: find /etc/cni/net.d -mindepth 1 -delete
+      changed_when: true
+      failed_when: false
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      ignore_unreachable: true
+      loop: "{{ noeuds_optionnels }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Attendre que Typha ait suivi le départ du nœud
+      ansible.builtin.include_tasks: typha-stable.yml

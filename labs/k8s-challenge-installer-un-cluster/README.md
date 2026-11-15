@@ -17,7 +17,7 @@ its own through its setup.
 |---|---|
 | Target | `k8s-cp.lab` and `k8s-w1.lab`, the catalogue's kubeadm cluster; `k8s-kind.lab`, where the learner creates cluster `ha` |
 | Duration | about 60 minutes |
-| Related page | [High availability](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/) |
+| Related page | [High availability](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/) |
 
 ```bash
 dsoxlab run    k8s-challenge-installer-un-cluster

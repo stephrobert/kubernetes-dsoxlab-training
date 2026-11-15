@@ -56,7 +56,7 @@ compense pas l'un d'eux manqué.
 Les tests demandent au runtime du nœud ce qui tourne, relancent l'analyse
 statique et les scans de vulnérabilités, vérifient les signatures avec la clé
 prise dans le ConfigMap, puis soumettent deux Pods à l'admission sans les
-créer. Le retour se limite au verdict : réussi ou non, et la note.
+créer. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-livrer-une-image-verifiee

@@ -51,7 +51,7 @@ for missing one of them.
 The tests read the state of the cluster and the git repository, never the
 commands typed. For state 3, the grader starts a short-lived Pod,
 `sonde-placement`, that the scheduler must place on the worker, then removes
-it. The feedback is limited to the verdict: passed or not, and the score.
+it. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-maintenir-un-noeud

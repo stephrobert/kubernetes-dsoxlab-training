@@ -45,8 +45,7 @@ more. Passing the others does not make up for missing one of them.
 
 The tests enter the Pod of `collecte` and query the API with its token, then
 have the API compute each identity's effective rights: the application, not
-the administrator, must hold these rights. The feedback is limited to the
-verdict: passed or not, and the score.
+the administrator, must hold these rights. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-identite-et-droits-minimaux

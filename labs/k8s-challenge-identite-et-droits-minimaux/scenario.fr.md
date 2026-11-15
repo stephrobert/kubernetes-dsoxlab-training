@@ -45,8 +45,7 @@ Réussir les autres ne compense pas l'un d'eux manqué.
 
 Les tests entrent dans le Pod de `collecte` et interrogent l'API avec son
 jeton, puis font calculer par l'API les droits effectifs de chaque identité :
-c'est l'application, et pas l'administrateur, qui doit avoir ces droits. Le
-retour se limite au verdict : réussi ou non, et la note.
+c'est l'application, et pas l'administrateur, qui doit avoir ces droits. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-identite-et-droits-minimaux
