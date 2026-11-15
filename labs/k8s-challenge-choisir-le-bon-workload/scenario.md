@@ -47,11 +47,7 @@ whatever the total. They are the data of replica 1 read again intact
 (requirement 5), and the Collecte `journaux` matching, with its resource
 Established (requirement 6).
 
-Four **hints** are offered, and each one takes points off the scale before the
-grade is computed: 2, 3, 5 then 5, 15 at most. Without a hint, seven
-requirements give 100, six give 86 and five give 71. With the first hint, five
-requirements still give 70; with the first two, they give only 68, below the
-threshold. With all four, at least six requirements are needed (73).
+Seven requirements met give 100, six give 86 and five give 71.
 
 No procedure is given: the lessons of the module taught everything.
 

@@ -53,9 +53,7 @@ submit test Pods in server-side dry run, which creates nothing. For state 8,
 Deployment to grow. You have nothing to start for it, and a check can last
 that long.
 
-Four **hints** are offered, and each removes points from the scale before the
-grade is computed: 2, 3, 5 then 5. The feedback is limited to the verdict:
-passed or not, and the score.
+The feedback is limited to the verdict: passed or not, and the score.
 
 ```bash
 dsoxlab check  k8s-challenge-placer-et-plafonner

@@ -55,10 +55,7 @@ succeed whatever the total. They are `prod-colis` available on its digest
 (requirement 2), the probes with Pods Ready without restart (requirement 5), and
 the cause recorded before the repair (requirement 9).
 
-Four **hints** are offered, and each one takes points off the scale before the
-score is computed: 2, 3, 5 then 5, so 15 at most. With all four, ten requirements
-met give 85, nine give 76, and eight give 68, below the pass mark. Without a hint,
-seven requirements are just enough (70); with the first hint, they give only 69.
+Seven requirements met out of ten are just enough (70).
 
 No procedure is given: the lessons of the module taught everything.
 

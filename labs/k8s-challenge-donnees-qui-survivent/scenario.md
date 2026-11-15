@@ -42,10 +42,8 @@ must pass whatever the total. They are the volume created for
 `registre-donnees` by the class (requirement 1), the witness read again intact
 (requirement 3), and the cause recorded before the correction (requirement 5).
 
-Four **hints** are offered, and each one takes points off the scale before the
-grade is computed: 2, 3, 5 then 5, 15 at most. Without a hint, six requirements
-give 100 and five give 83. With all four, six requirements give 85 and five give
-71, still above the threshold. Four requirements are never enough: 67 at best.
+Six requirements met give 100 and five give 83. Four requirements are not
+enough: 67, below the threshold.
 
 No procedure is given: the lessons of the module taught everything.
 

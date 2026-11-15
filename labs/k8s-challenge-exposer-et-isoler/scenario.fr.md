@@ -42,10 +42,7 @@ tapées. Les **sept exigences pèsent toutes autant**. Le seuil est de **70 sur
 soit le total. Ce sont les chemins routés (exigence 1), la résolution de `sonde`
 (exigence 4), et l'accès à la base réservé au backend (exigence 6).
 
-Quatre **indices** sont proposés, et chacun retire des points du barème avant
-le calcul de la note : 2, 3, 5 puis 5, soit 15 au plus. Sans indice, sept
-exigences donnent 100, six en donnent 86 et cinq en donnent 71. Avec les quatre,
-sept exigences donnent 85, six en donnent 73, et cinq ne suffisent plus : 61.
+Sept exigences réussies donnent 100, six en donnent 86 et cinq en donnent 71.
 
 Aucune procédure n'est donnée : les leçons du module ont tout enseigné.
 

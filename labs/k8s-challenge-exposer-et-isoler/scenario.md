@@ -44,10 +44,7 @@ whatever the total. They are the routed paths (requirement 1), the resolution
 from `sonde` (requirement 4), and database access reserved to the backend
 (requirement 6).
 
-Four **hints** are offered, and each removes points from the scale before the
-grade is computed: 2, 3, 5 then 5, 15 at most. Without hints, seven
-requirements give 100, six give 86 and five give 71. With all four, seven
-requirements give 85, six give 73, and five are no longer enough: 61.
+Seven requirements met give 100, six give 86 and five give 71.
 
 No procedure is given: the lessons of the module taught everything.
 

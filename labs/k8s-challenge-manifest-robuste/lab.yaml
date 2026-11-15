@@ -7,8 +7,7 @@
 #
 # `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Dix
 # critères à poids égal, seuil 70, trois bloquants (décision de Stéphane du
-# 2026-11-11). Quatre indices à 2, 3, 5 et 5, annoncés dans le scénario avec
-# leur effet sur la note.
+# 2026-11-11). Aucun indice (D91, alignement sur la formation conteneurs).
 id: k8s-challenge-manifest-robuste
 title: "Ship a robust manifest from a set of requirements"
 level: application-deployment

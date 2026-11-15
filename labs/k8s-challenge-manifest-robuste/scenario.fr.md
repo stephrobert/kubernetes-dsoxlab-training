@@ -58,11 +58,7 @@ réussir quel que soit le total. Ce sont `prod-colis` disponible sur son digest
 (exigence 2), les sondes avec des Pods Ready sans redémarrage (exigence 5), et
 la cause consignée avant la réparation (exigence 9).
 
-Quatre **indices** sont proposés, et chacun retire des points du barème avant
-le calcul de la note : 2, 3, 5 puis 5, soit 15 au plus. Avec les quatre, dix
-exigences réussies donnent 85, neuf en donnent 76, et huit en donnent 68, sous
-le seuil. Sans indice, sept exigences suffisent tout juste (70) ; avec le
-premier indice, elles n'en donnent plus que 69.
+Sept exigences réussies sur dix suffisent tout juste (70).
 
 Aucune procédure n'est donnée : les leçons du module ont tout enseigné.
 
