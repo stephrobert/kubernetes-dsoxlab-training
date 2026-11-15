@@ -1,0 +1,41 @@
+---
+# Attendre que le nombre de réplicas de calico-typha soit stable.
+#
+# L'opérateur Tigera règle ce nombre sur le nombre de nœuds (1 réplica pour
+# les deux nœuds du cluster partagé, 2 dès qu'un troisième le rejoint), avec
+# un retard de 40 à 50 s (relevé dans son journal le 2026-11-15, logger
+# typha_autoscaler). Un nœud optionnel joint ou retiré laisse donc le cluster
+# dans un état transitoire : un lab joué ensuite, ou la photographie de
+# scripts/valider-labs.py, verrait un calico-typha à 2 sur un cluster de deux
+# nœuds, ou l'inverse.
+#
+# La valeur attendue n'est pas codée ici : on attend que spec.replicas et
+# readyReplicas soient égaux et inchangés pendant 60 s, plus que le retard
+# de l'opérateur. Sans calico-system (cluster sans Calico), rien à attendre.
+- name: Attendre un calico-typha stable pendant 60 s
+  ansible.builtin.shell:
+    cmd: |
+      set -u
+      K="kubectl --kubeconfig /etc/kubernetes/admin.conf -n calico-system"
+      $K get deployment calico-typha >/dev/null 2>&1 || { echo "pas de calico-typha"; exit 0; }
+      precedent=""
+      stable=0
+      etat=""
+      for _ in $(seq 1 36); do
+        etat=$($K get deployment calico-typha -o jsonpath='{.spec.replicas}/{.status.readyReplicas}')
+        if [ "$etat" = "$precedent" ] && [ "${etat%/*}" = "${etat#*/}" ]; then
+          stable=$((stable + 1))
+        else
+          stable=0
+        fi
+        if [ "$stable" -ge 6 ]; then
+          echo "calico-typha stable : $etat"
+          exit 0
+        fi
+        precedent=$etat
+        sleep 10
+      done
+      echo "calico-typha toujours instable après 6 min : $etat" >&2
+      exit 1
+    executable: /bin/bash
+  changed_when: false

@@ -1,0 +1,32 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster dans l'état
+# du socle, dans l'ordre inverse du setup.
+#
+# 1. Le namespace inference : réplicas, sélecteur, pool, Gateway, route, et le
+#    Service qu'Istio crée pour chaque InferencePool.
+# 2. Istio, les CRD de la Gateway API et celles de l'Inference Extension
+#    (shared/istio-ambient.yml, absent). Avant le retrait du second worker :
+#    son agent istio-cni retire sa configuration CNI en s'arrêtant.
+# 3. Le second worker, drainé, supprimé de l'API et remis à zéro.
+- name: Défaire le lab k8s-router-des-requetes-d-inference
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace inference --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer Istio ambient, la Gateway API et l'Inference Extension
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+      vars:
+        istio_etat: absent
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

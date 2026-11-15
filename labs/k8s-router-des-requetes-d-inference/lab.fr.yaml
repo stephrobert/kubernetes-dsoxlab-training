@@ -1,0 +1,24 @@
+title: "Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension"
+# Page provisoire, comme dans lab.yaml. URL cible (cadrage CKNE, L10) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Derrière une Gateway d'Istio, regrouper trois réplicas d'un serveur de modèle
+  simulé dans un InferencePool piloté par un sélecteur d'endpoints, y router
+  des requêtes de complétion, et prouver que les requêtes évitent le réplica
+  saturé qu'un Service ordinaire continuerait d'alimenter.
+
+criteria:
+  - id: pool-d-inference
+    label: "Un InferencePool d'inference regroupe les trois réplicas du modèle sur le port 8000 et désigne le sélecteur d'endpoints selecteur, qui est prêt"
+  - id: gateway-programmee
+    label: "Une Gateway de classe istio dans inference porte un listener HTTP et le cluster la déclare Programmed"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: route-vers-le-pool
+    label: "Une HTTPRoute attachée à la Gateway a l'InferencePool pour backend, Accepted et avec ses références résolues"
+  - id: requetes-servies
+    label: "Des requêtes de complétion envoyées à la Gateway reçoivent la réponse des réplicas du modèle"
+  - id: repartition-selon-la-charge
+    label: "Sur 30 requêtes, le réplica saturé en reçoit 10 % au plus, là où un Service ordinaire lui en enverrait un tiers"

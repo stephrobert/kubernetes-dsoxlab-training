@@ -1,0 +1,30 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, le second worker
+# optionnel joint au cluster, Istio 1.32 ambient AVEC l'Inference Extension
+# (CRD v1.5.0 et les deux variables de pilot), puis la situation du lab
+# (fixtures/prepare.sh) : trois réplicas du simulateur et le sélecteur
+# d'endpoints.
+- name: Préparer le lab k8s-router-des-requetes-d-inference
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    - name: Installer Istio ambient, la Gateway API et l'Inference Extension
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+      vars:
+        istio_inference: true
+
+    - name: Poser les réplicas du modèle et le sélecteur d'endpoints
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

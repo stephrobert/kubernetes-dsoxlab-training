@@ -1,0 +1,111 @@
+# Lab guidé de la leçon L10 du niveau 6 « Réseau avancé » (CKNE), « Router du
+# trafic d'inférence ». Objectif du programme CKNE « Optimizing LLM Traffic »,
+# domaine Advanced Traffic Management (20 %). Décision D82 : la Gateway API
+# Inference Extension, servie par la Gateway d'Istio, devant un serveur de
+# modèle simulé.
+#
+# La situation : Istio 1.32 en mode ambient (D90) avec les deux variables de
+# pilot qui activent l'Inference Extension, les CRD de la Gateway API v1.6.1 et
+# de l'extension v1.5.0 (versions du go.mod d'Istio 1.32.0). Dans le namespace
+# inference : TROIS réplicas du simulateur vLLM
+# ghcr.io/llm-d/llm-d-inference-sim:v0.7.1 (sans GPU), répartis en deux
+# Deployments qui portent la même étiquette app=modele. Deux réplicas sont
+# libres ; le troisième publie, par l'option --fake-metrics du simulateur, une
+# file d'attente de 40 requêtes et un cache KV plein à 97 %. Le sélecteur
+# d'endpoints (EPP v1.5.0) est déployé et attend son InferencePool.
+#
+# L'apprenant écrit l'InferencePool (inference.networking.k8s.io/v1) qui
+# regroupe les trois réplicas et désigne le sélecteur, une Gateway d'Istio et
+# une HTTPRoute dont le backend est le pool.
+#
+# La validation envoie 30 requêtes de complétion par la Gateway et lit, dans
+# l'en-tête x-inference-pod que le simulateur ajoute, quel réplica a répondu.
+# Un Service ordinaire répartirait au hasard, soit un tiers des requêtes sur le
+# réplica saturé ; le pool, guidé par les métriques, doit l'éviter (10 % au
+# plus admis).
+#
+# LIMITE DÉCLARÉE : la charge du réplica saturé est SIMULÉE (métriques
+# factices), pas produite par du trafic réel. C'est le seul moyen fiable,
+# sans GPU, de rendre une charge stable pendant tout le test. Le sélecteur lit
+# exactement les mêmes métriques Prometheus qu'avec un vrai vLLM.
+#
+# Briques attestées réutilisées : cka-gateway-api-httproute (Gateway,
+# HTTPRoute, conditions Programmed, Accepted et ResolvedRefs). L'Inference
+# Extension, le sélecteur et le simulateur sont NOUVEAUX dans ce catalogue.
+#
+# Topologie du cadrage : un control plane et deux workers (k8s-w2.lab,
+# optionnel, monté et joint par ce lab, retiré du cluster au cleanup).
+id: k8s-router-des-requetes-d-inference
+title: "Route inference requests by replica load with the Gateway API Inference Extension"
+level: advanced-traffic-management
+section: ckne
+difficulty: advanced
+description: |
+  Behind an Istio Gateway, group three replicas of a simulated model server in
+  an InferencePool driven by an endpoint picker, route completion requests to
+  it, and prove that the requests avoid the saturated replica that a plain
+  Service would keep feeding.
+skills:
+  - gateway-api
+  - inference-extension
+  - istio
+  - llm-serving
+distros:
+  - ubuntu24
+# Page provisoire : la leçon n'existe pas encore. URL cible (cadrage CKNE, L10) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: pool-d-inference
+    label: "An InferencePool of inference groups the three replicas of the model on port 8000 and names the endpoint picker selecteur, which is ready"
+    tests:
+      - test_le_pool_regroupe_les_trois_replicas
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+  - id: gateway-programmee
+    label: "A Gateway of class istio in inference has an HTTP listener and the cluster declares it Programmed"
+    tests:
+      - test_la_gateway_est_programmee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: route-vers-le-pool
+    label: "An HTTPRoute attached to the Gateway has the InferencePool as backend, Accepted and with its references Resolved"
+    tests:
+      - test_la_route_mene_au_pool
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+  - id: requetes-servies
+    label: "Completion requests sent to the Gateway are answered by the replicas of the model"
+    tests:
+      - test_les_requetes_d_inference_aboutissent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+  - id: repartition-selon-la-charge
+    label: "Out of 30 requests, the saturated replica receives at most 10 %, where a plain Service would send it a third"
+    tests:
+      - test_la_repartition_evite_le_replica_sature
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+
+feedback: full

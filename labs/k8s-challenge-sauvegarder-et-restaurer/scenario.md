@@ -27,4 +27,4 @@ You are on **`k8s-cp.lab`**, the control plane, with `kubectl`, `etcdctl`,
 
 ## Grading
 
-Each state counts equally; the pass mark is 70 %. Only the verdict is shown.
+Each state counts equally; the pass mark is 70 %. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.

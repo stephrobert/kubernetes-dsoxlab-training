@@ -46,8 +46,7 @@ really refuses. Passing the others does not make up for missing one of them.
 The tests compare the record with the object the setup created, wait for a
 full cycle of the mechanism before judging that the access is gone, create
 probe Pods in `calcul-lots` to see what the cluster accepts and refuses, and
-send real HTTP requests to `reservations`. The feedback is limited to the first
-line of each failure.
+send real HTTP requests to `reservations`. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
 ```bash
 dsoxlab check  k8s-challenge-contenir-une-attaque

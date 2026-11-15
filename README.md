@@ -199,11 +199,11 @@ one, start from [which Kubernetes certification to choose](https://www.stephane-
 
 | Certification | Format | Preparation | Exam labs in this repository |
 | --- | --- | --- | --- |
-| KCNA | proctored multiple-choice, 90 min | [KCNA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcna/) · [mock exam](https://www.stephane-robert.info/examens/kcna/) (in French) | none: a multiple-choice exam |
-| KCSA | proctored multiple-choice, no terminal, 90 min | [KCSA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcsa/) · [mock exam](https://www.stephane-robert.info/examens/kcsa/) (in French) | none: a multiple-choice exam |
-| CKAD | hands-on, 2 h, 66 % | [CKAD](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercises/) · [quiz](https://www.stephane-robert.info/examens/ckad/) (in French) | `ckad-capstone-boutique`, `ckad-examen-blanc` |
-| CKA | hands-on, 2 h, 66 % | [CKA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) · [quiz](https://www.stephane-robert.info/examens/cka/) (in French) | `cka-capstone-portail`, `cka-examen-blanc` |
-| CKS | hands-on, 2 h, 67 %, CKA required | [CKS](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) · [quiz](https://www.stephane-robert.info/examens/cks/) (in French) | `cks-capstone-enclave`, `cks-examen-blanc` |
+| KCNA | proctored multiple-choice, 90 min | [KCNA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcna/) · [mock exam](https://www.stephane-robert.info/examens/kcna/) (in French) · [site labs](https://www.stephane-robert.info/en/labs/kcna/) | none: a multiple-choice exam |
+| KCSA | proctored multiple-choice, no terminal, 90 min | [KCSA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/kcsa/) · [mock exam](https://www.stephane-robert.info/examens/kcsa/) (in French) · [site labs](https://www.stephane-robert.info/en/labs/kcsa/) | none: a multiple-choice exam |
+| CKAD | hands-on, 2 h, 66 % | [CKAD](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercises/) · [quiz](https://www.stephane-robert.info/examens/ckad/) (in French) · [site labs](https://www.stephane-robert.info/en/labs/ckad/) | `ckad-capstone-boutique`, `ckad-examen-blanc` |
+| CKA | hands-on, 2 h, 66 % | [CKA](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) · [quiz](https://www.stephane-robert.info/examens/cka/) (in French) · [site labs](https://www.stephane-robert.info/en/labs/cka/) | `cka-capstone-portail`, `cka-examen-blanc` |
+| CKS | hands-on, 2 h, 67 %, CKA required | [CKS](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/) · [essential commands](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/essential-commands/) · [exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) · [quiz](https://www.stephane-robert.info/examens/cks/) (in French) · [site labs](https://www.stephane-robert.info/en/labs/cks/) | `cks-capstone-enclave`, `cks-examen-blanc` |
 | CKNE | hands-on, 2 h, remote Linux desktop | [CKNE](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/) | in preparation: the training level that covers it is being written |
 
 Each hands-on exam has, in this repository, a **capstone** and a **timed mock
@@ -389,18 +389,20 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 
 ### Advanced networking (CKNE)
 
-Five domains in the CKNE curriculum. Service Networking and DNS and Network Security and Policy weigh 25 % each. The labs run on a dedicated Cilium cluster without kube-proxy.
+Five domains in the CKNE curriculum. Service Networking and DNS and Network Security and Policy weigh 25 % each. The labs run on a dedicated Cilium cluster without kube-proxy, or run Istio in ambient mode on the kubeadm cluster, with a second worker.
 
-2 lab(s).
+4 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
 | 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Install Cilium without kube-proxy | core-infrastructure-and-cni | 45m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 | 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
+| 3 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Serve an Istio Gateway over HTTPS with a cert-manager certificate | network-security-policy | 35m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 4 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Route inference requests by replica load with the Gateway API Inference Extension | advanced-traffic-management | 35m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
 
-Total: **129 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **131 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
-**Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-11-10** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
+**Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
 <!-- LABS:END -->
 

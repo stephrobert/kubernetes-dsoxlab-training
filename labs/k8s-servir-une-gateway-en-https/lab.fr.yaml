@@ -1,0 +1,24 @@
+title: "Servir une Gateway d'Istio en HTTPS avec un certificat de cert-manager"
+# Page provisoire, comme dans lab.yaml. URL cible (cadrage CKNE, L8) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Sur un cluster où Istio tourne en mode ambient, demander un certificat à
+  cert-manager dans le namespace de la Gateway, déclarer un listener HTTPS qui
+  le présente, y attacher une route, et prouver que le listener sert le
+  certificat émis, signé par la CA interne, à un vrai client HTTPS.
+
+criteria:
+  - id: certificat-emis
+    label: "Un Certificate de cert-manager pour vitrine.formation.test, émis par le ClusterIssuer ca-formation, est prêt dans le namespace vitrine"
+  - id: gateway-programmee
+    label: "Une Gateway de classe istio dans vitrine porte un listener HTTPS sur le port 443 dont la référence de certificat est résolue, et le cluster la déclare Programmed"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+  - id: certificat-presente
+    label: "Le listener présente le certificat rangé par cert-manager, pour le nom vitrine.formation.test"
+  - id: emetteur-verifie
+    label: "Le certificat présenté est émis par la CA interne et sa chaîne se vérifie contre elle"
+  - id: vitrine-en-https
+    label: "Un client HTTPS qui ne fait confiance qu'à la CA interne atteint l'application vitrine par la Gateway"

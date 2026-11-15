@@ -162,6 +162,20 @@ infra:
       vcpu: 2
       disk_gb: 20
 
+    # Le second worker des labs Istio du niveau 6 (Gateway HTTPS, traçage,
+    # trafic d'inférence) : un control plane et DEUX workers, la topologie de
+    # leur cadrage. Rôle `worker-optionnel` et NON `worker` : le socle kubeadm
+    # joint au cluster tout hôte `worker` de l'inventaire, or un hôte optionnel
+    # reste monté après le lab qui l'a fait monter. C'est le lab qui le cite
+    # qui le joint, par shared/noeud-optionnel.yml, et son cleanup qui le
+    # retire du cluster.
+    - name: k8s-w2.lab
+      distro: ubuntu24
+      role: worker-optionnel
+      ram_mb: 2560
+      vcpu: 2
+      disk_gb: 20
+
 # Sections et niveaux reprennent les DOMAINES des blueprints officiels, mot
 # pour mot. C'est ce qui permet de répondre à la seule question qui compte
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
@@ -470,15 +484,21 @@ sections:
   - id: ckne
     title: "Advanced networking (CKNE)"
     description: >-
-      Five domains in the CKNE curriculum. Service
-      Networking and DNS and Network Security and Policy weigh 25 % each.
-      The labs run on a dedicated Cilium cluster without kube-proxy.
+      Five domains in the CKNE curriculum. Service Networking and DNS and
+      Network Security and Policy weigh 25 % each. The labs run on a
+      dedicated Cilium cluster without kube-proxy, or run Istio in ambient
+      mode on the kubeadm cluster, with a second worker.
     labs:
       # Leçon L1 : le cluster que l'apprenant initialise et dont Cilium
       # remplace kube-proxy. Son cleanup remet les nœuds à zéro.
       - k8s-installer-cilium-sans-kube-proxy
       # Leçon L4 : sur le cluster prêt du socle, que son setup remonte.
       - k8s-auditer-les-flux-avec-hubble
+      # L8 : la Gateway d'Istio en HTTPS, certificat de cert-manager. Suppose
+      # joué k8s-emettre-un-certificat-avec-cert-manager (niveau 4, D85).
+      - k8s-servir-une-gateway-en-https
+      # L10 : Gateway API Inference Extension servie par la Gateway d'Istio.
+      - k8s-router-des-requetes-d-inference
 
 # Envoi des preuves vers le compte facultatif du site, par `dsoxlab login` puis
 # `dsoxlab push`. Rien ne part sans ces deux gestes de l'apprenant. Toutes ces

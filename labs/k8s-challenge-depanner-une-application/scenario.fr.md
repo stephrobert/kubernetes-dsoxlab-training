@@ -55,8 +55,7 @@ Dix états, à poids égal. Le seuil de réussite est de **70 sur 100**, et deux
 pas l'échec de l'un d'eux.
 
 Les tests lisent le cluster par son API, l'état des services et les fichiers
-des nœuds, et la date de vos fichiers de `~/incident/`. Le retour se limite au
-verdict : réussi ou non, et le score.
+des nœuds, et la date de vos fichiers de `~/incident/`. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-depanner-une-application

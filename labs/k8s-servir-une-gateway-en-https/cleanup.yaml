@@ -1,0 +1,50 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster dans l'état
+# du socle, dans l'ordre inverse du setup.
+#
+# 1. Le namespace de travail : Gateway, son Envoy, route, certificat, Secret.
+# 2. cert-manager par son manifeste officiel (CRD, webhooks, rôles, namespace
+#    cert-manager, et avec ses CRD les ClusterIssuer et le Secret de la CA).
+# 3. Istio et les CRD de la Gateway API (shared/istio-ambient.yml, absent).
+#    Avant le retrait du second worker : l'agent istio-cni de ce nœud doit
+#    pouvoir retirer sa configuration CNI en s'arrêtant.
+# 4. Le second worker, drainé, supprimé de l'API et remis à zéro : la
+#    photographie du validateur compte les nœuds et les DaemonSets.
+- name: Défaire le lab k8s-servir-une-gateway-en-https
+  hosts: lab_target
+  become: true
+  vars:
+    cert_manager_version: "1.21.3"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace vitrine --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer cert-manager avec son manifeste
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /root/cert-manager-v{{ cert_manager_version }}.yaml
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Vérifier qu'il ne reste aucune CRD de cert-manager
+      ansible.builtin.shell: |
+        set -o pipefail
+        test -z "$({{ kubectl }} get crd -o name | grep cert-manager.io || true)"
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Retirer Istio ambient et la Gateway API
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+      vars:
+        istio_etat: absent
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

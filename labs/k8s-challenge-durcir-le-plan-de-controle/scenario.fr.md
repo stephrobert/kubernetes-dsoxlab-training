@@ -48,8 +48,7 @@ autres ne compense pas l'un d'eux manqué.
 
 Les tests lisent les manifestes sur le nœud, relancent eux-mêmes kube-bench et
 comparent son compte à celui que le setup a mesuré, puis font deux lectures
-réelles et relisent ce que l'API server vient d'écrire. Le retour se limite au
-verdict : réussi ou non, et la note.
+réelles et relisent ce que l'API server vient d'écrire. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-durcir-le-plan-de-controle

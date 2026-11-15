@@ -57,7 +57,7 @@ exemplaire de `paiement` et regarde si son remplaçant reçoit du trafic avant
 d'être prêt ; puis il **évacue lui-même `k8s-w1.lab`**, mesure les exemplaires
 disponibles pendant l'évacuation, remet le nœud en service et répartit de
 nouveau les exemplaires. Le rapport est comparé à l'état du cluster au moment
-du check. Le retour se limite au verdict : réussi ou non, et le score.
+du check. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-garantir-la-disponibilite

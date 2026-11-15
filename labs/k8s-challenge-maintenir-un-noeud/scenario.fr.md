@@ -51,7 +51,7 @@ l'application. Réussir les autres ne compense pas l'un d'eux manqué.
 Les tests lisent l'état du cluster et le dépôt git, jamais les commandes
 tapées. Pour l'état 3, le correcteur lance un Pod éphémère,
 `sonde-placement`, que le scheduler doit placer sur le worker, puis le retire.
-Le retour se limite au verdict : réussi ou non, et la note.
+Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ```bash
 dsoxlab check  k8s-challenge-maintenir-un-noeud
