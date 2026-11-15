@@ -47,7 +47,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
   - id: p10-budget-de-la-boutique
-    label: "P10 : un budget de perturbation cible les Pods de la boutique et garantit le minimum demandé"
+    label: "P10 : pendant toute maintenance volontaire, la vitrine garde au moins un exemplaire disponible, et le cluster le garantit"
   - id: p11-worker-evacue-et-rendu
     label: "P11 : le worker est évacué sans couper la boutique puis remis en service, et il accepte de nouveau des Pods"
   - id: p12-noeud-repare
@@ -56,11 +56,11 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: p13-api-server-repare
-    label: "P13 (critique) : l'API server dont un flag est faux répond de nouveau et autorise toujours Node,RBAC"
+    label: "P13 (critique) : l'API server répond de nouveau et autorise toujours les requêtes par les modes Node et RBAC"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: p14-application-reparee
-    label: "P14 : l'application en CrashLoopBackOff a ses réplicas disponibles, ne redémarre plus et lit sa configuration au bon endroit"
+    label: "P14 : panier a tous ses exemplaires disponibles, ne redémarre plus, et lit sa configuration là où il la cherche"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
@@ -77,7 +77,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
   - id: p18-vitrine-repartie-et-sondee
-    label: "P18 : les réplicas de la boutique sont répartis sur des nœuds différents et portent une sonde de disponibilité"
+    label: "P18 : les exemplaires de la vitrine tournent sur des nœuds différents, et aucun ne reçoit de trafic avant d'être prêt à servir"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/disponibilite-applicative-kubernetes/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/

@@ -145,7 +145,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
   - id: p10-budget-de-la-boutique
-    label: "P10: a disruption budget targets the shop's Pods and guarantees the required minimum"
+    label: "P10: during any voluntary maintenance, the storefront keeps at least one replica available, and the cluster guarantees it"
     tests:
       - test_p10_un_budget_protege_la_vitrine
     lessons:
@@ -166,13 +166,13 @@ criteria:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/troubleshoot-a-node/
   - id: p13-api-server-repare
-    label: "P13 (critical): the API server with a wrong flag answers again and still authorizes Node,RBAC"
+    label: "P13 (critical): the API server answers again and still authorizes requests through the Node and RBAC modes"
     tests:
       - test_p13_l_api_server_repond_et_autorise_toujours_node_rbac
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
   - id: p14-application-reparee
-    label: "P14: the application in CrashLoopBackOff has its replicas available, no longer restarts and reads its configuration in the right place"
+    label: "P14: panier has all its replicas available, no longer restarts, and reads its configuration where it looks for it"
     tests:
       - test_p14_panier_est_disponible_stable_et_lit_sa_configuration
     lessons:
@@ -200,7 +200,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
   - id: p18-vitrine-repartie-et-sondee
-    label: "P18: the shop's replicas run on different nodes and carry a readiness probe"
+    label: "P18: the storefront's replicas run on different nodes, and none receives traffic before it is ready to serve"
     tests:
       - test_p18_la_vitrine_est_repartie_et_porte_une_sonde_de_disponibilite
     lessons:
