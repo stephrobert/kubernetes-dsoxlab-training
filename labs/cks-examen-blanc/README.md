@@ -34,7 +34,7 @@ sandboxed runtimes stay in their unit labs (`cks-istio-mtls-lockdown`,
 |---|---|
 | Target | `k8s-cp.lab`, control plane of the kubeadm cluster; tasks 6 and 16 run on the worker `k8s-w1.lab` |
 | Duration | 120 minutes |
-| Related page | [CKS exercises](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) (in French) |
+| Related page | [CKS exercises](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) |
 
 ```bash
 dsoxlab run    cks-examen-blanc

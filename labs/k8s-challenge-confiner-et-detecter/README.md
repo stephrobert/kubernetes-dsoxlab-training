@@ -13,7 +13,7 @@ blocking.
 |---|---|
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster; the lab installs Falco 0.45.2 (modern eBPF driver), Istio 1.31 and gVisor, and sets up the `coffre`, `maille`, `exterieur` and `donnees` namespaces |
 | Duration | about 75 minutes |
-| Related page | [Runtime Sandboxes, Put into practice section](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
+| Related page | [Runtime Sandboxes, Put into practice section](https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/) |
 
 ```bash
 dsoxlab run    k8s-challenge-confiner-et-detecter

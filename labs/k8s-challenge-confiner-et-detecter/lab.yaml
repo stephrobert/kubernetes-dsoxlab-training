@@ -41,7 +41,7 @@ distros:
   - ubuntu24
 # La leçon hôte (KUBERN-15-18) n'a pas de jumelle anglaise : l'URL française
 # reste ici, et lab.fr.yaml ne la répète pas.
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -137,13 +137,13 @@ criteria:
     tests:
       - test_runtimeclass_designe_le_runtime_du_noeud
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
   - id: bac-a-sable
     label: "The sandboxed Pod runs and reads a kernel other than the machine's"
     tests:
       - test_pod_en_bac_a_sable_lit_un_autre_noyau
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
   - id: falco-alerte
     label: "A shell opened by the grader in the protected Pod raises an alert of the requested Falco rule, with its priority"
     tests:

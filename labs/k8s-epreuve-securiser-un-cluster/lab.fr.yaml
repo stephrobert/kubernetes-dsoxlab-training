@@ -1,4 +1,5 @@
 title: "Épreuve du niveau 5 : sécuriser un cluster"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/
 description: |
   À partir d'un état hérité faible et d'un cahier des charges qui ne nomme
   aucun objet Kubernetes, sécurisez le cluster qui héberge la boutique :
@@ -41,6 +42,8 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: p12-bac-a-sable
     label: "P12 : une classe de runtime désigne le runtime bac à sable du nœud et le Pod qui l'emploie lit un autre noyau que celui de la machine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
   - id: p13-falco-shell
     label: "P13 (critique) : un shell dans l'espace protégé lève une alerte de la règle Falco demandée, avec sa priorité, et pas un shell ouvert ailleurs"
     lessons:

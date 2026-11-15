@@ -10,7 +10,7 @@ schema_version: 1
 repo:
   id: kubernetes-dsoxlab-training
   category: kubernetes
-  title: "Kubernetes DevSecOps Training: CKA, CKAD and CKS"
+  title: "Kubernetes Training: from the first Pod to the certifications"
   blog_url: "https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/"
   # Où `dsoxlab support --issue` dépose le rapport d'un apprenant.
   #

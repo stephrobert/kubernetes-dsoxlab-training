@@ -1,7 +1,7 @@
 title: "Épreuve du niveau 3 : exposer, configurer et livrer une application"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/
 # Page cible de la fiche, encore à créer :
 # https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
 description: |
   D'après un cahier des charges qui ne nomme aucun objet Kubernetes, livrez et
   remettez en état l'application d'un festival : routez deux applications web

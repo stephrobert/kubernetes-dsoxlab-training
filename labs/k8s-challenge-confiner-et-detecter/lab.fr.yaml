@@ -1,4 +1,5 @@
 title: "Confiner un Pod et détecter une activité anormale, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
 description: |
   Sans procédure, confiner des Pods face au noyau avec AppArmor, seccomp et un
   runtime bac à sable, exiger le TLS mutuel dans un maillage, fermer un
@@ -41,8 +42,12 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
   - id: runtimeclass
     label: "Une RuntimeClass désigne le runtime du nœud sous le nom demandé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
   - id: bac-a-sable
     label: "Le Pod en bac à sable tourne et lit un noyau différent de celui de la machine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
   - id: falco-alerte
     label: "Un shell ouvert par le correcteur dans le Pod protégé produit une alerte de la règle Falco demandée, avec sa priorité"
     lessons:

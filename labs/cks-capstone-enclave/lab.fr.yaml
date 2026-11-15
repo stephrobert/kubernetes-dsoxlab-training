@@ -1,4 +1,5 @@
 title: "Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
 description: |
   Une équipe extérieure a besoin de place dans votre cluster. Donnez-lui un
   espace qui reste sûr même si elle ne l'est pas : le cluster doit refuser
