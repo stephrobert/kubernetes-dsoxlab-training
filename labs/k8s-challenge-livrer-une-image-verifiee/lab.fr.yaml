@@ -26,10 +26,16 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
   - id: cle-publiee
     label: "La clé publique est publiée dans le cluster, dans le ConfigMap cosign-pub-key, sous la clé cosign.pub"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: signature-poussee
     label: "La signature de l'image est poussée dans le registre, à côté de l'image"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: cle-qui-trie
     label: "La clé publiée accepte l'image signée et refuse l'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: image-remplacee
     label: "Le Deployment boutique ne tourne plus sur son image d'origine"
   - id: moins-de-failles

@@ -55,6 +55,8 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
   - id: p16-signature
     label: "P16 : la clé publique est publiée dans le cluster, l'image est signée, et la vérification l'accepte et en refuse une autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: p17-moins-de-failles
     label: "P17 : l'image de production porte strictement moins de failles critiques que l'image d'origine"
   - id: p18-dockerfile

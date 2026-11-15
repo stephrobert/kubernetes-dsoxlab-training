@@ -66,7 +66,7 @@ criteria:
   - id: t13-cosign
     label: "Tâche 13 : la clé publiée valide l'image signée et refuse l'autre"
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
   - id: t14a-audit-secret
     label: "Tâche 14 : la lecture du Secret est journalisée avec son corps (RequestResponse)"
   - id: t14b-audit-metadata
@@ -78,4 +78,5 @@ criteria:
   - id: t16-pod-compromis
     label: "Tâche 16 : le Pod compromis est retiré, et lui seul"
     lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
