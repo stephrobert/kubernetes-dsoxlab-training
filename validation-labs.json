@@ -4421,12 +4421,12 @@
    "total": 7
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-12",
-  "duree_s": 129,
+  "date": "2026-11-15",
+  "duree_s": 175,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "cluster photographié, v1.37.0, 40 objets hors kube-system",
    "avant le travail : 0/7",
    "après la solution : 7/7",
    "après clean et run : 0/7",
@@ -4688,8 +4688,8 @@
    "total": 6
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-12",
-  "duree_s": 127,
+  "date": "2026-11-15",
+  "duree_s": 175,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -4809,8 +4809,8 @@
    "total": 7
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 490,
+  "date": "2026-11-15",
+  "duree_s": 532,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -5304,12 +5304,12 @@
    "total": 10
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 259,
+  "date": "2026-11-15",
+  "duree_s": 167,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/10",
    "après la solution : 10/10",
    "après clean et run : 0/10",
@@ -5369,12 +5369,12 @@
    "total": 8
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-14",
-  "duree_s": 447,
+  "date": "2026-11-15",
+  "duree_s": 451,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/8",
    "après la solution : 8/8",
    "après clean et run : 0/8",
@@ -5431,12 +5431,12 @@
    "total": 7
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 200,
+  "date": "2026-11-15",
+  "duree_s": 239,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 80 objets hors kube-system",
    "avant le travail : 0/7",
    "après la solution : 7/7",
    "après clean et run : 0/7",
