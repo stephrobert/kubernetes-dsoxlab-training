@@ -7387,6 +7387,120 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-router-des-requetes-d-inference": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_la_gateway_est_programmee",
+    "test_la_repartition_evite_le_replica_sature",
+    "test_la_route_mene_au_pool",
+    "test_le_pool_regroupe_les_trois_replicas",
+    "test_les_requetes_d_inference_aboutissent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-15",
+  "duree_s": 814,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-router-des-requetes-d-inference.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_gateway_est_programmee",
+    "test_la_repartition_evite_le_replica_sature",
+    "test_la_route_mene_au_pool",
+    "test_le_pool_regroupe_les_trois_replicas",
+    "test_les_requetes_d_inference_aboutissent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-servir-une-gateway-en-https": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_l_emetteur_du_certificat_presente_est_la_ca",
+    "test_la_gateway_https_est_programmee",
+    "test_la_vitrine_repond_en_https",
+    "test_le_certificat_est_emis_par_la_ca_de_la_formation",
+    "test_le_listener_presente_le_certificat_emis"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-15",
+  "duree_s": 971,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-servir-une-gateway-en-https.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_emetteur_du_certificat_presente_est_la_ca",
+    "test_la_gateway_https_est_programmee",
+    "test_la_vitrine_repond_en_https",
+    "test_le_certificat_est_emis_par_la_ca_de_la_formation",
+    "test_le_listener_presente_le_certificat_emis"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-suivre-un-pod-de-kubectl-au-conteneur": {
   "apres": {
    "echecs": [],
