@@ -91,19 +91,19 @@ criteria:
     tests:
       - test_la_cle_publique_est_publiee_dans_le_cluster
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
   - id: signature-poussee
     label: "The image's signature is pushed to the registry, next to the image"
     tests:
       - test_la_signature_est_poussee_dans_le_registre
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
   - id: cle-qui-trie
     label: "The published key accepts the signed image and refuses the other"
     tests:
       - test_la_cle_accepte_l_image_signee_et_refuse_l_autre
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
   - id: image-remplacee
     label: "The boutique Deployment no longer runs on its original image"
     tests:
@@ -121,5 +121,5 @@ criteria:
     tests:
       - test_le_cluster_refuse_l_image_non_signee_et_accepte_la_signee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
