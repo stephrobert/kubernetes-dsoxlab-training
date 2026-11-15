@@ -163,7 +163,7 @@ criteria:
     tests:
       - test_t13_la_cle_publiee_valide_web_et_refuse_outil
     lessons:
-      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
   - id: t14a-audit-secret
     label: "Task 14: reading the Secret is logged with its body (RequestResponse)"
     tests:
