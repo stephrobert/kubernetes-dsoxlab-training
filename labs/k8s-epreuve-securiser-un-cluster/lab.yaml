@@ -7,7 +7,10 @@
 # reprise d'un Pod privilégié, confinement (AppArmor, seccomp, gVisor), réseau
 # (mTLS d'Istio, NetworkPolicy par défaut), détection (Falco) et chaîne
 # d'approvisionnement (digest, cosign, trivy image, trivy config). Chaque pièce
-# reprend un lab cks-* attesté ; Falco reprend k8s-challenge-confiner-et-detecter.
+# reprend un lab cks-* attesté. L'installation de Falco reprend
+# k8s-challenge-confiner-et-detecter, mais P08 à P14 portent sur d'autres
+# espaces, d'autres Pods, d'autres chemins et une autre règle de détection
+# que ce challenge (D57) : ses manifestes ne refont pas l'épreuve.
 #
 # D34 : l'énoncé ne nomme aucun type d'objet Kubernetes. Les tests retrouvent
 # sur le cluster ce que l'apprenant a choisi (le profil AppArmor que le Pod
@@ -29,7 +32,7 @@ description: |
   object, secure the cluster hosting the shop: harden its control plane,
   trace Secret reads, have the cluster refuse what breaks a rule, take back a
   privileged Pod, confine workloads against the kernel, require mutual TLS and
-  close the network by default, detect a shell, and let in only a pinned,
+  close the network by default, detect a network tool, and let in only a pinned,
   signed and scanned image, while the shop keeps answering.
 skills:
   - api-server
@@ -60,7 +63,7 @@ exam_blocking_checks:
   - test_p05_la_boutique_refuse_un_pod_hors_standard_restricted
   - test_p06_une_image_par_tag_est_refusee_dans_la_boutique_seulement
   - test_p10_le_maillage_exige_le_tls_mutuel
-  - test_p13_falco_alerte_sur_un_shell_dans_le_coffre_et_pas_ailleurs
+  - test_p13_falco_alerte_sur_un_outil_reseau_en_facturation_et_pas_ailleurs
   - test_p19_la_boutique_repond_apres_les_durcissements
 estimated_time: 150m
 
@@ -93,7 +96,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
   - id: p03-audit-active
-    label: "P03: the API server runs with auditing on, its policy file and its log mounted"
+    label: "P03: the API server runs with auditing on, following the requested policy, and writes its log on the node"
     tests:
       - test_p03_l_api_server_tourne_avec_l_audit_monte
     lessons:
@@ -123,15 +126,15 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
   - id: p08-apparmor
-    label: "P08: the AppArmor profile is loaded in enforce mode and the confined Pod can read but no longer write into /tmp"
+    label: "P08: the AppArmor profile is loaded in enforce mode and the confined Pod can read but no longer write into /dev/shm"
     tests:
       - test_p08_apparmor_refuse_l_ecriture_et_laisse_lire
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
   - id: p09-seccomp
-    label: "P09: the seccomp profile refuses the chmod family and allows the rest, and the Pod declaring it runs"
+    label: "P09: the seccomp profile refuses the chown family and allows the rest, and the Pod declaring it runs"
     tests:
-      - test_p09_seccomp_refuse_chmod_et_le_pod_tourne
+      - test_p09_seccomp_refuse_chown_et_le_pod_tourne
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
   - id: p10-tls-mutuel
@@ -147,19 +150,19 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
   - id: p12-bac-a-sable
-    label: "P12: a runtime class designates the node's sandbox runtime and the Pod using it reads another kernel than the machine's"
+    label: "P12: the requested Pod runs in the node's sandbox runtime and reads another kernel than the machine's"
     tests:
       - test_p12_le_bac_a_sable_lit_un_autre_noyau
     lessons:
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
   - id: p13-falco-shell
-    label: "P13 (critical): a shell in the protected space raises an alert of the requested Falco rule, with its priority, and a shell elsewhere does not"
+    label: "P13 (critical): a network tool started in the protected space raises an alert of the requested Falco rule, with its priority, and the same tool started elsewhere does not"
     tests:
-      - test_p13_falco_alerte_sur_un_shell_dans_le_coffre_et_pas_ailleurs
+      - test_p13_falco_alerte_sur_un_outil_reseau_en_facturation_et_pas_ailleurs
     lessons:
       - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/
   - id: p14-regles-falco-intactes
-    label: "P14: the Falco rules shipped with the package are intact"
+    label: "P14: the Falco rules shipped with the package are intact, and the requested detection rule does raise an alert"
     tests:
       - test_p14_les_regles_falco_fournies_sont_intactes
     lessons:

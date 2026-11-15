@@ -25,7 +25,7 @@
     - name: Supprimer les espaces de l'épreuve, s'il en reste
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace
-        boutique coffre commandes exterieur paiement registre conformite
+        boutique facturation commandes partenaires paiement registre conformite
         --ignore-not-found --wait=true --timeout=300s
       changed_when: true
       failed_when: false

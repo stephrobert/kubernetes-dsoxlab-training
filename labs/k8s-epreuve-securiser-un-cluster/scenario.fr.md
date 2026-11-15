@@ -15,14 +15,17 @@ hérite :
   `nginxinc/nginx-unprivileged:1.21`, une image désignée par un tag, non
   signée et criblée de failles ; à côté, le Pod **`outil-ancien`** a été lancé
   « pour que ça marche », avec tous les privilèges ;
-- dans l'espace **`coffre`**, les charges partagent librement le noyau de la
-  machine, et personne ne verrait un shell ouvert dans son Pod **`tresor`** ;
+- dans l'espace des factures, **`facturation`**, les charges partagent
+  librement le noyau de la machine ; son Pod **`export-comptable`** envoie les
+  écritures au cabinet comptable par un canal déjà ouvert, et personne ne
+  verrait un outil de téléchargement s'y lancer ;
 - dans l'espace **`commandes`**, un maillage Istio accepte le trafic en clair :
-  depuis **`exterieur`**, **`client-nu`**, sans sidecar, lit ce que **`api`**
-  sert à **`client-maille`** ;
-- dans l'espace **`paiement`**, **`caisse`** est le client légitime de la base
-  **`base`** (HTTP, port 80), et tous les autres, **`intrus`** compris,
-  joignent tout, hors de l'espace aussi.
+  depuis l'espace **`partenaires`**, **`transporteur`**, sans sidecar, lit ce
+  que le suivi des commandes **`suivi`** sert au panier **`panier`** ;
+- dans l'espace **`paiement`**, **`caisse`** est le client légitime du grand
+  livre **`grand-livre`**, la base des paiements (HTTP, port 80), et tous les
+  autres, le traceur publicitaire **`publicite`** compris, joignent tout, hors
+  de l'espace aussi.
 
 Ce qui se trouve sur `k8s-cp.lab`, où vous travaillez avec `kubectl` et les
 droits root par `sudo` :
@@ -64,33 +67,36 @@ Kubernetes : les choisir fait partie de l'épreuve.
    (il dort), sans aucun de ses défauts, et ne voit plus les processus de
    l'hôte.
 
-**Confinement, dans l'espace `coffre`** (image `busybox:1.37`, sur
+**Confinement, dans l'espace `facturation`** (image `busybox:1.37`, sur
 `k8s-cp.lab`, pour ce groupe et pour le bac à sable)
 
-8. Un Pod **`lecteur`** peut lire son système de fichiers mais ne peut pas
-   écrire dans `/tmp`, le refus venant d'un profil AppArmor chargé en mode
-   enforce.
-9. Un Pod **`calcul`** tourne sous un profil seccomp local qui refuse la
-   famille `chmod` et autorise tout le reste.
+8. Un Pod **`consultation`**, qui affiche les factures, peut lire son système
+   de fichiers mais ne peut rien déposer dans `/dev/shm`, le refus venant d'un
+   profil AppArmor chargé en mode enforce.
+9. Un Pod **`numerotation`**, qui attribue les numéros de facture, tourne sous
+   un profil seccomp local qui refuse la famille `chown` et autorise tout le
+   reste.
 
 **Réseau**
 
-10. L'espace `commandes` exige le TLS mutuel : `client-nu` ne joint plus
-    `api`, `client-maille` le joint toujours.
+10. L'espace `commandes` exige le TLS mutuel : `transporteur` ne joint plus
+    `suivi`, `panier` le joint toujours.
 11. L'espace `paiement` refuse par défaut le trafic entrant et sortant pour
-    tous ses Pods ; seul `caisse` joint `base`, sur le port 80, et les noms se
-    résolvent toujours.
+    tous ses Pods ; seul `caisse` joint `grand-livre`, sur le port 80, et les
+    noms se résolvent toujours.
 
-**Bac à sable, dans l'espace `coffre`**
+**Bac à sable, dans l'espace `facturation`**
 
-12. Un Pod **`isole`** tourne dans le runtime bac à sable et lit un noyau
-    différent de celui de la machine.
+12. Un Pod **`rendu`**, qui fabrique les factures à partir de documents
+    reçus, tourne dans le runtime bac à sable et lit un noyau différent de
+    celui de la machine.
 
 **Détection**
 
-13. Un shell ouvert dans un conteneur de `coffre` lève une alerte d'une règle
-    Falco nommée **`shell-in-coffre`**, de priorité **`ERROR`** ; un shell
-    ouvert dans un autre espace, non.
+13. Un outil réseau ou de téléchargement (`wget`, `curl`, `nc` et
+    semblables) lancé dans un conteneur de `facturation` lève une alerte d'une
+    règle Falco nommée **`outil-reseau-en-facturation`**, de priorité
+    **`WARNING`** ; le même outil lancé dans un autre espace, non.
 14. Les règles livrées avec Falco restent intactes.
 
 **Chaîne d'approvisionnement, et la boutique**
@@ -119,8 +125,8 @@ de l'un d'eux.
 
 Les tests lisent le nœud et le cluster, jamais vos manifestes : ils rejouent
 l'audit CIS, lisent le journal d'audit après deux requêtes réelles, soumettent
-des Pods à l'admission, écrivent et lancent `chmod` dans les Pods, font de
-vraies connexions, comparent les noyaux, ouvrent eux-mêmes un shell, vérifient
+des Pods à l'admission, écrivent et lancent `chown` dans les Pods, font de
+vraies connexions, comparent les noyaux, lancent eux-mêmes `wget`, vérifient
 les signatures avec votre clé publiée, réanalysent les images et interrogent
 la boutique.
 

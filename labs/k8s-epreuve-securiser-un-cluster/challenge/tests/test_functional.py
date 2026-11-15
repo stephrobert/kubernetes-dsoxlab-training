@@ -39,9 +39,9 @@ ETAT = "/var/lib/dsoxlab/epreuve-securiser-un-cluster"
 MANIFESTE_API = "/etc/kubernetes/manifests/kube-apiserver.yaml"
 
 BOUTIQUE = "boutique"
-COFFRE = "coffre"
+FACTURATION = "facturation"
 COMMANDES = "commandes"
-EXTERIEUR = "exterieur"
+PARTENAIRES = "partenaires"
 PAIEMENT = "paiement"
 CONFORMITE = "conformite"
 
@@ -58,13 +58,20 @@ BUSYBOX_EPINGLEE = "busybox@sha256:ab33eacc8251e3807b85bb6dba570e4698c3998eca6f0
 BUSYBOX_TAG = "busybox:1.37"
 
 CONTROLES_PROFILAGE = ("1.2.15", "1.3.2", "1.4.1")
-FAMILLE_CHMOD = {"chmod", "fchmod", "fchmodat"}
+FAMILLE_CHOWN = {"chown", "fchown", "fchownat", "lchown"}
+#: /dev/shm est un tmpfs ouvert en écriture à tous dans chaque conteneur, root
+#: ou non, système de fichiers racine en lecture seule ou non : seul le profil
+#: AppArmor peut y refuser une écriture.
+REPERTOIRE_INTERDIT = "/dev/shm"  # noqa: S108 - chemin DANS le Pod, que le test doit voir refusé
 
 FALCO_SERVICE = "falco-modern-bpf.service"
 FALCO_JOURNAL = "/var/log/falco/events.json"
 FALCO_REGLES = "/etc/falco/falco_rules.yaml"
-REGLE = "shell-in-coffre"
-PRIORITE = "error"
+REGLE = "outil-reseau-en-facturation"
+PRIORITE = "warning"
+#: Le déclencheur : un binaire réseau lancé DIRECTEMENT par l'exec, sans shell,
+#: vers un port où rien n'écoute. Son échec est attendu, son lancement suffit.
+OUTIL_RESEAU = "wget -q -T 2 -O /dev/null http://127.0.0.1:9/"
 
 
 @pytest.fixture(scope="module")
@@ -514,70 +521,76 @@ def test_p07_le_pod_privilegie_herite_est_remplace(host):
 # P08 : AppArmor.
 # ======================================================================
 def test_p08_apparmor_refuse_l_ecriture_et_laisse_lire(host):
-    pod = _exiger_en_marche(host, COFFRE, "lecteur")
+    pod = _exiger_en_marche(host, FACTURATION, "consultation")
     assert pod["spec"].get("nodeName") == NOEUD, message(
-        en=f"lecteur runs on {pod['spec'].get('nodeName')}, not on {NOEUD}, the node where profiles are loaded.",
-        fr=f"lecteur tourne sur {pod['spec'].get('nodeName')}, et non sur {NOEUD}, le nœud où les profils sont chargés.",
+        en=f"consultation runs on {pod['spec'].get('nodeName')}, not on {NOEUD}, the node where profiles are loaded.",
+        fr=f"consultation tourne sur {pod['spec'].get('nodeName')}, et non sur {NOEUD}, le nœud où les profils sont chargés.",
     )
     noms = [p.get("localhostProfile") for p in _profils_du_pod(pod, "appArmorProfile") if p.get("type") == "Localhost"]
     assert noms, message(
-        en="lecteur declares no AppArmor profile loaded on the node (type Localhost).",
-        fr="lecteur ne déclare aucun profil AppArmor chargé sur le nœud (type Localhost).",
+        en="consultation declares no AppArmor profile loaded on the node (type Localhost).",
+        fr="consultation ne déclare aucun profil AppArmor chargé sur le nœud (type Localhost).",
     )
     profils = json.loads(host.run("sudo aa-status --json").stdout or "{}").get("profiles", {})
     modes = {n: profils.get(n, "absent") for n in noms}
     assert all(m == "enforce" for m in modes.values()), message(
-        en=f"The profile declared by lecteur is not loaded in enforce mode on {NOEUD}: {modes}.",
-        fr=f"Le profil que déclare lecteur n'est pas chargé en mode enforce sur {NOEUD} : {modes}.",
+        en=f"The profile declared by consultation is not loaded in enforce mode on {NOEUD}: {modes}.",
+        fr=f"Le profil que déclare consultation n'est pas chargé en mode enforce sur {NOEUD} : {modes}.",
     )
-    _, ecriture, _ = _dans(host, COFFRE, "lecteur", "echo test > /tmp/preuve 2>/dev/null; echo CODE=$?")
+    _, presence, _ = _dans(host, FACTURATION, "consultation", f"test -d {REPERTOIRE_INTERDIT}; echo CODE=$?")
+    assert "CODE=0" in presence, message(
+        en=f"{REPERTOIRE_INTERDIT} does not exist in consultation: a write there cannot prove a refusal.",
+        fr=f"{REPERTOIRE_INTERDIT} n'existe pas dans consultation : une écriture y échouerait sans rien prouver.",
+    )
+    _, ecriture, _ = _dans(host, FACTURATION, "consultation",
+                           f"echo test > {REPERTOIRE_INTERDIT}/preuve 2>/dev/null; echo CODE=$?")
     assert "CODE=" in ecriture and "CODE=0" not in ecriture, message(
-        en=f"lecteur can still write into /tmp: the profile does not deny it. Output: {ecriture}",
-        fr=f"lecteur peut encore écrire dans /tmp : le profil ne l'interdit pas. Sortie : {ecriture}",
+        en=f"consultation can still write into {REPERTOIRE_INTERDIT}: the profile does not deny it. Output: {ecriture}",
+        fr=f"consultation peut encore écrire dans {REPERTOIRE_INTERDIT} : le profil ne l'interdit pas. Sortie : {ecriture}",
     )
-    _, lecture, _ = _dans(host, COFFRE, "lecteur", "cat /etc/hostname >/dev/null; echo CODE=$?")
+    _, lecture, _ = _dans(host, FACTURATION, "consultation", "cat /etc/hostname >/dev/null; echo CODE=$?")
     assert "CODE=0" in lecture, message(
-        en=f"lecteur cannot even read /etc/hostname: the profile forbids more than asked. Output: {lecture}",
-        fr=f"lecteur ne peut même plus lire /etc/hostname : le profil interdit plus que demandé. Sortie : {lecture}",
+        en=f"consultation cannot even read /etc/hostname: the profile forbids more than asked. Output: {lecture}",
+        fr=f"consultation ne peut même plus lire /etc/hostname : le profil interdit plus que demandé. Sortie : {lecture}",
     )
 
 
 # ======================================================================
 # P09 : seccomp.
 # ======================================================================
-def test_p09_seccomp_refuse_chmod_et_le_pod_tourne(host):
-    pod = _exiger_en_marche(host, COFFRE, "calcul")
+def test_p09_seccomp_refuse_chown_et_le_pod_tourne(host):
+    pod = _exiger_en_marche(host, FACTURATION, "numerotation")
     chemins = [p.get("localhostProfile") for p in _profils_du_pod(pod, "seccompProfile") if p.get("type") == "Localhost"]
     assert chemins and pod["spec"].get("nodeName") == NOEUD, message(
-        en=f"calcul declares no local seccomp profile, or does not run on {NOEUD} where the profile lives.",
-        fr=f"calcul ne déclare aucun profil seccomp local, ou ne tourne pas sur {NOEUD}, où vit le profil.",
+        en=f"numerotation declares no local seccomp profile, or does not run on {NOEUD} where the profile lives.",
+        fr=f"numerotation ne déclare aucun profil seccomp local, ou ne tourne pas sur {NOEUD}, où vit le profil.",
     )
     res = host.run(f"sudo cat /var/lib/kubelet/seccomp/{chemins[0]}")
     try:
         profil = json.loads(res.stdout)
     except json.JSONDecodeError:
         pytest.fail(message(
-            en=f"The profile declared by calcul ({chemins[0]}) is not readable JSON on the node.",
-            fr=f"Le profil que déclare calcul ({chemins[0]}) n'est pas un JSON lisible sur le nœud.",
+            en=f"The profile declared by numerotation ({chemins[0]}) is not readable JSON on the node.",
+            fr=f"Le profil que déclare numerotation ({chemins[0]}) n'est pas un JSON lisible sur le nœud.",
         ))
     refuses = {n for r in profil.get("syscalls") or []
                if r.get("action") in ("SCMP_ACT_ERRNO", "SCMP_ACT_KILL", "SCMP_ACT_KILL_PROCESS")
                for n in r.get("names") or []}
-    assert profil.get("defaultAction") == "SCMP_ACT_ALLOW" and refuses >= FAMILLE_CHMOD, message(
-        en=f"The profile must allow by default and refuse {sorted(FAMILLE_CHMOD)}: defaultAction is "
-        f"{profil.get('defaultAction')}, refused: {sorted(refuses & FAMILLE_CHMOD)}.",
-        fr=f"Le profil doit autoriser par défaut et refuser {sorted(FAMILLE_CHMOD)} : defaultAction vaut "
-        f"{profil.get('defaultAction')}, refusés : {sorted(refuses & FAMILLE_CHMOD)}.",
+    assert profil.get("defaultAction") == "SCMP_ACT_ALLOW" and refuses >= FAMILLE_CHOWN, message(
+        en=f"The profile must allow by default and refuse {sorted(FAMILLE_CHOWN)}: defaultAction is "
+        f"{profil.get('defaultAction')}, refused: {sorted(refuses & FAMILLE_CHOWN)}.",
+        fr=f"Le profil doit autoriser par défaut et refuser {sorted(FAMILLE_CHOWN)} : defaultAction vaut "
+        f"{profil.get('defaultAction')}, refusés : {sorted(refuses & FAMILLE_CHOWN)}.",
     )
-    rc, sortie, diagnostic = _dans(host, COFFRE, "calcul", "touch /tmp/preuve && echo ok")
+    rc, sortie, diagnostic = _dans(host, FACTURATION, "numerotation", "touch /tmp/preuve && echo ok")
     assert rc == 0 and sortie == "ok", message(
-        en=f"calcul cannot even create a file: the filter refuses more than chmod. {diagnostic}",
-        fr=f"calcul ne peut même plus créer un fichier : le filtre refuse plus que chmod. {diagnostic}",
+        en=f"numerotation cannot even create a file: the filter refuses more than chown. {diagnostic}",
+        fr=f"numerotation ne peut même plus créer un fichier : le filtre refuse plus que chown. {diagnostic}",
     )
-    rc, _, diagnostic = _dans(host, COFFRE, "calcul", "chmod 700 /tmp/preuve")
+    rc, _, diagnostic = _dans(host, FACTURATION, "numerotation", "chown 1000:1000 /tmp/preuve")
     assert rc != 0 and "not permitted" in diagnostic.lower(), message(
-        en=f"chmod is not refused by seccomp in calcul (code {rc}, {diagnostic}).",
-        fr=f"chmod n'est pas refusé par seccomp dans calcul (code {rc}, {diagnostic}).",
+        en=f"chown is not refused by seccomp in numerotation (code {rc}, {diagnostic}).",
+        fr=f"chown n'est pas refusé par seccomp dans numerotation (code {rc}, {diagnostic}).",
     )
 
 
@@ -593,9 +606,9 @@ def _mode_effectif(host) -> str:
     return globaux.get(COMMANDES) or globaux.get("istio-system") or "PERMISSIVE"
 
 
-def _joint_api(host, ns: str, pod: str) -> bool:
+def _joint_suivi(host, ns: str, pod: str) -> bool:
     rc, _, _ = _kubectl(host, f"-n {ns} exec {pod} -c outil --request-timeout=30s "
-                              "-- wget -qO- -T 5 http://api.commandes.svc.cluster.local/")
+                              "-- wget -qO- -T 5 http://suivi.commandes.svc.cluster.local/")
     return rc == 0
 
 
@@ -607,23 +620,23 @@ def test_p10_le_maillage_exige_le_tls_mutuel(host):
         fr=f"Le mode TLS mutuel en vigueur pour l'espace {COMMANDES} est {mode} : le trafic en clair "
         "est encore accepté à côté du chiffré.",
     )
-    for ns, pod in ((COMMANDES, "api"), (COMMANDES, "client-maille"), (EXTERIEUR, "client-nu")):
+    for ns, pod in ((COMMANDES, "suivi"), (COMMANDES, "panier"), (PARTENAIRES, "transporteur")):
         _exiger_en_marche(host, ns, pod)
     fin = time.monotonic() + 30
-    nu_passe = True
+    hors_maillage_passe = True
     while time.monotonic() < fin:
-        nu_passe = _joint_api(host, EXTERIEUR, "client-nu")
-        if not nu_passe:
+        hors_maillage_passe = _joint_suivi(host, PARTENAIRES, "transporteur")
+        if not hors_maillage_passe:
             break
         time.sleep(3)
-    assert not nu_passe, message(
-        en="client-nu, without a sidecar, still reaches api in plain text after 30 seconds.",
-        fr="client-nu, sans sidecar, joint toujours api en clair après 30 secondes.",
+    assert not hors_maillage_passe, message(
+        en="transporteur, without a sidecar, still reaches suivi in plain text after 30 seconds.",
+        fr="transporteur, sans sidecar, joint toujours suivi en clair après 30 secondes.",
     )
-    assert _joint_api(host, COMMANDES, "client-maille"), message(
-        en="client-maille, which carries a sidecar, no longer reaches api: the requirement must cut "
+    assert _joint_suivi(host, COMMANDES, "panier"), message(
+        en="panier, which carries a sidecar, no longer reaches suivi: the requirement must cut "
         "what is outside the mesh, not the mesh itself.",
-        fr="client-maille, qui porte un sidecar, ne joint plus api : l'exigence doit couper ce qui est "
+        fr="panier, qui porte un sidecar, ne joint plus suivi : l'exigence doit couper ce qui est "
         "hors du maillage, pas le maillage lui-même.",
     )
 
@@ -658,24 +671,24 @@ def test_p11_paiement_est_ferme_sauf_le_flux_prevu_et_le_dns(host):
         fr=f"Rien ne ferme {PAIEMENT} par défaut pour tous ses Pods en : {', '.join(sorted(manquantes))}.",
     )
     ecarts = []
-    if _joint(host, "intrus", PAIEMENT, "annuaire"):
-        ecarts.append(message(en="intrus reaches annuaire (inbound not closed)",
-                              fr="intrus joint annuaire (entrée non fermée)"))
-    if _joint(host, "base", EXTERIEUR, "temoin-http"):
-        ecarts.append(message(en="base reaches temoin-http outside the space (outbound not closed)",
-                              fr="base joint temoin-http hors de l'espace (sortie non fermée)"))
-    if not _joint(host, "caisse", PAIEMENT, "base"):
-        ecarts.append(message(en="caisse no longer reaches base on port 80 (planned flow cut)",
-                              fr="caisse ne joint plus base sur le port 80 (flux prévu coupé)"))
-    if _joint(host, "intrus", PAIEMENT, "base"):
-        ecarts.append(message(en="intrus reaches base", fr="intrus joint base"))
+    if _joint(host, "publicite", PAIEMENT, "fidelite"):
+        ecarts.append(message(en="publicite reaches fidelite (inbound not closed)",
+                              fr="publicite joint fidelite (entrée non fermée)"))
+    if _joint(host, "grand-livre", PARTENAIRES, "site-partenaire"):
+        ecarts.append(message(en="grand-livre reaches site-partenaire outside the space (outbound not closed)",
+                              fr="grand-livre joint site-partenaire hors de l'espace (sortie non fermée)"))
+    if not _joint(host, "caisse", PAIEMENT, "grand-livre"):
+        ecarts.append(message(en="caisse no longer reaches grand-livre on port 80 (planned flow cut)",
+                              fr="caisse ne joint plus grand-livre sur le port 80 (flux prévu coupé)"))
+    if _joint(host, "publicite", PAIEMENT, "grand-livre"):
+        ecarts.append(message(en="publicite reaches grand-livre", fr="publicite joint grand-livre"))
     rc, _, _ = _kubectl(host, f"-n {PAIEMENT} exec caisse --request-timeout=30s -- "
                               "nslookup kubernetes.default.svc.cluster.local")
     if rc != 0:
         ecarts.append(message(en="caisse resolves no name (DNS cut)", fr="caisse ne résout plus aucun nom (DNS coupé)"))
-    if _joint(host, "caisse", EXTERIEUR, "temoin-http"):
-        ecarts.append(message(en="caisse reaches temoin-http (outbound reopened too broadly)",
-                              fr="caisse joint temoin-http (sortie rouverte trop largement)"))
+    if _joint(host, "caisse", PARTENAIRES, "site-partenaire"):
+        ecarts.append(message(en="caisse reaches site-partenaire (outbound reopened too broadly)",
+                              fr="caisse joint site-partenaire (sortie rouverte trop largement)"))
     assert not ecarts, message(
         en=f"The {PAIEMENT} space is not closed as required: {ecarts}.",
         fr=f"L'espace {PAIEMENT} n'est pas fermé comme demandé : {ecarts}.",
@@ -686,7 +699,7 @@ def test_p11_paiement_est_ferme_sauf_le_flux_prevu_et_le_dns(host):
 # P12 : le bac à sable.
 # ======================================================================
 def _noyau(host, pod: str) -> str:
-    rc, sortie, diagnostic = _kubectl(host, f"-n {COFFRE} exec {pod} --request-timeout=30s -- cat /proc/version")
+    rc, sortie, diagnostic = _kubectl(host, f"-n {FACTURATION} exec {pod} --request-timeout=30s -- cat /proc/version")
     assert rc == 0 and sortie, message(
         en=f"Cannot read the kernel seen by {pod}. {diagnostic}",
         fr=f"Impossible de lire le noyau que voit {pod}. {diagnostic}",
@@ -695,11 +708,11 @@ def _noyau(host, pod: str) -> str:
 
 
 def test_p12_le_bac_a_sable_lit_un_autre_noyau(host):
-    pod = _exiger_en_marche(host, COFFRE, "isole")
+    pod = _exiger_en_marche(host, FACTURATION, "rendu")
     classe = pod["spec"].get("runtimeClassName")
     assert classe, message(
-        en="isole names no runtime class: it runs with the default runtime.",
-        fr="isole ne nomme aucune classe de runtime : il tourne avec le runtime par défaut.",
+        en="rendu names no runtime class: it runs with the default runtime.",
+        fr="rendu ne nomme aucune classe de runtime : il tourne avec le runtime par défaut.",
     )
     objet = _json(host, f"get runtimeclass {classe}") or {}
     assert objet.get("handler") == "runsc", message(
@@ -708,15 +721,15 @@ def test_p12_le_bac_a_sable_lit_un_autre_noyau(host):
         fr=f"La classe de runtime {classe} désigne {objet.get('handler')}, et non le runtime bac à "
         "sable du nœud tel que containerd le connaît.",
     )
-    isole, temoin = _noyau(host, "isole"), _noyau(host, "ordinaire")
+    rendu, temoin = _noyau(host, "rendu"), _noyau(host, "temoin-noyau")
     machine = host.run("uname -r").stdout.strip()
     assert machine and machine in temoin, message(
-        en=f"The witness ordinaire does not read the machine's kernel ({machine}): no comparison point.",
-        fr=f"Le témoin ordinaire ne lit pas le noyau de la machine ({machine}) : aucun point de comparaison.",
+        en=f"The witness temoin-noyau does not read the machine's kernel ({machine}): no comparison point.",
+        fr=f"Le témoin temoin-noyau ne lit pas le noyau de la machine ({machine}) : aucun point de comparaison.",
     )
-    assert machine not in isole and isole != temoin, message(
-        en=f"isole reads the machine's kernel: {isole}.",
-        fr=f"isole lit le noyau de la machine : {isole}.",
+    assert machine not in rendu and rendu != temoin, message(
+        en=f"rendu reads the machine's kernel: {rendu}.",
+        fr=f"rendu lit le noyau de la machine : {rendu}.",
     )
 
 
@@ -741,12 +754,17 @@ def _lignes_falco(host) -> int:
     return int(res.stdout.strip()) if res.stdout.strip().isdigit() else 0
 
 
-def _alertes_apres_un_shell(host, ns: str, pod: str, essais: int) -> list[dict]:
+def _alertes_apres_un_outil_reseau(host, ns: str, pod: str, essais: int) -> list[dict]:
+    """Lance l'outil réseau dans le Pod, directement par l'exec (sans shell,
+    pour que le processus créé soit bien wget), puis lit les alertes de la
+    règle demandée. wget échoue faute de serveur : seul compte qu'il ait été
+    lancé, ce que distingue le message « command terminated with exit code »
+    d'un exec qui n'a pas abouti."""
     depuis = _lignes_falco(host)
-    rc, _, diagnostic = _kubectl(host, f"-n {ns} exec {pod} --request-timeout=30s -- sh -c 'echo correcteur'")
-    assert rc == 0, message(
-        en=f"The grader cannot open a shell in {pod} of {ns}: the setup placed it, it stays. {diagnostic}",
-        fr=f"Le correcteur ne peut pas ouvrir de shell dans {pod} de {ns} : le setup l'a posé, il reste. {diagnostic}",
+    rc, _, diagnostic = _kubectl(host, f"-n {ns} exec {pod} --request-timeout=30s -- {OUTIL_RESEAU}")
+    assert rc == 0 or "command terminated with exit code" in diagnostic, message(
+        en=f"The grader cannot start wget in {pod} of {ns}: the setup placed it, it stays. {diagnostic}",
+        fr=f"Le correcteur ne peut pas lancer wget dans {pod} de {ns} : le setup l'a posé, il reste. {diagnostic}",
     )
     for _ in range(essais):
         time.sleep(2)
@@ -764,33 +782,33 @@ def _alertes_apres_un_shell(host, ns: str, pod: str, essais: int) -> list[dict]:
     return []
 
 
-def _alertes_du_coffre(host) -> list[dict]:
-    if "coffre" not in _FALCO:
+def _alertes_de_facturation(host) -> list[dict]:
+    if "facturation" not in _FALCO:
         _falco_actif(host)
-        _exiger_en_marche(host, COFFRE, "tresor")
-        _FALCO["coffre"] = _alertes_apres_un_shell(host, COFFRE, "tresor", essais=10)
-    return _FALCO["coffre"]
+        _exiger_en_marche(host, FACTURATION, "export-comptable")
+        _FALCO["facturation"] = _alertes_apres_un_outil_reseau(host, FACTURATION, "export-comptable", essais=10)
+    return _FALCO["facturation"]
 
 
-def test_p13_falco_alerte_sur_un_shell_dans_le_coffre_et_pas_ailleurs(host):
-    alertes = _alertes_du_coffre(host)
+def test_p13_falco_alerte_sur_un_outil_reseau_en_facturation_et_pas_ailleurs(host):
+    alertes = _alertes_de_facturation(host)
     assert alertes, message(
-        en=f"A shell opened in tresor ({COFFRE}) raised no alert of rule {REGLE} within 20 seconds "
-        f"(read in {FALCO_JOURNAL}).",
-        fr=f"Un shell ouvert dans tresor ({COFFRE}) n'a levé aucune alerte de la règle {REGLE} en 20 "
-        f"secondes (lu dans {FALCO_JOURNAL}).",
+        en=f"wget started in export-comptable ({FACTURATION}) raised no alert of rule {REGLE} within "
+        f"20 seconds (read in {FALCO_JOURNAL}).",
+        fr=f"wget lancé dans export-comptable ({FACTURATION}) n'a levé aucune alerte de la règle {REGLE} "
+        f"en 20 secondes (lu dans {FALCO_JOURNAL}).",
     )
     priorites = sorted({str(a.get("priority", "")).lower() for a in alertes})
     assert PRIORITE in priorites, message(
         en=f"Rule {REGLE} fires with priority {priorites} instead of {PRIORITE.upper()}.",
         fr=f"La règle {REGLE} alerte avec la priorité {priorites} au lieu de {PRIORITE.upper()}.",
     )
-    _exiger_en_marche(host, EXTERIEUR, "curieux")
-    ailleurs = _alertes_apres_un_shell(host, EXTERIEUR, "curieux", essais=5)
+    _exiger_en_marche(host, PARTENAIRES, "visiteur")
+    ailleurs = _alertes_apres_un_outil_reseau(host, PARTENAIRES, "visiteur", essais=5)
     assert not ailleurs, message(
-        en=f"A shell in curieux ({EXTERIEUR}) raises rule {REGLE} too: it is not limited to {COFFRE}.",
-        fr=f"Un shell dans curieux ({EXTERIEUR}) déclenche aussi la règle {REGLE} : elle n'est pas "
-        f"limitée à {COFFRE}.",
+        en=f"wget in visiteur ({PARTENAIRES}) raises rule {REGLE} too: it is not limited to {FACTURATION}.",
+        fr=f"wget dans visiteur ({PARTENAIRES}) déclenche aussi la règle {REGLE} : elle n'est pas "
+        f"limitée à {FACTURATION}.",
     )
 
 
@@ -806,7 +824,7 @@ def test_p14_les_regles_falco_fournies_sont_intactes(host):
         fr=f"{FALCO_REGLES} diffère du fichier livré par le paquet ({actuel}, attendu "
         f"{attendu or 'inconnu'}) : une règle personnalisée vit dans son propre fichier.",
     )
-    assert _alertes_du_coffre(host), message(
+    assert _alertes_de_facturation(host), message(
         en=f"The shipped rules are intact, but rule {REGLE} raises nothing: half of the requirement.",
         fr=f"Les règles fournies sont intactes, mais la règle {REGLE} ne lève rien : la moitié de la demande.",
     )

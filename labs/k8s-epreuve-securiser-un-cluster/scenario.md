@@ -13,14 +13,17 @@ all anyone ever asked of it. The audit lists what it inherited:
   **`catalogue-svc`**), runs `nginxinc/nginx-unprivileged:1.21`, an image
   named by a tag, unsigned and riddled with flaws; next to it, the Pod
   **`outil-ancien`** was started "to make it work", with every privilege;
-- in the **`coffre`** space, workloads share the machine's kernel freely, and
-  nobody would notice a shell opened in its Pod **`tresor`**;
-- in the **`commandes`** space, an Istio mesh accepts plain traffic: from
-  **`exterieur`**, **`client-nu`**, without a sidecar, reads what **`api`**
-  serves to **`client-maille`**;
+- in the invoicing space, **`facturation`**, workloads share the machine's
+  kernel freely; its Pod **`export-comptable`** sends the ledger entries to the
+  accountants over a channel that is already open, and nobody would notice a
+  download tool starting there;
+- in the **`commandes`** space, an Istio mesh accepts plain traffic: from the
+  **`partenaires`** space, **`transporteur`**, without a sidecar, reads what
+  the order tracking service **`suivi`** serves to the cart **`panier`**;
 - in the **`paiement`** space, **`caisse`** is the legitimate client of the
-  database **`base`** (HTTP, port 80), and everyone else, **`intrus`**
-  included, reaches everything, outside the space too.
+  ledger **`grand-livre`**, the payments database (HTTP, port 80), and
+  everyone else, the ad tracker **`publicite`** included, reaches everything,
+  outside the space too.
 
 What is on `k8s-cp.lab`, where you work with `kubectl` and root through
 `sudo`:
@@ -62,31 +65,34 @@ choosing them is part of the test.
    (it sleeps), without any of its defects, and no longer sees the host's
    processes.
 
-**Confinement, in the `coffre` space** (image `busybox:1.37`, on `k8s-cp.lab`, for this group and the sandbox)
+**Confinement, in the `facturation` space** (image `busybox:1.37`, on `k8s-cp.lab`, for this group and the sandbox)
 
-8. A Pod **`lecteur`** can read its filesystem but cannot write into `/tmp`,
-   the refusal coming from an AppArmor profile loaded in enforce mode.
-9. A Pod **`calcul`** runs under a local seccomp profile that refuses the
-   `chmod` family and allows everything else.
+8. A Pod **`consultation`**, which displays invoices, can read its
+   filesystem but cannot drop anything into `/dev/shm`, the refusal coming
+   from an AppArmor profile loaded in enforce mode.
+9. A Pod **`numerotation`**, which assigns invoice numbers, runs under a
+   local seccomp profile that refuses the `chown` family and allows
+   everything else.
 
 **Network**
 
-10. The `commandes` space requires mutual TLS: `client-nu` no longer reaches
-    `api`, `client-maille` still does.
+10. The `commandes` space requires mutual TLS: `transporteur` no longer
+    reaches `suivi`, `panier` still does.
 11. The `paiement` space refuses inbound and outbound traffic by default for
-    all its Pods; only `caisse` reaches `base`, on port 80, and names still
+    all its Pods; only `caisse` reaches `grand-livre`, on port 80, and names still
     resolve.
 
-**Sandbox, in the `coffre` space**
+**Sandbox, in the `facturation` space**
 
-12. A Pod **`isole`** runs in the sandbox runtime and reads a kernel other
-    than the machine's.
+12. A Pod **`rendu`**, which builds invoices from received documents,
+    runs in the sandbox runtime and reads a kernel other than the machine's.
 
 **Detection**
 
-13. A shell opened in a container of `coffre` raises an alert of a Falco rule
-    named **`shell-in-coffre`**, with priority **`ERROR`**; a shell opened in
-    another space does not.
+13. A network or download tool (`wget`, `curl`, `nc` and the like) started
+    in a container of `facturation` raises an alert of a Falco rule named
+    **`outil-reseau-en-facturation`**, with priority **`WARNING`**; the same
+    tool started in another space does not.
 14. The rules shipped with Falco stay intact.
 
 **Supply chain, and the shop**
@@ -114,8 +120,8 @@ up for missing one of them.
 
 The tests read the node and the cluster, never your manifests: they replay the
 CIS audit, read the audit log after two real requests, submit Pods to
-admission, write and run `chmod` inside the Pods, make real connections,
-compare kernels, open a shell themselves, verify signatures with your
+admission, write and run `chown` inside the Pods, make real connections,
+compare kernels, start `wget` themselves, verify signatures with your
 published key, rescan the images and query the shop.
 
 Hints exist, they cost points, and they go from the vaguest to the most

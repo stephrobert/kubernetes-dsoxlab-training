@@ -10,7 +10,7 @@ payants.
 
 | | |
 |---|---|
-| Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab installe Falco 0.45.2, Istio 1.31, gVisor, trivy, cosign et crane, un registre local, et pose les espaces `boutique`, `coffre`, `commandes`, `exterieur`, `paiement`, `registre` et `conformite` |
+| Cible | `k8s-cp.lab`, cluster kubeadm du catalogue ; le lab installe Falco 0.45.2, Istio 1.31, gVisor, trivy, cosign et crane, un registre local, et pose les espaces `boutique`, `facturation`, `commandes`, `partenaires`, `paiement`, `registre` et `conformite` |
 | Durée | environ 150 minutes |
 | Page associée | [Épreuve du niveau 5 : sécuriser un cluster](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/) |
 
