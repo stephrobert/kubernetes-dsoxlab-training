@@ -1,0 +1,41 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, istioctl posé par
+# mise, puis la situation du challenge (fixtures/prepare.sh) : gVisor connu de
+# containerd, Falco installé et muet sur le namespace protégé, Istio en mode
+# permissif, et quatre namespaces où rien n'est encore confiné ni fermé.
+- name: Préparer le challenge k8s-challenge-confiner-et-detecter
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Vérifier qu'AppArmor est bien actif sur le nœud
+      ansible.builtin.command: aa-status --enabled
+      register: aa
+      changed_when: false
+      failed_when: false
+
+    # Sur un nœud en conteneur, le kubelet refuse un Pod AppArmor. Ce
+    # challenge exige une vraie machine, comme cks-apparmor-confiner-un-pod.
+    - name: Refuser de continuer si AppArmor est absent
+      ansible.builtin.fail:
+        msg: >-
+          AppArmor n'est pas actif sur ce nœud. Ce challenge exige une vraie
+          machine, pas un nœud en conteneur.
+      when: aa.rc != 0
+
+    - name: Poser istioctl sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: istioctl
+        outil_version: "1.31.0"
+        # istioctl n'accepte pas --version seul : il attend une sous-commande.
+        outil_verification: version --remote=false
+
+    - name: Poser la situation du challenge
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,165 @@
+# Le challenge du module « Confiner et détecter » (niveau 5), fiche
+# E-confiner-et-detecter. C'est la preuve sans procédure du module : il croise
+# AppArmor, seccomp, le mTLS d'Istio, la NetworkPolicy par défaut, le bac à
+# sable gVisor et la détection d'un shell par Falco.
+#
+# Il reprend les pièces attestées de cks-apparmor-confiner-un-pod,
+# cks-seccomp-profile, cks-istio-mtls-lockdown, cks-networkpolicy-default-deny et
+# cks-runtime-sandbox-gvisor, sans en refaire aucun à l'identique : le profil
+# AppArmor est à écrire et non fourni, les noms changent, et tout tient sur le
+# même cluster en même temps.
+#
+# Falco est la partie neuve du catalogue. Le setup l'installe sur le plan de
+# contrôle depuis le dépôt officiel falcosecurity, en paquet épinglé (0.45.2,
+# version mesurée le 2026-11-14 dans l'index du dépôt), avec le pilote
+# modern_ebpf qui ne compile rien. L'apprenant écrit la règle, il n'installe pas
+# l'outil : l'installer n'est pas ce que la leçon mesure.
+#
+# Seize états, à poids égal (dsoxlab note par test). Trois bloquent, un par
+# famille du module : le confinement qui agit vraiment (écriture refusée), le
+# chiffrement qui coupe le client hors maillage, et la détection du shell.
+id: k8s-challenge-confiner-et-detecter
+title: "Confine a Pod and detect abnormal activity, without guidance"
+level: monitoring-logging
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, confine Pods against the kernel with AppArmor, seccomp and
+  a sandbox runtime, require mutual TLS in a mesh, close a namespace by
+  default while keeping its application flow and DNS, and make Falco raise an
+  alert when a shell opens in the protected namespace, and only there.
+skills:
+  - apparmor
+  - seccomp
+  - istio
+  - mtls
+  - networkpolicy
+  - runtimeclass
+  - gvisor
+  - falco
+distros:
+  - ubuntu24
+# La leçon hôte (KUBERN-15-18) n'a pas de jumelle anglaise : l'URL française
+# reste ici, et lab.fr.yaml ne la répète pas.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_ecriture_dans_tmp_refusee_et_lecture_permise
+  - test_client_sans_sidecar_bloque_et_client_maille_passe
+  - test_shell_dans_le_coffre_declenche_la_regle_falco
+estimated_time: 75m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: apparmor-charge
+    label: "The requested AppArmor profile is loaded in the node's kernel, in enforce mode"
+    tests:
+      - test_profil_apparmor_charge_en_enforce
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: apparmor-declare
+    label: "The confined Pod runs on the node where the profile is loaded and declares that profile"
+    tests:
+      - test_pod_confine_tourne_sur_le_noeud_du_profil_et_le_declare
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: apparmor-effectif
+    label: "A write into /tmp from that Pod is denied, reading the filesystem works"
+    tests:
+      - test_ecriture_dans_tmp_refusee_et_lecture_permise
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: seccomp-profil
+    label: "The seccomp profile refuses the chmod family and allows everything else by default"
+    tests:
+      - test_profil_seccomp_refuse_chmod_et_autorise_le_reste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: seccomp-declare
+    label: "The Pod declares the local seccomp profile and runs"
+    tests:
+      - test_pod_declare_le_profil_seccomp_local_et_tourne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: seccomp-effectif
+    label: "In that Pod, a chmod fails and creating a file works"
+    tests:
+      - test_chmod_echoue_et_creation_de_fichier_fonctionne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: mtls-exige
+    label: "The meshed namespace only accepts mutually authenticated traffic"
+    tests:
+      - test_namespace_maille_exige_le_tls_mutuel
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: mtls-effectif
+    label: "A client without a sidecar is blocked and a client of the mesh gets through"
+    tests:
+      - test_client_sans_sidecar_bloque_et_client_maille_passe
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: reseau-ferme
+    label: "The namespace refuses inbound and outbound traffic by default, for all its Pods"
+    tests:
+      - test_namespace_ferme_par_defaut_dans_les_deux_sens
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: reseau-flux-prevu
+    label: "Only the planned application flow reaches the database"
+    tests:
+      - test_seul_le_flux_prevu_atteint_la_base
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: reseau-dns
+    label: "DNS resolves, without reopening the rest of the outbound traffic"
+    tests:
+      - test_dns_resout_sans_rouvrir_la_sortie
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: runtimeclass
+    label: "A RuntimeClass designates the node's runtime under the requested name"
+    tests:
+      - test_runtimeclass_designe_le_runtime_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+  - id: bac-a-sable
+    label: "The sandboxed Pod runs and reads a kernel other than the machine's"
+    tests:
+      - test_pod_en_bac_a_sable_lit_un_autre_noyau
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+  - id: falco-alerte
+    label: "A shell opened by the grader in the protected Pod raises an alert of the requested Falco rule, with its priority"
+    tests:
+      - test_shell_dans_le_coffre_declenche_la_regle_falco
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/
+  - id: falco-ailleurs
+    label: "A shell opened in another namespace does not trigger that rule"
+    tests:
+      - test_shell_ailleurs_ne_declenche_pas_la_regle
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+  - id: falco-regles-intactes
+    label: "The Falco rules shipped with the package are intact"
+    tests:
+      - test_regles_falco_fournies_intactes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/falco/

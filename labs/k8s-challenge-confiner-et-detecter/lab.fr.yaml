@@ -1,0 +1,58 @@
+title: "Confiner un Pod et détecter une activité anormale, sans guidage"
+description: |
+  Sans procédure, confiner des Pods face au noyau avec AppArmor, seccomp et un
+  runtime bac à sable, exiger le TLS mutuel dans un maillage, fermer un
+  namespace par défaut en gardant son flux applicatif et son DNS, et faire
+  lever par Falco une alerte quand un shell s'ouvre dans le namespace protégé,
+  et seulement là.
+
+criteria:
+  - id: apparmor-charge
+    label: "Le profil AppArmor demandé est chargé dans le noyau du nœud, en mode enforce"
+  - id: apparmor-declare
+    label: "Le Pod confiné tourne sur le nœud où le profil est chargé et déclare ce profil"
+  - id: apparmor-effectif
+    label: "Une écriture dans /tmp depuis ce Pod est refusée, la lecture du système de fichiers fonctionne"
+  - id: seccomp-profil
+    label: "Le profil seccomp refuse la famille chmod et autorise tout le reste par défaut"
+  - id: seccomp-declare
+    label: "Le Pod déclare le profil seccomp local et tourne"
+  - id: seccomp-effectif
+    label: "Dans ce Pod, un chmod échoue et la création d'un fichier fonctionne"
+  - id: mtls-exige
+    label: "Le namespace maillé n'accepte plus que du trafic mutuellement authentifié"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: mtls-effectif
+    label: "Un client sans sidecar est bloqué et un client du maillage passe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: reseau-ferme
+    label: "Le namespace refuse par défaut le trafic entrant et sortant pour tous ses Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: reseau-flux-prevu
+    label: "Seul le flux applicatif prévu atteint la base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: reseau-dns
+    label: "Le DNS résout, sans rouvrir le reste de la sortie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: runtimeclass
+    label: "Une RuntimeClass désigne le runtime du nœud sous le nom demandé"
+  - id: bac-a-sable
+    label: "Le Pod en bac à sable tourne et lit un noyau différent de celui de la machine"
+  - id: falco-alerte
+    label: "Un shell ouvert par le correcteur dans le Pod protégé produit une alerte de la règle Falco demandée, avec sa priorité"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+  - id: falco-ailleurs
+    label: "Un shell ouvert dans un autre namespace ne déclenche pas cette règle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+  - id: falco-regles-intactes
+    label: "Les règles Falco fournies avec le paquet sont intactes"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
