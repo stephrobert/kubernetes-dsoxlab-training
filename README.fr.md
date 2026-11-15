@@ -20,9 +20,9 @@ son titre. Un **capstone** n'en nomme aucune : il remet une situation, le seuil
 de réussite de son examen (66 % pour la CKA et la CKAD, 67 % pour la CKS), et
 laisse choisir les outils.
 
-**La CKA, la CKAD et la CKS sont des examens pratiques.** Le candidat répare
-ou construit sur un vrai cluster : il ne choisit pas la bonne réponse parmi
-quatre. Pour ces trois-là, un quiz ne suffit pas, et ce catalogue donne à
+**La CKA, la CKAD, la CKS et la CKNE sont des examens pratiques.** Le
+candidat répare ou construit sur un vrai cluster : il ne choisit pas la bonne
+réponse parmi quatre. Pour ces quatre-là, un quiz ne suffit pas, et ce catalogue donne à
 l'apprenant les moyens de **prouver** qu'il sait faire. La **KCNA** et la
 **KCSA** sont des examens à choix multiples : le site les prépare avec ses
 pages et ses examens blancs, et les labs d'ici aident à comprendre ce dont
@@ -273,7 +273,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 | 21 | [`k8s-appliquer-une-recommandation-vpa`](labs/k8s-appliquer-une-recommandation-vpa/) | Appliquer une recommandation du VPA | workloads-scheduling | 25m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/#mettre-en-pratique) |
 | 22 | [`cka-resourcequota-limitrange`](labs/cka-resourcequota-limitrange/) | Plafonner un namespace sans bloquer ceux qui oublient de se déclarer | workloads-scheduling | 25m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/) |
 | 23 | [`k8s-challenge-placer-et-plafonner`](labs/k8s-challenge-placer-et-plafonner/) | Placer des Pods, plafonner un namespace et dimensionner, sans guidage | workloads-scheduling | 50m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/) |
-| 24 | [`k8s-epreuve-livrer-une-application`](labs/k8s-epreuve-livrer-une-application/) | Épreuve du niveau 3 : exposer, configurer et livrer une application | services-networking | 120m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 24 | [`k8s-epreuve-livrer-une-application`](labs/k8s-epreuve-livrer-une-application/) | Épreuve du niveau 3 : exposer, configurer et livrer une application | services-networking | 120m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/) |
 | 25 | [`cka-troubleshoot-imagepullbackoff`](labs/cka-troubleshoot-imagepullbackoff/) | Sortir un Pod de l'ImagePullBackOff | troubleshooting | 10m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/) |
 | 26 | [`cka-troubleshoot-crashloopbackoff`](labs/cka-troubleshoot-crashloopbackoff/) | Sortir un Deployment du CrashLoopBackOff | troubleshooting | 15m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/) |
 | 27 | [`cka-kubectl-debug`](labs/cka-kubectl-debug/) | Entrer dans un conteneur sans shell avec kubectl debug | troubleshooting | 10m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique) |
@@ -296,7 +296,7 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 | 44 | [`k8s-donner-un-acces-par-csr`](labs/k8s-donner-un-acces-par-csr/) | Donner un accès humain par une CertificateSigningRequest | cluster-architecture-installation-configuration | 25m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
 | 45 | [`k8s-challenge-sauvegarder-et-restaurer`](labs/k8s-challenge-sauvegarder-et-restaurer/) | Challenge : sauvegarder, restaurer et remettre un cluster en ordre | cluster-architecture-installation-configuration | 50m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique) |
 | 46 | [`k8s-challenge-garantir-la-disponibilite`](labs/k8s-challenge-garantir-la-disponibilite/) | Garantir la disponibilité d'une application pendant une maintenance | workloads-scheduling | 45m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/) |
-| 47 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Épreuve du niveau 4 : administrer un cluster | cluster-architecture-installation-configuration | 180m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 47 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Épreuve du niveau 4 : administrer un cluster | cluster-architecture-installation-configuration | 180m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/administrer-un-cluster/) |
 | 48 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone : remettre le portail en service, sans personne à qui demander | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 | 49 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | Examen blanc CKA : 17 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
@@ -383,7 +383,7 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 24 | [`k8s-detecter-une-persistance`](labs/k8s-detecter-une-persistance/) | Repérer et retirer ce qu'un attaquant a laissé derrière lui | cluster-hardening | 30m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/persistance-attaquant-cluster/) |
 | 25 | [`k8s-contenir-un-deni-de-service`](labs/k8s-contenir-un-deni-de-service/) | Contenir un déni de service dans son namespace | cluster-hardening | 30m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
 | 26 | [`k8s-challenge-contenir-une-attaque`](labs/k8s-challenge-contenir-une-attaque/) | Détecter et contenir une persistance et un déni de service | cluster-hardening | 45m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/) |
-| 27 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Épreuve du niveau 5 : sécuriser un cluster | cluster-hardening | 150m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 27 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Épreuve du niveau 5 : sécuriser un cluster | cluster-hardening | 150m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/) |
 | 28 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 | 29 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | Examen blanc CKS : 16 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 

@@ -50,7 +50,7 @@ distros:
 # Page cible de la fiche, encore à créer :
 #   https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/
 # URL provisoire, celle de la formation, en attendant que la page existe.
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-secure-a-cluster/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -151,7 +151,7 @@ criteria:
     tests:
       - test_p12_le_bac_a_sable_lit_un_autre_noyau
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
   - id: p13-falco-shell
     label: "P13 (critical): a shell in the protected space raises an alert of the requested Falco rule, with its priority, and a shell elsewhere does not"
     tests:

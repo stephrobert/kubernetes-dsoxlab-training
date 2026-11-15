@@ -10,16 +10,18 @@
 # anglaise lisait donc les trois titres de sections en français.
 
 repo:
-  title: "Kubernetes DevSecOps Training : CKA, CKAD et CKS"
+  title: "Formation Kubernetes : du premier Pod aux certifications"
   description: |
     Labs vérifiables pour la formation Kubernetes du blog Stéphane Robert.
     Chaque lab est jumelé à une leçon du site et valide une compétence
-    nommée par un blueprint officiel, CKA, CKAD ou CKS.
+    nommée par le blueprint d'un examen officiel.
 
-    Ces trois examens sont entièrement PRATIQUES : le candidat répare ou
-    construit sur un cluster réel, il ne reconnaît pas une bonne réponse
-    parmi quatre. Un quiz ne prépare donc pas à l'épreuve, il prépare au
-    vocabulaire. C'est le trou que ce catalogue comble.
+    La CKA, la CKAD, la CKS et la CKNE sont des examens PRATIQUES : le
+    candidat répare ou construit sur un cluster réel, il ne reconnaît pas
+    une bonne réponse parmi quatre. Un quiz ne prépare donc pas à l'épreuve,
+    il prépare au vocabulaire. C'est le trou que ce catalogue comble. La
+    KCNA et la KCSA sont des QCM : les labs aident à comprendre ce dont
+    parlent leurs questions.
 
 sections:
   - id: kcna

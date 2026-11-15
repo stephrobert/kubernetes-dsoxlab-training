@@ -39,7 +39,7 @@ skills:
   - runtime-security
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
 lab_type: capstone
 exam_passing_score: 67
 estimated_time: 120m

@@ -1,4 +1,5 @@
 title: "Examen blanc CKS : 16 tâches en 120 minutes"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
 description: |
   Un examen blanc chronométré au format de la CKS : seize tâches réparties comme
   les six domaines officiels, sur un cluster kubeadm, chaque tâche sur l'hôte

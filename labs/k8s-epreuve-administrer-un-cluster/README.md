@@ -20,7 +20,7 @@ labs' kind clusters, which each one recreates through its own setup.
 |---|---|
 | Target | `k8s-cp.lab` and `k8s-w1.lab`, the catalogue's kubeadm cluster; `k8s-kind.lab`, where the learner creates cluster `ha` |
 | Duration | about 180 minutes |
-| Related page | [Kubernetes](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) (temporary, until the test's own page exists) |
+| Related page | [Level 4 exam: administer a cluster](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-administer-a-cluster/) |
 
 ```bash
 dsoxlab run    k8s-epreuve-administrer-un-cluster
