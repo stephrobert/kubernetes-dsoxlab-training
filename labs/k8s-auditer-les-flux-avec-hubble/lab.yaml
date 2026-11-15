@@ -1,0 +1,85 @@
+# Lab guidé de la leçon L4 du module « Réseau avancé » (niveau 6, CKNE),
+# « Observer, mesurer et auditer les flux avec Hubble ». Objectifs CKNE
+# servis : « Analyzing Network Health Using Metrics » et « Auditing Traffic
+# with Logs », du domaine Observability.
+#
+# La situation : dans le namespace magasin, une API sur net-w1.lab et trois
+# clients sur net-w2.lab qui l'appellent toutes les deux secondes. Une
+# NetworkPolicy en refuse un, tiré au sort à chaque passage. L'apprenant
+# retrouve le flux refusé avec Hubble, le consigne, donne à la métrique des
+# refus le contexte qui la fait désigner le Pod, et journalise les seuls refus
+# dans un fichier du nœud (faits vérifiés n°8 du cadrage CKNE, Cilium 1.20.4).
+#
+# Le cluster est celui du socle shared/cilium-cluster.yml, monté prêt par le
+# setup. Le cleanup ramène Cilium aux valeurs du socle, retire les journaux
+# d'export et le namespace : le cluster reste pour le lab suivant.
+#
+# Briques attestées réutilisées : cks-networkpolicy-default-deny et
+# cka-networkpolicy-isolate-db (une NetworkPolicy d'entrée qui refuse, deux
+# côtés exercés), k8s-detecter-une-persistance (un constat jugé contre une
+# référence que seul root lit), ckad-helm-install-upgrade (helm upgrade).
+#
+# RISQUE R3 du cadrage : Cilium 1.20.4 déclare Kubernetes 1.33 à 1.36, et le
+# cluster tourne en 1.37.
+id: k8s-auditer-les-flux-avec-hubble
+title: "Audit network flows with Hubble"
+level: observability
+section: ckne
+difficulty: advanced
+description: |
+  Find with Hubble the flow a NetworkPolicy refuses and record it, give the
+  Hubble drop metric the context that makes it name the Pod, and log only the
+  refused flows to a file on the node, without lifting the refusal.
+skills:
+  - hubble
+  - cilium
+  - network-observability
+  - networkpolicy
+  - helm
+distros:
+  - ubuntu24
+# La leçon hubble/ n'a pas de jumelle anglaise (table fr_vers_en du
+# 2026-11-14) : l'URL française vaut pour les deux langues.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+lab_type: lab
+estimated_time: 40m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # L'API tourne sur net-w1.lab, les clients sur net-w2.lab : les deux
+      # workers sont utilisés en même temps que le plan de contrôle.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: flux-refuse-designe
+    label: "The refused flow is recorded in the ConfigMap constat: source Pod and drop reason, as Hubble gives them"
+    tests:
+      - test_le_constat_designe_le_flux_refuse
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: metrique-du-refus
+    label: "hubble_drop_total names the refused Pod as its source, and still grows"
+    tests:
+      - test_la_metrique_compte_les_refus_du_client
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+  - id: journal-des-refus
+    label: "The node logs the refused flows, and only DROPPED flows, to /var/run/cilium/hubble/events.log"
+    tests:
+      - test_les_refus_sont_journalises_sur_le_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/

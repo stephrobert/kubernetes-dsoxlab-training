@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run`.
+#
+# Ce setup laisse trois nœuds PRÊTS et aucun cluster : on n'apprend pas
+# `kubeadm init` sur un plan de contrôle qui existe déjà.
+#
+#   1. le socle Cilium à l'étape `noeuds` : kubelet, kubeadm et kubectl 1.37
+#      figés, containerd, helm 4.3.0 sur le plan de contrôle, et la clé SSH du
+#      plan de contrôle autorisée sur les workers ;
+#   2. la remise à zéro des trois nœuds (kubeadm reset, configuration CNI,
+#      état de l'agent Cilium, chaînes KUBE et CILIUM) : un cluster laissé par
+#      un lab précédent, ou par un passage précédent de celui-ci, disparaît.
+#
+# Le cluster partagé k8s-cp/k8s-w1 n'est pas touché.
+- name: Préparer le lab k8s-installer-cilium-sans-kube-proxy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, les nœuds du cluster Cilium, sans cluster
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: noeuds
+
+    - name: Défaire le cluster qu'un lab ou un passage précédent aurait laissé
+      ansible.builtin.include_tasks: ../../shared/cilium-remettre-a-zero.yml

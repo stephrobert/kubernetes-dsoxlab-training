@@ -1,0 +1,60 @@
+---
+# Remet les trois nœuds du cluster Cilium (net-cp, net-w1, net-w2) à l'état
+# « prêts, sans cluster » : celui que shared/cilium-cluster.yml laisse avec
+# `cilium_etape: noeuds`.
+#
+# À inclure depuis un play sur lab_target (net-cp.lab). Le fichier recense
+# lui-même les workers : un cleanup peut l'inclure seul, sans rejouer la
+# préparation des nœuds.
+#
+# Ce que `kubeadm reset` ne défait pas, et que ce fichier retire :
+#   - la configuration CNI de /etc/cni/net.d (kubeadm le dit lui-même) ;
+#   - l'état de l'agent Cilium sous /var/run/cilium/state, qui décrit des
+#     endpoints d'un cluster qui n'existe plus. Pas tout /var/run/cilium :
+#     l'agent y monte la hiérarchie cgroup v2 du nœud (cgroupv2), et un
+#     `rm -rf` y supprimerait les cgroups vides du système ;
+#   - les interfaces cilium_host, cilium_net et cilium_vxlan ;
+#   - les chaînes iptables KUBE-* et CILIUM_*. Les premières n'existent que si
+#     un kube-proxy a tourné (un essai de l'apprenant) : les laisser ferait
+#     échouer à tort le contrôle « aucune règle KUBE-SVC » du passage suivant.
+#     Le filtre `iptables-save | grep -v KUBE` est celui que donne la page
+#     kubeproxy-free de Cilium. Le kubelet recrée ses propres chaînes à son
+#     démarrage ;
+#   - les kubeconfig de root et de l'utilisateur, qui viseraient un cluster
+#     disparu.
+#
+# Le kubelet et containerd restent installés : c'est l'état de départ d'un lab
+# qui fait initialiser le cluster.
+- name: Recenser les workers du cluster Cilium déclarés par meta.yml
+  ansible.builtin.set_fact:
+    cilium_workers: >-
+      {{ groups['labenv'] | default([])
+         | reject('equalto', inventory_hostname)
+         | select('in', hostvars | dict2items | selectattr('value.role', 'defined')
+                                  | selectattr('value.role', 'equalto', 'cilium-worker')
+                                  | map(attribute='key') | list)
+         | list }}
+
+- name: Remettre à zéro chaque nœud du cluster Cilium
+  ansible.builtin.shell: |
+    kubeadm reset -f > /dev/null 2>&1 || true
+    rm -rf /etc/cni/net.d/* /var/run/cilium/state
+    for lien in cilium_vxlan cilium_host cilium_net; do
+      ip link delete "$lien" 2> /dev/null || true
+    done
+    iptables-save | grep -v -e KUBE -e CILIUM | iptables-restore || true
+    ip6tables-save | grep -v -e KUBE -e CILIUM | ip6tables-restore || true
+    rm -f /root/.kube/config
+    rm -f "$(getent passwd '{{ ansible_user | default('ubuntu') }}' | cut -d: -f6)/.kube/config"
+  args:
+    executable: /bin/bash
+  changed_when: true
+  delegate_to: "{{ noeud }}"
+  loop: "{{ cilium_workers + [inventory_hostname] }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Retirer le fichier des valeurs du socle Cilium
+  ansible.builtin.file:
+    path: /root/cilium-socle-valeurs.yaml
+    state: absent

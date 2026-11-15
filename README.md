@@ -385,9 +385,20 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 28 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 | 29 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-14 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total: **127 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+### Advanced networking (CKNE)
 
-**Runtime validated: Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
+Five domains in the CKNE curriculum. Service Networking and DNS and Network Security and Policy weigh 25 % each. The labs run on a dedicated Cilium cluster without kube-proxy.
+
+2 lab(s).
+
+| # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
+|---|---|---|---|---|---|---|
+| 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Install Cilium without kube-proxy | core-infrastructure-and-cni | 45m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
+| 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
+
+Total: **129 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+
+**Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-11-10** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
 <!-- LABS:END -->
 

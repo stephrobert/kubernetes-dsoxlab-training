@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset`.
+#
+# Le cluster de l'apprenant est défait : les trois nœuds net-* sont remis à
+# zéro par kubeadm reset (shared/cilium-remettre-a-zero.yml), ce qui emporte le
+# namespace demo, Cilium et sa configuration. C'est l'état que le lab suivant
+# attend : son setup remonte le cluster prêt avec shared/cilium-cluster.yml.
+#
+# Le kubelet, kubeadm, kubectl, containerd et helm restent installés : ils
+# appartiennent au socle, pas au lab.
+- name: Défaire le lab k8s-installer-cilium-sans-kube-proxy
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Remettre les trois nœuds du cluster Cilium à zéro
+      ansible.builtin.include_tasks: ../../shared/cilium-remettre-a-zero.yml
+
+    - name: Retirer la configuration Helm de l'utilisateur du lab
+      ansible.builtin.shell: |
+        maison="$(getent passwd '{{ ansible_user | default('ubuntu') }}' | cut -d: -f6)"
+        rm -rf "$maison/.config/helm" "$maison/.cache/helm"
+      args:
+        executable: /bin/bash
+      changed_when: true

@@ -1,0 +1,17 @@
+title: "Auditer les flux réseau avec Hubble"
+description: |
+  Retrouver avec Hubble le flux qu'une NetworkPolicy refuse et le consigner,
+  donner à la métrique des refus de Hubble le contexte qui lui fait nommer le
+  Pod, et journaliser les seuls flux refusés dans un fichier du nœud, sans
+  lever le refus.
+
+criteria:
+  - id: flux-refuse-designe
+    label: "Le flux refusé est consigné dans le ConfigMap constat : Pod source et raison du refus, tels que Hubble les donne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: metrique-du-refus
+    label: "hubble_drop_total nomme le Pod refusé comme source, et augmente encore"
+  - id: journal-des-refus
+    label: "Le nœud journalise les flux refusés, et seulement des flux DROPPED, dans /var/run/cilium/hubble/events.log"

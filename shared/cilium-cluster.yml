@@ -1,0 +1,364 @@
+---
+# Socle des labs Cilium du niveau 6 « Réseau avancé » (CKNE) : un cluster
+# kubeadm d'un plan de contrôle et de deux workers, SANS kube-proxy, sur les
+# hôtes optionnels net-cp.lab, net-w1.lab et net-w2.lab de meta.yml.
+#
+# Ce cluster est DISTINCT du cluster partagé k8s-cp/k8s-w1 (Calico et
+# kube-proxy, shared/kubeadm-cluster.yml), et ce fichier n'y touche jamais :
+# il ne regarde que les hôtes dont le rôle vaut `cilium-worker`.
+#
+# À inclure depuis le `setup.yaml` (et le `cleanup.yaml` au besoin) d'un lab
+# dont la target est net-cp.lab et qui déclare les deux workers en `roles` :
+#
+#     runtime:
+#       targets:
+#         - name: cp
+#           host: net-cp.lab
+#           roles:
+#             worker1: net-w1.lab
+#             worker2: net-w2.lab
+#
+#     - name: Installer le socle, le cluster Cilium sans kube-proxy
+#       ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+#       vars:
+#         cilium_etape: cluster        # ou noeuds
+#
+# DEUX ÉTAPES, choisies par `cilium_etape`.
+#
+#   noeuds    les trois nœuds sont prêts à recevoir Kubernetes (swap, modules,
+#             containerd, kubelet, kubeadm et kubectl 1.37 figés), helm est
+#             posé sur le plan de contrôle, le plan de contrôle joint les
+#             workers en SSH. Rien de plus : c'est l'état de départ du lab
+#             qui fait initialiser le cluster et installer Cilium par
+#             l'apprenant (k8s-installer-cilium-sans-kube-proxy). Ce lab
+#             appelle ensuite shared/cilium-remettre-a-zero.yml, pour défaire
+#             un cluster qu'un lab précédent aurait laissé.
+#   cluster   (défaut) l'étape précédente, puis le cluster prêt : `kubeadm
+#             init --skip-phases=addon/kube-proxy`, jonction des deux
+#             workers, Cilium 1.20.4 par son chart Helm officiel avec
+#             kubeProxyReplacement=true, k8sServiceHost et k8sServicePort,
+#             Hubble et Hubble Relay activés, métriques Hubble exposées.
+#
+# IDEMPOTENT, TÂCHE PAR TÂCHE, pour la raison que raconte
+# shared/kubeadm-cluster.yml : une garde grossière (« le cluster répond-il
+# déjà ? ») transforme un échec partiel en échec permanent. Un cluster sain
+# n'est pas recréé : `kubeadm init` est gardé par admin.conf, chaque jonction
+# par le kubelet.conf du worker, et le chart n'est rejoué QUE si ses valeurs
+# diffèrent de celles du socle.
+#
+# CE QUE LE REJEU DES VALEURS GARANTIT. Un lab peut demander à l'apprenant de
+# changer la configuration de Cilium (exemple : des métriques Hubble par Pod).
+# Le setup et le cleanup du lab suivant repassent ici, constatent l'écart entre
+# `helm get values` et les valeurs du socle, et reposent celles du socle avec
+# `--reset-values`. `rollOutCiliumPods=true` redémarre alors les agents, sans
+# quoi ils garderaient en mémoire la configuration de l'apprenant alors que le
+# ConfigMap aurait été rendu.
+#
+# LES VALEURS QU'UN LAB AJOUTE. `cilium_valeurs_supplementaires` (un mapping au
+# format du chart) est fusionné récursivement dans les valeurs du socle. C'est
+# la porte des lots suivants : egress (`egressGateway.enabled`,
+# `bpf.masquerade`), BGP (`bgpControlPlane.enabled`), Multus
+# (`cni.exclusive: false`), WireGuard (`encryption.*`). Un lab qui n'en passe
+# pas ramène le cluster aux valeurs du socle, ce qui est voulu : chaque lab
+# part de la configuration qu'il déclare. Seule exception, dite par la
+# documentation de Cilium : le pool d'adresses `cluster-pool` et son masque ne
+# changent plus après l'installation, ils ne se surchargent donc pas.
+#
+# CE QUI N'EST PAS RÉGLÉ ICI, et pourquoi (risque R4 du cadrage CKNE).
+# `socketLB.hostNamespaceOnly=true` et `cni.exclusive=false` sont demandés par
+# la documentation de Cilium quand Istio cohabite avec le remplacement de
+# kube-proxy. Istio tourne sur un cluster de lab DISTINCT (décision D90) :
+# rien ne les justifie sur celui-ci. `cni.exclusive=false` ne sert qu'à
+# Multus (leçon L3), dont le lab le passera par `cilium_valeurs_supplementaires`.
+#
+# VERSIONS. Kubernetes 1.37, du dépôt pkgs.k8s.io, par shared/noeud-kubernetes.yml
+# comme le socle partagé. Cilium 1.20.4, dernière stable relevée le 2026-11-14.
+# RISQUE R3 : la page de compatibilité de Cilium 1.20.4 déclare Kubernetes 1.33
+# à 1.36 et ne cite pas 1.37. Le cluster tourne donc hors du périmètre déclaré
+# par Cilium, ce que les labs disent à l'apprenant, et que seule la validation
+# sur cluster confirme.
+#
+# PLAGES D'ADRESSES. Le pool des Pods est 10.244.0.0/16, en /24 par nœud, et
+# non le défaut de Cilium (10.0.0.0/8) : ce défaut CONTIENT le réseau des VM du
+# catalogue (10.10.50.0/24, meta.yml), et un Pod pourrait recevoir une adresse
+# qui masque celle d'un nœud. Les Services gardent le défaut de kubeadm,
+# 10.96.0.0/12, disjoint des deux.
+
+# ---------------------------------------------------------------------------
+# Les nœuds du cluster Cilium
+# ---------------------------------------------------------------------------
+- name: Recenser les workers du cluster Cilium déclarés par meta.yml
+  ansible.builtin.set_fact:
+    cilium_workers: >-
+      {{ groups['labenv'] | default([])
+         | reject('equalto', inventory_hostname)
+         | select('in', hostvars | dict2items | selectattr('value.role', 'defined')
+                                  | selectattr('value.role', 'equalto', 'cilium-worker')
+                                  | map(attribute='key') | list)
+         | list }}
+
+# Deux workers, ni plus ni moins : les labs du niveau 6 comptent sur un trafic
+# qui traverse le réseau entre deux workers. Un worker absent vient d'un lab
+# qui ne le déclare pas en `roles` : `start` ne l'a pas monté.
+- name: Exiger les deux workers du cluster Cilium
+  ansible.builtin.assert:
+    that:
+      - cilium_workers | length == 2
+    fail_msg: >-
+      Le cluster Cilium attend deux hôtes de rôle cilium-worker dans
+      l'inventaire, il en trouve {{ cilium_workers | length }}
+      ({{ cilium_workers | join(', ') }}). Le lab doit les déclarer dans
+      runtime.targets[].roles (net-w1.lab et net-w2.lab) pour que dsoxlab
+      les monte.
+    quiet: true
+
+# Le plan de contrôle joint les workers par leur nom, en SSH et pour la
+# jonction. Les noms se résolvent par le DNS du réseau libvirt pour les hôtes
+# communs (mesuré le 2026-09-14 sur k8s-w1.lab) ; pour des hôtes optionnels,
+# cela n'a pas été mesuré. Les adresses connues de l'inventaire sont donc
+# posées dans /etc/hosts des trois nœuds, ce qui ne dépend d'aucun DNS.
+- name: Poser les noms du cluster Cilium dans /etc/hosts des trois nœuds
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} dsoxlab cluster Cilium"
+    block: |
+      {% for h in [inventory_hostname] + cilium_workers %}
+      {{ hostvars[h].ansible_host }} {{ h }} {{ h.split('.')[0] }}
+      {% endfor %}
+  delegate_to: "{{ noeud }}"
+  loop: "{{ [inventory_hostname] + cilium_workers }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Préparer le plan de contrôle comme un nœud Kubernetes
+  ansible.builtin.include_tasks: noeud-kubernetes.yml
+
+- name: Préparer chaque worker comme un nœud Kubernetes
+  ansible.builtin.include_tasks:
+    file: noeud-kubernetes.yml
+    apply:
+      delegate_to: "{{ noeud }}"
+  loop: "{{ cilium_workers }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Installer helm sur le plan de contrôle
+  ansible.builtin.include_tasks: outil-par-mise.yml
+  vars:
+    outil_nom: helm
+    outil_version: "4.3.0"
+    outil_verification: version --short
+
+# Comme sur le cluster partagé : depuis le plan de contrôle, `ssh <worker>`
+# ouvre une session sans mot de passe. Les labs qui font joindre un worker,
+# capturer sur un nœud ou lire ses règles en dépendent.
+- name: Donner une clé SSH à l'utilisateur du lab sur le plan de contrôle
+  ansible.builtin.command:
+    cmd: ssh-keygen -q -t ed25519 -N "" -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519
+    creates: /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519
+  become: true
+  become_user: "{{ ansible_user | default('ubuntu') }}"
+
+- name: Lire cette clé publique
+  ansible.builtin.slurp:
+    src: /home/{{ ansible_user | default('ubuntu') }}/.ssh/id_ed25519.pub
+  register: cilium_cle_lab
+
+- name: Autoriser cette clé sur chaque worker
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user | default('ubuntu') }}/.ssh/authorized_keys
+    line: "{{ cilium_cle_lab.content | b64decode | trim }}"
+    create: true
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0600"
+  delegate_to: "{{ noeud }}"
+  loop: "{{ cilium_workers }}"
+  loop_control:
+    loop_var: noeud
+
+- name: Accepter la clé d'hôte des nœuds du cluster au premier ssh
+  ansible.builtin.copy:
+    dest: /home/{{ ansible_user | default('ubuntu') }}/.ssh/config
+    owner: "{{ ansible_user | default('ubuntu') }}"
+    mode: "0600"
+    content: |
+      Host net-*
+        StrictHostKeyChecking accept-new
+
+# ---------------------------------------------------------------------------
+# Le cluster prêt, pour les labs qui ne font pas installer Cilium
+# ---------------------------------------------------------------------------
+- name: Monter le cluster Cilium sans kube-proxy
+  when: cilium_etape | default('cluster') == 'cluster'
+  block:
+    - name: Fixer les valeurs du chart Cilium du socle
+      ansible.builtin.set_fact:
+        cilium_valeurs: >-
+          {{ {
+               'kubeProxyReplacement': true,
+               'k8sServiceHost': ansible_default_ipv4.address,
+               'k8sServicePort': 6443,
+               'ipam': {
+                 'mode': 'cluster-pool',
+                 'operator': {
+                   'clusterPoolIPv4PodCIDRList': ['10.244.0.0/16'],
+                   'clusterPoolIPv4MaskSize': 24
+                 }
+               },
+               'rollOutCiliumPods': true,
+               'operator': {'rollOutPods': true},
+               'hubble': {
+                 'enabled': true,
+                 'relay': {'enabled': true},
+                 'metrics': {
+                   'enabled': ['dns', 'drop', 'tcp', 'flow', 'port-distribution', 'icmp', 'httpV2']
+                 }
+               }
+             } | combine(cilium_valeurs_supplementaires | default({}), recursive=true) }}
+
+    # Sans --pod-network-cidr : en IPAM cluster-pool, c'est l'opérateur Cilium
+    # qui découpe le pool, pas le contrôleur de nœuds de Kubernetes.
+    - name: Initialiser le plan de contrôle sans kube-proxy
+      ansible.builtin.command:
+        cmd: kubeadm init --skip-phases=addon/kube-proxy
+        creates: /etc/kubernetes/admin.conf
+
+    - name: Créer le répertoire kube de root
+      ansible.builtin.file:
+        path: /root/.kube
+        state: directory
+        mode: "0700"
+
+    - name: Poser le kubeconfig pour root
+      ansible.builtin.file:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        state: link
+        force: true
+
+    - name: Créer le répertoire kube de l'utilisateur du lab
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ubuntu') }}/.kube"
+        state: directory
+        owner: "{{ ansible_user | default('ubuntu') }}"
+        mode: "0700"
+
+    - name: Donner le kubeconfig à l'utilisateur du lab
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "/home/{{ ansible_user | default('ubuntu') }}/.kube/config"
+        remote_src: true
+        owner: "{{ ansible_user | default('ubuntu') }}"
+        mode: "0600"
+
+    # Le taint du plan de contrôle reste : deux workers portent les charges,
+    # et l'opérateur Cilium (deux réplicas, un par nœud) y trouve sa place.
+    # Les DaemonSets de Cilium tolèrent ce taint et couvrent les trois nœuds.
+    - name: Lister les nœuds déjà joints
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+        -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+      register: cilium_noeuds_joints
+      changed_when: false
+
+    - name: Retenir les workers qui manquent encore au cluster
+      ansible.builtin.set_fact:
+        cilium_workers_manquants: "{{ cilium_workers | reject('in', cilium_noeuds_joints.stdout_lines) | list }}"
+
+    - name: Fabriquer une commande de jointure
+      ansible.builtin.command: kubeadm token create --print-join-command --ttl 30m
+      register: cilium_jointure
+      changed_when: true
+      when: cilium_workers_manquants | length > 0
+
+    # La jonction n'attend pas le CNI : le worker s'enregistre NotReady, et
+    # Cilium le rend Ready une fois installé.
+    - name: Joindre chaque worker manquant au cluster
+      ansible.builtin.command:
+        cmd: "{{ cilium_jointure.stdout }}"
+        creates: /etc/kubernetes/kubelet.conf
+      # `| default` : ansible-core évalue delegate_to même quand le bloc est
+      # sauté (étape « noeuds »), avant que la variable de boucle existe.
+      delegate_to: "{{ noeud | default(inventory_hostname) }}"
+      loop: "{{ cilium_workers_manquants | default([]) }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Déclarer le dépôt de charts de Cilium
+      ansible.builtin.command:
+        cmd: /usr/local/bin/helm repo add cilium https://helm.cilium.io
+      register: cilium_depot
+      changed_when: "'has been added' in cilium_depot.stdout"
+      failed_when: cilium_depot.rc != 0 and 'already exists' not in cilium_depot.stderr
+
+    - name: Lire les valeurs de la release Cilium en place
+      ansible.builtin.command:
+        cmd: /usr/local/bin/helm get values cilium --namespace kube-system -o json
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      register: cilium_valeurs_en_place
+      changed_when: false
+      failed_when: false
+
+    - name: Lire la version du chart Cilium en place
+      ansible.builtin.shell: |
+        set -o pipefail
+        /usr/local/bin/helm list --namespace kube-system --filter '^cilium$' -o json \
+          | python3 -c 'import json,sys; r=json.load(sys.stdin); print(r[0]["chart"] if r else "")'
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      register: cilium_chart_en_place
+      changed_when: false
+
+    - name: Écrire les valeurs du socle dans un fichier
+      ansible.builtin.copy:
+        dest: /root/cilium-socle-valeurs.yaml
+        mode: "0600"
+        content: "{{ cilium_valeurs | to_nice_yaml }}"
+
+    # Rejoué seulement si la release manque, si son chart n'est pas la
+    # 1.20.4, ou si ses valeurs diffèrent de celles du socle. Les valeurs se
+    # comparent en structures, pas en texte : l'ordre des clés ne compte pas.
+    - name: Installer ou ramener Cilium 1.20.4 aux valeurs du socle
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/bin/helm upgrade --install cilium cilium/cilium
+          --version 1.20.4 --namespace kube-system
+          --reset-values -f /root/cilium-socle-valeurs.yaml
+          --wait --timeout 10m
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      when: >-
+        cilium_valeurs_en_place.rc != 0
+        or cilium_chart_en_place.stdout | trim != 'cilium-1.20.4'
+        or (cilium_valeurs_en_place.stdout | from_json) != cilium_valeurs
+
+    - name: Attendre l'agent Cilium sur les trois nœuds
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        rollout status daemonset/cilium --timeout=600s
+      changed_when: false
+
+    - name: Attendre l'opérateur Cilium et Hubble Relay
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        rollout status deployment/{{ item }} --timeout=600s
+      changed_when: false
+      loop:
+        - cilium-operator
+        - hubble-relay
+
+    - name: Attendre que les trois nœuds soient Ready
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf wait --for=condition=Ready
+        nodes --all --timeout=300s
+      changed_when: false
+
+    - name: Attendre CoreDNS
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        rollout status deployment/coredns --timeout=300s
+      changed_when: false

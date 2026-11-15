@@ -48,3 +48,10 @@ sections:
       Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux
       seuls. Plusieurs compétences y sont invérifiables sur un cluster en
       conteneur, ce qui est la raison d'être des VM de ce catalogue.
+
+  - id: ckne
+    title: "Réseau avancé (CKNE)"
+    description: >-
+      Cinq domaines au programme de la CKNE. Service
+      Networking and DNS et Network Security and Policy pèsent 25 % chacun.
+      Les labs tournent sur un cluster Cilium dédié, sans kube-proxy.

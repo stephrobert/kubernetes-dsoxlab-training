@@ -271,7 +271,11 @@ def _version_kubernetes(mesures: dict[str, dict]) -> str:
     celle des validations serait pire que pas de version du tout. Plusieurs
     versions coexistant, on les rend toutes plutôt que d'en choisir une.
     """
-    versions = sorted({str(m.get("kubernetes", "")) for m in mesures.values() if m.get("kubernetes")})
+    # Seules les vraies versions comptent : un lab qui démarre sans cluster
+    # (k8s-creer-un-cluster-kind) est mesuré « aucun cluster », et cette mention
+    # française finissait telle quelle dans la table anglaise.
+    versions = sorted({str(m.get("kubernetes", "")) for m in mesures.values()
+                       if str(m.get("kubernetes", "")).startswith("v")})
     if not versions:
         return "non mesuré"
     return ", ".join(versions)

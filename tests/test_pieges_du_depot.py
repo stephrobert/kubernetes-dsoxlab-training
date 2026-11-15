@@ -143,12 +143,16 @@ def test_le_setup_installe_le_socle(lab: Path) -> None:
     setup = lab / "setup.yaml"
     assert setup.is_file(), f"{lab.name} n'a pas de setup.yaml."
 
-    # Deux socles : le cluster kubeadm des VM (shared/kubeadm-cluster.yml) et
+    # Trois socles : le cluster kubeadm des VM (shared/kubeadm-cluster.yml),
     # le cluster kind de l'hôte k8s-kind.lab (shared/kind-cluster.yml), sur
-    # lequel tournent les labs du module Fondamentaux.
+    # lequel tournent les labs du module Fondamentaux, et le cluster Cilium
+    # sans kube-proxy des hôtes optionnels net-* (shared/cilium-cluster.yml),
+    # sur lequel tournent les labs du niveau 6 « Réseau avancé ».
     texte = setup.read_text(encoding="utf-8")
-    assert "kubeadm-cluster.yml" in texte or "kind-cluster.yml" in texte, (
-        f"{setup.relative_to(RACINE)} n'inclut ni shared/kubeadm-cluster.yml ni shared/kind-cluster.yml.\n"
+    socles = ("kubeadm-cluster.yml", "kind-cluster.yml", "cilium-cluster.yml")
+    assert any(socle in texte for socle in socles), (
+        f"{setup.relative_to(RACINE)} n'inclut aucun socle : shared/kubeadm-cluster.yml, "
+        "shared/kind-cluster.yml ou shared/cilium-cluster.yml.\n"
         "Il n'y a aucun point d'accroche après le provisionnement : le cluster "
         "n'existe que parce que chaque lab l'installe. Ce lab tournera tant "
         "qu'un autre sera passé avant lui, et échouera seul sur un cluster neuf."

@@ -88,3 +88,21 @@ certifications:
       "Container Orchestration": 28
       "Cloud Native Application Delivery": 16
       "Cloud Native Architecture": 12
+
+  # Ajoutée le 2026-11-14 avec la section ckne du niveau 6 « Réseau avancé »
+  # (décision D84). CKNE_Curriculum.pdf ne porte AUCUN numéro de version, ni
+  # de Kubernetes : il se date par sa publication dans cncf/curriculum, le
+  # 2026-11-10. Poids relevés le 2026-11-14 dans le cadrage CKNE de la
+  # formation (todo/ckne-cadrage.md du site), qui précise que le PDF a été lu
+  # par l'orchestrateur et non relu par le cadrage : à confronter au PDF avec
+  # la procédure en tête de ce fichier avant de s'en servir comme source.
+  ckne:
+    version: "PDF 2026-11-10"
+    titre: "CKNE"
+    verifie_le: 2026-11-14
+    domaines:
+      "Service Networking and DNS": 25
+      "Network Security and Policy": 25
+      "Advanced Traffic Management": 20
+      "Core Infrastructure and CNI": 15
+      "Observability": 15
