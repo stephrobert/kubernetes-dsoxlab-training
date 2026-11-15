@@ -9,8 +9,7 @@
 # taint.
 #
 # `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Sept
-# critères à poids égal, seuil 70, trois bloquants. Quatre indices à 2, 3, 5 et
-# 5, annoncés dans le scénario avec leur effet sur la note.
+# critères à poids égal, seuil 70, trois bloquants. Aucun indice (D91, alignement sur la formation conteneurs).
 id: k8s-challenge-choisir-le-bon-workload
 title: "Choose and deploy the right workload for three needs"
 level: workloads

@@ -44,11 +44,8 @@ réussir quel que soit le total. Ce sont le volume créé pour `registre-donnees
 par la classe (exigence 1), le témoin relu intact (exigence 3), et la cause
 consignée avant la correction (exigence 5).
 
-Quatre **indices** sont proposés, et chacun retire des points du barème avant
-le calcul de la note : 2, 3, 5 puis 5, soit 15 au plus. Sans indice, six
-exigences donnent 100 et cinq en donnent 83. Avec les quatre, six exigences
-donnent 85 et cinq en donnent 71, encore au-dessus du seuil. Quatre exigences
-ne suffisent jamais : 67 au mieux.
+Six exigences réussies donnent 100 et cinq en donnent 83. Quatre exigences
+ne suffisent pas : 67, sous le seuil.
 
 Aucune procédure n'est donnée : les leçons du module ont tout enseigné.
 

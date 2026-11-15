@@ -7,8 +7,7 @@
 #
 # `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Six
 # critères à poids égal, seuil 70, trois bloquants, comme le challenge du
-# module 4. Quatre indices à 2, 3, 5 et 5, annoncés dans le scénario avec leur
-# effet sur la note.
+# module 4. Aucun indice (D91, alignement sur la formation conteneurs).
 id: k8s-challenge-donnees-qui-survivent
 title: "Keep data beyond the life of a Pod"
 level: storage

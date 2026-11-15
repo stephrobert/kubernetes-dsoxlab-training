@@ -45,12 +45,7 @@ soit le total. Ce sont la donnée du réplica 1 relue intacte (exigence 3), le
 taint du control plane gardé et toléré (exigence 5), et la Collecte `journaux`
 conforme avec sa ressource Established (exigence 6).
 
-Quatre **indices** sont proposés, et chacun retire des points du barème avant
-le calcul de la note : 2, 3, 5 puis 5, soit 15 au plus. Sans indice, sept
-exigences donnent 100, six en donnent 86 et cinq en donnent 71. Avec le premier
-indice, cinq exigences donnent encore 70 ; avec les deux premiers, elles n'en
-donnent plus que 68, sous le seuil. Avec les quatre, il faut au moins six
-exigences (73).
+Sept exigences réussies donnent 100, six en donnent 86 et cinq en donnent 71.
 
 Aucune procédure n'est donnée : les leçons du module ont tout enseigné.
 
