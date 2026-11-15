@@ -1,0 +1,40 @@
+---
+# Joué par `dsoxlab run`.
+#
+#   1. le socle Cilium à l'étape `cluster` : le cluster sans kube-proxy des
+#      hôtes net-*, Cilium 1.20.4 avec Hubble, Relay et les métriques du
+#      socle. Si un passage précédent a changé la configuration de Cilium
+#      (métriques par Pod, export des flux), le socle la ramène à la sienne et
+#      les agents redémarrent : leurs compteurs repartent de zéro ;
+#   2. les journaux d'export Hubble qu'un passage précédent aurait laissés sur
+#      les nœuds sont retirés, APRÈS le retour des agents à la configuration du
+#      socle, qui n'exporte rien : retirés avant, un agent encore configuré les
+#      réécrirait ;
+#   3. la situation du lab (fixtures/prepare.sh) : une API sur net-w1.lab, trois
+#      clients sur net-w2.lab, une NetworkPolicy qui en refuse un, tiré au sort.
+- name: Préparer le lab k8s-auditer-les-flux-avec-hubble
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer les journaux d'export Hubble d'un passage précédent
+      ansible.builtin.shell: |
+        rm -f /var/run/cilium/hubble/events*
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Poser l'API, ses trois clients et la politique qui en refuse un
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

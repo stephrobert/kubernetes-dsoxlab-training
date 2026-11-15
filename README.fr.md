@@ -387,9 +387,20 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 28 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 | 29 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | Examen blanc CKS : 16 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
-Total : **127 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+### Réseau avancé (CKNE)
 
-**Runtime validé : Kubernetes aucun cluster, v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
+Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Security and Policy pèsent 25 % chacun. Les labs tournent sur un cluster Cilium dédié, sans kube-proxy.
+
+2 lab(s).
+
+| # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
+|---|---|---|---|---|---|---|
+| 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Installer Cilium sans kube-proxy | core-infrastructure-and-cni | 45m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
+| 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Auditer les flux réseau avec Hubble | observability | 40m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
+
+Total : **129 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+
+**Runtime validé : Kubernetes v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-11-10** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 
 <!-- LABS:END -->
 

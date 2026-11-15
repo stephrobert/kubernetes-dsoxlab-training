@@ -1,0 +1,32 @@
+title: "Installer Cilium sans kube-proxy"
+description: |
+  Initialiser un cluster kubeadm sans kube-proxy, y joindre deux workers,
+  installer Cilium 1.20.4 par Helm en remplacement de kube-proxy sur un pool
+  d'adresses de Pods choisi, puis prouver qu'un Service est servi par Cilium
+  et non par des règles iptables.
+
+criteria:
+  - id: cluster-sans-kube-proxy
+    label: "Le cluster est initialisé sans kube-proxy"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: noeuds-joints
+    label: "Les deux workers sont joints et les trois nœuds sont Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: remplacement-de-kube-proxy
+    label: "Cilium 1.20.4 tourne sur chaque nœud avec KubeProxyReplacement True"
+  - id: aucune-regle-kube-proxy
+    label: "Aucun nœud ne porte de règle de kube-proxy (KUBE-SVC, KUBE-SERVICES) alors que les Services sont servis"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: service-servi-par-cilium
+    label: "Le Service web répond depuis un worker et c'est Cilium qui le sert"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: pool-cluster-pool
+    label: "Les Pods prennent leur adresse dans le pool cluster-pool 10.244.0.0/16"

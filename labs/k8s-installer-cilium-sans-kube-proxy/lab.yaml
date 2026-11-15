@@ -1,0 +1,110 @@
+# Lab guidé de la leçon L1 du module « Réseau avancé » (niveau 6, CKNE),
+# « Installer Cilium sans kube-proxy et choisir son IPAM ». Objectifs CKNE
+# servis : « Installing and Configuring CNI Plugins », « Managing IPAM and Pod
+# CIDR Allocation », « Understanding kube-proxy and CNI Alternatives », tous
+# du domaine Core Infrastructure and CNI.
+#
+# Le geste : initialiser un cluster kubeadm sans kube-proxy, y joindre deux
+# workers, installer Cilium 1.20.4 par Helm en remplacement de kube-proxy, sur
+# un pool d'adresses de Pods choisi, puis prouver qu'un Service est servi par
+# Cilium et non par des règles iptables.
+#
+# Le cluster est celui des hôtes optionnels net-* (shared/cilium-cluster.yml),
+# distinct du cluster partagé k8s-cp/k8s-w1. Le setup y laisse trois nœuds
+# prêts et AUCUN cluster ; le cleanup remet les trois nœuds à zéro par
+# kubeadm reset (shared/cilium-remettre-a-zero.yml), l'état que le lab
+# suivant attend pour remonter le cluster prêt.
+#
+# Briques attestées réutilisées : cka-initialiser-un-plan-de-controle et
+# cka-joindre-un-noeud-kubeadm (kubeadm init, jonction, lecture des nœuds),
+# ckad-helm-install-upgrade (Helm 4.3.0), ckad-expose-service (un Service
+# ClusterIP joint depuis un nœud).
+#
+# RISQUE R3 du cadrage : Cilium 1.20.4 déclare Kubernetes 1.33 à 1.36, et le
+# cluster tourne en 1.37. Le scénario le dit à l'apprenant.
+id: k8s-installer-cilium-sans-kube-proxy
+title: "Install Cilium without kube-proxy"
+level: core-infrastructure-and-cni
+section: ckne
+difficulty: advanced
+description: |
+  Initialise a kubeadm cluster without kube-proxy, join two workers, install
+  Cilium 1.20.4 with Helm as the kube-proxy replacement on a chosen Pod
+  address pool, then prove that a Service is served by Cilium and not by
+  iptables rules.
+skills:
+  - cilium
+  - kube-proxy-replacement
+  - cni
+  - ipam
+  - kubeadm
+  - helm
+distros:
+  - ubuntu24
+# La leçon cilium/ n'a pas de jumelle anglaise (table fr_vers_en du
+# 2026-11-14) : l'URL française vaut pour les deux langues.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+lab_type: lab
+estimated_time: 45m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # Les deux workers sont remis à zéro par le setup et joints par
+      # l'apprenant : `roles` déclare les hôtes utilisés en même temps, et
+      # c'est ce champ qui les fait monter par dsoxlab.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: cluster-sans-kube-proxy
+    label: "The cluster is initialised without kube-proxy"
+    tests:
+      - test_le_cluster_est_initialise_sans_kube_proxy
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-kubernetes-with-kubeadm/
+  - id: noeuds-joints
+    label: "Both workers are joined and the three nodes are Ready"
+    tests:
+      - test_les_trois_noeuds_sont_joints_et_ready
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-kubernetes-with-kubeadm/
+  - id: remplacement-de-kube-proxy
+    label: "Cilium 1.20.4 runs on every node with KubeProxyReplacement True"
+    tests:
+      - test_cilium_1_20_4_remplace_kube_proxy_sur_chaque_noeud
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+  - id: aucune-regle-kube-proxy
+    label: "No node carries kube-proxy rules (KUBE-SVC, KUBE-SERVICES) while Services are served"
+    tests:
+      - test_aucune_regle_kube_proxy_sur_les_noeuds
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/pod-networking/
+  - id: service-servi-par-cilium
+    label: "The web Service answers from a worker and is served by Cilium"
+    tests:
+      - test_le_service_web_repond_par_cilium
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: pool-cluster-pool
+    label: "Pods take their address from the cluster-pool 10.244.0.0/16"
+    tests:
+      - test_les_pods_prennent_leur_adresse_dans_le_pool_cluster_pool
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/

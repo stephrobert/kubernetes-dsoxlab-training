@@ -48,7 +48,10 @@ FQDN = re.compile(r"""["']([a-z0-9][a-z0-9.-]*\.lab)["']""")
 
 def _hotes_du_catalogue() -> set[str]:
     meta = yaml.safe_load((RACINE / "meta.yml").read_text(encoding="utf-8")) or {}
-    hosts = ((meta.get("infra") or {}).get("hosts")) or []
+    # Les hôtes optionnels comptent aussi (dsoxlab 0.9.0) : `start` ne les
+    # monte que si le lab les déclare, exactement comme les hôtes communs.
+    infra = meta.get("infra") or {}
+    hosts = (infra.get("hosts") or []) + (infra.get("optional_hosts") or [])
     return {h["name"] for h in hosts if h.get("name")}
 
 

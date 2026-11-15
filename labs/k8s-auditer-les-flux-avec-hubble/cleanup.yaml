@@ -1,0 +1,52 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset`.
+#
+# Le cluster Cilium RESTE : le lab suivant s'en sert. Ne partent que les
+# objets du lab et ce que sa solution a changé, dans cet ordre :
+#
+#   1. la configuration de Cilium est ramenée à celle du socle
+#      (shared/cilium-cluster.yml rejoue le chart seulement si ses valeurs ont
+#      changé) : les métriques par Pod et l'export des flux disparaissent, et
+#      les agents redémarrent ;
+#   2. les journaux d'export sont retirés des trois nœuds, une fois les agents
+#      revenus à une configuration qui n'exporte rien ;
+#   3. le namespace magasin, et la référence du client refusé.
+- name: Défaire le lab k8s-auditer-les-flux-avec-hubble
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer les journaux d'export Hubble des trois nœuds
+      ansible.builtin.shell: |
+        rm -f /var/run/cilium/hubble/events*
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace magasin --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Retirer la référence du client refusé
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab-labs/k8s-auditer-les-flux-avec-hubble.ref
+        state: absent
+
+    - name: Retirer la configuration Helm de l'utilisateur du lab
+      ansible.builtin.shell: |
+        maison="$(getent passwd '{{ ansible_user | default('ubuntu') }}' | cut -d: -f6)"
+        rm -rf "$maison/.config/helm" "$maison/.cache/helm"
+      args:
+        executable: /bin/bash
+      changed_when: true
