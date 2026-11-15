@@ -1,0 +1,68 @@
+title: "Épreuve du niveau 5 : sécuriser un cluster"
+description: |
+  À partir d'un état hérité faible et d'un cahier des charges qui ne nomme
+  aucun objet Kubernetes, sécurisez le cluster qui héberge la boutique :
+  durcissez son plan de contrôle, tracez les lectures de Secrets, faites
+  refuser ce qui enfreint une règle, reprenez un Pod privilégié, confinez les
+  charges face au noyau, exigez le TLS mutuel et fermez le réseau par défaut,
+  détectez un shell, et ne laissez entrer qu'une image épinglée, signée et
+  analysée, sans que la boutique cesse de répondre.
+
+criteria:
+  - id: p01-profileur-ferme
+    label: "P01 (critique) : le profileur de l'API server ne répond plus, et l'API répond toujours"
+  - id: p02-audit-cis
+    label: "P02 : un nouvel audit CIS compte moins d'échecs qu'au départ, et les contrôles de profilage passent"
+  - id: p03-audit-active
+    label: "P03 : l'API server tourne avec l'audit activé, fichier de politique et journal montés"
+  - id: p04-journal-d-audit
+    label: "P04 (critique) : le journal enregistre une lecture de Secret en entier et une lecture banale en métadonnées seulement"
+  - id: p05-standard-restricted
+    label: "P05 (critique) : l'espace de la boutique refuse un Pod qui viole le standard restricted et accepte un Pod conforme"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: p06-image-par-tag-refusee
+    label: "P06 (critique) : le cluster refuse un Pod dont l'image est désignée par un tag et accepte celui dont l'image est épinglée, sans toucher aux autres espaces"
+  - id: p07-pod-privilegie-repris
+    label: "P07 : le Pod privilégié hérité est remplacé par un Pod sans ses défauts, l'original n'existe plus et les processus de l'hôte ne sont plus visibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: p08-apparmor
+    label: "P08 : le profil AppArmor est chargé en enforce et le Pod confiné peut lire mais plus écrire dans /tmp"
+  - id: p09-seccomp
+    label: "P09 : le profil seccomp refuse la famille chmod et autorise le reste, et le Pod qui le déclare tourne"
+  - id: p10-tls-mutuel
+    label: "P10 (critique) : l'espace maillé exige le TLS mutuel, un client sans sidecar est bloqué et un client du maillage passe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: p11-reseau-ferme
+    label: "P11 : l'espace est fermé par défaut dans les deux sens, seul le flux prévu atteint la base et le DNS résout"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: p12-bac-a-sable
+    label: "P12 : une classe de runtime désigne le runtime bac à sable du nœud et le Pod qui l'emploie lit un autre noyau que celui de la machine"
+  - id: p13-falco-shell
+    label: "P13 (critique) : un shell dans l'espace protégé lève une alerte de la règle Falco demandée, avec sa priorité, et pas un shell ouvert ailleurs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+  - id: p14-regles-falco-intactes
+    label: "P14 : les règles Falco livrées avec le paquet sont intactes"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+  - id: p15-digest-execute
+    label: "P15 : le déploiement de la boutique référence son image par le digest que le nœud exécute réellement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: p16-signature
+    label: "P16 : la clé publique est publiée dans le cluster, l'image est signée, et la vérification l'accepte et en refuse une autre"
+  - id: p17-moins-de-failles
+    label: "P17 : l'image de production porte strictement moins de failles critiques que l'image d'origine"
+  - id: p18-dockerfile
+    label: "P18 : les constats de l'analyse statique du Dockerfile ont disparu et l'application fait toujours la même chose"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: p19-la-boutique-repond
+    label: "P19 (critique) : la boutique répond toujours après tous les durcissements, avec ses réplicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/

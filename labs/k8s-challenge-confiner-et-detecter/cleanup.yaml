@@ -1,0 +1,120 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : retire tout ce que le challenge
+# et sa solution posent, dans le cluster ET sur le nœud.
+#
+#   - cluster : les quatre namespaces, la RuntimeClass (objet de cluster, qui
+#     survivrait aux namespaces), Istio en entier et les ConfigMaps istio-ca-*
+#     qu'istiod sème dans chaque namespace (relevé de cks-istio-mtls-lockdown) ;
+#   - nœud : le profil AppArmor, le profil seccomp, et Falco. Le validateur
+#     photographie le cluster, pas le disque : un profil laissé ferait passer le
+#     prochain passage avant tout travail sans que rien ne le dise.
+#
+# Falco est purgé plutôt qu'arrêté : il tourne en permanence et coûte de la
+# mémoire au plan de contrôle, que les labs suivants n'ont pas à payer. Le
+# runtime runsc reste déclaré à containerd, comme après
+# cks-runtime-sandbox-gvisor : il ne coûte rien tant qu'aucun Pod ne le demande.
+- name: Défaire le challenge k8s-challenge-confiner-et-detecter
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer les quatre namespaces du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace coffre maille exterieur donnees
+        --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer la RuntimeClass du bac à sable
+      ansible.builtin.command: >-
+        {{ kubectl }} delete runtimeclass gvisor-coffre --ignore-not-found --wait=true --timeout=60s
+      changed_when: true
+      failed_when: false
+
+    - name: Désinstaller Istio en entier
+      ansible.builtin.command: istioctl uninstall --purge -y
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace d'Istio
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace istio-system --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    # Retrait par PRÉFIXE, comme cks-istio-mtls-lockdown : istio-ca-root-cert
+    # puis istio-ca-crl ont été trouvés l'un après l'autre par le validateur.
+    - name: Retirer les ConfigMaps qu'istiod distribue dans tous les namespaces
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+          kubectl get namespace -o name | sed 's|namespace/||' | while read -r ns; do
+            kubectl get configmap -n "$ns" -o name 2>/dev/null \
+              | grep -E '^configmap/istio-ca-' \
+              | xargs -r kubectl delete -n "$ns" --ignore-not-found >/dev/null
+          done
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Décharger le profil AppArmor du challenge, par son nom
+      ansible.builtin.shell:
+        cmd: |
+          if [ -e /sys/kernel/security/apparmor/.remove ]; then
+            printf '%s' k8s-coffre-sans-tmp > /sys/kernel/security/apparmor/.remove 2>/dev/null || true
+          fi
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Effacer tout fichier qui déclare ce profil AppArmor
+      ansible.builtin.shell:
+        cmd: |
+          { grep -lsE '^[[:space:]]*profile[[:space:]]+k8s-coffre-sans-tmp([[:space:]]|\{|$)' /etc/apparmor.d/* || true; } \
+            | xargs -r rm -f
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le profil seccomp du challenge
+      ansible.builtin.file:
+        path: /var/lib/kubelet/seccomp/profiles/coffre-sans-chmod.json
+        state: absent
+
+    - name: Arrêter Falco
+      ansible.builtin.command: systemctl stop falco-modern-bpf.service
+      changed_when: true
+      failed_when: false
+
+    - name: Purger le paquet Falco
+      ansible.builtin.apt:
+        name: falco
+        state: absent
+        purge: true
+        lock_timeout: 300
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Effacer la configuration, les règles et le journal de Falco
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/falco
+        - /var/log/falco
+        - /etc/apt/sources.list.d/falcosecurity.list
+        - /usr/share/keyrings/falco-archive-keyring.gpg
+
+    - name: Attendre que l'API server réponde
+      ansible.builtin.command: >-
+        {{ kubectl }} get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

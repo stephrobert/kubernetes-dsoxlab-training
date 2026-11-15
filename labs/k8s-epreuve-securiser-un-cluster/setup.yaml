@@ -1,0 +1,85 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, les outils de la
+# chaîne d'approvisionnement posés par mise (versions des labs cks-* qui les
+# emploient), le répertoire du catalogue de la boutique, puis l'état hérité de
+# l'épreuve (fixtures/prepare.sh).
+- name: Préparer l'épreuve k8s-epreuve-securiser-un-cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Vérifier qu'AppArmor est bien actif sur le nœud
+      ansible.builtin.command: aa-status --enabled
+      register: aa
+      changed_when: false
+      failed_when: false
+
+    - name: Refuser de continuer si AppArmor est absent
+      ansible.builtin.fail:
+        msg: >-
+          AppArmor n'est pas actif sur ce nœud. Cette épreuve exige une vraie
+          machine, pas un nœud en conteneur.
+      when: aa.rc != 0
+
+    - name: Poser istioctl sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: istioctl
+        outil_version: "1.31.0"
+        outil_verification: version --remote=false
+
+    - name: Poser Trivy sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: trivy
+        outil_version: "0.74.0"
+
+    - name: Poser cosign sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: cosign
+        outil_version: "3.1.3"
+        outil_verification: version
+
+    - name: Poser crane sur le nœud avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: crane
+        outil_version: "0.22.1"
+        outil_verification: version
+
+    # Le répertoire repart de zéro : un Dockerfile corrigé ou une paire de clés
+    # d'un passage précédent ferait passer P16 ou P18 avant le travail.
+    - name: Retirer le répertoire du catalogue d'un passage précédent
+      ansible.builtin.file:
+        path: /root/boutique
+        state: absent
+
+    - name: Créer le répertoire du catalogue de la boutique
+      ansible.builtin.file:
+        path: /root/boutique/site
+        state: directory
+        mode: "0755"
+
+    - name: Déposer le Dockerfile hérité du catalogue
+      ansible.builtin.copy:
+        src: fixtures/Dockerfile
+        dest: /root/boutique/Dockerfile
+        mode: "0644"
+        force: true
+
+    - name: Déposer la page du catalogue
+      ansible.builtin.copy:
+        src: fixtures/site/index.html
+        dest: /root/boutique/site/index.html
+        mode: "0644"
+        force: true
+
+    - name: Poser l'état hérité de l'épreuve
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

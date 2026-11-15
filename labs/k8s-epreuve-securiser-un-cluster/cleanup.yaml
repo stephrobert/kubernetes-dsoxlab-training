@@ -1,0 +1,43 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : défait l'épreuve dans le
+# cluster ET sur le nœud. Le gros du travail est dans fixtures/nettoyer.sh,
+# parce que les noms à retirer sont libres et se LISENT d'abord (profil
+# AppArmor que le Pod déclarait, chemins d'audit que l'API server désignait,
+# objets de cluster absents du relevé du setup).
+#
+# Ce qui est rendu : les trois manifestes du plan de contrôle, les espaces de
+# l'épreuve, les classes de runtime et politiques d'admission créées, Istio en
+# entier, les profils, les fichiers d'audit, Falco, /root/boutique. Restent,
+# comme après les labs cks-* qui les posent : runsc déclaré à containerd, et
+# les outils posés par mise (trivy et sa base, cosign, crane, istioctl).
+- name: Défaire l'épreuve k8s-epreuve-securiser-un-cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Lire puis retirer ce que l'épreuve a posé, et rendre le plan de contrôle
+      ansible.builtin.script: fixtures/nettoyer.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      failed_when: false
+
+    - name: Supprimer les espaces de l'épreuve, s'il en reste
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace
+        boutique coffre commandes exterieur paiement registre conformite
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Attendre que les Pods du plan de contrôle soient Running
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
+        get pods -l tier=control-plane
+        -o jsonpath={.items[*].status.phase}
+      register: phases
+      until: phases.stdout and 'Pending' not in phases.stdout
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

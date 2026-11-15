@@ -380,6 +380,11 @@ sections:
       # et l'apprenant qui a posé un default-deny voit mieux ce que le
       # chiffrement ajoute par-dessus.
       - cks-istio-mtls-lockdown
+      # Le challenge du module « Confiner et détecter » (niveau 5), posé dans
+      # la leçon « Runtime Sandboxes », après les labs du module qu'il croise :
+      # AppArmor, seccomp, gVisor, la NetworkPolicy par défaut et le mTLS. Il y
+      # ajoute Falco, qu'aucun autre lab du catalogue n'emploie.
+      - k8s-challenge-confiner-et-detecter
       - cks-ingress-tls
       # Niveau 4, lot A (vague 1) : des certificats émis par cert-manager et
       # une CA interne, juste après le TLS d'un Ingress.
@@ -399,6 +404,10 @@ sections:
       # Le challenge du module, posé dans la leçon Déni de service : il croise
       # les deux labs guidés précédents sur un autre scénario.
       - k8s-challenge-contenir-une-attaque
+      # L'épreuve de fin du niveau 5 (KUBERN-EPREUVE-N5), après tous les labs
+      # du niveau qu'elle croise : plan de contrôle, audit, admission,
+      # confinement, réseau, Falco et chaîne d'approvisionnement.
+      - k8s-epreuve-securiser-un-cluster
 
       # Le capstone vient en dernier, comme ceux du CKA et du CKAD : il ne
       # nomme plus aucun objet Kubernetes, et ne s'adresse donc qu'à qui a
