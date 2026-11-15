@@ -397,8 +397,8 @@ Five domains in the CKNE curriculum. Service Networking and DNS and Network Secu
 |---|---|---|---|---|---|---|
 | 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Install Cilium without kube-proxy | core-infrastructure-and-cni | 45m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 | 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
-| 3 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Serve an Istio Gateway over HTTPS with a cert-manager certificate | network-security-policy | 35m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 4 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Route inference requests by replica load with the Gateway API Inference Extension | advanced-traffic-management | 35m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 3 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Serve an Istio Gateway over HTTPS with a cert-manager certificate | network-security-policy | 35m | 2026-11-15 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 4 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Route inference requests by replica load with the Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
 
 Total: **131 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 

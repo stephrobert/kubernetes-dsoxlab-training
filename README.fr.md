@@ -399,8 +399,8 @@ Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Sec
 |---|---|---|---|---|---|---|
 | 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Installer Cilium sans kube-proxy | core-infrastructure-and-cni | 45m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 | 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Auditer les flux réseau avec Hubble | observability | 40m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
-| 3 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Servir une Gateway d'Istio en HTTPS avec un certificat de cert-manager | network-security-policy | 35m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 4 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension | advanced-traffic-management | 35m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 3 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Servir une Gateway d'Istio en HTTPS avec un certificat de cert-manager | network-security-policy | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 4 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
 
 Total : **131 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
