@@ -54,6 +54,7 @@ criteria:
     label: "P12 (critique) : le nœud NotReady est Ready et son kubelet survivra à un redémarrage"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
   - id: p13-api-server-repare
     label: "P13 (critique) : l'API server dont un flag est faux répond de nouveau et autorise toujours Node,RBAC"
     lessons:
@@ -62,10 +63,12 @@ criteria:
     label: "P14 : l'application en CrashLoopBackOff a ses réplicas disponibles, ne redémarre plus et lit sa configuration au bon endroit"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
   - id: p15-causes-consignees
     label: "P15 : la cause de chaque panne est consignée à partir de describe, des événements ou des journaux avant la réparation"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
   - id: p16-modification-versionnee
     label: "P16 : un champ modifié en direct pendant l'incident porte la même valeur dans le manifeste versionné"
   - id: p17-certificats
