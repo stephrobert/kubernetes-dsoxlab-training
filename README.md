@@ -11,7 +11,9 @@
 A catalogue of **verifiable labs and capstones** for the
 [Kubernetes training](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/)
 on Stéphane Robert's blog. Played by the
-[dsoxlab](https://github.com/stephrobert/dsoxlab) CLI.
+[dsoxlab](https://github.com/stephrobert/dsoxlab) CLI. The site lists them, by
+certification and by lab type, on its
+[Kubernetes labs page](https://www.stephane-robert.info/en/labs/kubernetes/).
 
 ## What it is
 

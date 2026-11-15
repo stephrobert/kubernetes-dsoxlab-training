@@ -7,12 +7,15 @@
 #   - boutique : le catalogue (nginx-unprivileged 1.21, par TAG, 2 réplicas,
 #     sans contexte de sécurité), son Service, son Secret, et outil-ancien, un
 #     Pod privilégié ; aucun standard, aucune politique d'admission ;
-#   - coffre : tresor (le Pod protégé) et ordinaire (témoin du runtime par
-#     défaut), sur k8s-cp.lab, là où vivent Falco, runsc et les profils ;
-#   - commandes : un maillage Istio permissif (api, client-maille) ;
-#   - exterieur : client-nu (sans sidecar), curieux (le shell d'ailleurs, sur
-#     k8s-cp.lab) et temoin-http (une cible hors de paiement) ;
-#   - paiement : base, caisse, intrus et annuaire, sans politique réseau ;
+#   - facturation : export-comptable (le Pod surveillé) et temoin-noyau (témoin
+#     du runtime par défaut), sur k8s-cp.lab, là où vivent Falco, runsc et les
+#     profils ;
+#   - commandes : un maillage Istio permissif (suivi, panier) ;
+#   - partenaires : transporteur (sans sidecar), visiteur (l'outil réseau
+#     d'ailleurs, sur k8s-cp.lab) et site-partenaire (une cible hors de
+#     paiement) ;
+#   - paiement : grand-livre, caisse, publicite et fidelite, sans politique
+#     réseau ;
 #   - registre : un registre local sur le port 5000 du nœud, qui porte l'image
 #     d'origine du catalogue et une autre image, aucune signée ;
 #   - nœud : Falco (modern_ebpf, sortie JSON), gVisor connu de containerd,
@@ -25,8 +28,9 @@
 # cks-apparmor-confiner-un-pod, cks-seccomp-profile, cks-runtime-sandbox-gvisor,
 # cks-istio-mtls-lockdown, cks-networkpolicy-default-deny,
 # cks-image-pinned-digest, cks-cosign-verify-image, cks-image-scanning-trivy,
-# cks-dockerfile-static-analysis ; Falco reprend
-# k8s-challenge-confiner-et-detecter.
+# cks-dockerfile-static-analysis ; l'installation de Falco reprend
+# k8s-challenge-confiner-et-detecter, avec d'autres espaces, d'autres Pods et
+# une autre règle à écrire que ce challenge (décision D57).
 #
 # Rejouable : ce qu'un passage précédent a laissé est retiré avant d'être reposé.
 set -euo pipefail
@@ -43,7 +47,7 @@ IMAGE_ORIGINE=nginxinc/nginx-unprivileged:1.21
 ETAT=/var/lib/dsoxlab/epreuve-securiser-un-cluster
 MANIFESTES=/etc/kubernetes/manifests
 COMPOSANTS=(kube-apiserver kube-controller-manager kube-scheduler)
-NAMESPACES=(boutique coffre commandes exterieur paiement registre conformite)
+NAMESPACES=(boutique facturation commandes partenaires paiement registre conformite)
 
 # gVisor épinglé sur une publication datée (relevé du 2026-11-14 dans le dépôt
 # officiel storage.googleapis.com/gvisor), Falco sur la dernière version de
@@ -225,7 +229,7 @@ done
 # Les profils que les Pods d'un passage précédent déclaraient : le nom du
 # profil AppArmor et le chemin du profil seccomp sont libres, on les lit donc
 # sur les Pods avant de les retirer.
-profil_aa=$(kubectl -n coffre get pod lecteur -o json 2>/dev/null \
+profil_aa=$(kubectl -n facturation get pod consultation -o json 2>/dev/null \
   | python3 -c 'import json,sys
 p=json.load(sys.stdin)["spec"]
 c=[p.get("securityContext") or {}]+[x.get("securityContext") or {} for x in p["containers"]]
@@ -234,7 +238,7 @@ for nom in $profil_aa; do
   printf '%s' "$nom" > /sys/kernel/security/apparmor/.remove 2>/dev/null || true
   { grep -lsE "^[[:space:]]*profile[[:space:]]+${nom}([[:space:]]|\{|$)" /etc/apparmor.d/* || true; } | xargs -r rm -f
 done
-profil_sc=$(kubectl -n coffre get pod calcul -o json 2>/dev/null \
+profil_sc=$(kubectl -n facturation get pod numerotation -o json 2>/dev/null \
   | python3 -c 'import json,sys
 p=json.load(sys.stdin)["spec"]
 c=[p.get("securityContext") or {}]+[x.get("securityContext") or {} for x in p["containers"]]
@@ -321,28 +325,30 @@ spec:
         runAsUser: 0
         allowPrivilegeEscalation: true
 ---
-# --- coffre ------------------------------------------------------------------
+# --- facturation : les factures de la boutique --------------------------------
+# export-comptable envoie chaque nuit les écritures au cabinet comptable par un
+# canal déjà ouvert : aucun outil de téléchargement n'a à y tourner.
 apiVersion: v1
 kind: Pod
 metadata:
-  name: tresor
-  namespace: coffre
+  name: export-comptable
+  namespace: facturation
   labels:
-    app: tresor
+    app: export-comptable
 spec:
   nodeName: ${NOEUD}
   containers:
-    - name: tresor
+    - name: export
       image: ${BUSYBOX}
       command: ["sh", "-c", "sleep 86400"]
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ordinaire
-  namespace: coffre
+  name: temoin-noyau
+  namespace: facturation
   labels:
-    app: ordinaire
+    app: temoin-noyau
 spec:
   nodeName: ${NOEUD}
   containers:
@@ -350,14 +356,14 @@ spec:
       image: ${BUSYBOX}
       command: ["sh", "-c", "sleep 86400"]
 ---
-# --- commandes : le maillage --------------------------------------------------
+# --- commandes : le suivi des commandes, dans le maillage --------------------
 apiVersion: v1
 kind: Pod
 metadata:
-  name: api
+  name: suivi
   namespace: commandes
   labels:
-    app: api
+    app: suivi
 spec:
   containers:
     - name: web
@@ -368,11 +374,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api
+  name: suivi
   namespace: commandes
 spec:
   selector:
-    app: api
+    app: suivi
   ports:
     - port: 80
       targetPort: 80
@@ -380,35 +386,39 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: client-maille
+  name: panier
   namespace: commandes
   labels:
-    app: client
+    app: panier
 spec:
   containers:
     - name: outil
       image: ${BUSYBOX}
       command: ["sh", "-c", "sleep 86400"]
 ---
-# --- exterieur ----------------------------------------------------------------
+# --- partenaires : hors du maillage et hors de paiement ----------------------
 apiVersion: v1
 kind: Pod
 metadata:
-  name: client-nu
-  namespace: exterieur
+  name: transporteur
+  namespace: partenaires
+  labels:
+    app: transporteur
 spec:
   containers:
     - name: outil
       image: ${BUSYBOX}
       command: ["sh", "-c", "sleep 86400"]
 ---
-# Sur k8s-cp.lab, là où Falco regarde : un shell ailleurs doit être VU pour
-# que son silence prouve quelque chose.
+# Sur k8s-cp.lab, là où Falco regarde : un outil réseau lancé ailleurs doit
+# être VU pour que son silence prouve quelque chose.
 apiVersion: v1
 kind: Pod
 metadata:
-  name: curieux
-  namespace: exterieur
+  name: visiteur
+  namespace: partenaires
+  labels:
+    app: visiteur
 spec:
   nodeName: ${NOEUD}
   containers:
@@ -419,10 +429,10 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: temoin-http
-  namespace: exterieur
+  name: site-partenaire
+  namespace: partenaires
   labels:
-    app: temoin-http
+    app: site-partenaire
 spec:
   containers:
     - name: web
@@ -430,14 +440,15 @@ spec:
       ports:
         - containerPort: 80
 ---
-# --- paiement : la base, son client légitime, un intrus, un second serveur ---
+# --- paiement : le grand livre, la caisse qui l'alimente, un traceur
+# publicitaire embarqué par erreur, et le programme de fidélité ----------------
 apiVersion: v1
 kind: Pod
 metadata:
-  name: base
+  name: grand-livre
   namespace: paiement
   labels:
-    app: base
+    app: grand-livre
 spec:
   containers:
     - name: base
@@ -461,7 +472,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: intrus
+  name: publicite
   namespace: paiement
   labels:
     tier: inconnu
@@ -474,10 +485,10 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: annuaire
+  name: fidelite
   namespace: paiement
   labels:
-    app: annuaire
+    app: fidelite
 spec:
   containers:
     - name: service
@@ -508,10 +519,10 @@ YAML
 
 kubectl -n boutique rollout status deployment/catalogue --timeout=300s
 kubectl -n boutique wait --for=condition=ready pod/outil-ancien --timeout=240s
-kubectl -n coffre wait --for=condition=ready pod/tresor pod/ordinaire --timeout=240s
-kubectl -n commandes wait --for=condition=ready pod/api pod/client-maille --timeout=300s
-kubectl -n exterieur wait --for=condition=ready pod/client-nu pod/curieux pod/temoin-http --timeout=240s
-kubectl -n paiement wait --for=condition=ready pod/base pod/caisse pod/intrus pod/annuaire --timeout=240s
+kubectl -n facturation wait --for=condition=ready pod/export-comptable pod/temoin-noyau --timeout=240s
+kubectl -n commandes wait --for=condition=ready pod/suivi pod/panier --timeout=300s
+kubectl -n partenaires wait --for=condition=ready pod/transporteur pod/visiteur pod/site-partenaire --timeout=240s
+kubectl -n paiement wait --for=condition=ready pod/grand-livre pod/caisse pod/publicite pod/fidelite --timeout=240s
 kubectl -n registre wait --for=condition=ready pod/registre --timeout=240s
 
 # ---------------------------------------------------------------------------
@@ -598,8 +609,8 @@ trivy image --quiet --download-db-only 2>&1 | tail -3 || true
 trivy image --quiet --scanners vuln --severity CRITICAL "$IMAGE_ORIGINE" >/dev/null 2>&1 || true
 
 # ---------------------------------------------------------------------------
-# 10. Les sondes : un Pod démarre-t-il dans runsc, et Falco voit-il le
-#     namespace d'un shell ? Chacune est retirée derrière elle.
+# 10. Les sondes : un Pod démarre-t-il dans runsc, et Falco voit-il wget
+#     lancé dans un Pod, avec son namespace ? Chacune est retirée derrière elle.
 # ---------------------------------------------------------------------------
 NS_SONDE=dsoxlab-sonde-runsc
 SONDE_FALCO=/etc/falco/rules.d/zz-dsoxlab-sonde.yaml
@@ -650,16 +661,19 @@ kubectl delete namespace "$NS_SONDE" --ignore-not-found --wait=true
 cat > "$SONDE_FALCO" <<'YAML'
 - rule: dsoxlab-sonde
   desc: Sonde du setup, retiree aussitot
-  condition: spawned_process and container and k8s.ns.name = "exterieur" and proc.cmdline contains "dsoxlab-sonde-falco"
-  output: "sonde dsoxlab ns=%k8s.ns.name pod=%k8s.pod.name"
+  condition: spawned_process and container and k8s.ns.name = "partenaires" and proc.name = "wget" and proc.cmdline contains "dsoxlab-sonde-falco"
+  output: "sonde dsoxlab ns=%k8s.ns.name pod=%k8s.pod.name proc=%proc.name"
   priority: NOTICE
 YAML
 systemctl restart falco-modern-bpf.service
 attendre_falco
 sleep 5
 vue=0
+# La sonde lance wget comme le correcteur, directement par l'exec et sans
+# shell : elle prouve que Falco voit le namespace ET nomme le processus wget,
+# les deux faits sur lesquels la règle de l'épreuve repose.
 for _ in $(seq 1 10); do
-  kubectl -n exterieur exec curieux -- sh -c 'echo dsoxlab-sonde-falco' >/dev/null
+  kubectl -n partenaires exec visiteur -- wget -q -T 1 -O /dev/null http://127.0.0.1:9/dsoxlab-sonde-falco >/dev/null 2>&1 || true
   sleep 3
   if grep -qE '"rule": ?"dsoxlab-sonde"' "$FALCO_JOURNAL"; then
     vue=1
@@ -667,7 +681,7 @@ for _ in $(seq 1 10); do
   fi
 done
 if [[ "$vue" != 1 ]]; then
-  echo "Falco ne voit pas le namespace d'un shell ouvert dans un Pod :" >&2
+  echo "Falco ne voit pas wget lance dans un Pod de partenaires :" >&2
   tail -n 20 "$FALCO_JOURNAL" >&2 || true
   journalctl -u falco-modern-bpf.service -n 60 --no-pager >&2 || true
   exit 1

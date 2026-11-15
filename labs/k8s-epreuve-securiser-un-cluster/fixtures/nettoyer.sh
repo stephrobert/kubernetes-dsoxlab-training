@@ -16,11 +16,11 @@ set -x
 ETAT=/var/lib/dsoxlab/epreuve-securiser-un-cluster
 MANIFESTES=/etc/kubernetes/manifests
 COMPOSANTS=(kube-apiserver kube-controller-manager kube-scheduler)
-NAMESPACES=(boutique coffre commandes exterieur paiement registre conformite)
+NAMESPACES=(boutique facturation commandes partenaires paiement registre conformite)
 
-# 1. Ce que les Pods de coffre déclarent, avant de les retirer.
+# 1. Ce que les Pods de facturation déclarent, avant de les retirer.
 lire_profils() {
-  kubectl -n coffre get pod "$1" -o json 2>/dev/null | python3 -c '
+  kubectl -n facturation get pod "$1" -o json 2>/dev/null | python3 -c '
 import json, sys
 champ = sys.argv[1]
 p = json.load(sys.stdin)["spec"]
@@ -28,11 +28,11 @@ c = [p.get("securityContext") or {}] + [x.get("securityContext") or {} for x in 
 print(" ".join(sorted({(s.get(champ) or {}).get("localhostProfile", "") for s in c} - {""})))
 ' "$2" 2>/dev/null || true
 }
-for nom in $(lire_profils lecteur appArmorProfile); do
+for nom in $(lire_profils consultation appArmorProfile); do
   printf '%s' "$nom" > /sys/kernel/security/apparmor/.remove 2>/dev/null || true
   { grep -lsE "^[[:space:]]*profile[[:space:]]+${nom}([[:space:]]|\{|$)" /etc/apparmor.d/* || true; } | xargs -r rm -f
 done
-for chemin in $(lire_profils calcul seccompProfile); do
+for chemin in $(lire_profils numerotation seccompProfile); do
   [[ "$chemin" == *..* ]] || rm -f "/var/lib/kubelet/seccomp/${chemin}"
 done
 

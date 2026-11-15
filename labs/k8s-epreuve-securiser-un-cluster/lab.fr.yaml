@@ -6,7 +6,7 @@ description: |
   durcissez son plan de contrôle, tracez les lectures de Secrets, faites
   refuser ce qui enfreint une règle, reprenez un Pod privilégié, confinez les
   charges face au noyau, exigez le TLS mutuel et fermez le réseau par défaut,
-  détectez un shell, et ne laissez entrer qu'une image épinglée, signée et
+  détectez un outil réseau, et ne laissez entrer qu'une image épinglée, signée et
   analysée, sans que la boutique cesse de répondre.
 
 criteria:
@@ -15,7 +15,7 @@ criteria:
   - id: p02-audit-cis
     label: "P02 : un nouvel audit CIS compte moins d'échecs qu'au départ, et les contrôles de profilage passent"
   - id: p03-audit-active
-    label: "P03 : l'API server tourne avec l'audit activé, fichier de politique et journal montés"
+    label: "P03 : l'API server tourne avec l'audit activé, selon la politique demandée, et écrit son journal sur le nœud"
   - id: p04-journal-d-audit
     label: "P04 (critique) : le journal enregistre une lecture de Secret en entier et une lecture banale en métadonnées seulement"
   - id: p05-standard-restricted
@@ -29,9 +29,9 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
   - id: p08-apparmor
-    label: "P08 : le profil AppArmor est chargé en enforce et le Pod confiné peut lire mais plus écrire dans /tmp"
+    label: "P08 : le profil AppArmor est chargé en enforce et le Pod confiné peut lire mais plus écrire dans /dev/shm"
   - id: p09-seccomp
-    label: "P09 : le profil seccomp refuse la famille chmod et autorise le reste, et le Pod qui le déclare tourne"
+    label: "P09 : le profil seccomp refuse la famille chown et autorise le reste, et le Pod qui le déclare tourne"
   - id: p10-tls-mutuel
     label: "P10 (critique) : l'espace maillé exige le TLS mutuel, un client sans sidecar est bloqué et un client du maillage passe"
     lessons:
@@ -41,15 +41,15 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
   - id: p12-bac-a-sable
-    label: "P12 : une classe de runtime désigne le runtime bac à sable du nœud et le Pod qui l'emploie lit un autre noyau que celui de la machine"
+    label: "P12 : le Pod demandé tourne dans le runtime bac à sable du nœud et lit un autre noyau que celui de la machine"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
   - id: p13-falco-shell
-    label: "P13 (critique) : un shell dans l'espace protégé lève une alerte de la règle Falco demandée, avec sa priorité, et pas un shell ouvert ailleurs"
+    label: "P13 (critique) : un outil réseau lancé dans l'espace protégé lève une alerte de la règle Falco demandée, avec sa priorité, et pas le même outil lancé ailleurs"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
   - id: p14-regles-falco-intactes
-    label: "P14 : les règles Falco livrées avec le paquet sont intactes"
+    label: "P14 : les règles Falco livrées avec le paquet sont intactes, et la règle de détection demandée lève bien une alerte"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
   - id: p15-digest-execute
