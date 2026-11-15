@@ -4393,6 +4393,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-auditer-les-flux-avec-hubble": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_la_metrique_compte_les_refus_du_client",
+    "test_le_constat_designe_le_flux_refuse",
+    "test_les_refus_sont_journalises_sur_le_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-15",
+  "duree_s": 602,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-auditer-les-flux-avec-hubble.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_metrique_compte_les_refus_du_client",
+    "test_le_constat_designe_le_flux_refuse",
+    "test_les_refus_sont_journalises_sur_le_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-choisir-le-bon-workload": {
   "apres": {
    "echecs": [],
@@ -6718,6 +6771,65 @@
    "skipped": 0,
    "status": "failed",
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-installer-cilium-sans-kube-proxy": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_aucune_regle_kube_proxy_sur_les_noeuds",
+    "test_cilium_1_20_4_remplace_kube_proxy_sur_chaque_noeud",
+    "test_le_cluster_est_initialise_sans_kube_proxy",
+    "test_le_service_web_repond_par_cilium",
+    "test_les_pods_prennent_leur_adresse_dans_le_pool_cluster_pool",
+    "test_les_trois_noeuds_sont_joints_et_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-15",
+  "duree_s": 624,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, aucun cluster, 0 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-installer-cilium-sans-kube-proxy.log",
+  "kubernetes": "aucun cluster",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_aucune_regle_kube_proxy_sur_les_noeuds",
+    "test_cilium_1_20_4_remplace_kube_proxy_sur_chaque_noeud",
+    "test_le_cluster_est_initialise_sans_kube_proxy",
+    "test_le_service_web_repond_par_cilium",
+    "test_les_pods_prennent_leur_adresse_dans_le_pool_cluster_pool",
+    "test_les_trois_noeuds_sont_joints_et_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },

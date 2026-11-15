@@ -393,8 +393,8 @@ Five domains in the CKNE curriculum. Service Networking and DNS and Network Secu
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
-| 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Install Cilium without kube-proxy | core-infrastructure-and-cni | 45m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
-| 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
+| 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Install Cilium without kube-proxy | core-infrastructure-and-cni | 45m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
+| 2 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
 
 Total: **129 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
