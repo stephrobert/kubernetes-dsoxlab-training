@@ -1,0 +1,85 @@
+---
+# Joué par `dsoxlab clean`, en deux plays.
+#
+# 1. Plan de contrôle : le namespace du Pod forcé part, le fichier de swap du
+#    lab est retiré du worker, puis le socle est rejoué : il prépare le worker
+#    (swap, pilote systemd, paquets figés) et le joint s'il manque. Le cluster
+#    du catalogue est rendu entier, quel que soit l'état laissé. La clé du plan
+#    de contrôle est retirée de l'hôte kind.
+# 2. Hôte kind : un nœud gelé par un check interrompu est dégelé, le cluster ha
+#    de l'apprenant est supprimé avec son répertoire. Les clusters des autres
+#    labs ne sont pas recréés ici : chaque lab recrée le sien par son setup.
+- name: Nettoyer le challenge k8s-challenge-installer-un-cluster, côté kubeadm
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+    hote_kind: "{{ groups['lab_kind'][0] }}"
+  tasks:
+    - name: Supprimer le namespace du Pod forcé
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace installation
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le fichier de swap du lab sur le worker
+      ansible.builtin.shell: |
+        swapoff /swapfile-lab 2>/dev/null || true
+        sed -i '\#/swapfile-lab#d' /etc/fstab
+        rm -f /swapfile-lab
+      changed_when: true
+      delegate_to: "{{ worker }}"
+
+    - name: Rejouer le socle, qui prépare le worker et le joint s'il manque
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Lire la clé publique de l'utilisateur du lab
+      ansible.builtin.slurp:
+        src: /home/{{ ansible_user | default('ansible') }}/.ssh/id_ed25519.pub
+      register: cle_du_plan_de_controle
+
+    - name: Retirer cette clé de l'hôte kind
+      ansible.builtin.lineinfile:
+        path: /home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys
+        line: "{{ cle_du_plan_de_controle.content | b64decode | trim }}"
+        state: absent
+      delegate_to: "{{ hote_kind }}"
+
+- name: Nettoyer le challenge k8s-challenge-installer-un-cluster, côté kind
+  hosts: lab_kind
+  become: true
+  tasks:
+    - name: Dégeler un nœud laissé en pause par un check interrompu
+      ansible.builtin.shell: |
+        set -o pipefail
+        docker ps -q --filter status=paused --filter name=ha- | xargs -r docker unpause
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le cluster ha et son contexte
+      ansible.builtin.shell: |
+        set -o pipefail
+        cfg="/home/{{ ansible_user | default('ansible') }}/.kube/config"
+        if kind get clusters 2>/dev/null | grep -qx ha; then
+          if [ -f "$cfg" ]; then
+            kind delete cluster --name ha --kubeconfig "$cfg"
+            chown "{{ ansible_user | default('ansible') }}:" "$cfg"
+          else
+            kind delete cluster --name ha
+          fi
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de travail et le kubeconfig du correcteur
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/ha"
+        - /root/ha-correcteur.kubeconfig

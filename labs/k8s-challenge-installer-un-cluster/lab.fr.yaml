@@ -1,0 +1,36 @@
+title: "Installer un cluster kubeadm, y joindre un nœud et rendre le plan de contrôle hautement disponible"
+description: |
+  Sans procédure, préparer un worker réinitialisé et le joindre au cluster
+  kubeadm de façon qu'il survive à un redémarrage, prouver qu'il fait tourner
+  un Pod forcé sur lui, puis monter un cluster à trois plans de contrôle
+  derrière un répartiteur, avec un etcd à trois membres, dont l'API répond
+  toujours quand un plan de contrôle tombe.
+
+criteria:
+  - id: worker-joint-en-1-37
+    label: "Le worker réinitialisé est Ready et son kubelet annonce la version 1.37"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+  - id: swap-coupe-durablement
+    label: "Le swap est désactivé sur le worker et le reste après redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: containerd-pilote-systemd
+    label: "containerd utilise le pilote de cgroup systemd sur le worker"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: pod-force-sur-le-worker
+    label: "Un Pod forcé sur le worker par nodeName passe Running"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: trois-plans-de-controle
+    label: "Les trois nœuds control-plane sont Ready, lus par l'adresse du répartiteur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/installation/
+  - id: etcd-trois-membres
+    label: "etcd compte trois membres votants et sains"
+  - id: api-survit-a-un-plan-de-controle
+    label: "L'API répond par l'adresse du répartiteur pendant que le correcteur tient un plan de contrôle à l'arrêt"

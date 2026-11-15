@@ -1,0 +1,119 @@
+# Le challenge du module Installer un cluster (niveau 4), posé dans la leçon
+# « Haute disponibilité » (KUBERN-12-04). C'est la preuve sans procédure du
+# module : joindre un worker réinitialisé au cluster kubeadm, puis monter un
+# plan de contrôle hautement disponible et le prouver en en perdant un.
+#
+# DEUX CLUSTERS, ET C'EST UN CHOIX MESURÉ. L'infrastructure du catalogue ne
+# porte qu'UN plan de contrôle kubeadm (k8s-cp.lab), un worker (k8s-w1.lab) et
+# l'hôte kind (k8s-kind.lab, 4 Go). Trois plans de contrôle kubeadm derrière un
+# répartiteur demanderaient trois VM de plus et un répartiteur (environ 9 Go),
+# et surtout transformeraient le cluster partagé par tout le catalogue : un
+# membre etcd ajouté puis perdu lui retirerait son quorum. Les états
+# d'installation (jonction, swap, containerd, Pod forcé) se jouent donc sur le
+# cluster kubeadm, et les états de haute disponibilité sur un cluster kind à
+# trois plans de contrôle que l'apprenant crée sur k8s-kind.lab. kind y pose
+# lui-même le répartiteur (le conteneur ha-external-load-balancer), et ses
+# nœuds sont des machines kubeadm : etcd y a bien trois membres empilés.
+#
+# « L'arrêt d'un plan de contrôle par le correcteur » est un `docker pause` du
+# conteneur du nœud, levé à la fin du test. Pas un `docker stop` : un nœud kind
+# redémarré peut reprendre une autre adresse IP, que son membre etcd et ses
+# certificats ne connaissent pas, et le cluster ne s'en remettrait pas.
+#
+# Sept états, à poids égal (dsoxlab note par test). Deux bloquent : le worker
+# joint (la raison d'être du module kubeadm) et l'API qui survit à la perte
+# d'un plan de contrôle (la raison d'être de la haute disponibilité).
+id: k8s-challenge-installer-un-cluster
+title: "Install a kubeadm cluster, join a node and make the control plane highly available"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, prepare a reset worker and join it to the kubeadm cluster
+  so that it survives a reboot, prove it runs a Pod forced onto it, then build
+  a cluster with three control-plane nodes behind a load balancer, with a
+  three-member etcd, whose API keeps answering when one control plane goes
+  down.
+skills:
+  - kubeadm
+  - kubelet
+  - containerd
+  - high-availability
+  - etcd
+  - kind
+distros:
+  - ubuntu24
+  - debian13
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_le_worker_reinitialise_est_ready_en_1_37
+  - test_l_api_repond_par_le_repartiteur_apres_l_arret_d_un_plan_de_controle
+estimated_time: 60m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Utilisés en même temps que la cible : le worker est réinitialisé puis
+      # joint, l'hôte kind porte le cluster hautement disponible.
+      roles:
+        worker: k8s-w1.lab
+        kind: k8s-kind.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: worker-joint-en-1-37
+    label: "The reset worker is Ready and its kubelet reports version 1.37"
+    tests:
+      - test_le_worker_reinitialise_est_ready_en_1_37
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-kubernetes-with-kubeadm/
+  - id: swap-coupe-durablement
+    label: "Swap is off on the worker and stays off after a reboot"
+    tests:
+      - test_le_swap_est_coupe_et_le_reste_au_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
+  - id: containerd-pilote-systemd
+    label: "containerd runs with the systemd cgroup driver on the worker"
+    tests:
+      - test_containerd_utilise_le_pilote_de_cgroup_systemd
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cni-csi-cri/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
+  - id: pod-force-sur-le-worker
+    label: "A Pod forced onto the worker by nodeName is Running"
+    tests:
+      - test_un_pod_force_sur_le_worker_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
+  - id: trois-plans-de-controle
+    label: "Three control-plane nodes are Ready, read through the load balancer's address"
+    tests:
+      - test_trois_plans_de_controle_ready_par_le_repartiteur
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/choose-how-to-install-kubernetes/
+  - id: etcd-trois-membres
+    label: "etcd has three healthy voting members"
+    tests:
+      - test_etcd_compte_trois_membres_sains
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+  - id: api-survit-a-un-plan-de-controle
+    label: "The API answers through the load balancer while the grader holds one control plane down"
+    tests:
+      - test_l_api_repond_par_le_repartiteur_apres_l_arret_d_un_plan_de_controle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/

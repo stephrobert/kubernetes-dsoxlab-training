@@ -495,7 +495,12 @@ def valider(lab: Path, rejeu: bool, amorcage: bool = True) -> dict:
             # lire_solution déchiffre : envoyer le blob vault par SSH ferait
             # échouer la solution sur une erreur de syntaxe bash, et le message
             # enverrait chercher le défaut dans le lab.
-            res = ssh(hote, lire_solution(solution), journal, 600)
+            # 600 s suffisent à presque toutes les solutions. Une épreuve qui
+            # restaure etcd, joint un nœud et monte le cluster de version en
+            # demande davantage : VALIDER_DELAI_SOLUTION l'allonge pour un passage,
+            # sans changer le délai des autres labs.
+            delai_solution = int(os.environ.get("VALIDER_DELAI_SOLUTION", "600"))
+            res = ssh(hote, lire_solution(solution), journal, delai_solution)
             if res.returncode != 0:
                 raise Echec(f"la solution du formateur a échoué (rc={res.returncode}) : "
                             f"{(res.stdout + res.stderr).strip()[-400:]}")

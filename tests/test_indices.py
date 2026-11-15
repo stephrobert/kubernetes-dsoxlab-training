@@ -68,6 +68,8 @@ SANS_INDICE = {
     "cka-examen-blanc": "examen blanc CKA sans indice, décision du 2026-11-12",
     "ckad-examen-blanc": "examen blanc CKAD sans indice, décision du 2026-11-12",
     "cks-examen-blanc": "examen blanc CKS sans indice, mêmes règles que CKA et CKAD (D53)",
+    "k8s-challenge-installer-un-cluster": "D91, challenge de module sans indice",
+    "k8s-challenge-maintenir-un-noeud": "D91, challenge de module sans indice",
 }
 
 

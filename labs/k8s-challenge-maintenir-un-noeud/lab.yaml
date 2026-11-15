@@ -1,0 +1,110 @@
+# Le challenge du module Maintenir et mettre à jour (niveau 4), posé dans la
+# leçon « Mettre à jour un cluster » (KUBERN-14-14). C'est la preuve sans
+# procédure du module : protéger une application par un budget, vider un nœud,
+# le rendre, garder la trace de l'opération, monter tout le cluster d'une
+# version mineure sans couper l'application, et reporter dans le dépôt une
+# modification faite en direct.
+#
+# Il reprend deux labs attestés sans les refaire à l'identique :
+# cka-node-drain-cordon pour l'évacuation (budget, Pod isolé, DaemonSet du
+# réseau, trace) et cka-kubeadm-upgrade pour la montée. Son setup et son
+# cleanup sont ceux de cka-kubeadm-upgrade : le cluster est reconstruit en
+# 1.36.4 et rendu ensuite à sa version.
+#
+# L'application compte QUATRE exemplaires et non deux, et c'est un arbitrage
+# de la fiche : un budget qui garantit deux Pods disponibles sur une
+# application à deux exemplaires interdit toute éviction, et aucun drain ne
+# passerait. « Ses deux exemplaires prêts » se lit donc comme le minimum que
+# le budget garde pendant les travaux ; à la fin, les quatre sont prêts.
+#
+# Sept états, à poids égal (dsoxlab note par test). Deux bloquent : le worker
+# évacué, et tout le cluster monté sans perdre l'application.
+id: k8s-challenge-maintenir-un-noeud
+title: "Drain, maintain and bring a node back into service, then upgrade the cluster"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: advanced
+description: |
+  Without guidance, protect an application with a disruption budget, empty a
+  worker and bring it back into service, record the operation, upgrade the
+  whole cluster one minor version without losing the application, and carry
+  into the versioned manifest a change made live.
+skills:
+  - poddisruptionbudget
+  - drain
+  - cordon
+  - kubeadm
+  - upgrade
+  - git
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_le_worker_a_ete_evacue
+  - test_chaque_noeud_en_1_37_0_ordonnancable_et_le_catalogue_tient
+estimated_time: 60m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Le worker est vidé, rendu et monté pendant le challenge.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: budget-de-disruption
+    label: "A named PodDisruptionBudget guarantees at least two available Pods and targets the application's Pods"
+    tests:
+      - test_le_budget_garantit_deux_pods_du_catalogue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/
+  - id: worker-evacue
+    label: "The worker was emptied: the application's Pods were recreated, the isolated Pod is gone, the network DaemonSet stayed"
+    tests:
+      - test_le_worker_a_ete_evacue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/
+  - id: worker-remis-en-service
+    label: "The worker is back in service and accepts Pods again"
+    tests:
+      - test_le_worker_est_remis_en_service
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+  - id: trace-de-maintenance
+    label: "A trace ConfigMap names the drained node and carries the completed status"
+    tests:
+      - test_la_trace_nomme_le_noeud_vide
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/maintenance-changements/
+  - id: api-server-1-37-0
+    label: "The API server reports version 1.37.0"
+    tests:
+      - test_l_api_server_annonce_1_37_0
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
+  - id: noeuds-1-37-0-application-entiere
+    label: "Every node reports 1.37.0, none is unschedulable, and the application has all its replicas ready"
+    tests:
+      - test_chaque_noeud_en_1_37_0_ordonnancable_et_le_catalogue_tient
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
+  - id: modification-reportee
+    label: "A field of the object changed live carries the new value, and the versioned manifest carries the same value"
+    tests:
+      - test_le_champ_modifie_en_direct_est_reporte_dans_le_depot
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/maintenance-changements/

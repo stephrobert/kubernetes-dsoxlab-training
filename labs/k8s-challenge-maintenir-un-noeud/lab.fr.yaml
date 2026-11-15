@@ -1,0 +1,27 @@
+title: "Vider, maintenir et remettre en service un nœud, puis monter le cluster de version"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+description: |
+  Sans procédure, protéger une application par un budget de perturbation,
+  vider un worker et le remettre en service, garder la trace de l'opération,
+  monter tout le cluster d'une version mineure sans perdre l'application, et
+  reporter dans le manifeste versionné une modification faite en direct.
+
+criteria:
+  - id: budget-de-disruption
+    label: "Un PodDisruptionBudget nommé garantit au moins deux Pods disponibles et cible les Pods de l'application"
+  - id: worker-evacue
+    label: "Le worker a été évacué : les Pods de l'application sont recréés, le Pod isolé est supprimé, le DaemonSet du réseau reste"
+  - id: worker-remis-en-service
+    label: "Le worker est remis en service et accepte de nouveau des Pods"
+  - id: trace-de-maintenance
+    label: "Un ConfigMap de trace nomme le nœud vidé et porte le statut completed"
+  - id: api-server-1-37-0
+    label: "L'API server annonce la version 1.37.0"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+  - id: noeuds-1-37-0-application-entiere
+    label: "Chaque nœud annonce la version 1.37.0, aucun n'est inordonnançable et l'application a tous ses réplicas prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+  - id: modification-reportee
+    label: "Un champ de l'objet modifié en direct porte la nouvelle valeur et le manifeste versionné porte la même valeur"
