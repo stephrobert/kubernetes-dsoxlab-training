@@ -1,0 +1,80 @@
+title: "Épreuve du niveau 4 : administrer un cluster"
+# Provisoire : la page cible est
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/administrer-un-cluster/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  À partir d'un état hérité et d'un cahier des charges qui ne nomme aucun objet
+  Kubernetes, administrez le cluster kubeadm qui héberge la boutique : ramener
+  un worker réinitialisé, prouver un plan de contrôle hautement disponible,
+  sauvegarder etcd et restaurer la boutique depuis une sauvegarde plus
+  ancienne, migrer des manifestes hors des API retirées, monter chaque nœud
+  d'une version mineure, garder la boutique disponible pendant la maintenance,
+  réparer un nœud, un API server et un composant après avoir consigné chaque
+  cause, et mener à bien les modifications en direct et le renouvellement des
+  certificats.
+
+criteria:
+  - id: p01-worker-joint
+    label: "P01 (critique) : le worker réinitialisé rejoint le cluster, il est Ready et son kubelet annonce la version 1.37"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: p02-swap-coupe
+    label: "P02 : le swap est désactivé sur le worker et le reste après redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
+  - id: p03-trois-plans-de-controle
+    label: "P03 (critique) : les trois nœuds control-plane sont Ready, lus par l'adresse du répartiteur"
+  - id: p04-api-survit
+    label: "P04 (critique) : l'API répond par l'adresse du répartiteur pendant que le correcteur tient un plan de contrôle à l'arrêt"
+  - id: p05-sauvegarde-fraiche
+    label: "P05 : une sauvegarde fraîche d'etcd existe, elle est vérifiée et plus récente que celle de la veille"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: p06-boutique-restauree
+    label: "P06 (critique) : la boutique supprimée est revenue avec ses UID d'origine après restauration depuis la sauvegarde de la veille"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: p07-apres-la-veille-efface
+    label: "P07 : un objet créé après la sauvegarde de la veille n'existe plus et les nœuds sont Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
+  - id: p08-manifestes-migres
+    label: "P08 : les manifestes de la boutique en API supprimée sont migrés vers l'API courante et s'appliquent"
+  - id: p09-cluster-monte
+    label: "P09 (critique) : l'API server et chaque nœud annoncent la version cible, aucun nœud n'est inordonnançable et la boutique garde ses réplicas prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+  - id: p10-budget-de-la-boutique
+    label: "P10 : un budget de perturbation cible les Pods de la boutique et garantit le minimum demandé"
+  - id: p11-worker-evacue-et-rendu
+    label: "P11 : le worker est évacué sans couper la boutique puis remis en service, et il accepte de nouveau des Pods"
+  - id: p12-noeud-repare
+    label: "P12 (critique) : le nœud NotReady est Ready et son kubelet survivra à un redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: p13-api-server-repare
+    label: "P13 (critique) : l'API server dont un flag est faux répond de nouveau et autorise toujours Node,RBAC"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: p14-application-reparee
+    label: "P14 : l'application en CrashLoopBackOff a ses réplicas disponibles, ne redémarre plus et lit sa configuration au bon endroit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: p15-causes-consignees
+    label: "P15 : la cause de chaque panne est consignée à partir de describe, des événements ou des journaux avant la réparation"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cluster-troubleshooting/
+  - id: p16-modification-versionnee
+    label: "P16 : un champ modifié en direct pendant l'incident porte la même valeur dans le manifeste versionné"
+  - id: p17-certificats
+    label: "P17 : aucun certificat du plan de contrôle n'expire dans moins de trente jours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/
+  - id: p18-vitrine-repartie-et-sondee
+    label: "P18 : les réplicas de la boutique sont répartis sur des nœuds différents et portent une sonde de disponibilité"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/disponibilite-applicative-kubernetes/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/probes/

@@ -224,6 +224,11 @@ sections:
       # Niveau 4, lot A (vague 1) : les interfaces d'un nœud (CNI, CSI et CRI),
       # puis la santé d'etcd avant sa sauvegarde.
       - k8s-lire-les-interfaces-d-un-noeud
+      # Le challenge du module Installer un cluster (initialiser, joindre, CNI
+      # CSI et CRI), posé dans la leçon « Haute disponibilité » : le worker
+      # réinitialisé sur le cluster kubeadm, la haute disponibilité sur un
+      # cluster kind à trois plans de contrôle.
+      - k8s-challenge-installer-un-cluster
       - cka-etcd-sante-et-defragmentation
       - cka-etcd-backup-restore
       # Les API retirées se repèrent avant toute montée de version.
@@ -233,6 +238,11 @@ sections:
       # restaurer l'état. C'est aussi le seul lab du catalogue qui reconstruit
       # le cluster, d'où sa place tardive.
       - cka-kubeadm-upgrade
+      # Le challenge du module Maintenir et mettre à jour, posé dans la leçon
+      # « Mettre à jour un cluster » : vider un nœud, le rendre, puis monter
+      # tout le cluster. Il reconstruit le cluster en 1.36 comme le lab
+      # précédent, dont il reprend le setup et le cleanup.
+      - k8s-challenge-maintenir-un-noeud
       # Niveau 4, lot A (vague 1) : la PKI du cluster (renouveler, donner un
       # accès par CSR), puis cert-manager.
       - kubeadm-verifier-et-renouveler-les-certificats
@@ -243,6 +253,11 @@ sections:
       # Le challenge du module Fiabiliser et exploiter (niveau 4), sur le cluster
       # kubeadm : son check évacue lui-même le worker.
       - k8s-challenge-garantir-la-disponibilite
+      # L'épreuve de fin du niveau 4 (KUBERN-EPREUVE-N4), qui suppose tous les
+      # modules du niveau joués : elle croise installation, haute
+      # disponibilité, sauvegarde, montée de version, maintenance et dépannage.
+      # Elle reconstruit le cluster kubeadm, comme cka-kubeadm-upgrade.
+      - k8s-epreuve-administrer-un-cluster
       # Le capstone vient en dernier : il suppose les dix-neuf précédents joués,
       # puisqu'il ne dit plus quel est le sujet de la panne.
       - cka-capstone-portail

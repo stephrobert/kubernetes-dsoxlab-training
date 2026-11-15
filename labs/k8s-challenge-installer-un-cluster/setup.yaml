@@ -1,0 +1,86 @@
+---
+# Joué par `dsoxlab run`, en deux plays.
+#
+# 1. Sur le plan de contrôle (lab_target) : le socle kubeadm d'abord, qui rend
+#    un cluster entier même après un passage interrompu, puis le worker
+#    k8s-w1.lab est vidé, retiré du cluster, réinitialisé et sa préparation
+#    défaite (fixtures/reinitialiser-worker.sh, repris de
+#    cka-joindre-un-noeud-kubeadm, attesté). Le namespace installation attend
+#    le Pod forcé sur le worker. La clé SSH que le socle a donnée à
+#    l'utilisateur du lab est autorisée sur l'hôte kind : depuis le plan de
+#    contrôle, `ssh k8s-kind.lab` ouvre une session, comme `ssh k8s-w1.lab`.
+# 2. Sur l'hôte kind (lab_kind) : le socle kind (Docker, kind, kubectl
+#    épinglés), puis la VM est libérée des clusters du catalogue pour que
+#    l'apprenant ait la mémoire de créer le sien (fixtures/liberer-l-hote-kind.sh).
+- name: Préparer le challenge k8s-challenge-installer-un-cluster, côté kubeadm
+  hosts: lab_target
+  become: true
+  vars:
+    worker: k8s-w1.lab
+    hote_kind: "{{ groups['lab_kind'][0] }}"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Vider le worker de ses Pods
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf drain {{ worker }}
+        --ignore-daemonsets --delete-emptydir-data --force --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le worker du cluster
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete node {{ worker }}
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+
+    - name: Réinitialiser le worker et défaire sa préparation
+      ansible.builtin.script: fixtures/reinitialiser-worker.sh
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ worker }}"
+
+    - name: Repartir d'un namespace installation vide
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace installation
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+
+    - name: Poser le namespace du Pod forcé
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf create namespace installation
+      changed_when: true
+
+    - name: Lire la clé publique de l'utilisateur du lab
+      ansible.builtin.slurp:
+        src: /home/{{ ansible_user | default('ansible') }}/.ssh/id_ed25519.pub
+      register: cle_du_plan_de_controle
+
+    - name: Autoriser cette clé sur l'hôte kind
+      ansible.builtin.lineinfile:
+        path: /home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys
+        line: "{{ cle_du_plan_de_controle.content | b64decode | trim }}"
+        create: true
+        owner: "{{ ansible_user | default('ansible') }}"
+        mode: "0600"
+      delegate_to: "{{ hote_kind }}"
+
+- name: Préparer le challenge k8s-challenge-installer-un-cluster, côté kind
+  hosts: lab_kind
+  become: true
+  tasks:
+    # Le socle crée toujours un cluster : on lui donne le plus léger du
+    # catalogue, « lab », à un nœud, que le script suivant supprime aussitôt.
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+        kind_donner_kubeconfig: false
+
+    - name: Libérer la VM et poser le répertoire de travail
+      ansible.builtin.script: fixtures/liberer-l-hote-kind.sh
+      args:
+        executable: /bin/bash
+      environment:
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

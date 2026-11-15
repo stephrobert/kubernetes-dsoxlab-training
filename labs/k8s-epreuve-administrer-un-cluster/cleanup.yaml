@@ -1,0 +1,300 @@
+---
+# Joué par `dsoxlab clean`, en deux plays.
+#
+# 1. Plan de contrôle : le cluster est RECONSTRUIT à la version du catalogue,
+#    toujours, et non monté comme le fait cka-kubeadm-upgrade. Le choix est
+#    dicté par l'épreuve elle-même : l'apprenant peut laisser le cluster dans
+#    n'importe quel état (kubelet désactivé, API server sans réponse, etcd sur
+#    un répertoire restauré, montée de version à moitié faite, worker hors du
+#    cluster), et une montée exige un cluster sain. Une reconstruction part
+#    d'un `kubeadm reset`, quel que soit l'état laissé, et c'est aussi ce que
+#    fait le setup de cka-kubeadm-upgrade à chaque passage.
+#
+#    La version visée est celle que le setup a relevée avant de dégrader le
+#    cluster, à défaut la plus récente de la mineure du dépôt (même logique que
+#    cka-kubeadm-upgrade). Les autorités de certification sont gardées, les
+#    certificats feuilles refaits pour un an : aucun certificat raccourci par
+#    l'épreuve ne survit. Le socle termine le travail : kubeconfig, taint,
+#    Calico, préparation et jonction du worker, clés SSH. etcdctl et etcdutl
+#    sont remis à la version de l'etcd du catalogue.
+#
+# 2. Hôte kind : un nœud gelé par un check interrompu est dégelé, le cluster ha
+#    est supprimé avec son répertoire.
+- name: Nettoyer l'épreuve k8s-epreuve-administrer-un-cluster, côté kubeadm
+  hosts: lab_target
+  become: true
+  vars:
+    mineure_catalogue: "1.37"
+    releve: /var/lib/dsoxlab/k8s-epreuve-administrer-un-cluster.version-du-catalogue
+    hote_kind: "{{ groups['lab_kind'][0] }}"
+  tasks:
+    - name: Supprimer le namespace de la boutique, si l'API répond encore
+      # La reconstruction efface tout ; cette tâche ne sert que si l'API
+      # répond, et ne doit jamais attendre longtemps une API absente.
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf --request-timeout=20s
+        delete namespace boutique --ignore-not-found --wait=false
+      changed_when: true
+      failed_when: false
+
+    - name: Recenser les workers déclarés par meta.yml
+      ansible.builtin.set_fact:
+        workers: >-
+          {{ hostvars | dict2items
+                      | selectattr('value.role', 'defined')
+                      | selectattr('value.role', 'equalto', 'worker')
+                      | map(attribute='key') | list }}
+
+    - name: Établir la version à laquelle reconstruire
+      # Repris de cka-kubeadm-upgrade : le relevé du setup d'abord, sinon la
+      # plus récente de la mineure. Le numéro APT se demande à APT. Si rien
+      # n'aboutit, la tâche ÉCHOUE plutôt que de choisir à l'aveugle.
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          apt-get update -qq || true
+          voulue=''
+          if [ -s '{{ releve }}' ]; then
+            voulue=$(tr -d 'v \n' < '{{ releve }}')
+          fi
+          disponibles=$(apt-cache madison kubeadm | awk '{print $3}')
+          apt=''
+          origine='depot'
+          if [ -n "$voulue" ]; then
+            apt=$(printf '%s\n' "$disponibles" | grep -E "^${voulue}-" | sort -V -r | head -1)
+            [ -n "$apt" ] && origine='releve-du-setup'
+          fi
+          if [ -z "$apt" ]; then
+            apt=$(printf '%s\n' "$disponibles" \
+                  | grep -E '^{{ mineure_catalogue }}\.' | sort -V -r | head -1)
+            origine='plus-recente-du-depot'
+          fi
+          if [ -z "$apt" ]; then
+            echo "aucune version {{ mineure_catalogue }} de kubeadm dans les depots declares" >&2
+            exit 1
+          fi
+          printf '%s v%s %s\n' "$apt" "${apt%%-*}" "$origine"
+        executable: /bin/bash
+      register: cible_lue
+      changed_when: false
+
+    - name: Retenir la version du catalogue
+      ansible.builtin.set_fact:
+        version_cible: "{{ cible_lue.stdout_lines[-1].split()[0] }}"
+        kube_cible: "{{ cible_lue.stdout_lines[-1].split()[1] }}"
+        origine_cible: "{{ cible_lue.stdout_lines[-1].split()[2] }}"
+
+    - name: Dire à quelle version le cluster est reconstruit, et d'où vient cette cible
+      ansible.builtin.debug:
+        msg: >-
+          Le cluster est reconstruit en {{ kube_cible }} (paquet {{ version_cible }}),
+          cible obtenue par {{ origine_cible }}.
+
+    - name: Défaire le cluster sur chaque worker
+      ansible.builtin.command:
+        cmd: kubeadm reset -f
+      delegate_to: "{{ noeud }}"
+      loop: "{{ workers }}"
+      loop_control:
+        loop_var: noeud
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le fichier de swap de l'épreuve sur chaque worker
+      ansible.builtin.shell: |
+        swapoff /swapfile-lab 2>/dev/null || true
+        sed -i '\#/swapfile-lab#d' /etc/fstab
+        rm -f /swapfile-lab
+      delegate_to: "{{ noeud }}"
+      loop: "{{ workers }}"
+      loop_control:
+        loop_var: noeud
+      changed_when: true
+
+    - name: Mettre les certificats du cluster de côté
+      ansible.builtin.shell: |
+        set -eu
+        test -f /etc/kubernetes/pki/ca.crt || exit 0
+        rm -rf /root/pki-du-cluster
+        mkdir -p /root/pki-du-cluster
+        cp -a /etc/kubernetes/pki/. /root/pki-du-cluster/
+      changed_when: true
+
+    - name: Défaire le plan de contrôle
+      ansible.builtin.command:
+        cmd: kubeadm reset -f
+      changed_when: true
+      failed_when: false
+
+    - name: Vider le répertoire de données d'etcd et les copies laissées par l'épreuve
+      ansible.builtin.shell: rm -rf /var/lib/etcd /var/lib/etcd-* /root/hors-service
+      changed_when: true
+
+    - name: Remettre les autorités de certification, sans les certificats feuilles
+      ansible.builtin.shell: |
+        set -eu
+        test -d /root/pki-du-cluster || exit 0
+        mkdir -p /etc/kubernetes/pki
+        cp -a /root/pki-du-cluster/. /etc/kubernetes/pki/
+        cd /etc/kubernetes/pki
+        rm -f apiserver.crt apiserver.key apiserver-kubelet-client.crt apiserver-kubelet-client.key \
+              apiserver-etcd-client.crt apiserver-etcd-client.key \
+              front-proxy-client.crt front-proxy-client.key \
+              etcd/server.crt etcd/server.key etcd/peer.crt etcd/peer.key \
+              etcd/healthcheck-client.crt etcd/healthcheck-client.key
+      changed_when: true
+
+    - name: Défiger les paquets Kubernetes
+      ansible.builtin.dpkg_selections:
+        name: "{{ item.1 }}"
+        selection: install
+      delegate_to: "{{ item.0 }}"
+      loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+    - name: Poser la version du catalogue sur tous les nœuds
+      ansible.builtin.apt:
+        name:
+          - "kubelet={{ version_cible }}"
+          - "kubeadm={{ version_cible }}"
+          - "kubectl={{ version_cible }}"
+        state: present
+        allow_downgrade: true
+        update_cache: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ [inventory_hostname] + workers }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Refiger les paquets
+      ansible.builtin.dpkg_selections:
+        name: "{{ item.1 }}"
+        selection: hold
+      delegate_to: "{{ item.0 }}"
+      loop: "{{ ([inventory_hostname] + workers) | product(['kubelet', 'kubeadm', 'kubectl']) | list }}"
+
+    - name: Retirer le dépôt de la version de départ
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/kubernetes-v1.36.list
+        state: absent
+      delegate_to: "{{ noeud }}"
+      loop: "{{ [inventory_hostname] + workers }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Réactiver le kubelet de chaque nœud, que l'épreuve a pu désactiver
+      ansible.builtin.systemd_service:
+        name: kubelet
+        enabled: true
+        daemon_reload: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ [inventory_hostname] + workers }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Initialiser le plan de contrôle à la version du catalogue
+      ansible.builtin.command:
+        cmd: kubeadm init --pod-network-cidr=10.244.0.0/16 --kubernetes-version {{ kube_cible }}
+        creates: /etc/kubernetes/admin.conf
+
+    - name: Rejouer le socle, qui termine le cluster et rejoint le worker
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Attendre le retour des Pods statiques du plan de contrôle
+      ansible.builtin.command:
+        cmd: >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system wait
+          --for=condition=Ready pod -l tier=control-plane --timeout=600s
+      register: attente_plan_de_controle
+      retries: 10
+      delay: 15
+      until: attente_plan_de_controle.rc == 0
+      changed_when: false
+
+    - name: Lire la version de l'etcd du catalogue
+      ansible.builtin.shell: |
+        set -o pipefail
+        sed -n 's#.*image: .*/etcd:\([0-9][0-9.]*\)-.*#\1#p' /etc/kubernetes/manifests/etcd.yaml | head -1
+      args:
+        executable: /bin/bash
+      register: etcd_lue
+      changed_when: false
+      failed_when: etcd_lue.stdout | trim == ''
+
+    - name: Récupérer l'archive etcd {{ etcd_lue.stdout | trim }}
+      ansible.builtin.get_url:
+        url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_lue.stdout | trim }}/etcd-v{{ etcd_lue.stdout | trim }}-linux-amd64.tar.gz"
+        dest: "/root/etcd-v{{ etcd_lue.stdout | trim }}-linux-amd64.tar.gz"
+        mode: "0644"
+
+    - name: Remettre etcdctl et etcdutl à la version de l'etcd du catalogue
+      ansible.builtin.unarchive:
+        src: "/root/etcd-v{{ etcd_lue.stdout | trim }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+          - "etcd-v{{ etcd_lue.stdout | trim }}-linux-amd64/etcdctl"
+          - "etcd-v{{ etcd_lue.stdout | trim }}-linux-amd64/etcdutl"
+
+    - name: Retirer le répertoire de l'épreuve, les sauvegardes et l'état noté
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/epreuve"
+        - /var/backups/etcd
+        - /var/lib/dsoxlab/k8s-epreuve-administrer-un-cluster.json
+
+    - name: Retirer les copies de manifestes écrites par le correcteur
+      ansible.builtin.shell: rm -f /root/epreuve-correcteur-*
+      changed_when: true
+
+    - name: Lire la clé publique de l'utilisateur du lab
+      ansible.builtin.slurp:
+        src: /home/{{ ansible_user | default('ansible') }}/.ssh/id_ed25519.pub
+      register: cle_du_plan_de_controle
+
+    - name: Retirer cette clé de l'hôte kind
+      ansible.builtin.lineinfile:
+        path: /home/{{ ansible_user | default('ansible') }}/.ssh/authorized_keys
+        line: "{{ cle_du_plan_de_controle.content | b64decode | trim }}"
+        state: absent
+      delegate_to: "{{ hote_kind }}"
+
+- name: Nettoyer l'épreuve k8s-epreuve-administrer-un-cluster, côté kind
+  hosts: lab_kind
+  become: true
+  tasks:
+    - name: Dégeler un nœud laissé en pause par un check interrompu
+      ansible.builtin.shell: |
+        set -o pipefail
+        docker ps -q --filter status=paused --filter name=ha- | xargs -r docker unpause
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le cluster ha et son contexte
+      ansible.builtin.shell: |
+        set -o pipefail
+        cfg="/home/{{ ansible_user | default('ansible') }}/.kube/config"
+        if kind get clusters 2>/dev/null | grep -qx ha; then
+          if [ -f "$cfg" ]; then
+            kind delete cluster --name ha --kubeconfig "$cfg"
+            chown "{{ ansible_user | default('ansible') }}:" "$cfg"
+          else
+            kind delete cluster --name ha
+          fi
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de travail et le kubeconfig du correcteur
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/ha"
+        - /root/ha-correcteur.kubeconfig
