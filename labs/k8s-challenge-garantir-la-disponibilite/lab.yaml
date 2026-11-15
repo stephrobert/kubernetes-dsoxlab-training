@@ -39,7 +39,7 @@ skills:
   - operations
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-operations-routine/
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
@@ -102,5 +102,5 @@ criteria:
     tests:
       - test_le_rapport_de_routine_dit_l_etat_reel_du_cluster
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-operations-routine/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/

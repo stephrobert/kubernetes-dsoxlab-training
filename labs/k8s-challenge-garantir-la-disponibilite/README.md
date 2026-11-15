@@ -11,7 +11,7 @@ state of the cluster. Six states, threshold 70, two blocking.
 |---|---|
 | Targets | `k8s-cp.lab`, the catalogue's kubeadm cluster, and `k8s-w1.lab`, which the check evacuates then puts back into service; the lab sets up the `paiement` and `exploitation` namespaces |
 | Duration | about 45 minutes |
-| Related page | [Operations routine](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/) (in French) |
+| Related page | [Operations routine](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-operations-routine/) (in French) |
 
 ```bash
 dsoxlab run    k8s-challenge-garantir-la-disponibilite
