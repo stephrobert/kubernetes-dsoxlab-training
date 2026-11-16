@@ -1,0 +1,39 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster dans l'état
+# du socle, dans l'ordre inverse du setup.
+#
+# 1. Le namespace boutique, ses clients, ses serveurs et sa NetworkPolicy.
+# 2. Le répertoire ~/captures de la session : un diagnostic laissé là pourrait
+#    retomber juste sur le tirage suivant, une chance sur six.
+# 3. Les captures jetables que la solution laisse dans /tmp des nœuds.
+# 4. Le second worker, drainé, supprimé de l'API et remis à zéro : la
+#    photographie du validateur compte les nœuds.
+- name: Défaire le lab k8s-capturer-le-trafic-d-un-pod
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace boutique --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire des captures de la session
+      ansible.builtin.file:
+        path: "/home/{{ session }}/captures"
+        state: absent
+
+    - name: Retirer les captures jetables des nœuds
+      ansible.builtin.shell: rm -f /tmp/dsoxlab-l2-*.pcap
+      changed_when: false
+      delegate_to: "{{ item }}"
+      loop: "{{ [inventory_hostname] + groups['lab_worker'] | default([]) + groups['lab_worker2'] | default([]) }}"
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

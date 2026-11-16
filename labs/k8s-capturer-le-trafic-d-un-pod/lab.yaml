@@ -1,0 +1,64 @@
+id: k8s-capturer-le-trafic-d-un-pod
+title: "Capture the traffic of a Pod and name the cause of each failure"
+level: core-infrastructure-and-cni
+section: ckne
+difficulty: advanced
+description: |
+  Three client Pods of the namespace boutique fail to reach their service,
+  each one in a different way, and their logs only say "failed". Find the
+  interface of each Pod on its node, capture its traffic with tcpdump (on
+  the host interface, inside the Pod network namespace with nsenter, or
+  from an ephemeral container with kubectl debug), bring the captures back
+  to the control plane, and name the cause of each failure from the packets:
+  refused, dropped or DNS. Nothing is to be repaired.
+skills:
+  - tcpdump
+  - nsenter
+  - kubectl-debug
+  - pod-networking
+distros:
+  - ubuntu24
+# Page provisoire : la leçon L2 n'est pas encore publiée. URL cible (cadrage
+# CKNE) : /docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 40m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: capture-du-bon-pod
+    label: "Each client has a readable capture in ~/captures, taken on its own interface: the packets come from the current address of that Pod"
+    tests:
+      - test_chaque_capture_vient_du_bon_pod
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+  - id: signature-de-la-panne
+    label: "Each capture holds the packets that prove the failure of its client: a reset, a SYN sent again with no answer, or NXDomain answers"
+    tests:
+      - test_chaque_capture_montre_la_panne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+  - id: cause-designee
+    label: "~/captures/diagnostic.yaml names the right cause for each client, and none of the three failures was repaired"
+    tests:
+      - test_le_diagnostic_designe_la_bonne_cause
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+
+feedback: full
