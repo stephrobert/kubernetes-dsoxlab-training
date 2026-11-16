@@ -1,0 +1,25 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il installe Helm 4.3.2
+# (dernière stable, mesurée le 2026-11-16, empreinte vérifiée), déclare le
+# dépôt du chart podinfo, puis pose la release vitrine en échec : révision 1
+# saine en 6.16.0, révision 2 montée en 6.17.0 avec une image introuvable.
+- name: Préparer le lab k8s-inspecter-et-restaurer-une-release-helm
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+    helm_version: "4.3.2"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Installer Helm {{ helm_version }}
+      ansible.builtin.include_tasks: fixtures/installer-helm.yml
+
+    - name: Poser la release en échec
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        SESSION_UTILISATEUR: "{{ session }}"

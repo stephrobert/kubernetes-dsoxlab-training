@@ -405,7 +405,14 @@ sections:
       - ckad-rolling-update-strategy
       - ckad-blue-green-deployment
       - ckad-kustomize-overlays
+      # Lab guidé de la leçon 12 facteurs (KUBERN-06-18, D110, issue #217) :
+      # Kustomize, état dans Redis, preStop et Job d'administration.
+      - k8s-rendre-une-application-conforme-12-facteurs
       - ckad-helm-install-upgrade
+      # Labs guidés des leçons Helm (règle 17, issues #218 et #219) : inspecter et
+      # restaurer une release, puis surcharger les values, Helm 4.3.2 et podinfo.
+      - k8s-inspecter-et-restaurer-une-release-helm
+      - k8s-surcharger-les-values-d-un-chart-helm
       - ckad-job-cronjob
       - ckad-in-place-pod-vertical-scaling
       - ckad-troubleshoot-missing-configmap

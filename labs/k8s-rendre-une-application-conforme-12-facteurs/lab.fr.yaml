@@ -1,0 +1,16 @@
+title: "Rendre une application conforme au 12-factor sur Kubernetes"
+description: |
+  L'équipe a livré podinfo avec sa configuration en dur dans ses arguments,
+  son état écrit sur un volume du Pod et aucun arrêt propre, alors qu'un Redis
+  tourne à côté sans servir. Générez la configuration avec un configMapGenerator
+  de Kustomize, déplacez l'état dans Redis, ajoutez un crochet preStop, puis
+  posez la graine du cache par un Job d'administration.
+criteria:
+  - id: configuration-generee
+    label: "La configuration vient d'un ConfigMap généré par Kustomize (nom suffixé d'un hash), injecté par envFrom"
+  - id: etat-dans-redis
+    label: "Aucun volume d'état local, et une valeur écrite dans le cache survit à la suppression du Pod"
+  - id: arret-propre
+    label: "Le conteneur podinfo a un crochet preStop"
+  - id: job-d-administration
+    label: "Le Job admin-seed est Complete, tourne avec l'image de l'application et a écrit la graine dans Redis"

@@ -1,0 +1,29 @@
+---
+# Installe Helm {{ helm_version }} sur le nœud, et le REMPLACE si une autre
+# version y est : un `creates:` sur le binaire laisserait un nœud qui porte une
+# version plus ancienne figé sur elle pour toujours. L'archive est vérifiée
+# contre l'empreinte publiée par get.helm.sh avant d'être décompressée.
+- name: Lire la version de Helm installée
+  ansible.builtin.command: /usr/local/bin/helm version --short
+  register: helm_installe
+  changed_when: false
+  failed_when: false
+
+- name: Installer Helm {{ helm_version }}
+  when: helm_installe.rc != 0 or not helm_installe.stdout.startswith('v' ~ helm_version ~ '+')
+  block:
+    - name: Récupérer l'archive, vérifiée contre l'empreinte publiée
+      ansible.builtin.get_url:
+        url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+        dest: "/root/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+        checksum: "sha256:https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz.sha256sum"
+        mode: "0644"
+
+    - name: Poser helm dans /usr/local/bin, en remplaçant l'ancien
+      ansible.builtin.unarchive:
+        src: "/root/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+          - linux-amd64/helm

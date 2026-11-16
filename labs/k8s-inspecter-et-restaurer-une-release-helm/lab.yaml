@@ -1,0 +1,68 @@
+id: k8s-inspecter-et-restaurer-une-release-helm
+title: "Inspect a failed Helm release and restore it"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  The release vitrine (podinfo chart) failed when it was upgraded. Find the
+  latest version of the chart with a search, name the failed revision from
+  the history, go back to the last healthy revision, then make the chart's
+  tests pass on it.
+skills:
+  - helm
+  - helm-history
+  - helm-rollback
+  - helm-test
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (404 relevé le 2026-11-16) : le
+# lab pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+lab_type: lab
+estimated_time: 20m
+
+# Lab guidé de la leçon KUBERN-06-13 « La commande helm » (règle 17, issue
+# #218). Blueprint CKAD, domaine Application Deployment : « Use the Helm
+# package manager to deploy existing packages ». Helm 4.3.2 et chart podinfo
+# 6.16.0 puis 6.17.0, dernières versions mesurées le 2026-11-16.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: derniere-version
+    label: "derniere-version.txt holds the latest version of the podinfo chart, as helm search repo gives it"
+    tests:
+      - test_la_derniere_version_du_chart_est_relevee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+  - id: revision-en-echec
+    label: "revision-en-echec.txt names the failed revision of the history"
+    tests:
+      - test_la_revision_en_echec_est_nommee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+  - id: retour-arriere
+    label: "The last revision is a deployed rollback to the last healthy revision, and the application is available"
+    tests:
+      - test_la_release_est_revenue_a_la_revision_saine
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+  - id: tests-du-chart
+    label: "The chart's tests succeeded on the current revision"
+    tests:
+      - test_les_tests_du_chart_passent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+
+feedback: full

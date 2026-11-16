@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace douze, avec l'application, le
+# Redis, les ConfigMaps générés et le Job, puis les manifestes de la session.
+# Le cluster, lui, reste en place.
+- name: Nettoyer le lab k8s-rendre-une-application-conforme-12-facteurs
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace douze --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les manifestes de la session et ceux du Redis
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ session }}/douze"
+        - /root/douze-redis.yaml

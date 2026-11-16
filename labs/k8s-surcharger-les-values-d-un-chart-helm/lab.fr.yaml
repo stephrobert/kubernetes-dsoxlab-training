@@ -1,0 +1,13 @@
+title: "Surcharger les values d'un chart Helm sans tomber dans le piège du typage"
+description: |
+  La release catalogue (chart podinfo 6.16.0) porte deux réglages posés par
+  l'exploitation. Montez-la en 6.17.0 sans les perdre, et fixez le message de
+  l'interface à 2026, qui doit rester une chaîne alors qu'il ressemble à un
+  nombre.
+criteria:
+  - id: message-chaine
+    label: "Les values de la release portent ui.message comme la chaîne '2026', pas l'entier"
+  - id: montee-sans-perte
+    label: "La release tourne en podinfo 6.17.0 et garde les réglages de l'exploitation (3 réplicas, #ff6b00)"
+  - id: message-servi
+    label: "podinfo répond le message 2026"
