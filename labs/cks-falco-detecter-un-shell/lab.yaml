@@ -1,0 +1,62 @@
+id: cks-falco-detecter-un-shell
+title: "Make Falco raise an alert on a shell opened in a protected namespace"
+level: monitoring-logging
+section: cks
+difficulty: intermediate
+description: |
+  Falco runs on the control plane with its shipped rules only. Write the rule
+  the security team asks for: an alert of priority CRITICAL, under an exact
+  name, as soon as a shell starts in a container of the namespace paiements,
+  and nowhere else. The shipped rules must stay untouched.
+skills:
+  - falco
+  - runtime-security
+  - detection-rules
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+lab_type: lab
+estimated_time: 25m
+
+# Lab guidé de la leçon 15-16 « Falco » (décision D103), fiche
+# cks-falco-detecter-un-shell du parcours (points P01 à P03). Blueprint CKS,
+# domaine Monitoring, Logging and Runtime Security (20 %) : « Perform
+# behavioral analytics to detect malicious activities ».
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: alerte-du-perimetre
+    label: "A shell opened in the Pod caisse of paiements raises the rule « Shell dans paiements » with priority CRITICAL"
+    tests:
+      - test_un_shell_dans_paiements_leve_l_alerte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+  - id: silence-hors-perimetre
+    label: "A shell opened in another namespace does not raise that rule"
+    tests:
+      - test_un_shell_ailleurs_ne_leve_pas_l_alerte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+  - id: regles-fournies-intactes
+    label: "The shipped rules file is untouched: the custom rule lives in its own file"
+    tests:
+      - test_les_regles_fournies_sont_intactes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/
+
+feedback: full

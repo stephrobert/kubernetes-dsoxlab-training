@@ -1,0 +1,70 @@
+id: k8s-modifier-une-ressource-en-production
+title: "Change a live Deployment without losing a container, and resolve the drift"
+level: workloads-scheduling
+section: cka
+difficulty: intermediate
+description: |
+  An incident on the Deployment web of the namespace magasin, which carries
+  two containers. Move web to nginx 1.30 without losing the log-agent
+  container nor recreating the object, note the incident on it, switch
+  log-agent to debug, then report every change made in the cluster, and the
+  four replicas set during the load peak, into its manifest, until kubectl
+  diff finds nothing left.
+skills:
+  - kubectl-patch
+  - kubectl-edit
+  - kubectl-diff
+  - configuration-drift
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+lab_type: lab
+estimated_time: 25m
+
+# Lab guidé de la leçon 14-11 « Modifier une ressource en production : edit,
+# patch, replace » (décision D103). Blueprint CKA, domaine Workloads and
+# Scheduling : « Understand application deployments and how to perform rolling
+# updates and rollbacks ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: liste-preservee
+    label: "web runs nginx 1.30, log-agent is still there, and the Deployment is the same object (same uid)"
+    tests:
+      - test_web_passe_en_1_30_sans_perdre_log_agent_ni_l_objet
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+  - id: incident-note
+    label: "The annotation incident-ref of web names the incident"
+    tests:
+      - test_l_incident_est_annote
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+  - id: second-conteneur-vise
+    label: "log-agent, the second container of the list, has LOG_LEVEL=debug"
+    tests:
+      - test_log_agent_passe_en_debug
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+  - id: derive-resorbee
+    label: "kubectl diff finds no gap between the cluster and ~/magasin/web.yaml, and the four replicas of the peak are kept"
+    tests:
+      - test_la_derive_est_resorbee_dans_git
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+
+feedback: full

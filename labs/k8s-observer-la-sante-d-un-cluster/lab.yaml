@@ -1,0 +1,62 @@
+id: k8s-observer-la-sante-d-un-cluster
+title: "Make the health of a cluster readable and write its health report"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  A kubeadm cluster without metrics-server: kubectl top answers nothing.
+  Install metrics-server from the pinned manifest provided, make it accept
+  the kubelets' certificates, then write a health report in the ConfigMap
+  bulletin of the namespace sante: the Pod that uses the most memory, and the
+  node whose CPU is the most reserved by requests.
+skills:
+  - metrics-server
+  - kubectl-top
+  - kubectl-describe-node
+  - resource-requests
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/
+lab_type: lab
+estimated_time: 25m
+
+# Lab guidé de la leçon 14-02 « Observer la santé d'un cluster » (décision
+# D103). Blueprint CKA, domaine Troubleshooting : « Monitor cluster and
+# application resource usage ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: top-disponible
+    label: "The Metrics API is available and kubectl top nodes answers"
+    tests:
+      - test_kubectl_top_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/
+  - id: pod-gourmand
+    label: "The report names the Pod of sante that uses the most memory, as kubectl top measures it"
+    tests:
+      - test_le_bulletin_nomme_le_pod_le_plus_gourmand
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/
+  - id: noeud-reserve
+    label: "The report names the node whose allocatable CPU is the most reserved by requests"
+    tests:
+      - test_le_bulletin_nomme_le_noeud_le_plus_reserve
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/observer-sante-cluster-kubernetes/
+
+feedback: full

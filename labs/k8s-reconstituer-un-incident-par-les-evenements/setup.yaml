@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose l'incident que le
+# scénario décrit, cinq applications dont quatre en panne, créées l'une après
+# l'autre. Compter un peu plus de deux minutes : l'espacement des créations est
+# ce qui rend la chronologie des Events lisible.
+- name: Préparer le lab k8s-reconstituer-un-incident-par-les-evenements
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser l'incident
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

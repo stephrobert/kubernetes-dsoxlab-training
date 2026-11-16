@@ -1,0 +1,36 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé. Le cluster, lui, reste
+# en place. L'essentiel vit hors du namespace : l'étiquette, le rôle, la taint
+# et l'annotation de k8s-w2.lab. Une taint NoExecute oubliée chasserait les Pods
+# de tous les labs suivants de ce nœud.
+- name: Nettoyer le lab cka-etiqueter-et-isoler-un-noeud
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace equipes --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer la réserve de l'équipe data
+      ansible.builtin.command: kubectl taint nodes k8s-w2.lab equipe-
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'étiquette et le rôle de l'équipe data
+      ansible.builtin.command: kubectl label nodes --all equipe- node-role.kubernetes.io/data-
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'annotation de contact
+      ansible.builtin.command: kubectl annotate node k8s-w2.lab maintenance-contact-
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

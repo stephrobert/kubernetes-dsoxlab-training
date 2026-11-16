@@ -1,0 +1,18 @@
+title: "Lire pourquoi quatre Pods restent en Pending et placer chacun"
+description: |
+  Quatre applications du namespace placement n'ont jamais démarré : leurs Pods
+  restent en Pending, chacun pour une raison différente. Lisez le message
+  FailedScheduling du scheduler pour chacun, notez la cause, et faites placer
+  chaque Pod sans renoncer à ce que l'équipe a demandé : le disque NVMe, le
+  nœud réservé aux traitements batch, la classe de stockage des archives.
+criteria:
+  - id: cause-designee
+    label: "Le ConfigMap diagnostic nomme la cause de chaque application bloquée : ressources, selecteur, taint ou volume"
+  - id: ressources-realistes
+    label: "calcul tourne avec une demande de CPU qu'un nœud peut donner, plutôt qu'aucune demande"
+  - id: etiquette-tenue
+    label: "cache garde son sélecteur disk=ssd-nvme et tourne sur le seul nœud qui porte le disque NVMe"
+  - id: reserve-toleree
+    label: "batch tolère la taint de son nœud réservé, et la taint est toujours là"
+  - id: volume-lie
+    label: "archives-data est lié dans sa propre classe, et archives y écrit"

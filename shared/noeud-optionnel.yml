@@ -178,3 +178,27 @@
 
     - name: Attendre que Typha ait suivi le départ du nœud
       ansible.builtin.include_tasks: typha-stable.yml
+
+    # Le nœud supprimé, le contrôleur des DaemonSets met encore un moment à
+    # recompter : calico-node a été photographié en [3, 3] au lieu de [2, 2]
+    # juste après un cleanup réussi, et le validateur a rendu ROUGE
+    # cka-placer-un-pod-pending le 2026-11-16 alors que le nœud était bien
+    # parti. On attend que le DaemonSet vise autant de nœuds que le cluster en
+    # compte, avec un budget borné.
+    - name: Attendre que calico-node ait recompté les nœuds
+      ansible.builtin.shell: |
+        set -o pipefail
+        noeuds=$(kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes -o name | wc -l)
+        vises=$(kubectl --kubeconfig /etc/kubernetes/admin.conf -n calico-system get daemonset calico-node \
+          -o jsonpath='{.status.desiredNumberScheduled}')
+        prets=$(kubectl --kubeconfig /etc/kubernetes/admin.conf -n calico-system get daemonset calico-node \
+          -o jsonpath='{.status.numberReady}')
+        test "$vises" = "$noeuds" && test "$prets" = "$noeuds"
+      args:
+        executable: /bin/bash
+      register: _calico_recompte
+      until: _calico_recompte.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

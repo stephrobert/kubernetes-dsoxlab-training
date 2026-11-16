@@ -1,0 +1,61 @@
+id: k8s-reconstituer-un-incident-par-les-evenements
+title: "Rebuild an incident from the Events of a namespace"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  Five applications in the namespace boutique, four of them down, each in a
+  different way. Without repairing anything, read the Events of the namespace
+  and write the incident report in the ConfigMap rapport: the reason of the
+  Warning Events of each application, the healthy one, and the first
+  application hit.
+skills:
+  - kubectl-events
+  - kubernetes-events
+  - troubleshooting
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
+lab_type: lab
+estimated_time: 20m
+
+# Lab guidé de la leçon 14-04 « Analyser les événements Kubernetes » (décision
+# D103). Blueprint CKA, domaine Troubleshooting : « Troubleshoot clusters and
+# nodes » et « Troubleshoot components ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: raisons
+    label: "Each faulty application carries the reason of its Warning Events, word for word"
+    tests:
+      - test_chaque_panne_est_nommee_par_sa_raison
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
+  - id: saine
+    label: "The application without any Warning Event is reported as healthy"
+    tests:
+      - test_l_application_saine_est_reconnue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
+  - id: chronologie
+    label: "The report names the application hit by the first Warning Event of the namespace"
+    tests:
+      - test_la_premiere_application_touchee_est_trouvee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/analyser-evenements-kubernetes/
+
+feedback: full

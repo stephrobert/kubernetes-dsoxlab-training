@@ -1,0 +1,14 @@
+title: "Faire lever par Falco une alerte sur un shell ouvert dans un namespace protégé"
+description: |
+  Falco tourne sur le control plane avec ses seules règles fournies. Écrivez la
+  règle que l'équipe sécurité demande : une alerte de priorité CRITICAL, sous
+  un nom exact, dès qu'un shell démarre dans un conteneur du namespace
+  paiements, et nulle part ailleurs. Les règles fournies doivent rester
+  intactes.
+criteria:
+  - id: alerte-du-perimetre
+    label: "Un shell ouvert dans le Pod caisse de paiements lève la règle « Shell dans paiements » avec la priorité CRITICAL"
+  - id: silence-hors-perimetre
+    label: "Un shell ouvert dans un autre namespace ne lève pas cette règle"
+  - id: regles-fournies-intactes
+    label: "Le fichier des règles fournies est intact : la règle personnalisée vit dans son propre fichier"

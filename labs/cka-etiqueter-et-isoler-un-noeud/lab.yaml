@@ -1,0 +1,70 @@
+id: cka-etiqueter-et-isoler-un-noeud
+title: "Label a node, show its role and reserve it for one team"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  The data team takes over the worker k8s-w2.lab. Label the node for that
+  team, make its role readable in kubectl get nodes, record who to call
+  before a maintenance, and reserve it with a taint whose effect makes the
+  other teams' Pods already running there leave, without stopping them.
+skills:
+  - nodes
+  - labels
+  - taints-tolerations
+  - annotations
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+lab_type: lab
+estimated_time: 20m
+
+# Lab guidé de la leçon 14-13 « Gérer les nœuds » (décision D103). Blueprint
+# CKA, domaine Troubleshooting (30 %) : « Troubleshoot clusters and nodes » ;
+# et Workloads and Scheduling : « Configure Pod admission and scheduling ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: etiquette-d-equipe
+    label: "k8s-w2.lab, and no other node, carries the label equipe=data"
+    tests:
+      - test_le_noeud_porte_l_etiquette_de_l_equipe
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+  - id: role-lisible
+    label: "kubectl get nodes shows the data role of k8s-w2.lab"
+    tests:
+      - test_le_noeud_affiche_le_role_data
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+  - id: contact-note
+    label: "The annotation maintenance-contact of k8s-w2.lab names the data team"
+    tests:
+      - test_le_noeud_porte_le_contact_de_maintenance
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+  - id: reserve-effective
+    label: "A NoExecute taint reserves the node: entrepot runs on it, rapports has left it and still runs elsewhere"
+    tests:
+      - test_la_reserve_fait_partir_les_autres_et_accueille_l_equipe
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/gerer-noeuds-kubernetes/
+
+feedback: full

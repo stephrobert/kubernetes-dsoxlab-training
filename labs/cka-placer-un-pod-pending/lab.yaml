@@ -1,0 +1,78 @@
+id: cka-placer-un-pod-pending
+title: "Read why four Pods stay Pending and get each one placed"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  Four applications of the namespace placement never started: their Pods
+  stay Pending, each for a different reason. Read the scheduler's
+  FailedScheduling message for each one, write down the cause, and get every
+  Pod placed without giving up what the team asked for: the NVMe disk, the
+  node reserved for batch jobs, the storage class of the archives.
+skills:
+  - troubleshooting
+  - scheduling
+  - taints-tolerations
+  - persistent-volumes
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-16) : le lab
+# pointe la page française, comme cka-troubleshoot-imagepullbackoff.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+lab_type: lab
+estimated_time: 25m
+
+# Lab guidé de la leçon 14-07 « Diagnostiquer un Pod Pending » (décision D103).
+# Blueprint CKA, domaine Troubleshooting (30 %) : « Troubleshoot clusters and
+# nodes » ; et Workloads and Scheduling : « Configure Pod admission and
+# scheduling (limits, node affinity, etc.) ».
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: cause-designee
+    label: "The ConfigMap diagnostic names the cause of each blocked application: ressources, selecteur, taint or volume"
+    tests:
+      - test_le_diagnostic_nomme_chaque_cause
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+  - id: ressources-realistes
+    label: "calcul runs with a CPU request a node can give, instead of no request at all"
+    tests:
+      - test_calcul_demande_une_part_realiste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+  - id: etiquette-tenue
+    label: "cache keeps its disk=ssd-nvme selector and runs on the only node that has the NVMe disk"
+    tests:
+      - test_cache_tourne_sur_le_noeud_nvme
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+  - id: reserve-toleree
+    label: "batch tolerates the taint of its reserved node, and the taint is still there"
+    tests:
+      - test_batch_tolere_la_reserve_sans_la_lever
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+  - id: volume-lie
+    label: "archives-data is bound in its own class, and archives writes to it"
+    tests:
+      - test_archives_ecrit_sur_son_volume
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/pods-pending-kubernetes/
+
+feedback: full

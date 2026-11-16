@@ -1,0 +1,44 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé, et ce que la solution
+# a pu poser hors du namespace. Le cluster, lui, reste en place.
+#
+# Trois objets vivent hors du namespace placement, et le lab suivant paierait
+# leur oubli : la taint de k8s-w1.lab (elle refuserait ses Pods), l'étiquette
+# disk de k8s-w2.lab, et le PersistentVolume de la classe « lente » que
+# l'apprenant a déclaré.
+- name: Nettoyer le lab cka-placer-un-pod-pending
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace placement --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer la réserve de l'équipe batch
+      ansible.builtin.command: kubectl taint nodes k8s-w1.lab equipe-
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'étiquette disk des nœuds
+      ansible.builtin.command: kubectl label nodes --all disk-
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les PersistentVolumes de la classe lente
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubectl get pv -o jsonpath='{range .items[?(@.spec.storageClassName=="lente")]}{.metadata.name}{"\n"}{end}' \
+          | xargs -r kubectl delete pv --wait=true
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent
