@@ -1,0 +1,27 @@
+---
+# Ramène ha-cp1, ha-cp2 et ha-cp3 à « prêts, sans cluster ». Inclus par le
+# setup (un passage précédent a pu laisser un cluster) et par le cleanup.
+#
+# Ce que `kubeadm reset` ne défait pas, et que ce fichier retire : la
+# configuration CNI de /etc/cni/net.d, les interfaces de Flannel (cni0,
+# flannel.1), les chaînes iptables KUBE-* et FLANNEL-*, les kubeconfig de root
+# et de l'utilisateur, qui viseraient un cluster disparu. Le kubelet et
+# containerd restent installés.
+- name: Remettre à zéro chaque plan de contrôle du cluster hautement disponible
+  ansible.builtin.shell: |
+    command -v kubeadm > /dev/null && kubeadm reset -f > /dev/null 2>&1 || true
+    rm -rf /etc/cni/net.d/* /var/lib/etcd
+    for lien in cni0 flannel.1; do
+      ip link delete "$lien" 2> /dev/null || true
+    done
+    iptables-save | grep -v -e KUBE -e FLANNEL | iptables-restore || true
+    ip6tables-save | grep -v -e KUBE -e FLANNEL | ip6tables-restore || true
+    rm -f /root/.kube/config
+    rm -f "$(getent passwd '{{ ansible_user | default('ansible') }}' | cut -d: -f6)/.kube/config"
+  args:
+    executable: /bin/bash
+  changed_when: true
+  delegate_to: "{{ noeud }}"
+  loop: "{{ [inventory_hostname] + groups['lab_cp2'] + groups['lab_cp3'] }}"
+  loop_control:
+    loop_var: noeud

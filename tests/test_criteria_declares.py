@@ -63,7 +63,6 @@ DETTE: set[str] = {
     "cka-troubleshoot-crashloopbackoff",
     "cka-troubleshoot-imagepullbackoff",
     "ckad-capstone-boutique",
-    "ckad-helm-install-upgrade",
     "ckad-rbac-role-rolebinding",
     "ckad-security-context-hardened",
     "ckad-troubleshoot-crashloop",

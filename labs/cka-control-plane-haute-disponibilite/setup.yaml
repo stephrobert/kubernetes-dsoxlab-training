@@ -1,0 +1,142 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Il pose l'état de départ
+# du lab : trois nœuds prêts pour kubeadm (ha-cp1, ha-cp2, ha-cp3), SANS
+# cluster, et le répartiteur HAProxy posé sur ha-lb.lab devant leurs ports
+# 6443. L'apprenant initialise et joint lui-même.
+#
+# Ce cluster est DISTINCT du cluster partagé k8s-cp/k8s-w1 : ce lab n'inclut
+# pas shared/kubeadm-cluster.yml et ne touche à aucun hôte commun. Les quatre
+# hôtes sont optionnels (meta.yml) : dsoxlab ne les monte que pour ce lab,
+# parce qu'il les déclare en roles.
+#
+# Rejouable : un cluster laissé par un passage précédent est défait d'abord.
+- name: Préparer le lab cka-control-plane-haute-disponibilite
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+  tasks:
+    - name: Recenser les nœuds du cluster hautement disponible
+      ansible.builtin.set_fact:
+        ha_plans: "{{ groups['lab_cp2'] + groups['lab_cp3'] }}"
+        ha_repartiteur: "{{ groups['lab_repartiteur'] | first }}"
+
+    - name: Poser les noms du cluster dans /etc/hosts des quatre hôtes
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} dsoxlab cluster hautement disponible"
+        block: |
+          {% for h in [inventory_hostname] + ha_plans + [ha_repartiteur] %}
+          {{ hostvars[h].ansible_host }} {{ h }} {{ h.split('.')[0] }}
+          {% endfor %}
+      delegate_to: "{{ noeud }}"
+      loop: "{{ [inventory_hostname] + ha_plans + [ha_repartiteur] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Défaire un cluster laissé par un passage précédent
+      ansible.builtin.include_tasks: fixtures/remettre-a-zero.yml
+
+    - name: Préparer ha-cp1 comme un nœud Kubernetes
+      ansible.builtin.include_tasks: ../../shared/noeud-kubernetes.yml
+
+    - name: Préparer ha-cp2 et ha-cp3 comme des nœuds Kubernetes
+      ansible.builtin.include_tasks:
+        file: ../../shared/noeud-kubernetes.yml
+        apply:
+          delegate_to: "{{ noeud }}"
+      loop: "{{ ha_plans }}"
+      loop_control:
+        loop_var: noeud
+
+    # Le répartiteur de la leçon, en TCP, avec un contrôle de santé : un plan
+    # de contrôle arrêté sort de la rotation après trois échecs. HAProxy du
+    # dépôt Ubuntu : il n'est pas le sujet de la formation.
+    - name: Installer HAProxy sur le répartiteur
+      ansible.builtin.apt:
+        name: haproxy
+        state: present
+        update_cache: true
+      delegate_to: "{{ ha_repartiteur }}"
+
+    - name: Configurer HAProxy devant les trois serveurs d'API
+      ansible.builtin.copy:
+        dest: /etc/haproxy/haproxy.cfg
+        mode: "0644"
+        content: |
+          global
+              log /dev/log local0
+              maxconn 2000
+              user haproxy
+              group haproxy
+              daemon
+
+          defaults
+              log global
+              mode tcp
+              option tcplog
+              option dontlognull
+              timeout connect 5s
+              timeout client 50s
+              timeout server 50s
+
+          frontend kubernetes-api
+              bind *:6443
+              default_backend kubernetes-masters
+
+          backend kubernetes-masters
+              balance roundrobin
+              option tcp-check
+          {% for h in [inventory_hostname] + ha_plans %}
+              server {{ h.split('.')[0] }} {{ hostvars[h].ansible_host }}:6443 check fall 3 rise 2
+          {% endfor %}
+      delegate_to: "{{ ha_repartiteur }}"
+      register: ha_config
+
+    - name: Démarrer HAProxy avec sa configuration
+      ansible.builtin.systemd_service:
+        name: haproxy
+        state: "{{ 'restarted' if ha_config.changed else 'started' }}"
+        enabled: true
+      delegate_to: "{{ ha_repartiteur }}"
+
+    # Depuis ha-cp1, `ssh ha-cp2` ouvre une session sans mot de passe : c'est
+    # là que l'apprenant joue les jonctions.
+    - name: Donner une clé SSH à l'utilisateur du lab sur ha-cp1
+      ansible.builtin.command:
+        cmd: ssh-keygen -q -t ed25519 -N "" -f /home/{{ session }}/.ssh/id_ed25519
+        creates: /home/{{ session }}/.ssh/id_ed25519
+      become: true
+      become_user: "{{ session }}"
+
+    - name: Lire cette clé publique
+      ansible.builtin.slurp:
+        src: /home/{{ session }}/.ssh/id_ed25519.pub
+      register: ha_cle
+
+    - name: Autoriser cette clé sur ha-cp2 et ha-cp3
+      ansible.builtin.lineinfile:
+        path: /home/{{ session }}/.ssh/authorized_keys
+        line: "{{ ha_cle.content | b64decode | trim }}"
+        create: true
+        owner: "{{ session }}"
+        mode: "0600"
+      delegate_to: "{{ noeud }}"
+      loop: "{{ ha_plans }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Accepter la clé d'hôte des nœuds du cluster au premier ssh
+      ansible.builtin.copy:
+        dest: /home/{{ session }}/.ssh/config
+        owner: "{{ session }}"
+        mode: "0600"
+        content: |
+          Host ha-*
+            StrictHostKeyChecking accept-new
+
+    - name: Vérifier que le répartiteur écoute sur 6443
+      ansible.builtin.wait_for:
+        host: "{{ hostvars[ha_repartiteur].ansible_host }}"
+        port: 6443
+        timeout: 30

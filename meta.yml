@@ -176,6 +176,43 @@ infra:
       vcpu: 2
       disk_gb: 20
 
+    # Le cluster hautement disponible du lab cka-control-plane-haute-disponibilite
+    # (leçon 12-04, décisions D11 et D71, option B validée par Stéphane le
+    # 2026-11-16) : trois plans de contrôle derrière un répartiteur HAProxy,
+    # DISTINCT du cluster partagé, que ce lab ne touche pas. Joindre deux membres
+    # etcd au cluster partagé mettrait son quorum en jeu.
+    #
+    # 2048 Mo par plan de contrôle : le minimum de lab que donne la leçon (2 CPU,
+    # 2 Go), au-dessus des 1,7 Go que kubeadm exige. Le répartiteur ne porte que
+    # HAProxy. Le surcoût réel se mesure pendant le lab (à relever ici).
+    - name: ha-cp1.lab
+      distro: ubuntu24
+      role: ha-control-plane
+      ram_mb: 2048
+      vcpu: 2
+      disk_gb: 20
+
+    - name: ha-cp2.lab
+      distro: ubuntu24
+      role: ha-control-plane
+      ram_mb: 2048
+      vcpu: 2
+      disk_gb: 20
+
+    - name: ha-cp3.lab
+      distro: ubuntu24
+      role: ha-control-plane
+      ram_mb: 2048
+      vcpu: 2
+      disk_gb: 20
+
+    - name: ha-lb.lab
+      distro: ubuntu24
+      role: ha-repartiteur
+      ram_mb: 512
+      vcpu: 1
+      disk_gb: 10
+
 # Sections et niveaux reprennent les DOMAINES des blueprints officiels, mot
 # pour mot. C'est ce qui permet de répondre à la seule question qui compte
 # pour un candidat : « combien de compétences de l'examen puis-je démontrer ? »
@@ -298,6 +335,9 @@ sections:
       # Niveau 4, lot A (vague 1) : les interfaces d'un nœud (CNI, CSI et CRI),
       # puis la santé d'etcd avant sa sauvegarde.
       - k8s-lire-les-interfaces-d-un-noeud
+      # Lab guidé de la leçon 12-04 « Haute disponibilité » (D71, D103) : trois
+      # plans de contrôle kubeadm derrière HAProxy, sur les hôtes optionnels ha-*.
+      - cka-control-plane-haute-disponibilite
       # Le challenge du module Installer un cluster (initialiser, joindre, CNI
       # CSI et CRI), posé dans la leçon « Haute disponibilité » : le worker
       # réinitialisé sur le cluster kubeadm, la haute disponibilité sur un
