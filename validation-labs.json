@@ -62,6 +62,61 @@
   },
   "verdict": "VALIDE"
  },
+ "cka-control-plane-haute-disponibilite": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_etcd_compte_trois_membres_votants_sains",
+    "test_l_api_repond_par_le_repartiteur_apres_la_perte_d_un_plan_de_controle",
+    "test_le_point_d_acces_est_le_repartiteur",
+    "test_trois_plans_de_controle_sont_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "ha-cp1.lab",
+  "date": "2026-11-16",
+  "duree_s": 518,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, aucun cluster, 0 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-control-plane-haute-disponibilite.log",
+  "kubernetes": "aucun cluster",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_etcd_compte_trois_membres_votants_sains",
+    "test_l_api_repond_par_le_repartiteur_apres_la_perte_d_un_plan_de_controle",
+    "test_le_point_d_acces_est_le_repartiteur",
+    "test_trois_plans_de_controle_sont_ready"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "cka-daemonset-all-nodes": {
   "apres": {
    "echecs": [],
@@ -297,6 +352,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-etiqueter-et-isoler-un-noeud": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_reserve_fait_partir_les_autres_et_accueille_l_equipe",
+    "test_le_noeud_affiche_le_role_data",
+    "test_le_noeud_porte_l_etiquette_de_l_equipe",
+    "test_le_noeud_porte_le_contact_de_maintenance"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 653,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-etiqueter-et-isoler-un-noeud.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_reserve_fait_partir_les_autres_et_accueille_l_equipe",
+    "test_le_noeud_affiche_le_role_data",
+    "test_le_noeud_porte_l_etiquette_de_l_equipe",
+    "test_le_noeud_porte_le_contact_de_maintenance"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -1005,6 +1115,63 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "cka-placer-un-pod-pending": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_archives_ecrit_sur_son_volume",
+    "test_batch_tolere_la_reserve_sans_la_lever",
+    "test_cache_tourne_sur_le_noeud_nvme",
+    "test_calcul_demande_une_part_realiste",
+    "test_le_diagnostic_nomme_chaque_cause"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 1003,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cka-placer-un-pod-pending.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_archives_ecrit_sur_son_volume",
+    "test_batch_tolere_la_reserve_sans_la_lever",
+    "test_cache_tourne_sur_le_noeud_nvme",
+    "test_calcul_demande_une_part_realiste",
+    "test_le_diagnostic_nomme_chaque_cause"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
@@ -2244,8 +2411,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 150,
+  "date": "2026-11-16",
+  "duree_s": 140,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3642,6 +3809,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 20
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-falco-detecter-un-shell": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_les_regles_fournies_sont_intactes",
+    "test_un_shell_ailleurs_ne_leve_pas_l_alerte",
+    "test_un_shell_dans_paiements_leve_l_alerte"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 306,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-falco-detecter-un-shell.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_les_regles_fournies_sont_intactes",
+    "test_un_shell_ailleurs_ne_leve_pas_l_alerte",
+    "test_un_shell_dans_paiements_leve_l_alerte"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
@@ -6774,6 +6994,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-faire-la-routine-d-exploitation": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_api_ne_garde_que_trois_anciennes_revisions",
+    "test_l_export_repart_sans_relever_le_quota",
+    "test_l_historique_de_l_export_est_borne",
+    "test_les_imports_reussis_partent_et_l_echec_reste"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 677,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-faire-la-routine-d-exploitation.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_api_ne_garde_que_trois_anciennes_revisions",
+    "test_l_export_repart_sans_relever_le_quota",
+    "test_l_historique_de_l_export_est_borne",
+    "test_les_imports_reussis_partent_et_l_echec_reste"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-gerer-les-images": {
   "apres": {
    "echecs": [],
@@ -7273,6 +7548,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-modifier-une-ressource-en-production": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_incident_est_annote",
+    "test_la_derive_est_resorbee_dans_git",
+    "test_log_agent_passe_en_debug",
+    "test_web_passe_en_1_30_sans_perdre_log_agent_ni_l_objet"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 255,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-modifier-une-ressource-en-production.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_incident_est_annote",
+    "test_la_derive_est_resorbee_dans_git",
+    "test_log_agent_passe_en_debug",
+    "test_web_passe_en_1_30_sans_perdre_log_agent_ni_l_objet"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-observer-la-reconciliation": {
   "apres": {
    "echecs": [],
@@ -7325,6 +7655,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-observer-la-sante-d-un-cluster": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_kubectl_top_repond",
+    "test_le_bulletin_nomme_le_noeud_le_plus_reserve",
+    "test_le_bulletin_nomme_le_pod_le_plus_gourmand"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 325,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-observer-la-sante-d-un-cluster.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_kubectl_top_repond",
+    "test_le_bulletin_nomme_le_noeud_le_plus_reserve",
+    "test_le_bulletin_nomme_le_pod_le_plus_gourmand"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
@@ -7437,6 +7820,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-reconstituer-un-incident-par-les-evenements": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_panne_est_nommee_par_sa_raison",
+    "test_l_application_saine_est_reconnue",
+    "test_la_premiere_application_touchee_est_trouvee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 721,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-reconstituer-un-incident-par-les-evenements.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_panne_est_nommee_par_sa_raison",
+    "test_l_application_saine_est_reconnue",
+    "test_la_premiere_application_touchee_est_trouvee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
