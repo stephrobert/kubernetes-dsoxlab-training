@@ -7102,6 +7102,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-inspecter-et-restaurer-une-release-helm": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_derniere_version_du_chart_est_relevee",
+    "test_la_release_est_revenue_a_la_revision_saine",
+    "test_la_revision_en_echec_est_nommee",
+    "test_les_tests_du_chart_passent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 340,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-inspecter-et-restaurer-une-release-helm.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_derniere_version_du_chart_est_relevee",
+    "test_la_release_est_revenue_a_la_revision_saine",
+    "test_la_revision_en_echec_est_nommee",
+    "test_les_tests_du_chart_passent"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-installer-cilium-sans-kube-proxy": {
   "apres": {
    "echecs": [],
@@ -7876,6 +7931,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-rendre-une-application-conforme-12-facteurs": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_l_etat_survit_a_la_suppression_du_pod",
+    "test_la_configuration_vient_d_un_configmap_genere",
+    "test_la_graine_est_posee_par_le_job_admin_seed",
+    "test_le_conteneur_a_un_prestop"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 190,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-rendre-une-application-conforme-12-facteurs.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_etat_survit_a_la_suppression_du_pod",
+    "test_la_configuration_vient_d_un_configmap_genere",
+    "test_la_graine_est_posee_par_le_job_admin_seed",
+    "test_le_conteneur_a_un_prestop"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-router-des-requetes-d-inference": {
   "apres": {
    "echecs": [],
@@ -8042,6 +8152,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-surcharger-les-values-d-un-chart-helm": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_l_application_sert_le_message",
+    "test_la_montee_garde_les_reglages_de_l_exploitation",
+    "test_le_message_est_une_chaine"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 223,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-surcharger-les-values-d-un-chart-helm.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_application_sert_le_message",
+    "test_la_montee_garde_les_reglages_de_l_exploitation",
+    "test_le_message_est_une_chaine"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
