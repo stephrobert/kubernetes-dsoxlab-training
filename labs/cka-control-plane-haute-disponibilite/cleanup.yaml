@@ -1,0 +1,11 @@
+---
+# Joué par `dsoxlab clean` : défait le cluster hautement disponible monté par
+# l'apprenant. Les nœuds restent prêts pour kubeadm et HAProxy reste posé :
+# c'est l'état de départ du lab. Les hôtes optionnels eux-mêmes ne partent
+# qu'avec `dsoxlab destroy --optional-hosts`.
+- name: Nettoyer le lab cka-control-plane-haute-disponibilite
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Défaire le cluster hautement disponible
+      ansible.builtin.include_tasks: fixtures/remettre-a-zero.yml

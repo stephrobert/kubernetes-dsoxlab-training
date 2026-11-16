@@ -36,3 +36,26 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+# Critères ajoutés le 2026-11-16 pour la couverture stricte de la CKAD. La
+# leçon n'a pas encore de jumelle anglaise (404 relevé ce jour) : les liens
+# visent la page française.
+criteria:
+  - id: trois-revisions
+    label: "The release history shows install, upgrade, then a rollback, the last revision deployed"
+    tests:
+      - test_l_historique_montre_les_trois_revisions
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+  - id: montee-annulee
+    label: "Revision 2 carried two replicas, the current values bring back one"
+    tests:
+      - test_la_montee_en_charge_a_eu_lieu_puis_a_ete_annulee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+  - id: application-repond
+    label: "The application runs with one replica, the chart's image, and answers through its Service"
+    tests:
+      - test_l_application_tourne_et_repond
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/

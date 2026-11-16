@@ -1,0 +1,79 @@
+# Lab guidé de la leçon 12-04 « Haute disponibilité » (décisions D11, D71 et
+# D103 ; option B validée par Stéphane le 2026-11-16). Un cluster kubeadm à
+# trois plans de contrôle derrière un répartiteur HAProxy, sur quatre hôtes
+# OPTIONNELS (ha-cp1, ha-cp2, ha-cp3, ha-lb), distinct du cluster partagé.
+#
+# Le challenge k8s-challenge-installer-un-cluster prouve la haute
+# disponibilité sur un cluster kind, qui cache kubeadm. Ce lab fait le geste
+# kubeadm lui-même : init --control-plane-endpoint, join --control-plane, puis
+# la preuve par l'arrêt d'un plan de contrôle.
+id: cka-control-plane-haute-disponibilite
+title: "Build a kubeadm control plane with three nodes behind a load balancer, and lose one"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: advanced
+description: |
+  Three nodes ready for kubeadm and an HAProxy load balancer, without any
+  cluster. Initialise the first control plane behind the load balancer, join
+  the two others as control planes, install a CNI, then check that etcd has
+  three voting members. The test stops a control plane and writes into the
+  cluster through the load balancer.
+skills:
+  - kubeadm
+  - high-availability
+  - etcd
+  - haproxy
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+lab_type: lab
+estimated_time: 40m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp1
+      host: ha-cp1.lab
+      # Utilisés en même temps que la cible : les deux autres plans de
+      # contrôle et le répartiteur. Les déclarer ici est ce qui fait monter
+      # ces hôtes optionnels par dsoxlab.
+      roles:
+        cp2: ha-cp2.lab
+        cp3: ha-cp3.lab
+        repartiteur: ha-lb.lab
+  default: cp1
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: point-d-acces
+    label: "The controlPlaneEndpoint of the cluster is the load balancer ha-lb.lab:6443"
+    tests:
+      - test_le_point_d_acces_est_le_repartiteur
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+  - id: trois-plans
+    label: "ha-cp1, ha-cp2 and ha-cp3 are Ready control planes, in 1.37"
+    tests:
+      - test_trois_plans_de_controle_sont_ready
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+  - id: etcd-trois-membres
+    label: "etcd has three voting members, all healthy"
+    tests:
+      - test_etcd_compte_trois_membres_votants_sains
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+  - id: survit-a-une-perte
+    label: "With ha-cp2 down, the cluster still accepts writes through the load balancer"
+    tests:
+      - test_l_api_repond_par_le_repartiteur_apres_la_perte_d_un_plan_de_controle
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+
+feedback: full

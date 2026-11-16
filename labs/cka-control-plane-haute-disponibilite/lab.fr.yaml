@@ -1,0 +1,16 @@
+title: "Monter un plan de contrôle kubeadm à trois nœuds derrière un répartiteur, et en perdre un"
+description: |
+  Trois nœuds prêts pour kubeadm et un répartiteur HAProxy, sans cluster.
+  Initialisez le premier plan de contrôle derrière le répartiteur, joignez les
+  deux autres en plans de contrôle, posez un CNI, puis vérifiez qu'etcd compte
+  trois membres votants. Le test arrête un plan de contrôle et écrit dans le
+  cluster par le répartiteur.
+criteria:
+  - id: point-d-acces
+    label: "Le controlPlaneEndpoint du cluster est le répartiteur ha-lb.lab:6443"
+  - id: trois-plans
+    label: "ha-cp1, ha-cp2 et ha-cp3 sont des plans de contrôle Ready, en 1.37"
+  - id: etcd-trois-membres
+    label: "etcd compte trois membres votants, tous sains"
+  - id: survit-a-une-perte
+    label: "ha-cp2 arrêté, le cluster accepte encore les écritures par le répartiteur"
