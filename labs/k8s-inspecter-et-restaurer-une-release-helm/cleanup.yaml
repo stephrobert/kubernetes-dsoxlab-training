@@ -1,0 +1,26 @@
+---
+# Joué par `dsoxlab clean` : désinstalle la release, retire le namespace et le
+# répertoire de la session. Helm et la déclaration du dépôt podinfo restent :
+# ce sont des outils du nœud, pas des objets du lab.
+- name: Nettoyer le lab k8s-inspecter-et-restaurer-une-release-helm
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Désinstaller la release
+      ansible.builtin.command: helm uninstall vitrine -n helm-demo --ignore-not-found --wait
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace helm-demo --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire du lab dans la session
+      ansible.builtin.file:
+        path: "/home/{{ session }}/vitrine"
+        state: absent

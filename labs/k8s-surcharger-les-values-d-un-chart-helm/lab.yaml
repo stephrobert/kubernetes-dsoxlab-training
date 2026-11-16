@@ -1,0 +1,62 @@
+id: k8s-surcharger-les-values-d-un-chart-helm
+title: "Override the values of a Helm chart without falling into the typing trap"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  The release catalogue (podinfo chart 6.16.0) carries two settings made by
+  the operations team. Upgrade it to 6.17.0 without losing them, and set the
+  interface message to 2026, which must stay a string although it looks like
+  a number.
+skills:
+  - helm
+  - helm-values
+  - reuse-values
+  - set-string
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (404 relevé le 2026-11-16) : le
+# lab pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+lab_type: lab
+estimated_time: 20m
+
+# Lab guidé de la leçon KUBERN-06-15 « Les values Helm » (règle 17, issue
+# #219). Blueprint CKAD, domaine Application Deployment : « Use the Helm
+# package manager to deploy existing packages ». Helm 4.3.2 et chart podinfo
+# 6.16.0 puis 6.17.0, dernières versions mesurées le 2026-11-16.
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: message-chaine
+    label: "The release values carry ui.message as the string '2026', not the integer"
+    tests:
+      - test_le_message_est_une_chaine
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+  - id: montee-sans-perte
+    label: "The release runs podinfo 6.17.0 and still carries the operations settings (3 replicas, #ff6b00)"
+    tests:
+      - test_la_montee_garde_les_reglages_de_l_exploitation
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+  - id: message-servi
+    label: "podinfo answers the message 2026"
+    tests:
+      - test_l_application_sert_le_message
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+
+feedback: full
