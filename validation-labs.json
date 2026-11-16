@@ -4446,6 +4446,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-capturer-le-trafic-d-un-pod": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_capture_montre_la_panne",
+    "test_chaque_capture_vient_du_bon_pod",
+    "test_le_diagnostic_designe_la_bonne_cause"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-16",
+  "duree_s": 815,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-capturer-le-trafic-d-un-pod.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_capture_montre_la_panne",
+    "test_chaque_capture_vient_du_bon_pod",
+    "test_le_diagnostic_designe_la_bonne_cause"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-choisir-le-bon-workload": {
   "apres": {
    "echecs": [],
