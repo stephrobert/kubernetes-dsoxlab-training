@@ -1,0 +1,41 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, le second worker
+# optionnel joint au cluster, puis la situation du lab (fixtures/prepare.sh) :
+# trois clients du namespace boutique dont les appels échouent, chacun d'une
+# panne différente tirée au hasard.
+#
+# Le répertoire ~/captures de la session est vidé : une capture ou un
+# diagnostic laissé par un passage précédent porterait sur des Pods qui
+# n'existent plus.
+- name: Préparer le lab k8s-capturer-le-trafic-d-un-pod
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    - name: Vérifier tcpdump sur les trois nœuds
+      ansible.builtin.command: tcpdump --version
+      changed_when: false
+      delegate_to: "{{ item }}"
+      loop: "{{ [inventory_hostname] + groups['lab_worker'] | default([]) + groups['lab_worker2'] | default([]) }}"
+
+    - name: Vider le répertoire des captures de la session
+      ansible.builtin.file:
+        path: "/home/{{ session }}/captures"
+        state: absent
+
+    - name: Poser les trois clients et leurs pannes
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

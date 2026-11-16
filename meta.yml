@@ -492,6 +492,9 @@ sections:
       # Leçon L1 : le cluster que l'apprenant initialise et dont Cilium
       # remplace kube-proxy. Son cleanup remet les nœuds à zéro.
       - k8s-installer-cilium-sans-kube-proxy
+      # Leçon L2 : capturer sur l'interface d'un Pod (tcpdump, nsenter,
+      # kubectl debug), sur le cluster kubeadm du socle et son second worker.
+      - k8s-capturer-le-trafic-d-un-pod
       # Leçon L4 : sur le cluster prêt du socle, que son setup remonte.
       - k8s-auditer-les-flux-avec-hubble
       # L8 : la Gateway d'Istio en HTTPS, certificat de cert-manager. Suppose

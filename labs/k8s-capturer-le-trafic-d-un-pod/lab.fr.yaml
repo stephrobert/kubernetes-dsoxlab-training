@@ -1,0 +1,21 @@
+title: "Capturer le trafic d'un Pod et désigner la cause de chaque échec"
+# Page provisoire, comme dans lab.yaml. URL cible (cadrage CKNE, L2) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Trois Pods clients du namespace boutique n'arrivent pas à joindre leur
+  service, chacun d'une façon différente, et leurs journaux ne disent
+  qu'« échec ». Trouvez l'interface de chaque Pod sur son nœud, capturez son
+  trafic avec tcpdump (sur l'interface de l'hôte, dans l'espace réseau du Pod
+  avec nsenter, ou depuis un conteneur éphémère avec kubectl debug),
+  rapatriez les captures sur le control plane, et désignez d'après les
+  paquets la cause de chaque échec : refus, perte ou DNS. Rien n'est à
+  réparer.
+
+criteria:
+  - id: capture-du-bon-pod
+    label: "Chaque client a une capture lisible dans ~/captures, prise sur sa propre interface : les paquets viennent de l'adresse actuelle de ce Pod"
+  - id: signature-de-la-panne
+    label: "Chaque capture contient les paquets qui prouvent la panne de son client : un reset, un SYN renvoyé sans réponse, ou des réponses NXDomain"
+  - id: cause-designee
+    label: "~/captures/diagnostic.yaml désigne la bonne cause pour chaque client, et aucune des trois pannes n'a été réparée"
