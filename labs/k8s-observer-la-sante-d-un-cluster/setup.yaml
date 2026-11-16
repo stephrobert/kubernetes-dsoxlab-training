@@ -1,0 +1,29 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
+# le scénario décrit, un cluster sans metrics-server dont il faut rendre la
+# santé lisible. Le manifeste de metrics-server est celui du lab
+# cka-hpa-autoscaling, épinglé en 0.9.0 (mesuré disponible le 2026-09-15).
+- name: Préparer le lab k8s-observer-la-sante-d-un-cluster
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+    metrics_server_version: "0.9.0"
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Récupérer le manifeste de metrics-server {{ metrics_server_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/kubernetes-sigs/metrics-server/releases/download/v{{ metrics_server_version }}/components.yaml"
+        dest: "/root/metrics-server-v{{ metrics_server_version }}.yaml"
+        mode: "0644"
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        SESSION_UTILISATEUR: "{{ session }}"
+        MANIFESTE: "/root/metrics-server-v{{ metrics_server_version }}.yaml"

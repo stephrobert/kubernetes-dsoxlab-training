@@ -1,0 +1,13 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace de l'incident. Le lab ne pose
+# rien hors du namespace, et le cluster reste en place.
+- name: Nettoyer le lab k8s-reconstituer-un-incident-par-les-evenements
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace boutique --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false

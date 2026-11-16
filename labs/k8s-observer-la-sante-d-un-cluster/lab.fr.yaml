@@ -1,0 +1,14 @@
+title: "Rendre lisible la santé d'un cluster et rédiger son bulletin"
+description: |
+  Un cluster kubeadm sans metrics-server : kubectl top ne répond rien.
+  Installez metrics-server depuis le manifeste épinglé fourni, faites-lui
+  accepter les certificats des kubelets, puis rédigez un bulletin de santé
+  dans le ConfigMap bulletin du namespace sante : le Pod qui consomme le plus
+  de mémoire, et le nœud dont le CPU est le plus réservé par les demandes.
+criteria:
+  - id: top-disponible
+    label: "La Metrics API est disponible et kubectl top nodes répond"
+  - id: pod-gourmand
+    label: "Le bulletin nomme le Pod de sante qui consomme le plus de mémoire, tel que kubectl top le mesure"
+  - id: noeud-reserve
+    label: "Le bulletin nomme le nœud dont le CPU allouable est le plus réservé par les demandes"

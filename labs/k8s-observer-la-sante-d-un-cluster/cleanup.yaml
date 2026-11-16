@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab clean` : retire le namespace, puis metrics-server que
+# l'apprenant a installé (APIService, rôles et Deployment de kube-system), et
+# le répertoire ~/sante de la session. Le cluster, lui, reste en place.
+- name: Nettoyer le lab k8s-observer-la-sante-d-un-cluster
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+    metrics_server_version: "0.9.0"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace sante --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer metrics-server
+      ansible.builtin.command: >-
+        kubectl delete -f /root/metrics-server-v{{ metrics_server_version }}.yaml --ignore-not-found --wait=true
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire du lab dans la session
+      ansible.builtin.file:
+        path: "/home/{{ session }}/sante"
+        state: absent

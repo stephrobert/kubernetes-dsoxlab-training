@@ -1,0 +1,24 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé. Le cluster, lui, reste
+# en place. Le manifeste de la session et l'uid de référence sont retirés aussi :
+# un passage suivant repart d'un fichier « Git » d'origine.
+- name: Nettoyer le lab k8s-modifier-une-ressource-en-production
+  hosts: lab_target
+  become: true
+  vars:
+    session: "{{ ansible_user | default('ansible') }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: kubectl delete namespace magasin --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le manifeste de la session et l'uid de référence
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ session }}/magasin"
+        - /var/lib/dsoxlab-lab/magasin-web.uid

@@ -1,0 +1,17 @@
+title: "Modifier un Deployment en production sans perdre un conteneur, et résorber la dérive"
+description: |
+  Un incident sur le Deployment web du namespace magasin, qui porte deux
+  conteneurs. Passez web en nginx 1.30 sans perdre le conteneur log-agent ni
+  recréer l'objet, notez l'incident dessus, passez log-agent en debug, puis
+  reportez dans son manifeste chaque changement fait dans le cluster, et les
+  quatre réplicas posés pendant le pic de charge, jusqu'à ce que kubectl diff
+  ne voie plus rien.
+criteria:
+  - id: liste-preservee
+    label: "web tourne en nginx 1.30, log-agent est toujours là, et le Deployment est le même objet (même uid)"
+  - id: incident-note
+    label: "L'annotation incident-ref de web nomme l'incident"
+  - id: second-conteneur-vise
+    label: "log-agent, second conteneur de la liste, a LOG_LEVEL=debug"
+  - id: derive-resorbee
+    label: "kubectl diff ne voit plus d'écart entre le cluster et ~/magasin/web.yaml, et les quatre réplicas du pic sont gardés"

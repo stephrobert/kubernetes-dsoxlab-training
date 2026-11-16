@@ -252,6 +252,9 @@ sections:
       # « StorageClass », sur le cluster kind « lab ».
       - k8s-challenge-donnees-qui-survivent
       - cka-deployment-rollout-rollback
+      # Lab guidé de la leçon 14-11 « Modifier une ressource en production »
+      # (D103) : patch strategic, JSON et dérive avec Git, sur le cluster kubeadm.
+      - k8s-modifier-une-ressource-en-production
       - cka-node-drain-cordon
       # Lab guidé de la leçon 14-13 « Gérer les nœuds » (D103) : étiquette, rôle,
       # annotation et taint NoExecute sur un worker, sur le cluster kubeadm.
@@ -268,6 +271,12 @@ sections:
       # les modules RBAC, Réseau, Scheduling et capacité, et Sécurité des
       # workloads joués, sur le cluster kind « capacite » (trois workers).
       - k8s-epreuve-livrer-une-application
+      # Lab guidé de la leçon 14-02 « Observer la santé d'un cluster » (D103) :
+      # metrics-server, kubectl top et réservation des nœuds, sur le cluster kubeadm.
+      - k8s-observer-la-sante-d-un-cluster
+      # Lab guidé de la leçon 14-04 « Analyser les événements Kubernetes » (D103) :
+      # quatre pannes nommées par leurs Events, et leur chronologie, sur le cluster kubeadm.
+      - k8s-reconstituer-un-incident-par-les-evenements
       - cka-troubleshoot-imagepullbackoff
       - cka-troubleshoot-crashloopbackoff
       # Lab guidé de la leçon 14-07 « Diagnostiquer un Pod Pending » (D103) :
@@ -315,6 +324,9 @@ sections:
       # Niveau 4, lot A (vague 2) : le challenge du module Administrer le cluster,
       # après les labs qu'il met en jeu.
       - k8s-challenge-sauvegarder-et-restaurer
+      # Lab guidé de la leçon 14-18 « Tâches quotidiennes de l'admin » (D103) : la
+      # revue hebdomadaire (Jobs, quota, révisions), avant le challenge du module.
+      - k8s-faire-la-routine-d-exploitation
       # Le challenge du module Fiabiliser et exploiter (niveau 4), sur le cluster
       # kubeadm : son check évacue lui-même le worker.
       - k8s-challenge-garantir-la-disponibilite

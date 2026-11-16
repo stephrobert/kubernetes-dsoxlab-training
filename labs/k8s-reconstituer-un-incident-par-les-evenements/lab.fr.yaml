@@ -1,0 +1,14 @@
+title: "Reconstituer un incident à partir des Events d'un namespace"
+description: |
+  Cinq applications dans le namespace boutique, dont quatre en panne, chacune
+  d'une façon différente. Sans rien réparer, lisez les Events du namespace et
+  rédigez le rapport d'incident dans le ConfigMap rapport : la raison des
+  Events Warning de chaque application, celle qui est saine, et la première
+  application touchée.
+criteria:
+  - id: raisons
+    label: "Chaque application en panne porte la raison de ses Events Warning, mot pour mot"
+  - id: saine
+    label: "L'application sans aucun Event Warning est dite saine"
+  - id: chronologie
+    label: "Le rapport nomme l'application touchée par le premier Event Warning du namespace"
