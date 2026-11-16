@@ -267,6 +267,9 @@ sections:
       - k8s-epreuve-livrer-une-application
       - cka-troubleshoot-imagepullbackoff
       - cka-troubleshoot-crashloopbackoff
+      # Lab guidé de la leçon 14-07 « Diagnostiquer un Pod Pending » (D103) :
+      # quatre causes de Pending, une par application, sur le cluster kubeadm.
+      - cka-placer-un-pod-pending
       - cka-kubectl-debug
       - cka-troubleshoot-dns
       - cka-troubleshoot-networking
