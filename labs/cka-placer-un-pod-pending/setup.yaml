@@ -1,12 +1,19 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session : il pose la situation que
-# le scénario décrit, quatre applications en Pending pour quatre causes.
+# le scénario décrit, après avoir joint le second worker optionnel
+# k8s-w2.lab au cluster (shared/noeud-optionnel.yml) : quatre applications en Pending pour quatre causes.
 - name: Préparer le lab cka-placer-un-pod-pending
   hosts: lab_target
   become: true
   tasks:
     - name: Installer le socle, le cluster kubeadm du catalogue
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
 
     - name: Poser la situation du lab
       ansible.builtin.script: fixtures/prepare.sh

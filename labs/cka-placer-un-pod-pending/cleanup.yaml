@@ -36,3 +36,9 @@
         executable: /bin/bash
       changed_when: true
       failed_when: false
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

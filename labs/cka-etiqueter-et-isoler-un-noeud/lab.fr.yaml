@@ -1,0 +1,15 @@
+title: "Étiqueter un nœud, afficher son rôle et le réserver à une équipe"
+description: |
+  L'équipe data reprend le worker k8s-w2.lab. Étiquetez le nœud pour cette
+  équipe, rendez son rôle lisible dans kubectl get nodes, notez qui appeler
+  avant une maintenance, et réservez-le par une taint dont l'effet fait partir
+  les Pods des autres équipes qui y tournent déjà, sans les arrêter.
+criteria:
+  - id: etiquette-d-equipe
+    label: "k8s-w2.lab, et aucun autre nœud, porte l'étiquette equipe=data"
+  - id: role-lisible
+    label: "kubectl get nodes affiche le rôle data de k8s-w2.lab"
+  - id: contact-note
+    label: "L'annotation maintenance-contact de k8s-w2.lab nomme l'équipe data"
+  - id: reserve-effective
+    label: "Une taint NoExecute réserve le nœud : entrepot y tourne, rapports en est parti et tourne toujours ailleurs"

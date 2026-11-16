@@ -253,6 +253,9 @@ sections:
       - k8s-challenge-donnees-qui-survivent
       - cka-deployment-rollout-rollback
       - cka-node-drain-cordon
+      # Lab guidé de la leçon 14-13 « Gérer les nœuds » (D103) : étiquette, rôle,
+      # annotation et taint NoExecute sur un worker, sur le cluster kubeadm.
+      - cka-etiqueter-et-isoler-un-noeud
       - cka-hpa-autoscaling
       # Lab guidé de la leçon « Vertical Pod Scaling », module 8, sur le
       # cluster kubeadm.
@@ -442,10 +445,14 @@ sections:
       # et l'apprenant qui a posé un default-deny voit mieux ce que le
       # chiffrement ajoute par-dessus.
       - cks-istio-mtls-lockdown
+      # Lab guidé de la leçon 15-16 « Falco » (D103) : une règle personnalisée,
+      # limitée à un namespace, chargée en plus des règles fournies. Il vient
+      # avant le challenge qui suit, lequel croise Falco avec le confinement.
+      - cks-falco-detecter-un-shell
       # Le challenge du module « Confiner et détecter » (niveau 5), posé dans
       # la leçon « Runtime Sandboxes », après les labs du module qu'il croise :
       # AppArmor, seccomp, gVisor, la NetworkPolicy par défaut et le mTLS. Il y
-      # ajoute Falco, qu'aucun autre lab du catalogue n'emploie.
+      # ajoute Falco, dont le lab guidé précédent a posé les bases.
       - k8s-challenge-confiner-et-detecter
       - cks-ingress-tls
       # Niveau 4, lot A (vague 1) : des certificats émis par cert-manager et

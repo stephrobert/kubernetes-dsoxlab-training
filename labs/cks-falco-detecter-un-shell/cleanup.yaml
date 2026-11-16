@@ -1,0 +1,39 @@
+---
+# Joué par `dsoxlab clean` : défait ce que le lab a créé. Le cluster, lui, reste
+# en place. Falco est retiré du nœud, comme le fait le challenge
+# k8s-challenge-confiner-et-detecter : un lab suivant ne doit pas hériter d'un
+# Falco qui tourne, ni de ses règles.
+- name: Nettoyer le lab cks-falco-detecter-un-shell
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer les namespaces du lab
+      ansible.builtin.command: kubectl delete namespace paiements accueil --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Arrêter Falco
+      ansible.builtin.command: systemctl stop falco-modern-bpf.service
+      changed_when: true
+      failed_when: false
+
+    - name: Purger le paquet Falco
+      ansible.builtin.apt:
+        name: falco
+        state: absent
+        purge: true
+        lock_timeout: 300
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Effacer la configuration, les règles et le journal de Falco
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/falco
+        - /var/log/falco
+        - /etc/apt/sources.list.d/falcosecurity.list
+        - /usr/share/keyrings/falco-archive-keyring.gpg
