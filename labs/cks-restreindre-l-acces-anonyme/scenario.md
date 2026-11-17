@@ -22,9 +22,10 @@ token. That join must keep working.
    `/healthz`) and what `kubeadm join` needs. Everywhere else, the API server
    answers **401**. The authentication configuration lives in
    **`/etc/kubernetes/authn-config.yaml`**.
-2. No RBAC binding grants rights to anonymous clients, apart from the two
-   kubeadm creates itself (`system:public-info-viewer` and
-   `kubeadm:bootstrap-signer-clusterinfo`).
+2. No RBAC binding grants rights to anonymous clients, apart from
+   `system:public-info-viewer`, which the API server sets at startup, and
+   `kubeadm:bootstrap-signer-clusterinfo`, which kubeadm creates to read
+   `cluster-info`.
 3. The control plane kubelet answers **401** to an anonymous client, and
    **delegates** its authorization decisions to the API server.
 4. The kubelet credentials can no longer set a `node-restriction.kubernetes.io/`

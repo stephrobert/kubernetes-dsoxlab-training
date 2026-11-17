@@ -24,8 +24,12 @@ NOEUD = "k8s-w2.lab"
 KUBECTL = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
 # Ce qui écoute sur toutes les interfaces d'un worker du catalogue, relevé le
 # 2026-11-17 sur k8s-w1.lab : sshd, bird (BGP de Calico), kubelet, kube-proxy,
-# VXLAN de Calico, et le client DHCP lié à l'adresse du nœud.
-PORTS_ATTENDUS = {("tcp", 22), ("tcp", 179), ("tcp", 10250), ("tcp", 10256), ("udp", 4789), ("udp", 68)}
+# VXLAN de Calico, et le client DHCP lié à l'adresse du nœud. Plus calico-typha
+# (5473) : l'opérateur Tigera en place selon le nombre de nœuds, et le
+# 2026-11-17 l'un d'eux a atterri sur k8s-w2 entre deux passages du lab.
+PORTS_ATTENDUS = {
+    ("tcp", 22), ("tcp", 179), ("tcp", 5473), ("tcp", 10250), ("tcp", 10256), ("udp", 4789), ("udp", 68),
+}
 PORTS_RETIRES = (111, 21, 8000)
 PAQUETS_RETIRES = ("rpcbind", "vsftpd")
 

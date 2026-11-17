@@ -14,7 +14,8 @@ du code à corriger à chaque faille publiée.
 Ce qu'un worker du cluster utilise réellement, sur toutes ses interfaces :
 `sshd` (22), `bird`, le BGP de Calico (179), le kubelet (10250), kube-proxy
 (10256), le tunnel VXLAN de Calico (UDP 4789), et le client DHCP (UDP 68, lié
-à l'adresse du nœud).
+à l'adresse du nœud). S'y ajoute `calico-typha` (5473) quand l'opérateur de
+Calico en place une instance sur ce nœud.
 
 ## Ce que vous devez obtenir
 

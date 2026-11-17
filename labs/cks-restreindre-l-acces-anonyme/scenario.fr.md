@@ -22,9 +22,10 @@ Une contrainte : de nouveaux workers rejoindront ce cluster par
    `/readyz`, `/healthz`) et ce dont `kubeadm join` a besoin. Partout ailleurs,
    l'API server lui répond **401**. La configuration d'authentification vit
    dans **`/etc/kubernetes/authn-config.yaml`**.
-2. Aucune liaison RBAC ne donne de droits aux clients anonymes, hormis les
-   deux que kubeadm crée lui-même (`system:public-info-viewer` et
-   `kubeadm:bootstrap-signer-clusterinfo`).
+2. Aucune liaison RBAC ne donne de droits aux clients anonymes, hormis
+   `system:public-info-viewer`, que l'API server pose à son démarrage, et
+   `kubeadm:bootstrap-signer-clusterinfo`, que kubeadm crée pour la lecture de
+   `cluster-info`.
 3. Le kubelet du control plane répond **401** à un client anonyme, et
    **délègue** ses décisions d'autorisation à l'API server.
 4. Les identifiants du kubelet ne peuvent plus poser d'étiquette
