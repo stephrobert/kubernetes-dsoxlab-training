@@ -8,7 +8,7 @@ disposez pour cela de trois machines : **`net-cp.lab`**, le plan de contrôle,
 et deux workers, **`net-w1.lab`** et **`net-w2.lab`**.
 
 Les trois nœuds sont prêts : swap coupé, containerd configuré, `kubelet`,
-`kubeadm` et `kubectl` 1.37 installés et figés, `helm` 4.3.0 sur le plan de
+`kubeadm` et `kubectl` 1.37 installés et figés, `helm` 4.3.2 sur le plan de
 contrôle. Aucun cluster n'existe encore. Depuis le plan de contrôle,
 `ssh net-w1.lab` et `ssh net-w2.lab` ouvrent une session sur chaque worker
 sans mot de passe, et `sudo` n'en demande pas non plus.

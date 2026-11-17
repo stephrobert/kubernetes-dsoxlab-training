@@ -3,7 +3,7 @@
 **CKAD** lab, *Application Deployment* domain (20 % of the exam), competency
 "Use the Helm package manager to deploy existing packages".
 
-Helm 4.3.0, the current version. The inherited lab went through the Bitnami
+Helm 4.3.2, the current version. The inherited lab went through the Bitnami
 charts, whose images are no longer served freely: the chart is local, generated
 by `helm create`, with an image aligned on the rest of the catalogue.
 

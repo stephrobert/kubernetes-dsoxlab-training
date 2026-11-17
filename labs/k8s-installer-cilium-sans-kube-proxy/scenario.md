@@ -8,7 +8,7 @@ have three machines for it: **`net-cp.lab`**, the control plane, and two
 workers, **`net-w1.lab`** and **`net-w2.lab`**.
 
 The three nodes are ready: swap off, containerd configured, `kubelet`,
-`kubeadm` and `kubectl` 1.37 installed and held, `helm` 4.3.0 on the control
+`kubeadm` and `kubectl` 1.37 installed and held, `helm` 4.3.2 on the control
 plane. No cluster exists yet. From the control plane, `ssh net-w1.lab` and
 `ssh net-w2.lab` open a session on each worker without a password, and `sudo`
 needs none either.

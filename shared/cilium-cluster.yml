@@ -146,7 +146,7 @@
   ansible.builtin.include_tasks: outil-par-mise.yml
   vars:
     outil_nom: helm
-    outil_version: "4.3.0"
+    outil_version: "4.3.2"
     outil_verification: version --short
 
 # Comme sur le cluster partagé : depuis le plan de contrôle, `ssh <worker>`

@@ -49,8 +49,8 @@
   # La première version construisait donc le chemin
   # <data-dir>/installs/<outil>/<version>/<outil>, en affirmant ici même que
   # « la structure de mise est stable ». Elle ne l'est pas, et cela a coûté un
-  # cycle de validation le même jour : helm 4.3.0 est posé sous
-  # `4.3.0/linux-amd64/helm`, parce que mise déplie l'archive amont telle
+  # cycle de validation le même jour : helm 4.3.0 était posé sous
+  # `4.3.0/linux-amd64/helm` (même forme en 4.3.2), parce que mise déplie l'archive amont telle
   # quelle. Le lien pointait dans le vide, `state: link` ne s'en plaint pas, et
   # l'échec n'apparaissait qu'à la tâche suivante.
   #
