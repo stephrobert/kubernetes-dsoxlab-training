@@ -1,0 +1,13 @@
+title: "Retirer d'un worker ce qui écoute sans servir Kubernetes"
+description: |
+  Un ancien modèle de serveur a laissé trois services sur le worker
+  k8s-w2.lab, chacun en écoute sur toutes les interfaces : rpcbind, un serveur
+  FTP, et un outil de débogage HTTP oublié qui sert /etc. Retirez-les pour de
+  bon, sans toucher à ce dont le nœud a besoin pour rester un nœud Kubernetes.
+criteria:
+  - id: surface-reduite
+    label: "Rien n'écoute sur les interfaces de k8s-w2 en dehors de ce qu'un worker utilise, et les ports 111, 21 et 8000 refusent une connexion"
+  - id: retrait-durable
+    label: "rpcbind et vsftpd sont purgés, et l'outil de débogage est arrêté et désactivé : rien ne revient au prochain démarrage"
+  - id: noeud-intact
+    label: "Le kubelet, containerd et sshd tournent encore, le nœud est Ready et accueille un Pod"

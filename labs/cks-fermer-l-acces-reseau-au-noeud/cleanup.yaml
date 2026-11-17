@@ -1,0 +1,65 @@
+---
+# Joué par `dsoxlab clean` : retire le pare-feu de k8s-w2.lab et rend le
+# service nftables livré, puis retire le nœud du cluster. Le nœud optionnel
+# reste monté et servira à d'autres labs.
+#
+# `ignore_unreachable` : une politique drop mal écrite peut couper SSH. Le
+# nettoyage ne doit pas échouer pour autant ; `dsoxlab destroy
+# --optional-hosts` retire alors la machine entière.
+- name: Rendre k8s-w2.lab sans pare-feu
+  hosts: lab_worker2
+  become: true
+  ignore_unreachable: true
+  tasks:
+    - name: Désactiver le service nftables, sans l'arrêter (ExecStop vide tout)
+      ansible.builtin.systemd:
+        name: nftables.service
+        enabled: false
+      failed_when: false
+
+    - name: Lister les tables de la famille inet
+      ansible.builtin.shell:
+        cmd: set -o pipefail && nft list tables | awk '$2 == "inet" {print $3}'
+        executable: /bin/bash
+      register: _tables_inet
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer les tables inet
+      ansible.builtin.command: nft delete table inet {{ item }}
+      loop: "{{ _tables_inet.stdout_lines | default([]) }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de règles
+      ansible.builtin.file:
+        path: /etc/nftables.d
+        state: absent
+
+    - name: Rendre le nftables.conf livré
+      ansible.builtin.copy:
+        src: /var/backups/nftables.conf.livre
+        dest: /etc/nftables.conf
+        remote_src: true
+        mode: "0644"
+      failed_when: false
+
+    - name: Arrêter les minuteurs de retrait laissés par systemd-run
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          for t in $(systemctl list-units --type=timer --no-legend 'run-*' | awk '{print $1}');
+          do systemctl stop "$t"; done
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+- name: Retirer le second worker du cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

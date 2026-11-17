@@ -1,0 +1,104 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Deux temps :
+#   1. sur le control plane : le socle, puis la jonction du second worker
+#      optionnel k8s-w2.lab (shared/noeud-optionnel.yml) ;
+#   2. sur k8s-w2.lab : ce qu'un ancien modèle de serveur y a laissé, trois
+#      services qui écoutent sur toutes les interfaces sans servir Kubernetes.
+#
+# Les trois pièges sont mesurés (Ubuntu 24.04.5, 2026-11-17) :
+#   - rpcbind (port 111) est relancé par rpcbind.socket : arrêter le service
+#     ne suffit pas, le prochain client le rallume ;
+#   - vsftpd (port 21) est un paquet du dépôt, actif dès son installation ;
+#   - outil-debug.service, un serveur HTTP Python sur le port 8000 qui expose
+#     /etc, n'est fourni par aucun paquet : apt ne le voit pas.
+#
+# Le nœud travaillé est l'hôte OPTIONNEL k8s-w2.lab : retirer un paquet de
+# trop (containerd, le kubelet) y casse un nœud jetable, pas le cluster
+# partagé.
+- name: Préparer le cluster du lab cks-reduire-la-surface-du-noeud
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    # Un nœud optionnel détruit puis remonté (`dsoxlab destroy
+    # --optional-hosts`) revient avec une NOUVELLE clé d'hôte. Le compte du
+    # lab sur le control plane garde l'ancienne dans known_hosts, et
+    # `ssh k8s-w2.lab` est alors refusé (« REMOTE HOST IDENTIFICATION HAS
+    # CHANGED »), pour l'apprenant comme pour la solution. Vécu le 2026-11-17.
+    # On oublie l'ancienne clé ; accept-new acceptera la nouvelle.
+    - name: Oublier une ancienne clé d'hôte du second worker
+      ansible.builtin.shell: >-
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts -R {{ item }};
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts
+        -R {{ hostvars[item].ansible_host | default(item) }}
+      loop: "{{ groups['lab_worker2'] | default([]) }}"
+      become: true
+      become_user: "{{ ansible_user | default('ubuntu') }}"
+      changed_when: true
+      failed_when: false
+
+- name: Laisser trois services superflus sur k8s-w2.lab
+  hosts: lab_worker2
+  become: true
+  tasks:
+    - name: Installer rpcbind et vsftpd
+      ansible.builtin.apt:
+        name:
+          - rpcbind=1.2.6-7ubuntu2
+          - vsftpd=3.0.5-0ubuntu3.1
+        state: present
+        update_cache: true
+        lock_timeout: 300
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Démarrer rpcbind et vsftpd
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+        masked: false
+      loop: [rpcbind.socket, rpcbind.service, vsftpd.service]
+
+    - name: Poser l'outil de débogage oublié
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/outil-debug.service
+        content: |
+          [Unit]
+          Description=Outil de debogage HTTP laisse par l'ancien modele
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/python3 -m http.server 8000 --directory /etc
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Démarrer l'outil de débogage
+      ansible.builtin.systemd:
+        name: outil-debug.service
+        state: restarted
+        enabled: true
+        daemon_reload: true
+
+    - name: Vérifier que les trois ports écoutent
+      ansible.builtin.shell:
+        cmd: set -o pipefail && ss -Htln | awk '{print $4}' | grep -cE ':(111|21|8000)$'
+        executable: /bin/bash
+      register: _ports
+      until: _ports.stdout | int >= 3
+      retries: 10
+      delay: 2
+      changed_when: false

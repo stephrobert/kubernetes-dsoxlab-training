@@ -1,0 +1,72 @@
+id: cks-restreindre-l-acces-anonyme
+title: "Close the API server and the kubelet to anonymous clients without breaking kubeadm join"
+level: cluster-hardening
+section: cks
+difficulty: advanced
+description: |
+  On the control plane, an anonymous client reads the cluster objects, the
+  kubelet answers it and lets it do anything, and the NodeRestriction
+  admission plugin is gone. Leave anonymous access open to health checks and
+  to the discovery that kubeadm join needs, and to nothing else.
+skills:
+  - api-server
+  - authentication
+  - kubelet
+  - admission
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-17) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+lab_type: lab
+estimated_time: 35m
+
+# Lab guidé de la leçon 15-28 « Restreindre l'accès à l'API server » (issue
+# #234). Blueprint CKS, domaine Cluster Hardening : « Restrict access to the
+# Kubernetes API ». Gestes mesurés sur kubeadm v1.37.2 le 2026-11-16 (série 2
+# CKS-A, M1 et M2) : avec les seuls chemins de santé dans les conditions
+# anonymes, kubeadm join échoue (401 sur cluster-info) ; avec cluster-info en
+# plus, il réussit.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: anonyme-limite-a-la-sante
+    label: "An anonymous client reaches the health paths and the cluster-info ConfigMap kubeadm join reads, and gets 401 everywhere else"
+    tests:
+      - test_l_anonyme_n_atteint_que_la_sante
+      - test_la_decouverte_de_kubeadm_join_reste_ouverte
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+  - id: aucun-droit-anonyme
+    label: "No binding grants rights to anonymous clients, apart from the two kubeadm creates"
+    tests:
+      - test_aucun_droit_rbac_pour_les_anonymes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+  - id: kubelet-ferme
+    label: "The control plane kubelet answers 401 to an anonymous client and delegates authorization to the API server"
+    tests:
+      - test_le_kubelet_refuse_l_anonyme
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+  - id: noderestriction
+    label: "NodeRestriction refuses a node-restriction.kubernetes.io/ label set with the kubelet credentials"
+    tests:
+      - test_noderestriction_refuse_les_etiquettes_reservees
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+
+feedback: full

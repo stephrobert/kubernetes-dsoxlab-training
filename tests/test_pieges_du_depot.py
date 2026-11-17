@@ -56,10 +56,28 @@ LABS = RACINE / "labs"
 REPERTOIRES = sorted(p.parent for p in LABS.glob("*/lab.yaml"))
 IDS = [p.name for p in REPERTOIRES]
 
-#: Un appel à la commande `ssh`, suivi de ses options courtes.
-#: `(?!-)` écarte `ssh-keygen` et `ssh-copy-id` ; `\b` écarte `sshd` et
-#: `ssh_config`, où le mot ne se termine pas après « ssh ».
-APPEL_SSH = re.compile(r"\bssh\b(?!-)((?:\s+-[\w-]+(?:=\S+)?)*)")
+#: Un appel à la commande `ssh`, suivi de ses options courtes. Le mot doit
+#: être en POSITION DE COMMANDE : début de ligne, après `;`, `&&`, `|`, `(`
+#: (donc `$(`), `!`, ou après sudo, then, do, if, while, timeout <durée>.
+#: Sinon « /etc/ssh/sshd_config.d » ou « systemctl reload ssh » passaient pour
+#: des appels (vécu le 2026-11-17). `(?![-./\w])` écarte `ssh-keygen`,
+#: `sshd`, `ssh_config` et un chemin.
+APPEL_SSH = re.compile(
+    r"(?:^|[;&|(!]|\bsudo|\bthen|\bdo|\bif|\bwhile|\btimeout\s+\S+)\s*ssh\b(?![-./\w])"
+    r"((?:\s+-[\w-]+(?:=\S+)?)*)"
+)
+
+
+def _ssh_sans_n(ligne: str) -> bool:
+    """Un appel ssh qui lirait l'entrée standard du script.
+
+    Un ssh nourri par un heredoc (`<<`) lit ce heredoc, pas le script : il
+    n'avale rien, et `-n` le rendrait au contraire muet.
+    """
+    appel = APPEL_SSH.search(ligne)
+    if not appel or "-n" in appel.group(1).split():
+        return False
+    return "<<" not in ligne[appel.end():]
 
 #: `kubectl create namespace <nom>`, avec ou sans le `kubectl`.
 CREE_NAMESPACE = re.compile(r"create\s+namespace\s+([a-z0-9-]+)")
@@ -104,8 +122,7 @@ def test_tout_ssh_d_une_solution_porte_l_option_n(lab: Path) -> None:
     fautifs = [
         (numero, ligne.strip())
         for numero, ligne in lignes
-        for options in [APPEL_SSH.search(ligne)]
-        if options and "-n" not in options.group(1).split()
+        if _ssh_sans_n(ligne)
     ]
 
     assert not fautifs, (
@@ -221,3 +238,21 @@ def test_aucun_test_ne_decide_sur_stdout_plus_stderr(lab: Path) -> None:
         "jamais vide, et un test qui conclut « vide = absent » passe toujours. "
         "Lisez la sortie standard seule."
     )
+
+
+@pytest.mark.parametrize(
+    ("ligne", "fautive"),
+    [
+        ("ssh k8s-w1.lab 'sudo systemctl restart kubelet'", True),
+        ("out=$(ssh -o BatchMode=yes k8s-w1.lab hostname)", True),
+        ("sudo ssh k8s-w1.lab true", True),
+        ("ssh -n k8s-w1.lab true", False),
+        ("ssh -o StrictHostKeyChecking=accept-new k8s-w2.lab 'sudo bash -s' <<'NOEUD'", False),
+        ("rm -f /etc/ssh/sshd_config.d/05-heritage.conf", False),
+        ("sshd -t && systemctl reload ssh", False),
+        ("ssh-keygen -q -t ed25519 -f cle", False),
+    ],
+)
+def test_le_motif_ssh_distingue_un_appel_d_un_mot(ligne: str, fautive: bool) -> None:
+    """Le contrôle refuse un vrai ssh sans -n, et lui seul."""
+    assert _ssh_sans_n(ligne) is fautive

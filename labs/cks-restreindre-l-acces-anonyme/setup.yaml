@@ -1,0 +1,16 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session : le socle, puis trois
+# portes ouvertes aux clients sans identifiant (fixtures/prepare.sh).
+- name: Préparer le lab cks-restreindre-l-acces-anonyme
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
