@@ -496,6 +496,11 @@ sections:
       - k8s-challenge-livrer-une-image-verifiee
       - cks-rbac-least-privilege
       - cks-api-server-hardening
+      # Lab guidé de la leçon 15-28 « Restreindre l'accès à l'API server »
+      # (#234) : l'anonyme gardé sur la santé et la découverte de kubeadm
+      # join, le kubelet fermé, NodeRestriction rendu. Après le durcissement
+      # du profileur, sur le même Pod statique.
+      - cks-restreindre-l-acces-anonyme
       - cks-audit-log-policy
       - cks-networkpolicy-default-deny
       # Le mTLS vient juste après la NetworkPolicy, et dans cet ordre : l'un
@@ -518,6 +523,17 @@ sections:
       # une CA interne, juste après le TLS d'un Ingress.
       - k8s-emettre-un-certificat-avec-cert-manager
       - cks-cis-benchmark-remediate
+      # Lab guidé de la leçon 15-27 « Durcir les nœuds » (#235) : SSH réservé
+      # à un groupe, par clé seulement, et un sudo ramené au plus juste, sur
+      # l'hôte optionnel k8s-w2.lab (une erreur d'AllowGroups s'y répare en
+      # détruisant la machine, sans toucher au cluster partagé).
+      - cks-restreindre-l-acces-au-noeud
+      # Lab guidé de la même leçon 15-27 (#220) : réduire la surface de l'OS
+      # du même nœud optionnel, ce qui écoute sans servir Kubernetes.
+      - cks-reduire-la-surface-du-noeud
+      # Lab guidé de la même leçon 15-27 (#221) : le pare-feu nftables du
+      # nœud optionnel, persistant, sans effacer kube-proxy ni Calico.
+      - cks-fermer-l-acces-reseau-au-noeud
       # Le challenge du module Durcir le cluster (niveau 5), posé dans la
       # leçon « Audit Logs » : il croise l'API server durci, la remédiation
       # CIS et l'audit, sur le cluster kubeadm.

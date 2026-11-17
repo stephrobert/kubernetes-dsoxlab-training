@@ -1,0 +1,50 @@
+---
+# Joué par `dsoxlab clean` : retire de k8s-w2.lab ce que le lab y a posé (ou
+# ce qu'il en reste), puis retire le nœud du cluster. Le nœud optionnel reste
+# monté et servira à d'autres labs.
+- name: Rendre k8s-w2.lab à son état d'origine
+  hosts: lab_worker2
+  become: true
+  ignore_unreachable: true
+  tasks:
+    - name: Arrêter et retirer l'outil de débogage
+      ansible.builtin.systemd:
+        name: outil-debug.service
+        state: stopped
+        enabled: false
+      failed_when: false
+
+    - name: Supprimer son unité
+      ansible.builtin.file:
+        path: /etc/systemd/system/outil-debug.service
+        state: absent
+
+    - name: Démasquer ce que l'apprenant aurait masqué
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        masked: false
+      loop: [rpcbind.socket, rpcbind.service, vsftpd.service, outil-debug.service]
+      failed_when: false
+
+    - name: Purger rpcbind et vsftpd
+      ansible.builtin.apt:
+        name: [rpcbind, vsftpd]
+        state: absent
+        purge: true
+        lock_timeout: 300
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Recharger systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+- name: Retirer le second worker du cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

@@ -1,0 +1,15 @@
+title: "Fermer l'API server et le kubelet aux clients anonymes sans casser kubeadm join"
+description: |
+  Sur le control plane, un client anonyme lit les objets du cluster, le kubelet
+  lui répond et le laisse tout faire, et le plugin d'admission NodeRestriction
+  a disparu. Laissez l'accès anonyme ouvert aux sondes de santé et à la
+  découverte dont kubeadm join a besoin, et à rien d'autre.
+criteria:
+  - id: anonyme-limite-a-la-sante
+    label: "Un client anonyme atteint les chemins de santé et le ConfigMap cluster-info que lit kubeadm join, et reçoit 401 partout ailleurs"
+  - id: aucun-droit-anonyme
+    label: "Aucune liaison ne donne de droits aux clients anonymes, hors les deux que kubeadm crée"
+  - id: kubelet-ferme
+    label: "Le kubelet du control plane répond 401 à un client anonyme et délègue l'autorisation à l'API server"
+  - id: noderestriction
+    label: "NodeRestriction refuse une étiquette node-restriction.kubernetes.io/ posée avec les identifiants du kubelet"

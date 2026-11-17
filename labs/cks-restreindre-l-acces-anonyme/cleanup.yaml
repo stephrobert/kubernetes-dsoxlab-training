@@ -1,0 +1,83 @@
+---
+# Joué par `dsoxlab clean` : rend l'API server et le kubelet du control plane
+# tels que kubeadm les a posés, que le candidat ait réussi ou non. Les
+# sauvegardes viennent de fixtures/prepare.sh.
+#
+# Comme pour cks-api-server-hardening, on attend que l'API réponde ET que son
+# Pod statique soit revenu Running : /healthz répond avant que l'objet Pod ne
+# sorte de Pending, et le validateur photographie le cluster dans cette
+# fenêtre.
+- name: Nettoyer le lab cks-restreindre-l-acces-anonyme
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Restaurer le manifeste de l'API server
+      ansible.builtin.copy:
+        src: /var/backups/kube-apiserver.avant-acces-anonyme.yaml
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        remote_src: true
+        mode: "0600"
+      failed_when: false
+
+    - name: Retirer la configuration d'authentification du lab
+      ansible.builtin.file:
+        path: /etc/kubernetes/authn-config.yaml
+        state: absent
+
+    - name: Restaurer la configuration du kubelet
+      ansible.builtin.copy:
+        src: /var/backups/kubelet-config.avant-acces-anonyme.yaml
+        dest: /var/lib/kubelet/config.yaml
+        remote_src: true
+        mode: "0644"
+      register: _kubelet_restaure
+      failed_when: false
+
+    - name: Relancer le kubelet sur sa configuration d'origine
+      ansible.builtin.systemd:
+        name: kubelet
+        state: restarted
+      when: _kubelet_restaure is changed
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: kubectl get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que le Pod statique de l'API server soit Running
+      ansible.builtin.command: >-
+        kubectl -n kube-system get pods -l component=kube-apiserver
+        -o jsonpath={.items[*].status.phase}
+      register: phase_api
+      until: phase_api.stdout.split() | unique == ["Running"]
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer la lecture publique
+      ansible.builtin.command: kubectl delete clusterrolebinding lecture-publique --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer une étiquette réservée qu'un essai aurait laissée
+      ansible.builtin.command: kubectl label node k8s-cp.lab node-restriction.kubernetes.io/essai-
+      changed_when: true
+      failed_when: false
+
+    - name: Attendre que le control plane soit Ready
+      ansible.builtin.command: >-
+        kubectl get node k8s-cp.lab
+        -o jsonpath={.status.conditions[?(@.type=="Ready")].status}
+      register: pret
+      until: pret.stdout == "True"
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false

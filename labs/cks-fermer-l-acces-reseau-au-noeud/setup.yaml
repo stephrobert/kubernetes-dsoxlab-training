@@ -1,0 +1,97 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Deux temps :
+#   1. sur le control plane : le socle, puis la jonction du second worker
+#      optionnel k8s-w2.lab (shared/noeud-optionnel.yml) ;
+#   2. sur k8s-w2.lab : aucun pare-feu, tous les ports joignables, le
+#      service nftables livré par Ubuntu (désactivé, et dont le fichier
+#      commence par `flush ruleset`).
+#
+# Le nœud travaillé est l'hôte OPTIONNEL k8s-w2.lab : une politique `drop`
+# mal écrite peut couper SSH, et un nœud optionnel se retire par
+# `dsoxlab destroy --optional-hosts` sans toucher au cluster partagé.
+#
+# Rejouable : le second temps retire toute table de la famille inet (celles
+# de l'apprenant ; kube-proxy en mode iptables et Calico écrivent dans les
+# familles ip, ip6 et arp), et rend /etc/nftables.conf livré.
+- name: Préparer le cluster du lab cks-fermer-l-acces-reseau-au-noeud
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    # Un nœud optionnel détruit puis remonté (`dsoxlab destroy
+    # --optional-hosts`) revient avec une NOUVELLE clé d'hôte. Le compte du
+    # lab sur le control plane garde l'ancienne dans known_hosts, et
+    # `ssh k8s-w2.lab` est alors refusé (« REMOTE HOST IDENTIFICATION HAS
+    # CHANGED »), pour l'apprenant comme pour la solution. Vécu le 2026-11-17.
+    # On oublie l'ancienne clé ; accept-new acceptera la nouvelle.
+    - name: Oublier une ancienne clé d'hôte du second worker
+      ansible.builtin.shell: >-
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts -R {{ item }};
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts
+        -R {{ hostvars[item].ansible_host | default(item) }}
+      loop: "{{ groups['lab_worker2'] | default([]) }}"
+      become: true
+      become_user: "{{ ansible_user | default('ubuntu') }}"
+      changed_when: true
+      failed_when: false
+
+- name: Laisser k8s-w2.lab sans pare-feu
+  hosts: lab_worker2
+  become: true
+  tasks:
+    - name: Garder une copie du nftables.conf livré, une fois pour toutes
+      ansible.builtin.copy:
+        src: /etc/nftables.conf
+        dest: /var/backups/nftables.conf.livre
+        remote_src: true
+        force: false
+        mode: "0644"
+
+    # `disable` seul, sans `stop` : l'ExecStop de l'unité est
+    # `nft flush ruleset`, qui effacerait aussi les règles de kube-proxy et de
+    # Calico (mesuré le 2026-11-17, série 3 CKS-A).
+    - name: Désactiver le service nftables
+      ansible.builtin.systemd:
+        name: nftables.service
+        enabled: false
+
+    - name: Lister les tables de la famille inet
+      ansible.builtin.shell:
+        cmd: set -o pipefail && nft list tables | awk '$2 == "inet" {print $3}'
+        executable: /bin/bash
+      register: _tables_inet
+      changed_when: false
+
+    - name: Retirer les tables inet d'un passage précédent
+      ansible.builtin.command: nft delete table inet {{ item }}
+      loop: "{{ _tables_inet.stdout_lines }}"
+      changed_when: true
+
+    - name: Retirer les fichiers de règles d'un passage précédent
+      ansible.builtin.file:
+        path: /etc/nftables.d
+        state: absent
+
+    - name: Rendre le nftables.conf livré
+      ansible.builtin.copy:
+        src: /var/backups/nftables.conf.livre
+        dest: /etc/nftables.conf
+        remote_src: true
+        mode: "0644"
+
+    - name: Arrêter les minuteurs de retrait laissés par systemd-run
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          for t in $(systemctl list-units --type=timer --no-legend 'run-*' | awk '{print $1}');
+          do systemctl stop "$t"; done
+        executable: /bin/bash
+      changed_when: true

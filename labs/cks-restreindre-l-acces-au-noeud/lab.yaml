@@ -1,0 +1,69 @@
+id: cks-restreindre-l-acces-au-noeud
+title: "Restrict who can log into a worker node, and with what rights"
+level: system-hardening
+section: cks
+difficulty: intermediate
+description: |
+  The second worker k8s-w2.lab accepts SSH from every account, with a password,
+  and root may log in. An on-call account holds full sudo rights twice over.
+  Reserve SSH to a named group, by key only, without locking yourself out, and
+  cut the on-call account down to the one command it needs.
+skills:
+  - ssh-hardening
+  - sudo
+  - least-privilege
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-17) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+lab_type: lab
+estimated_time: 25m
+
+# Lab guidé de la leçon 15-27 « Durcir les nœuds » (issue #235). Blueprint CKS,
+# domaine System Hardening : « Using least-privilege identity and access
+# management ». Le nœud travaillé est l'hôte OPTIONNEL k8s-w2.lab, et pas
+# k8s-w1.lab : une erreur dans AllowGroups enferme dehors, et un nœud
+# optionnel se retire par `dsoxlab destroy --optional-hosts` sans toucher au
+# cluster partagé. Gestes mesurés sur Ubuntu 24.04.5 et OpenSSH 9.6p1 le
+# 2026-11-17 (série 3 CKS-A, n°5).
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: ssh-reserve-au-groupe
+    label: "Only members of k8s-admins (ansible and student) can open an SSH session on k8s-w2; stagiaire is refused"
+    tests:
+      - test_ssh_est_reserve_au_groupe_k8s_admins
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: cle-seulement
+    label: "sshd offers key authentication only, and root cannot log in"
+    tests:
+      - test_ssh_accepte_la_cle_seulement
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: sudo-au-plus-juste
+    label: "stagiaire keeps its account and may read the kubelet status with sudo, nothing more"
+    tests:
+      - test_stagiaire_n_a_plus_les_pleins_droits
+      - test_stagiaire_garde_l_etat_du_kubelet
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+      - https://www.stephane-robert.info/docs/securiser/durcissement/sudoers/
+
+feedback: full

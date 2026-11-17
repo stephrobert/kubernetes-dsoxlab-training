@@ -1,0 +1,14 @@
+title: "Restreindre qui se connecte à un worker, et avec quels droits"
+description: |
+  Le second worker k8s-w2.lab accepte SSH de tous les comptes, par mot de
+  passe, et root peut s'y connecter. Un compte d'astreinte a les pleins droits
+  sudo, et par deux chemins. Réservez SSH à un groupe nommé, par clé seulement,
+  sans vous enfermer dehors, et ramenez le compte d'astreinte à la seule
+  commande dont il a besoin.
+criteria:
+  - id: ssh-reserve-au-groupe
+    label: "Seuls les membres de k8s-admins (ansible et student) ouvrent une session SSH sur k8s-w2 ; stagiaire est refusé"
+  - id: cle-seulement
+    label: "sshd ne propose que l'authentification par clé, et root ne peut pas se connecter"
+  - id: sudo-au-plus-juste
+    label: "stagiaire garde son compte et peut lire l'état du kubelet avec sudo, rien de plus"

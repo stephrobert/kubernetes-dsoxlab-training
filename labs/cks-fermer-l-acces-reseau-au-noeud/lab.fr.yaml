@@ -1,0 +1,14 @@
+title: "Fermer un worker au réseau, sauf les flux dont Kubernetes a besoin"
+description: |
+  Le worker k8s-w2.lab n'a pas de pare-feu : chaque port en écoute répond à
+  tout le réseau. Écrivez une chaîne d'entrée nftables en politique drop qui
+  laisse passer SSH depuis l'administration, le kubelet et le plugin réseau
+  depuis les nœuds et les Pods, et rien d'autre, puis faites-la survivre à un
+  redémarrage sans effacer les règles de kube-proxy et de Calico.
+criteria:
+  - id: reste-ferme
+    label: "Une chaîne d'entrée en policy drop est chargée sur k8s-w2, et un nœud qui n'est pas un poste d'administration n'atteint ni SSH ni le port 10256"
+  - id: flux-du-cluster
+    label: "Les nœuds atteignent le kubelet, le control plane atteint SSH, et les Pods se parlent à travers le nœud par un Service"
+  - id: persistance
+    label: "nftables.service est activé et charge les règles au démarrage, sans flush ruleset qui effacerait kube-proxy et Calico"
