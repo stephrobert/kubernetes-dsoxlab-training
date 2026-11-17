@@ -1,0 +1,84 @@
+---
+# Joué par `dsoxlab clean` : rend k8s-w2.lab tel que l'image l'a livré, puis
+# retire le nœud du cluster. Le nœud optionnel, lui, reste monté (`clean` le
+# garde) et servira à d'autres labs : il ne doit rien hériter de celui-ci.
+#
+# `ignore_unreachable` : si l'apprenant s'est enfermé dehors, aucune session
+# ne s'ouvre plus sur k8s-w2. Le nettoyage ne doit pas échouer pour autant ;
+# `dsoxlab destroy --optional-hosts` retire alors la machine entière.
+- name: Rendre k8s-w2.lab à son état d'origine
+  hosts: lab_worker2
+  become: true
+  ignore_unreachable: true
+  vars:
+    fichiers_de_l_image:
+      - 50-cloud-init.conf
+      - 60-cloudimg-settings.conf
+  tasks:
+    - name: Lister les fichiers de sshd_config.d
+      ansible.builtin.find:
+        paths: /etc/ssh/sshd_config.d
+        patterns: "*"
+      register: _sshd_d
+
+    - name: Retirer tout fichier SSH ajouté par le lab ou l'apprenant
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _sshd_d.files | rejectattr('path', 'search', '/(' ~ (fichiers_de_l_image | join('|')) ~ ')$') | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Retirer la clé d'essai des comptes conservés
+      ansible.builtin.lineinfile:
+        path: "/home/{{ item }}/.ssh/authorized_keys"
+        regexp: "lab-acces-essai$"
+        state: absent
+      loop: [student, ansible]
+
+    # Une session SSH ouverte en stagiaire (par l'apprenant ou par les tests)
+    # laisse son gestionnaire systemd utilisateur en marche, et userdel refuse
+    # alors (« user stagiaire is currently used by process », vécu le
+    # 2026-11-17). On ferme ses sessions d'abord.
+    - name: Fermer les sessions du compte d'astreinte
+      ansible.builtin.shell:
+        cmd: loginctl terminate-user stagiaire; pkill -KILL -u stagiaire; sleep 2
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le compte d'astreinte
+      ansible.builtin.user:
+        name: stagiaire
+        state: absent
+        remove: true
+        force: true
+
+    - name: Retirer ses droits sudo
+      ansible.builtin.file:
+        path: /etc/sudoers.d/90-stagiaire
+        state: absent
+
+    - name: Retirer le groupe k8s-admins
+      ansible.builtin.group:
+        name: k8s-admins
+        state: absent
+
+    - name: Retirer le répertoire des essais
+      ansible.builtin.file:
+        path: /root/.lab-acces
+        state: absent
+
+    - name: Vérifier puis recharger sshd
+      ansible.builtin.shell:
+        cmd: sshd -t && systemctl reload ssh
+      changed_when: true
+
+- name: Retirer le second worker du cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

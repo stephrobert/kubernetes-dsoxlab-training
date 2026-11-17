@@ -1,0 +1,70 @@
+id: cks-fermer-l-acces-reseau-au-noeud
+title: "Close a worker node to the network, except the flows Kubernetes needs"
+level: system-hardening
+section: cks
+difficulty: advanced
+description: |
+  The worker k8s-w2.lab has no firewall: every listening port answers the
+  whole network. Write an nftables input chain with a drop policy that lets
+  through SSH from administration, the kubelet and the network plugin from the
+  nodes and the Pods, and nothing else, then make it survive a reboot without
+  erasing the rules of kube-proxy and Calico.
+skills:
+  - nftables
+  - host-firewall
+  - kubernetes-ports
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-17) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+lab_type: lab
+estimated_time: 35m
+
+# Lab guidé de la leçon 15-27 « Durcir les nœuds » (issue #221). Blueprint CKS,
+# domaine System Hardening : « Minimize external access to the network ». La
+# solution de référence est le fichier worker de la leçon, joué tel quel sur
+# ce cluster le 2026-11-17 (série 3 CKS-A, n°1). Pièges mesurés le même jour
+# (n°3) : l'unité nftables.service d'Ubuntu 24.04.5 a pour ExecStop
+# `nft flush ruleset`, qui vide aussi kube-proxy et Calico à chaque restart
+# d'un service actif ; reload ne touche à rien.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: true
+
+criteria:
+  - id: reste-ferme
+    label: "An input chain with policy drop is loaded on k8s-w2, and a node that is not an administration host reaches neither SSH nor port 10256"
+    tests:
+      - test_le_pare_feu_ferme_le_reste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+      - https://www.stephane-robert.info/docs/securiser/reseaux/nftables/
+  - id: flux-du-cluster
+    label: "The nodes reach the kubelet, the control plane reaches SSH, and Pods talk across the node through a Service"
+    tests:
+      - test_les_flux_du_cluster_passent
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: persistance
+    label: "nftables.service is enabled and loads the rules at boot, without a flush ruleset that would erase kube-proxy and Calico"
+    tests:
+      - test_les_regles_survivent_au_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+
+feedback: full
