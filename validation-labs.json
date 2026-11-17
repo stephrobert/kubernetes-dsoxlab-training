@@ -3865,6 +3865,59 @@
   },
   "verdict": "VALIDE"
  },
+ "cks-fermer-l-acces-reseau-au-noeud": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_le_pare_feu_ferme_le_reste",
+    "test_les_flux_du_cluster_passent",
+    "test_les_regles_survivent_au_redemarrage"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-17",
+  "duree_s": 694,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-fermer-l-acces-reseau-au-noeud.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_pare_feu_ferme_le_reste",
+    "test_les_flux_du_cluster_passent",
+    "test_les_regles_survivent_au_redemarrage"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "cks-image-pinned-digest": {
   "apres": {
    "echecs": [],
@@ -4230,6 +4283,173 @@
     "test_le_compte_n_est_plus_administrateur_du_cluster",
     "test_le_droit_est_porte_par_le_namespace",
     "test_le_droit_s_arrete_au_namespace"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-reduire-la-surface-du-noeud": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_aucun_port_superflu_n_ecoute",
+    "test_l_outil_de_debogage_ne_redemarre_plus",
+    "test_le_noeud_sert_encore_kubernetes",
+    "test_les_paquets_superflus_sont_purges"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-17",
+  "duree_s": 715,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-reduire-la-surface-du-noeud.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_aucun_port_superflu_n_ecoute",
+    "test_l_outil_de_debogage_ne_redemarre_plus",
+    "test_le_noeud_sert_encore_kubernetes",
+    "test_les_paquets_superflus_sont_purges"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-restreindre-l-acces-anonyme": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_aucun_droit_rbac_pour_les_anonymes",
+    "test_l_anonyme_n_atteint_que_la_sante",
+    "test_la_decouverte_de_kubeadm_join_reste_ouverte",
+    "test_le_kubelet_refuse_l_anonyme",
+    "test_noderestriction_refuse_les_etiquettes_reservees"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-17",
+  "duree_s": 725,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-restreindre-l-acces-anonyme.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_aucun_droit_rbac_pour_les_anonymes",
+    "test_l_anonyme_n_atteint_que_la_sante",
+    "test_la_decouverte_de_kubeadm_join_reste_ouverte",
+    "test_le_kubelet_refuse_l_anonyme",
+    "test_noderestriction_refuse_les_etiquettes_reservees"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "cks-restreindre-l-acces-au-noeud": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_ssh_accepte_la_cle_seulement",
+    "test_ssh_est_reserve_au_groupe_k8s_admins",
+    "test_stagiaire_garde_l_etat_du_kubelet",
+    "test_stagiaire_n_a_plus_les_pleins_droits"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-17",
+  "duree_s": 680,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-restreindre-l-acces-au-noeud.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_ssh_accepte_la_cle_seulement",
+    "test_ssh_est_reserve_au_groupe_k8s_admins",
+    "test_stagiaire_garde_l_etat_du_kubelet",
+    "test_stagiaire_n_a_plus_les_pleins_droits"
    ],
    "passed": 0,
    "recorded": true,
