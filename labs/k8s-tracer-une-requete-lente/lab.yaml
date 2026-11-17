@@ -1,0 +1,101 @@
+# Lab guidé de la leçon L9 du niveau 6 « Réseau avancé » (CKNE), « Tracer une
+# requête lente à travers le maillage Istio ». Geste KUBERN-17-09, issue #226.
+#
+# La situation : Istio 1.32.0 en mode ambient, sans fournisseur de traces. Dans
+# observabilite, hors du maillage, un collecteur OpenTelemetry contrib 0.165.0
+# exporte vers Jaeger 2.23.0. Dans boutique, dans le maillage mais sans
+# waypoint, client appelle web, qui appelle api ET stock (podinfo 6.17.0). Un
+# seul des deux répond en 1 à 1,5 s, tiré au hasard par le setup.
+#
+# L'apprenant déclare le fournisseur dans meshConfig (istioctl install -f),
+# trace 100 % des requêtes par une Telemetry, pose un waypoint, trouve pourquoi
+# aucune span n'arrive (le port du collecteur n'est pas reconnu comme gRPC :
+# panne silencieuse, mesurée le 2026-11-17), fait suivre le contexte de trace
+# par web, puis nomme le service lent dans une ConfigMap.
+#
+# La validation lit meshConfig, les Telemetry, le waypoint et son Pod, puis
+# envoie ses propres requêtes et lit l'API v3 de Jaeger par le proxy de
+# l'API server : spans reçues, puis une trace unique qui relie web au saut lent.
+#
+# Briques attestées réutilisées : k8s-servir-une-gateway-en-https (Istio
+# ambient du catalogue, second worker optionnel), cks-istio-mtls-lockdown
+# (istioctl, retrait complet).
+id: k8s-tracer-une-requete-lente
+title: "Trace a slow request through the Istio mesh"
+level: observability
+section: ckne
+difficulty: advanced
+description: |
+  On a cluster running Istio in ambient mode, send the traces of a waypoint to
+  an OpenTelemetry collector and Jaeger, find why no span arrives, make the
+  application forward the trace context, and name the slow service from a
+  single trace.
+skills:
+  - istio
+  - opentelemetry
+  - jaeger
+  - tracing
+distros:
+  - ubuntu24
+# Page provisoire : la leçon n'est pas encore publiée. URL cible (EN) :
+# https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+lab_type: lab
+estimated_time: 40m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: fournisseur-declare
+    label: "The mesh configuration declares an opentelemetry provider aiming at the collector of observabilite, port 4317"
+    tests:
+      - test_le_maillage_declare_le_fournisseur_de_traces
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+  - id: telemetry-a-100
+    label: "A mesh-wide Telemetry traces 100 % of requests with that provider"
+    tests:
+      - test_une_telemetry_trace_toutes_les_requetes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+  - id: waypoint-actif
+    label: "A waypoint serves the namespace boutique, is Programmed, and its Pod is Ready"
+    tests:
+      - test_un_waypoint_sert_le_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+  - id: spans-recues
+    label: "Requests sent during the check produce waypoint spans that Jaeger receives"
+    tests:
+      - test_les_spans_du_waypoint_arrivent_dans_jaeger
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+  - id: trace-unique
+    label: "A single trace links a span of web to the waypoint span of the hop to the slow service"
+    tests:
+      - test_une_seule_trace_montre_le_service_lent
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+  - id: diagnostic
+    label: "The ConfigMap diagnostic of boutique names the slow service, key service-lent"
+    tests:
+      - test_le_diagnostic_nomme_le_service_lent
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/
+
+feedback: full

@@ -406,7 +406,7 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 
 Five domains in the CKNE curriculum. Service Networking and DNS and Network Security and Policy weigh 25 % each. The labs run on a dedicated Cilium cluster without kube-proxy, or run Istio in ambient mode on the kubeadm cluster, with a second worker.
 
-5 lab(s).
+6 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -414,9 +414,10 @@ Five domains in the CKNE curriculum. Service Networking and DNS and Network Secu
 | 2 | [`k8s-capturer-le-trafic-d-un-pod`](labs/k8s-capturer-le-trafic-d-un-pod/) | Capture the traffic of a Pod and name the cause of each failure | core-infrastructure-and-cni | 40m | 2026-11-16 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
 | 3 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Audit network flows with Hubble | observability | 40m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
 | 4 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Serve an Istio Gateway over HTTPS with a cert-manager certificate | network-security-policy | 35m | 2026-11-15 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 5 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Route inference requests by replica load with the Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 5 | [`k8s-tracer-une-requete-lente`](labs/k8s-tracer-une-requete-lente/) | Trace a slow request through the Istio mesh | observability | 40m | no | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 6 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Route inference requests by replica load with the Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/) |
 
-Total: **147 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **148 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

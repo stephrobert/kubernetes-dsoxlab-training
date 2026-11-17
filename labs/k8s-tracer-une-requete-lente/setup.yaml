@@ -1,0 +1,41 @@
+---
+# Joué par `dsoxlab run` : le cluster kubeadm du catalogue, le second worker
+# optionnel joint au cluster, Istio 1.32 ambient ramené au profil du lab (ce
+# qui efface un fournisseur de traces laissé par un passage précédent), puis la
+# situation du lab (fixtures/prepare.sh) : collecteur et Jaeger hors du
+# maillage, l'application boutique dans le maillage, sans waypoint.
+#
+# Le second worker est joint AVANT Istio : les DaemonSets istio-cni et ztunnel
+# doivent couvrir les trois nœuds dès leur premier déploiement.
+- name: Préparer le lab k8s-tracer-une-requete-lente
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    # La leçon lit les traces par l'API de Jaeger et un filtre jq. Le paquet de
+    # la distribution suffit : jq n'est pas le sujet, seulement l'outil de
+    # lecture (jq 1.7.1 sur Ubuntu 24.04).
+    - name: Installer jq sur le control plane
+      ansible.builtin.apt:
+        name: jq
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Installer ou ramener Istio ambient au profil du lab
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+
+    - name: Poser le collecteur, Jaeger et l'application boutique
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
