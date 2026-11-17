@@ -161,7 +161,9 @@ def test_noderestriction_refuse_les_etiquettes_reservees(host):
         fr=f"Les identifiants du kubelet de {NOEUD} ont pu poser une étiquette node-restriction.kubernetes.io/ "
         "sur leur propre nœud : le plugin d'admission NodeRestriction n'est pas actif.",
     )
-    assert "node-restriction.kubernetes.io" in res.stderr, message(
+    # La phrase de NodeRestriction, relevée le 2026-11-16 (série 2 CKS-A, M2) :
+    # « is not allowed to modify labels: node-restriction.kubernetes.io/... ».
+    assert "is not allowed to modify labels" in res.stderr, message(
         en=f"The label was refused, but not by NodeRestriction: {res.stderr.strip()}",
         fr=f"L'étiquette a été refusée, mais pas par NodeRestriction : {res.stderr.strip()}",
     )
