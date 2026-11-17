@@ -59,7 +59,7 @@
   ansible.builtin.include_tasks: outil-par-mise.yml
   vars:
     outil_nom: helm
-    outil_version: "4.3.0"
+    outil_version: "4.3.2"
     # `helm --version` n'existe pas : helm attend la sous-commande `version`.
     outil_verification: version --short
 

@@ -1,0 +1,68 @@
+id: cks-reduire-la-surface-du-noeud
+title: "Remove from a worker node what listens without serving Kubernetes"
+level: system-hardening
+section: cks
+difficulty: intermediate
+description: |
+  An old server template left three services on the worker k8s-w2.lab, each
+  listening on every interface: rpcbind, an FTP server, and a forgotten HTTP
+  debug tool that serves /etc. Remove them for good, without touching what
+  the node needs to stay a Kubernetes node.
+skills:
+  - host-hardening
+  - systemd
+  - attack-surface
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-17) : le lab
+# pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+lab_type: lab
+estimated_time: 20m
+
+# Lab guidé de la leçon 15-27 « Durcir les nœuds » (issue #220). Blueprint CKS,
+# domaine System Hardening : « Minimize host OS footprint (reduce attack
+# surface) ». Les ports attendus d'un worker sont ceux relevés sur k8s-w1.lab
+# le 2026-11-17 (22, 179, 10250, 10256, UDP 4789, et le client DHCP).
+# rpcbind 1.2.6-7ubuntu2 et vsftpd 3.0.5-0ubuntu3.1 sont les versions du dépôt
+# Ubuntu 24.04 mesurées ce jour-là.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: surface-reduite
+    label: "Nothing listens on the interfaces of k8s-w2 except what a worker needs, and ports 111, 21 and 8000 refuse a connection"
+    tests:
+      - test_aucun_port_superflu_n_ecoute
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: retrait-durable
+    label: "rpcbind and vsftpd are purged, and the debug tool is stopped and disabled: nothing comes back at the next boot"
+    tests:
+      - test_les_paquets_superflus_sont_purges
+      - test_l_outil_de_debogage_ne_redemarre_plus
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+      - https://www.stephane-robert.info/docs/securiser/durcissement/cis-benchmarks/
+  - id: noeud-intact
+    label: "The kubelet, containerd and sshd still run, the node is Ready and accepts a Pod"
+    tests:
+      - test_le_noeud_sert_encore_kubernetes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+
+feedback: full

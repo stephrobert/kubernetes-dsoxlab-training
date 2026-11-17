@@ -1,0 +1,167 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Deux temps :
+#   1. sur le control plane : le socle, puis la jonction du second worker
+#      optionnel k8s-w2.lab (shared/noeud-optionnel.yml) ;
+#   2. sur k8s-w2.lab : la situation du scénario, un accès trop large.
+#
+# Le nœud travaillé est k8s-w2.lab et non k8s-w1.lab, à dessein : une erreur
+# dans AllowGroups enferme dehors. Un nœud optionnel se retire par
+# `dsoxlab destroy --optional-hosts`, sans toucher au cluster partagé.
+#
+# Le second temps est REJOUABLE : il repart de la configuration SSH de l'image
+# (50-cloud-init.conf et 60-cloudimg-settings.conf, relevés le 2026-11-17 sur
+# Ubuntu 24.04.5), quels que soient les fichiers qu'un passage précédent a
+# laissés dans sshd_config.d.
+- name: Préparer le cluster du lab cks-restreindre-l-acces-au-noeud
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    # Un nœud optionnel détruit puis remonté (`dsoxlab destroy
+    # --optional-hosts`) revient avec une NOUVELLE clé d'hôte. Le compte du
+    # lab sur le control plane garde l'ancienne dans known_hosts, et
+    # `ssh k8s-w2.lab` est alors refusé (« REMOTE HOST IDENTIFICATION HAS
+    # CHANGED »), pour l'apprenant comme pour la solution. Vécu le 2026-11-17.
+    # On oublie l'ancienne clé ; accept-new acceptera la nouvelle.
+    - name: Oublier une ancienne clé d'hôte du second worker
+      ansible.builtin.shell: >-
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts -R {{ item }};
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts
+        -R {{ hostvars[item].ansible_host | default(item) }}
+      loop: "{{ groups['lab_worker2'] | default([]) }}"
+      become: true
+      become_user: "{{ ansible_user | default('ubuntu') }}"
+      changed_when: true
+      failed_when: false
+
+- name: Poser l'accès trop large sur k8s-w2.lab
+  hosts: lab_worker2
+  become: true
+  vars:
+    fichiers_de_l_image:
+      - 50-cloud-init.conf
+      - 60-cloudimg-settings.conf
+  tasks:
+    - name: Lister les fichiers de sshd_config.d
+      ansible.builtin.find:
+        paths: /etc/ssh/sshd_config.d
+        patterns: "*"
+      register: _sshd_d
+
+    - name: Retirer ce qu'un passage précédent a ajouté à sshd_config.d
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _sshd_d.files | rejectattr('path', 'search', '/(' ~ (fichiers_de_l_image | join('|')) ~ ')$') | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Retirer le groupe k8s-admins d'un passage précédent
+      ansible.builtin.group:
+        name: k8s-admins
+        state: absent
+
+    # L'héritage : un fichier qui ouvre le mot de passe et root. Son nom en
+    # 05- le fait lire AVANT 50-cloud-init.conf : sshd garde la première valeur
+    # lue d'un mot-clé, c'est donc lui qui décide.
+    - name: Poser la configuration héritée, trop large
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/05-heritage.conf
+        content: |
+          # Reprise d'un ancien modèle de serveur.
+          PasswordAuthentication yes
+          PermitRootLogin yes
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Créer le compte d'astreinte stagiaire, membre du groupe sudo
+      ansible.builtin.user:
+        name: stagiaire
+        shell: /bin/bash
+        groups: sudo
+        append: true
+
+    - name: Donner un mot de passe au compte d'astreinte
+      ansible.builtin.shell:
+        cmd: set -o pipefail && echo 'stagiaire:Astreinte-2026' | chpasswd
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Accorder en plus tous les droits sudo sans mot de passe
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/90-stagiaire
+        content: |
+          stagiaire ALL=(ALL) NOPASSWD: ALL
+        owner: root
+        group: root
+        mode: "0440"
+        validate: visudo -cf %s
+
+    # Une clé d'essai, posée chez les trois comptes : les tests s'en servent
+    # pour ouvrir de VRAIES sessions SSH sur 127.0.0.1, et lire la décision de
+    # sshd, pas seulement sa configuration.
+    - name: Créer le répertoire des essais de connexion
+      ansible.builtin.file:
+        path: /root/.lab-acces
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Créer la clé d'essai
+      ansible.builtin.command:
+        cmd: ssh-keygen -q -t ed25519 -N "" -C lab-acces-essai -f /root/.lab-acces/essai_ed25519
+        creates: /root/.lab-acces/essai_ed25519
+
+    - name: Lire la clé publique d'essai
+      ansible.builtin.slurp:
+        src: /root/.lab-acces/essai_ed25519.pub
+      register: _cle_essai
+
+    - name: Créer le répertoire .ssh de chaque compte essayé
+      ansible.builtin.file:
+        path: "/home/{{ item }}/.ssh"
+        state: directory
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0700"
+      loop: [stagiaire, student, ansible]
+
+    - name: Autoriser la clé d'essai chez chaque compte essayé
+      ansible.builtin.lineinfile:
+        path: "/home/{{ item }}/.ssh/authorized_keys"
+        line: "{{ _cle_essai.content | b64decode | trim }}"
+        create: true
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: "0600"
+      loop: [stagiaire, student, ansible]
+
+    # Mesuré le 2026-11-17 sur un k8s-w2 fraîchement monté : ssh.service avait
+    # démarré DEUX fois au premier boot, et KillMode=process laisse vivre le
+    # premier « sshd -D [listener] ». Les deux partagent la socket de
+    # ssh.socket, mais `systemctl reload ssh` ne signale que le MainPID :
+    # 12 connexions sur 20 échappaient à un AllowGroups neuf. Le lab part d'un
+    # seul listener ; le scénario apprend à le vérifier.
+    - name: Arrêter un listener sshd orphelin
+      ansible.builtin.shell:
+        cmd: >-
+          main=$(systemctl show ssh -p MainPID --value);
+          for p in $(pgrep -f 'sshd -D \[listener\]'); do
+          [ "$p" != "$main" ] && kill "$p" && echo "orphelin $p arrêté"; done; true
+      register: _orphelins
+      changed_when: _orphelins.stdout | length > 0
+
+    - name: Vérifier puis recharger sshd
+      ansible.builtin.shell:
+        cmd: sshd -t && systemctl reload ssh
+      changed_when: true

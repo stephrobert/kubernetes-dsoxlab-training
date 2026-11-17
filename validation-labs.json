@@ -451,8 +451,8 @@
    "total": 20
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 636,
+  "date": "2026-11-17",
+  "duree_s": 679,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -524,8 +524,8 @@
    "total": 6
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 276,
+  "date": "2026-11-17",
+  "duree_s": 256,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -636,8 +636,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 233,
+  "date": "2026-11-17",
+  "duree_s": 224,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -2272,8 +2272,8 @@
    "total": 20
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 425,
+  "date": "2026-11-17",
+  "duree_s": 423,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -2411,8 +2411,8 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-16",
-  "duree_s": 140,
+  "date": "2026-11-17",
+  "duree_s": 136,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3766,8 +3766,8 @@
    "total": 20
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-14",
-  "duree_s": 1220,
+  "date": "2026-11-17",
+  "duree_s": 1056,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3994,8 +3994,8 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 227,
+  "date": "2026-11-17",
+  "duree_s": 220,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -5135,8 +5135,8 @@
    "total": 7
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-15",
-  "duree_s": 532,
+  "date": "2026-11-17",
+  "duree_s": 470,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",

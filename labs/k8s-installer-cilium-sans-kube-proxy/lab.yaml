@@ -17,7 +17,7 @@
 #
 # Briques attestées réutilisées : cka-initialiser-un-plan-de-controle et
 # cka-joindre-un-noeud-kubeadm (kubeadm init, jonction, lecture des nœuds),
-# ckad-helm-install-upgrade (Helm 4.3.0), ckad-expose-service (un Service
+# ckad-helm-install-upgrade (Helm 4.3.2), ckad-expose-service (un Service
 # ClusterIP joint depuis un nœud).
 #
 # RISQUE R3 du cadrage : Cilium 1.20.4 déclare Kubernetes 1.33 à 1.36, et le
