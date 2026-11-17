@@ -19,7 +19,7 @@ lab_type: lab
 estimated_time: 15m
 
 # Compétence du blueprint CKAD, domaine Application Deployment (20 %) :
-# « Use the Helm package manager to deploy existing packages ». Helm 4.3.0,
+# « Use the Helm package manager to deploy existing packages ». Helm 4.3.2,
 # la version courante : les labs sont à jour, et le blog a une leçon sur la
 # migration vers Helm 4. Le lab hérité passait par les charts Bitnami, dont
 # les images ne sont plus librement servies : le chart est local.

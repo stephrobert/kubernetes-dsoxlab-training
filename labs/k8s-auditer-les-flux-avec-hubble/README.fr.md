@@ -11,7 +11,7 @@ refusés dans un fichier du nœud, sans lever le refus.
 |---|---|
 | Cible | `net-cp.lab`, avec les workers `net-w1.lab` et `net-w2.lab` : le cluster Cilium du catalogue ; le lab pose le namespace `magasin` |
 | Durée | environ 40 minutes |
-| Versions | Kubernetes 1.37, Cilium 1.20.4 (qui déclare Kubernetes 1.33 à 1.36), Helm 4.3.0 |
+| Versions | Kubernetes 1.37, Cilium 1.20.4 (qui déclare Kubernetes 1.33 à 1.36), Helm 4.3.2 |
 | Page liée | [Hubble](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
 
 Les trois nœuds sont des hôtes optionnels du catalogue : `dsoxlab run` les

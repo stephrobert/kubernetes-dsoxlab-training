@@ -11,7 +11,7 @@ Service est servi par Cilium et non par des règles iptables.
 |---|---|
 | Cible | `net-cp.lab`, avec les workers `net-w1.lab` et `net-w2.lab` : le cluster Cilium du catalogue, distinct du cluster partagé `k8s-cp.lab` |
 | Durée | environ 45 minutes |
-| Versions | Kubernetes 1.37, Cilium 1.20.4 (qui déclare Kubernetes 1.33 à 1.36), Helm 4.3.0 |
+| Versions | Kubernetes 1.37, Cilium 1.20.4 (qui déclare Kubernetes 1.33 à 1.36), Helm 4.3.2 |
 | Page liée | [Cilium](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 
 Les trois nœuds sont des hôtes optionnels du catalogue : `dsoxlab run` les
