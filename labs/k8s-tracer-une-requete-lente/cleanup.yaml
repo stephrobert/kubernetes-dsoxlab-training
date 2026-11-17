@@ -1,0 +1,44 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster dans l'état
+# du socle, dans l'ordre inverse du setup.
+#
+# 1. Les namespaces du lab : boutique (application, waypoint, ConfigMap
+#    diagnostic) puis observabilite (collecteur, Jaeger). Avant Istio : le
+#    waypoint est un Gateway que le contrôleur d'Istio doit voir partir.
+# 2. La copie de configuration que l'apprenant a écrite pour istioctl.
+# 3. Istio et les CRD de la Gateway API (shared/istio-ambient.yml, absent),
+#    Telemetry comprises puisque leur CRD part avec. Avant le retrait du second
+#    worker : l'agent istio-cni de ce nœud doit pouvoir retirer sa
+#    configuration CNI en s'arrêtant.
+# 4. Le second worker, drainé, supprimé de l'API et remis à zéro.
+#
+# jq reste installé : c'est un paquet de la distribution, déjà présent dans
+# l'image Ubuntu du catalogue avant le premier lab.
+- name: Défaire le lab k8s-tracer-une-requete-lente
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer les namespaces du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace boutique observabilite
+        --ignore-not-found --wait=true --timeout=240s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les configurations d'Istio écrites pendant le lab
+      ansible.builtin.file:
+        path: /root/istio-ambient-otel.yaml
+        state: absent
+
+    - name: Retirer Istio ambient et la Gateway API
+      ansible.builtin.include_tasks: ../../shared/istio-ambient.yml
+      vars:
+        istio_etat: absent
+
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent

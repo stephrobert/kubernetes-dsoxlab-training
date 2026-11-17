@@ -1,0 +1,35 @@
+title: "Tracer une requête lente à travers le maillage Istio"
+# Page provisoire, comme dans lab.yaml. URL cible (FR) :
+# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+description: |
+  Sur un cluster où Istio tourne en mode ambient, envoyer les traces d'un
+  waypoint vers un collecteur OpenTelemetry et Jaeger, trouver pourquoi aucune
+  span n'arrive, faire suivre le contexte de trace par l'application, et nommer
+  le service lent à partir d'une seule trace.
+
+criteria:
+  - id: fournisseur-declare
+    label: "La configuration du maillage déclare un fournisseur opentelemetry qui vise le collecteur d'observabilite, port 4317"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+  - id: telemetry-a-100
+    label: "Une Telemetry de niveau maillage trace 100 % des requêtes avec ce fournisseur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+  - id: waypoint-actif
+    label: "Un waypoint sert le namespace boutique, il est Programmed et son Pod est Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+  - id: spans-recues
+    label: "Les requêtes envoyées pendant la vérification produisent des spans du waypoint que Jaeger reçoit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+  - id: trace-unique
+    label: "Une seule trace relie une span de web à la span du waypoint pour le saut vers le service lent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
+  - id: diagnostic
+    label: "La ConfigMap diagnostic de boutique nomme le service lent, clé service-lent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/

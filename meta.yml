@@ -585,6 +585,10 @@ sections:
       # L8 : la Gateway d'Istio en HTTPS, certificat de cert-manager. Suppose
       # joué k8s-emettre-un-certificat-avec-cert-manager (niveau 4, D85).
       - k8s-servir-une-gateway-en-https
+      # L9 : tracer une requête lente (waypoint, collecteur OpenTelemetry,
+      # Jaeger) dans le même maillage ambient que L8, service lent tiré au
+      # hasard par le setup.
+      - k8s-tracer-une-requete-lente
       # L10 : Gateway API Inference Extension servie par la Gateway d'Istio.
       - k8s-router-des-requetes-d-inference
 
