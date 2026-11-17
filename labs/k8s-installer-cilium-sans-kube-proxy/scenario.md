@@ -17,7 +17,7 @@ The node network is `10.10.50.0/24`. The default Pod pool of Cilium,
 `10.0.0.0/8`, contains it: a Pod could receive an address that hides a node.
 The team has chosen the pool **`10.244.0.0/16`**, one `/24` block per node.
 
-Version note: Cilium 1.20.4 declares support for Kubernetes 1.33 to 1.36, and
+Version note: Cilium 1.20.5 declares support for Kubernetes 1.33 to 1.36, and
 this cluster runs 1.37. The lab runs on this combination, which sits outside
 what Cilium officially declares: an unexpected behaviour may come from there.
 
@@ -26,7 +26,7 @@ what Cilium officially declares: an unexpected behaviour may come from there.
 1. A cluster initialised on `net-cp.lab` **without kube-proxy**: neither its
    DaemonSet nor its ConfigMap in `kube-system`.
 2. Both workers **joined**, and the three nodes **Ready**.
-3. **Cilium 1.20.4** installed with Helm on every node, with the agent
+3. **Cilium 1.20.5** installed with Helm on every node, with the agent
    reporting **`KubeProxyReplacement: True`**.
 4. **No kube-proxy rule** on any node: no `KUBE-SVC` or `KUBE-SERVICES` chain.
 5. A Deployment **`web`** (image `nginx:1.30.6`, 2 replicas) in the namespace
@@ -50,7 +50,7 @@ expected.
 
 **Install Cilium as the kube-proxy replacement.** Declare the chart repository
 (`helm repo add cilium https://helm.cilium.io`), then install the chart
-`cilium/cilium` **version 1.20.4** in `kube-system`. The values that matter:
+`cilium/cilium` **version 1.20.5** in `kube-system`. The values that matter:
 
 - `kubeProxyReplacement=true`;
 - `k8sServiceHost` and `k8sServicePort`: the address of the control plane

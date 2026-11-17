@@ -17,7 +17,7 @@ Le réseau des nœuds est `10.10.50.0/24`. Le pool de Pods par défaut de Cilium
 `10.0.0.0/8`, le contient : un Pod pourrait recevoir une adresse qui masque un
 nœud. L'équipe a choisi le pool **`10.244.0.0/16`**, un bloc `/24` par nœud.
 
-Note de version : Cilium 1.20.4 déclare prendre en charge Kubernetes 1.33 à
+Note de version : Cilium 1.20.5 déclare prendre en charge Kubernetes 1.33 à
 1.36, et ce cluster tourne en 1.37. Le lab tourne sur cette combinaison, qui
 sort de ce que Cilium déclare officiellement : un comportement inattendu peut
 venir de là.
@@ -27,7 +27,7 @@ venir de là.
 1. Un cluster initialisé sur `net-cp.lab` **sans kube-proxy** : ni son
    DaemonSet, ni son ConfigMap dans `kube-system`.
 2. Les deux workers **joints**, et les trois nœuds **Ready**.
-3. **Cilium 1.20.4** installé par Helm sur chaque nœud, l'agent annonçant
+3. **Cilium 1.20.5** installé par Helm sur chaque nœud, l'agent annonçant
    **`KubeProxyReplacement: True`**.
 4. **Aucune règle de kube-proxy** sur aucun nœud : ni chaîne `KUBE-SVC`, ni
    chaîne `KUBE-SERVICES`.
@@ -53,7 +53,7 @@ il n'y a pas encore de CNI, c'est attendu.
 
 **Installer Cilium en remplacement de kube-proxy.** Déclarez le dépôt de
 charts (`helm repo add cilium https://helm.cilium.io`), puis installez le
-chart `cilium/cilium` en **version 1.20.4** dans `kube-system`. Les valeurs qui
+chart `cilium/cilium` en **version 1.20.5** dans `kube-system`. Les valeurs qui
 comptent :
 
 - `kubeProxyReplacement=true` ;

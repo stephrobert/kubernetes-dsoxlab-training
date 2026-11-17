@@ -1,7 +1,7 @@
 title: "Installer Cilium sans kube-proxy"
 description: |
   Initialiser un cluster kubeadm sans kube-proxy, y joindre deux workers,
-  installer Cilium 1.20.4 par Helm en remplacement de kube-proxy sur un pool
+  installer Cilium 1.20.5 par Helm en remplacement de kube-proxy sur un pool
   d'adresses de Pods choisi, puis prouver qu'un Service est servi par Cilium
   et non par des règles iptables.
 
@@ -17,7 +17,7 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
   - id: remplacement-de-kube-proxy
-    label: "Cilium 1.20.4 tourne sur chaque nœud avec KubeProxyReplacement True"
+    label: "Cilium 1.20.5 tourne sur chaque nœud avec KubeProxyReplacement True"
   - id: aucune-regle-kube-proxy
     label: "Aucun nœud ne porte de règle de kube-proxy (KUBE-SVC, KUBE-SERVICES) alors que les Services sont servis"
     lessons:

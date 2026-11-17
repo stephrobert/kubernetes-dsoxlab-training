@@ -3,7 +3,7 @@
 Guided lab of the lesson "Install Cilium without kube-proxy and choose its
 IPAM", Advanced networking module of the Kubernetes course (level 6, CKNE
 objectives of the Core Infrastructure and CNI domain). Initialise a kubeadm
-cluster without kube-proxy, join two workers, install Cilium 1.20.4 with Helm
+cluster without kube-proxy, join two workers, install Cilium 1.20.5 with Helm
 as the kube-proxy replacement on the pool `10.244.0.0/16`, then prove that a
 Service is served by Cilium and not by iptables rules.
 
@@ -11,7 +11,7 @@ Service is served by Cilium and not by iptables rules.
 |---|---|
 | Target | `net-cp.lab`, with the workers `net-w1.lab` and `net-w2.lab`: the Cilium cluster of the catalogue, separate from the shared cluster `k8s-cp.lab` |
 | Duration | about 45 minutes |
-| Versions | Kubernetes 1.37, Cilium 1.20.4 (which declares Kubernetes 1.33 to 1.36), Helm 4.3.2 |
+| Versions | Kubernetes 1.37, Cilium 1.20.5 (which declares Kubernetes 1.33 to 1.36), Helm 4.3.2 |
 | Related page | [Cilium](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 
 The three nodes are optional hosts of the catalogue: `dsoxlab run` brings
