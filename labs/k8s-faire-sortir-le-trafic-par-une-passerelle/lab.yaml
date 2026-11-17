@@ -1,0 +1,80 @@
+# Lab guidé de la leçon L6 du niveau 6 « Réseau avancé » (CKNE), « Faire
+# sortir le trafic par une passerelle d'egress ». Geste KUBERN-17-06, issue
+# #224.
+#
+# La situation : le cluster Cilium 1.20.5 sans kube-proxy des hôtes net-*,
+# passerelle d'egress désactivée et masquage par iptables (valeurs du socle).
+# Deux Pods sur net-w1.lab, sortie-controlee et autre. Un serveur témoin sur
+# k8s-cp.lab, HORS du cluster net-*, répond par l'adresse source qu'il voit.
+#
+# L'apprenant active la passerelle d'egress avec le masquage BPF qu'elle exige
+# (sans lui, l'agent s'arrête en level=fatal : mesuré le 2026-11-17), étiquette
+# net-w2.lab comme nœud passerelle, et écrit une CiliumEgressGatewayPolicy qui
+# fait sortir sortie-controlee, et lui seul, par net-w2.lab vers le témoin.
+id: k8s-faire-sortir-le-trafic-par-une-passerelle
+title: "Send a Pod's traffic out through an egress gateway"
+level: advanced-traffic-management
+section: ckne
+difficulty: advanced
+description: |
+  On a Cilium cluster without kube-proxy, turn on the egress gateway with the
+  BPF masquerading it requires, designate a gateway node, and write a policy
+  that makes one Pod, and only that one, reach an external server through
+  that node.
+skills:
+  - cilium
+  - egress-gateway
+  - bpf-masquerade
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # Les Pods tournent sur net-w1.lab, la passerelle est net-w2.lab, le
+      # témoin écoute sur k8s-cp.lab, hors du cluster net-*.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+        temoin: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: passerelle-activee
+    label: "The egress gateway and BPF masquerading are both on, and every Cilium agent is ready"
+    tests:
+      - test_la_passerelle_d_egress_est_activee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+  - id: pod-vise
+    label: "A CiliumEgressGatewayPolicy selects the Pod sortie-controlee of egress-demo, and not autre"
+    tests:
+      - test_une_politique_vise_le_pod_sortie_controlee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+  - id: passerelle-designee
+    label: "That policy covers the witness in its destinations and designates net-w2.lab, and no other node, as gateway"
+    tests:
+      - test_la_politique_couvre_le_temoin_et_designe_net_w2
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+  - id: sortie-controlee
+    label: "The external witness sees sortie-controlee coming from net-w2.lab, and autre still from net-w1.lab"
+    tests:
+      - test_le_pod_vise_sort_par_la_passerelle_et_l_autre_non
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+
+feedback: full

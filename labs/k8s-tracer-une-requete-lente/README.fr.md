@@ -11,7 +11,7 @@ le service lent à partir d'une seule trace.
 | Cible | `k8s-cp.lab`, le cluster kubeadm du catalogue, agrandi du second worker optionnel `k8s-w2.lab` ; le lab installe Istio 1.32 en mode ambient, un collecteur OpenTelemetry contrib 0.165.0 et Jaeger 2.23.0 |
 | Durée | environ 40 minutes |
 | Prérequis | le lab `k8s-servir-une-gateway-en-https` (même maillage, même cluster) |
-| Page liée | [Formation Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/), en attendant la publication de la leçon |
+| Page liée | [Tracer une requête lente à travers le maillage Istio](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/) |
 
 Le `run` de ce lab monte `k8s-w2.lab` s'il ne tourne pas encore, et le joint au
 cluster. Chaque `run` ramène Istio au profil du lab, ce qui efface un

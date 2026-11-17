@@ -1,0 +1,76 @@
+# Lab guidé de la leçon L7 du niveau 6 « Réseau avancé » (CKNE), « Relier deux
+# clusters avec ClusterMesh ». Geste KUBERN-17-07, issue #225.
+#
+# La situation : deux clusters kubeadm 1.37 d'un seul nœud chacun (décision du
+# 2026-11-15), sans kube-proxy, avec Cilium 1.20.5 : cluster-1 sur ha-cp1.lab,
+# cluster-2 sur ha-cp2.lab, plages de Pods distinctes, identifiants distincts,
+# même autorité de certification Cilium, clustermesh-apiserver en NodePort.
+# Dans chaque cluster, un Service echo ORDINAIRE répond par le nom de son
+# cluster ; un Pod client tourne dans cluster-1.
+#
+# L'apprenant relie les deux clusters (cilium clustermesh connect, CLI
+# v0.20.3), rend le Service echo global des deux côtés, et prouve que le
+# client de cluster-1 reçoit des réponses des deux clusters.
+#
+# Mesuré le 2026-11-17 (captures CKNE 17-07, Cilium 1.20.4) : sans
+# clustermesh.config.enabled, clustermesh-apiserver reste en Init ; copier le
+# Secret cilium-ca d'un cluster à l'autre fait refuser l'installation par
+# Helm ; tls.ca.cert et tls.ca.key en valeurs sont la voie qui marche.
+id: k8s-relier-deux-clusters
+title: "Connect two clusters with Cilium ClusterMesh"
+level: core-infrastructure-and-cni
+section: ckne
+difficulty: advanced
+description: |
+  Two single-node Cilium clusters share the same certificate authority.
+  Connect them with ClusterMesh, make a Service global on both sides, and
+  prove that a Pod of the first cluster reaches the backends of both.
+skills:
+  - cilium
+  - clustermesh
+  - multi-cluster
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/clustermesh/
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cluster1
+      host: ha-cp1.lab
+      # cluster-2 tourne sur ha-cp2.lab, son unique nœud. Les deux hôtes
+      # sont remis à zéro au cleanup : le lab de haute disponibilité s'en sert.
+      roles:
+        cluster2: ha-cp2.lab
+  default: cluster1
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: clusters-relies
+    label: "The Cilium agent of each cluster sees the node of the other one"
+    tests:
+      - test_les_deux_clusters_se_voient
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/clustermesh/
+  - id: service-global
+    label: "The Service echo of mesh-demo is global in both clusters"
+    tests:
+      - test_le_service_echo_est_global_des_deux_cotes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/clustermesh/
+  - id: deux-clusters-repondent
+    label: "From the Pod client of cluster-1, both clusters answer through the Service echo"
+    tests:
+      - test_le_client_recoit_des_reponses_des_deux_clusters
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/clustermesh/
+
+feedback: full

@@ -1,0 +1,34 @@
+---
+# Joué par `dsoxlab run` : le cluster Cilium sans kube-proxy des hôtes net-*,
+# ramené aux valeurs du socle (plan de contrôle BGP désactivé), le routeur FRR
+# 10.6.2 lancé sur l'hôte témoin (k8s-cp.lab, hors du cluster net-*), puis la
+# situation du lab (fixtures/prepare.sh).
+#
+# Le routeur : ASN 65000, adresse 10.10.50.200 sur le réseau des VM, voisins
+# les trois nœuds net-*, qu'il attend en ASN 65001.
+- name: Préparer le lab k8s-annoncer-un-service-en-bgp
+  hosts: lab_target
+  become: true
+  vars:
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+    routeur_adresse: 10.10.50.200/24
+    voisins: "{{ (cilium_workers + [inventory_hostname]) | map('extract', hostvars, 'ansible_host') | join(' ') }}"
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Lancer le routeur FRR sur l'hôte témoin
+      ansible.builtin.script: >-
+        fixtures/routeur.sh present {{ routeur_adresse }} 65000 65001 {{ voisins }}
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ temoin_hote }}"
+
+    - name: Poser l'application et son Service LoadBalancer
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

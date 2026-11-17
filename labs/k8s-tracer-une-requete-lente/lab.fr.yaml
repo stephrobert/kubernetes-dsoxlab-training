@@ -1,7 +1,5 @@
 title: "Tracer une requête lente à travers le maillage Istio"
-# Page provisoire, comme dans lab.yaml. URL cible (FR) :
-# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/
 description: |
   Sur un cluster où Istio tourne en mode ambient, envoyer les traces d'un
   waypoint vers un collecteur OpenTelemetry et Jaeger, trouver pourquoi aucune

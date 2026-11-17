@@ -1,0 +1,29 @@
+title: "Annoncer les Pods et les Services à un routeur en BGP"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+description: |
+  Sur un cluster Cilium sans kube-proxy, activer le plan de contrôle BGP,
+  appairer les trois nœuds avec un routeur FRR externe, annoncer les réseaux
+  des Pods et l'adresse de LoadBalancer d'un Service, et joindre ce Service
+  depuis le routeur par la route qu'il a apprise.
+
+criteria:
+  - id: bgp-active
+    label: "Le plan de contrôle BGP de Cilium est activé, et chaque agent est prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+  - id: sessions-etablies
+    label: "Le routeur externe a une session établie avec chacun des trois nœuds, AS 65001 face à l'AS 65000"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+  - id: pods-annonces
+    label: "Le routeur a appris le réseau des Pods de chaque nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+  - id: lb-annonce
+    label: "Le Service web a une adresse de 172.30.0.0/28, et le routeur l'a apprise en /32"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+  - id: service-joignable
+    label: "Depuis le réseau du routeur, l'application répond à cette adresse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/

@@ -1,0 +1,65 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster net-* dans
+# l'état du socle, et retire le routeur.
+#
+# 1. Les ressources BGP et le pool d'adresses (objets de cluster), puis le
+#    namespace du lab.
+# 2. L'étiquette bgp sur chaque nœud : la photographie du validateur lit les
+#    étiquettes des nœuds.
+# 3. Cilium ramené aux valeurs du socle (plan de contrôle BGP éteint), puis
+#    les CRD que l'opérateur a créées à l'activation.
+# 4. Le routeur FRR de l'hôte témoin : conteneur, espace de noms réseau,
+#    interface macvlan et configuration.
+- name: Défaire le lab k8s-annoncer-un-service-en-bgp
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+  tasks:
+    - name: Supprimer les ressources BGP et le pool d'adresses
+      ansible.builtin.shell: |
+        for type in ciliumbgpclusterconfigs ciliumbgppeerconfigs ciliumbgpadvertisements ciliumloadbalancerippools; do
+          {{ kubectl }} delete "$type.cilium.io" --all --ignore-not-found --wait=true 2>/dev/null || true
+        done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace bgp-demo --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'étiquette bgp de chaque nœud
+      ansible.builtin.shell: |
+        for n in $({{ kubectl }} get nodes -o name); do {{ kubectl }} label "$n" bgp- 2>/dev/null || true; done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    # L'opérateur crée ces cinq CRD quand le plan de contrôle BGP est activé,
+    # et ne les retire jamais : la photographie du validateur les voyait en
+    # trop (validation du 2026-11-17). Retirées APRÈS le retour au socle,
+    # quand l'opérateur ne les recréera plus.
+    - name: Retirer les CRD du plan de contrôle BGP
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd --ignore-not-found --wait=true
+        ciliumbgpadvertisements.cilium.io
+        ciliumbgpclusterconfigs.cilium.io
+        ciliumbgpnodeconfigoverrides.cilium.io
+        ciliumbgpnodeconfigs.cilium.io
+        ciliumbgppeerconfigs.cilium.io
+      changed_when: true
+
+    - name: Retirer le routeur FRR de l'hôte témoin
+      ansible.builtin.script: fixtures/routeur.sh absent
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ temoin_hote }}"

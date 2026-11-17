@@ -165,11 +165,18 @@ def test_le_setup_installe_le_socle(lab: Path) -> None:
     # lequel tournent les labs du module Fondamentaux, et le cluster Cilium
     # sans kube-proxy des hôtes optionnels net-* (shared/cilium-cluster.yml),
     # sur lequel tournent les labs du niveau 6 « Réseau avancé ».
+    #
+    # Une quatrième forme, ajoutée le 2026-11-18 pour k8s-relier-deux-clusters :
+    # le setup bâtit LUI-MÊME ses clusters, nœuds préparés par
+    # shared/noeud-kubernetes.yml puis `kubeadm init`. Les deux doivent y être :
+    # préparer les nœuds sans initialiser de cluster ne pose aucun socle.
     texte = setup.read_text(encoding="utf-8")
     socles = ("kubeadm-cluster.yml", "kind-cluster.yml", "cilium-cluster.yml")
-    assert any(socle in texte for socle in socles), (
+    bati_par_le_lab = "noeud-kubernetes.yml" in texte and "kubeadm init" in texte
+    assert bati_par_le_lab or any(socle in texte for socle in socles), (
         f"{setup.relative_to(RACINE)} n'inclut aucun socle : shared/kubeadm-cluster.yml, "
-        "shared/kind-cluster.yml ou shared/cilium-cluster.yml.\n"
+        "shared/kind-cluster.yml ou shared/cilium-cluster.yml, ni ne bâtit son cluster "
+        "(shared/noeud-kubernetes.yml puis kubeadm init).\n"
         "Il n'y a aucun point d'accroche après le provisionnement : le cluster "
         "n'existe que parce que chaque lab l'installe. Ce lab tournera tant "
         "qu'un autre sera passé avant lui, et échouera seul sur un cluster neuf."

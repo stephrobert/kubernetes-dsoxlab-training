@@ -1,0 +1,54 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster net-* dans
+# l'état du socle.
+#
+# 1. Le namespace du lab : Pods, NetworkAttachmentDefinition.
+# 2. Multus par son manifeste : DaemonSet, CRD, rôles, ConfigMap.
+# 3. Cilium ramené aux valeurs du socle (cni.exclusive=true). Cette inclusion
+#    définit aussi cilium_workers, dont l'étape suivante a besoin : placée
+#    après, la boucle échoue sur « 'noeud' is undefined » (validation du
+#    2026-11-17).
+# 4. Les fichiers que Multus laisse sur chaque nœud, y compris la copie
+#    .cilium_bak que Cilium exclusif vient d'en faire. Le plus dangereux est
+#    00-multus.conf : kubelet prend le premier fichier de /etc/cni/net.d par
+#    ordre alphabétique, et sans le démon de Multus plus aucun Pod du nœud ne
+#    démarrerait.
+- name: Défaire le lab k8s-attacher-une-seconde-interface
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace multus-demo --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer Multus par son manifeste
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f /opt/multus/multus-daemonset-thick.yml --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer les fichiers de Multus des trois nœuds
+      ansible.builtin.shell: |
+        rm -f /etc/cni/net.d/00-multus.conf /etc/cni/net.d/*.cilium_bak /opt/cni/bin/multus-shim
+        rm -rf /etc/cni/net.d/multus.d
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Retirer le manifeste de Multus
+      ansible.builtin.file:
+        path: /opt/multus/multus-daemonset-thick.yml
+        state: absent

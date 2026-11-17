@@ -1,0 +1,46 @@
+---
+# Joué par `dsoxlab run` : le cluster Cilium sans kube-proxy des hôtes net-*,
+# ramené aux valeurs du socle (passerelle d'egress désactivée), le serveur
+# témoin lancé sur k8s-cp.lab (hors du cluster net-*, sur le même réseau des
+# VM), puis la situation du lab (fixtures/prepare.sh).
+- name: Préparer le lab k8s-faire-sortir-le-trafic-par-une-passerelle
+  hosts: lab_target
+  become: true
+  vars:
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+    temoin_url: "http://{{ hostvars[temoin_hote]['ansible_host'] }}:8090/"
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Poser le serveur témoin sur l'hôte témoin
+      ansible.builtin.copy:
+        src: fixtures/temoin.py
+        dest: /usr/local/lib/dsoxlab-temoin-egress.py
+        mode: "0644"
+      delegate_to: "{{ temoin_hote }}"
+
+    # Unité transitoire : elle disparaît au redémarrage de l'hôte et ne
+    # démarre jamais seule. Arrêtée d'abord, pour qu'un second run reparte
+    # d'un serveur neuf.
+    - name: Lancer le serveur témoin, port 8090
+      ansible.builtin.shell: |
+        systemctl stop dsoxlab-temoin-egress 2>/dev/null || true
+        systemctl reset-failed dsoxlab-temoin-egress 2>/dev/null || true
+        systemd-run --unit dsoxlab-temoin-egress /usr/bin/python3 /usr/local/lib/dsoxlab-temoin-egress.py
+        for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8090/ && exit 0; sleep 1; done
+        exit 1
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ temoin_hote }}"
+
+    - name: Poser les deux Pods et l'URL du témoin
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        TEMOIN_URL: "{{ temoin_url }}"

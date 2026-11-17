@@ -11,7 +11,7 @@ single trace.
 | Target | `k8s-cp.lab`, the catalogue's kubeadm cluster, grown with the optional second worker `k8s-w2.lab`; the lab installs Istio 1.32 in ambient mode, an OpenTelemetry collector contrib 0.165.0 and Jaeger 2.23.0 |
 | Duration | about 40 minutes |
 | Prerequisite | the lab `k8s-servir-une-gateway-en-https` (same mesh, same cluster) |
-| Related page | [Kubernetes course](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/), until the lesson is published |
+| Related page | [Trace a slow request through the Istio mesh](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/trace-slow-request-istio/) |
 
 The `run` of this lab mounts `k8s-w2.lab` if it is not running yet, and joins it
 to the cluster. Each `run` brings Istio back to the lab's profile, which erases

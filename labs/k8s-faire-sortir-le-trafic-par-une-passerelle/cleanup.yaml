@@ -1,0 +1,59 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster net-* dans
+# l'état du socle, et arrête le témoin.
+#
+# 1. Les politiques de passerelle (objets de cluster) et le namespace du lab.
+# 2. L'étiquette de passerelle sur chaque nœud : la photographie du
+#    validateur lit les étiquettes des nœuds.
+# 3. Cilium ramené aux valeurs du socle (passerelle et masquage BPF éteints),
+#    puis la CRD que l'opérateur a créée à l'activation.
+# 4. Le serveur témoin de k8s-cp.lab, arrêté et retiré.
+- name: Défaire le lab k8s-faire-sortir-le-trafic-par-une-passerelle
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+  tasks:
+    - name: Supprimer les politiques de passerelle
+      ansible.builtin.command: >-
+        {{ kubectl }} delete ciliumegressgatewaypolicies.cilium.io --all --ignore-not-found --wait=true
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace egress-demo --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'étiquette de passerelle de chaque nœud
+      ansible.builtin.shell: |
+        for n in $({{ kubectl }} get nodes -o name); do {{ kubectl }} label "$n" egress-gateway- 2>/dev/null || true; done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    # L'opérateur crée cette CRD quand la passerelle est activée, et ne la
+    # retire jamais : la photographie du validateur la voyait en trop
+    # (validation du 2026-11-17). Retirée APRÈS le retour au socle, quand
+    # l'opérateur ne la recréera plus.
+    - name: Retirer la CRD des politiques de passerelle
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd ciliumegressgatewaypolicies.cilium.io --ignore-not-found --wait=true
+      changed_when: true
+
+    - name: Arrêter le serveur témoin
+      ansible.builtin.shell: |
+        systemctl stop dsoxlab-temoin-egress 2>/dev/null || true
+        systemctl reset-failed dsoxlab-temoin-egress 2>/dev/null || true
+        rm -f /usr/local/lib/dsoxlab-temoin-egress.py
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ temoin_hote }}"

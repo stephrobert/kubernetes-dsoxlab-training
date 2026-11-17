@@ -408,18 +408,22 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 
 Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Security and Policy pèsent 25 % chacun. Les labs tournent sur un cluster Cilium dédié, sans kube-proxy, ou font tourner Istio en mode ambient sur le cluster kubeadm, agrandi d'un second worker.
 
-6 lab(s).
+10 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
 | 1 | [`k8s-installer-cilium-sans-kube-proxy`](labs/k8s-installer-cilium-sans-kube-proxy/) | Installer Cilium sans kube-proxy | core-infrastructure-and-cni | 45m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/) |
 | 2 | [`k8s-capturer-le-trafic-d-un-pod`](labs/k8s-capturer-le-trafic-d-un-pod/) | Capturer le trafic d'un Pod et désigner la cause de chaque échec | core-infrastructure-and-cni | 40m | 2026-11-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 3 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Auditer les flux réseau avec Hubble | observability | 40m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
-| 4 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Servir une Gateway d'Istio en HTTPS avec un certificat de cert-manager | network-security-policy | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 5 | [`k8s-tracer-une-requete-lente`](labs/k8s-tracer-une-requete-lente/) | Tracer une requête lente à travers le maillage Istio | observability | 40m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
-| 6 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 3 | [`k8s-attacher-une-seconde-interface`](labs/k8s-attacher-une-seconde-interface/) | Donner une seconde interface réseau à un Pod avec Multus | core-infrastructure-and-cni | 35m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/) |
+| 4 | [`k8s-auditer-les-flux-avec-hubble`](labs/k8s-auditer-les-flux-avec-hubble/) | Auditer les flux réseau avec Hubble | observability | 40m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/) |
+| 5 | [`k8s-annoncer-un-service-en-bgp`](labs/k8s-annoncer-un-service-en-bgp/) | Annoncer les Pods et les Services à un routeur en BGP | service-networking-and-dns | 40m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/) |
+| 6 | [`k8s-faire-sortir-le-trafic-par-une-passerelle`](labs/k8s-faire-sortir-le-trafic-par-une-passerelle/) | Faire sortir le trafic d'un Pod par une passerelle d'egress | advanced-traffic-management | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/) |
+| 7 | [`k8s-relier-deux-clusters`](labs/k8s-relier-deux-clusters/) | Relier deux clusters avec Cilium ClusterMesh | core-infrastructure-and-cni | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/) |
+| 8 | [`k8s-servir-une-gateway-en-https`](labs/k8s-servir-une-gateway-en-https/) | Servir une Gateway d'Istio en HTTPS avec un certificat de cert-manager | network-security-policy | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
+| 9 | [`k8s-tracer-une-requete-lente`](labs/k8s-tracer-une-requete-lente/) | Tracer une requête lente à travers le maillage Istio | observability | 40m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/) |
+| 10 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
 
-Total : **148 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **152 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

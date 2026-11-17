@@ -1,0 +1,25 @@
+title: "Faire sortir le trafic d'un Pod par une passerelle d'egress"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+description: |
+  Sur un cluster Cilium sans kube-proxy, activer la passerelle d'egress avec le
+  masquage BPF qu'elle exige, désigner un nœud passerelle, et écrire une
+  politique qui fait joindre un serveur externe par ce nœud à un Pod, et à lui
+  seul.
+
+criteria:
+  - id: passerelle-activee
+    label: "La passerelle d'egress et le masquage BPF sont tous deux activés, et chaque agent Cilium est prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+  - id: pod-vise
+    label: "Une CiliumEgressGatewayPolicy sélectionne le Pod sortie-controlee d'egress-demo, et pas autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+  - id: passerelle-designee
+    label: "Cette politique couvre le témoin dans ses destinations et désigne net-w2.lab, et aucun autre nœud, comme passerelle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+  - id: sortie-controlee
+    label: "Le témoin externe voit sortie-controlee arriver de net-w2.lab, et autre toujours de net-w1.lab"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/

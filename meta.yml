@@ -580,8 +580,21 @@ sections:
       # Leçon L2 : capturer sur l'interface d'un Pod (tcpdump, nsenter,
       # kubectl debug), sur le cluster kubeadm du socle et son second worker.
       - k8s-capturer-le-trafic-d-un-pod
+      # Leçon L3 : une seconde interface par Multus v4.3.2 thick, à côté de
+      # Cilium en cni.exclusive=false, sur les hôtes net-*.
+      - k8s-attacher-une-seconde-interface
       # Leçon L4 : sur le cluster prêt du socle, que son setup remonte.
       - k8s-auditer-les-flux-avec-hubble
+      # Leçon L5 : le plan de contrôle BGP de Cilium face à un routeur FRR
+      # 10.6.2 hors du cluster (sur k8s-cp.lab, espace de noms réseau à lui).
+      - k8s-annoncer-un-service-en-bgp
+      # Leçon L6 : la passerelle d'egress de Cilium (masquage BPF exigé),
+      # témoin externe sur k8s-cp.lab, hors du cluster net-*.
+      - k8s-faire-sortir-le-trafic-par-une-passerelle
+      # Leçon L7 : ClusterMesh entre deux clusters d'un nœud (ha-cp1,
+      # ha-cp2), autorité de certification partagée. Le cleanup remet les
+      # deux hôtes à zéro pour le lab de haute disponibilité.
+      - k8s-relier-deux-clusters
       # L8 : la Gateway d'Istio en HTTPS, certificat de cert-manager. Suppose
       # joué k8s-emettre-un-certificat-avec-cert-manager (niveau 4, D85).
       - k8s-servir-une-gateway-en-https

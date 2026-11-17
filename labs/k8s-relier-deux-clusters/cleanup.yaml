@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet les deux nœuds à l'état
+# « prêts, sans cluster ». C'est aussi l'état qu'attend le lab
+# cka-control-plane-haute-disponibilite, qui se sert des mêmes hôtes.
+- name: Défaire le lab k8s-relier-deux-clusters
+  hosts: lab_target:lab_cluster2
+  become: true
+  tasks:
+    # Le kubeadm reset qui suit efface tout le cluster, namespace compris ;
+    # le supprimer d'abord garde ce cleanup juste si la remise à zéro change.
+    - name: Supprimer le namespace du lab, dans le cluster du nœud
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace mesh-demo
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Remettre le nœud à zéro
+      ansible.builtin.include_tasks: fixtures/remise-a-zero.yml
+
+    - name: Retirer le CLI cilium et le kubeconfig de cluster-2
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/cilium
+        - /etc/kubernetes/cluster-2.conf
+        - /tmp/cilium-linux-amd64.tar.gz

@@ -1,0 +1,20 @@
+title: "Relier deux clusters avec Cilium ClusterMesh"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/
+description: |
+  Deux clusters Cilium d'un nœud partagent la même autorité de certification.
+  Les relier par ClusterMesh, rendre un Service global des deux côtés, et
+  prouver qu'un Pod du premier cluster atteint les backends des deux.
+
+criteria:
+  - id: clusters-relies
+    label: "L'agent Cilium de chaque cluster voit le nœud de l'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/
+  - id: service-global
+    label: "Le Service echo de mesh-demo est global dans les deux clusters"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/
+  - id: deux-clusters-repondent
+    label: "Depuis le Pod client de cluster-1, les deux clusters répondent par le Service echo"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/

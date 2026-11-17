@@ -1,0 +1,45 @@
+---
+# Joué par `dsoxlab run` : le cluster Cilium sans kube-proxy des hôtes net-*,
+# ramené aux valeurs du socle (cni.exclusive=true), les fichiers de Multus d'un
+# passage précédent retirés des trois nœuds, puis la situation du lab
+# (fixtures/prepare.sh).
+#
+# Les plugins CNI macvlan et static sont déjà sur chaque nœud : le paquet
+# kubernetes-cni du socle les pose dans /opt/cni/bin.
+- name: Préparer le lab k8s-attacher-une-seconde-interface
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Poser le manifeste épinglé de Multus et le namespace de travail
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+    # Après le retrait du DaemonSet par prepare.sh : un Pod Multus encore en
+    # marche réécrirait 00-multus.conf.
+    - name: Retirer les fichiers de Multus des trois nœuds
+      ansible.builtin.shell: |
+        rm -f /etc/cni/net.d/00-multus.conf /etc/cni/net.d/*.cilium_bak /opt/cni/bin/multus-shim
+        rm -rf /etc/cni/net.d/multus.d
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Vérifier que les plugins macvlan et static sont sur chaque nœud
+      ansible.builtin.command: test -x /opt/cni/bin/macvlan -a -x /opt/cni/bin/static
+      changed_when: false
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
