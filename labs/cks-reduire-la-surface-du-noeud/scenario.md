@@ -14,7 +14,8 @@ at each published flaw.
 What a cluster worker really uses, on all its interfaces: `sshd` (22), `bird`,
 the BGP of Calico (179), the kubelet (10250), kube-proxy (10256), the VXLAN
 tunnel of Calico (UDP 4789), and the DHCP client (UDP 68, bound to the node
-address).
+address). Add `calico-typha` (5473) when the Calico operator places an
+instance on this node.
 
 ## What you must achieve
 

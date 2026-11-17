@@ -23,7 +23,8 @@ estimated_time: 20m
 # Lab guidé de la leçon 15-27 « Durcir les nœuds » (issue #220). Blueprint CKS,
 # domaine System Hardening : « Minimize host OS footprint (reduce attack
 # surface) ». Les ports attendus d'un worker sont ceux relevés sur k8s-w1.lab
-# le 2026-11-17 (22, 179, 10250, 10256, UDP 4789, et le client DHCP).
+# le 2026-11-17 (22, 179, 10250, 10256, UDP 4789, et le client DHCP), plus
+# calico-typha (5473) quand l'opérateur Tigera en place une sur le nœud.
 # rpcbind 1.2.6-7ubuntu2 et vsftpd 3.0.5-0ubuntu3.1 sont les versions du dépôt
 # Ubuntu 24.04 mesurées ce jour-là.
 certification_tags:

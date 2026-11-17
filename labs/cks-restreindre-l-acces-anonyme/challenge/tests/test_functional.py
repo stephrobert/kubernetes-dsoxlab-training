@@ -31,8 +31,11 @@ KUBECTL = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
 CLUSTER_INFO = "/api/v1/namespaces/kube-public/configmaps/cluster-info"
 SANTE = ("/livez", "/readyz", "/healthz")
 FERMES = ("/version", "/api", "/api/v1/namespaces/default/pods", "/apis")
-# Les deux liaisons que kubeadm pose lui-même vers les anonymes (relevé du
-# 2026-11-17, kubeadm v1.37.2). Toute autre est une porte ouverte.
+# Les deux liaisons d'origine vers les anonymes (relevé du 2026-11-17,
+# kubeadm v1.37.2) : system:public-info-viewer, posée par l'API server à son
+# démarrage (rôles de bootstrap RBAC), et kubeadm:bootstrap-signer-clusterinfo,
+# créée par kubeadm pour la lecture de cluster-info. Toute autre est une porte
+# ouverte.
 LIAISONS_KUBEADM = {
     ("ClusterRoleBinding", "", "system:public-info-viewer"),
     ("RoleBinding", "kube-public", "kubeadm:bootstrap-signer-clusterinfo"),

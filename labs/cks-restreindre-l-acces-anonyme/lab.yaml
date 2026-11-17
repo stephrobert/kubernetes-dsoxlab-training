@@ -51,7 +51,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
   - id: aucun-droit-anonyme
-    label: "No binding grants rights to anonymous clients, apart from the two kubeadm creates"
+    label: "No binding grants rights to anonymous clients, apart from system:public-info-viewer (set by the API server) and the one kubeadm creates to read cluster-info"
     tests:
       - test_aucun_droit_rbac_pour_les_anonymes
     lessons:
