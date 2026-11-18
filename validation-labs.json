@@ -4721,6 +4721,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-annoncer-un-service-en-bgp": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_l_adresse_de_loadbalancer_est_annoncee",
+    "test_l_application_repond_depuis_le_routeur",
+    "test_le_plan_de_controle_bgp_est_active",
+    "test_le_reseau_des_pods_est_annonce",
+    "test_les_trois_sessions_sont_etablies"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 964,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-annoncer-un-service-en-bgp.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_adresse_de_loadbalancer_est_annoncee",
+    "test_l_application_repond_depuis_le_routeur",
+    "test_le_plan_de_controle_bgp_est_active",
+    "test_le_reseau_des_pods_est_annonce",
+    "test_les_trois_sessions_sont_etablies"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-appliquer-une-recommandation-vpa": {
   "apres": {
    "echecs": [],
@@ -4768,6 +4825,63 @@
     "test_le_vpa_n_a_evince_aucun_pod",
     "test_les_pods_tournent_avec_ces_requests",
     "test_les_requests_sont_dans_les_bornes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-attacher-une-seconde-interface": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_cilium_n_est_plus_exclusif",
+    "test_deux_pods_ont_deux_interfaces",
+    "test_la_definition_du_second_reseau_existe",
+    "test_le_client_joint_le_serveur_par_le_second_reseau",
+    "test_multus_v4_3_2_tourne_sur_chaque_noeud"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 609,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-attacher-une-seconde-interface.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_cilium_n_est_plus_exclusif",
+    "test_deux_pods_ont_deux_interfaces",
+    "test_la_definition_du_second_reseau_existe",
+    "test_le_client_joint_le_serveur_par_le_second_reseau",
+    "test_multus_v4_3_2_tourne_sur_chaque_noeud"
    ],
    "passed": 0,
    "recorded": true,
@@ -4857,8 +4971,8 @@
    "total": 3
   },
   "cible": "net-cp.lab",
-  "date": "2026-11-15",
-  "duree_s": 602,
+  "date": "2026-11-18",
+  "duree_s": 677,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -7021,6 +7135,67 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-epreuve-reseau-avance": {
+  "apres": {
+   "echecs": [],
+   "passed": 7,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 7
+  },
+  "avant": {
+   "echecs": [
+    "test_e1_un_gateway_cilium_est_programme",
+    "test_e2_le_listener_https_presente_le_certificat_de_la_vitrine",
+    "test_e3_la_route_mene_a_la_vitrine_et_seulement_pour_son_nom",
+    "test_e4_par_le_gateway_get_passe_et_post_est_refuse",
+    "test_e5_caisse_lit_sans_ecrire_et_publicite_est_coupee",
+    "test_e6_chaque_agent_chiffre_en_wireguard",
+    "test_e7_le_diagnostic_nomme_la_requete_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 738,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/7",
+   "après la solution : 7/7",
+   "après clean et run : 0/7",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-epreuve-reseau-avance.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_e1_un_gateway_cilium_est_programme",
+    "test_e2_le_listener_https_presente_le_certificat_de_la_vitrine",
+    "test_e3_la_route_mene_a_la_vitrine_et_seulement_pour_son_nom",
+    "test_e4_par_le_gateway_get_passe_et_post_est_refuse",
+    "test_e5_caisse_lit_sans_ecrire_et_publicite_est_coupee",
+    "test_e6_chaque_agent_chiffre_en_wireguard",
+    "test_e7_le_diagnostic_nomme_la_requete_refusee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 7
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-epreuve-securiser-un-cluster": {
   "apres": {
    "echecs": [],
@@ -7269,6 +7444,116 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-faire-sortir-le-trafic-par-une-passerelle": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_passerelle_d_egress_est_activee",
+    "test_la_politique_couvre_le_temoin_et_designe_net_w2",
+    "test_le_pod_vise_sort_par_la_passerelle_et_l_autre_non",
+    "test_une_politique_vise_le_pod_sortie_controlee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 655,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-faire-sortir-le-trafic-par-une-passerelle.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_passerelle_d_egress_est_activee",
+    "test_la_politique_couvre_le_temoin_et_designe_net_w2",
+    "test_le_pod_vise_sort_par_la_passerelle_et_l_autre_non",
+    "test_une_politique_vise_le_pod_sortie_controlee"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-filtrer-en-l7-avec-cilium": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_route_mene_aux_fiches",
+    "test_lecteur_lit_sans_ecrire",
+    "test_par_le_gateway_get_passe_et_post_est_refuse",
+    "test_un_gateway_cilium_est_programme"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 687,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-filtrer-en-l7-avec-cilium.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_route_mene_aux_fiches",
+    "test_lecteur_lit_sans_ecrire",
+    "test_par_le_gateway_get_passe_et_post_est_refuse",
+    "test_un_gateway_cilium_est_programme"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-gerer-les-images": {
   "apres": {
    "echecs": [],
@@ -7404,8 +7689,8 @@
    "total": 6
   },
   "cible": "net-cp.lab",
-  "date": "2026-11-15",
-  "duree_s": 624,
+  "date": "2026-11-18",
+  "duree_s": 560,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -8151,6 +8436,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-relier-deux-clusters": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_le_client_recoit_des_reponses_des_deux_clusters",
+    "test_le_service_echo_est_global_des_deux_cotes",
+    "test_les_deux_clusters_se_voient"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "ha-cp1.lab",
+  "date": "2026-11-18",
+  "duree_s": 1156,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, aucun cluster, 0 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-relier-deux-clusters.log",
+  "kubernetes": "aucun cluster",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_client_recoit_des_reponses_des_deux_clusters",
+    "test_le_service_echo_est_global_des_deux_cotes",
+    "test_les_deux_clusters_se_voient"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-rendre-une-application-conforme-12-facteurs": {
   "apres": {
    "echecs": [],
@@ -8425,6 +8763,65 @@
    "skipped": 0,
    "status": "failed",
    "total": 3
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-tracer-une-requete-lente": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_le_diagnostic_nomme_le_service_lent",
+    "test_le_maillage_declare_le_fournisseur_de_traces",
+    "test_les_spans_du_waypoint_arrivent_dans_jaeger",
+    "test_un_waypoint_sert_le_namespace",
+    "test_une_seule_trace_montre_le_service_lent",
+    "test_une_telemetry_trace_toutes_les_requetes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 1043,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 36 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-tracer-une-requete-lente.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_diagnostic_nomme_le_service_lent",
+    "test_le_maillage_declare_le_fournisseur_de_traces",
+    "test_les_spans_du_waypoint_arrivent_dans_jaeger",
+    "test_un_waypoint_sert_le_namespace",
+    "test_une_seule_trace_montre_le_service_lent",
+    "test_une_telemetry_trace_toutes_les_requetes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
   },
   "verdict": "VALIDE"
  },
