@@ -124,11 +124,9 @@ admission, write and run `chown` inside the Pods, make real connections,
 compare kernels, start `wget` themselves, verify signatures with your
 published key, rescan the images and query the shop.
 
-Hints exist, they cost points, and they go from the vaguest to the most
-explicit.
+There is no hint: the test is passed without help, the way it is graded.
 
 ```bash
-dsoxlab hint   k8s-epreuve-securiser-un-cluster
 dsoxlab check  k8s-epreuve-securiser-un-cluster
 dsoxlab submit k8s-epreuve-securiser-un-cluster
 ```

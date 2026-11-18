@@ -5,7 +5,7 @@ requirements that name no Kubernetes object, secure the cluster hosting the
 shop. Control plane, audit log, admission, confinement, network, detection
 with Falco and supply chain, while the shop keeps answering. Graded on the
 final state: nineteen states of equal weight, pass mark 70, seven critical
-states, paid hints.
+states, no hint.
 
 | | |
 |---|---|

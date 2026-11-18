@@ -94,8 +94,7 @@ de contrôle de `ha` (il gèle son conteneur) puis le remet en marche, et lance
 dans la boutique un Pod éphémère, `sonde-placement`, que le scheduler doit
 placer sur le worker. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
-Quatre indices sont disponibles, du plus vague au plus précis. Ils coûtent 10, 15, 20 et 25 points,
-retirés du barème : un indice pris rend le seuil plus difficile à atteindre.
+Il n'y a aucun indice : l'épreuve se passe sans aide, comme elle se note.
 
 ```bash
 dsoxlab check  k8s-epreuve-administrer-un-cluster

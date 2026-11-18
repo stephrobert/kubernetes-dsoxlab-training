@@ -130,11 +130,9 @@ vraies connexions, comparent les noyaux, lancent eux-mêmes `wget`, vérifient
 les signatures avec votre clé publiée, réanalysent les images et interrogent
 la boutique.
 
-Des indices existent, ils coûtent des points, et ils vont du plus vague au
-plus explicite.
+Il n'y a aucun indice : l'épreuve se passe sans aide, comme elle se note.
 
 ```bash
-dsoxlab hint   k8s-epreuve-securiser-un-cluster
 dsoxlab check  k8s-epreuve-securiser-un-cluster
 dsoxlab submit k8s-epreuve-securiser-un-cluster
 ```

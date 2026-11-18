@@ -9,10 +9,8 @@
 # P09, P12 et P13. `lab_type: challenge` comme les autres épreuves du
 # catalogue ; capstone est réservé aux certifications.
 #
-# Indices payants, en gradation réelle : quatre, de 10, 15, 20 et 25 points (D91), du plus
-# vague au plus explicite. dsoxlab retire leur coût du barème, ce que le
-# scénario dit à l'apprenant (D36 l'avait fait renoncer aux indices sur les
-# épreuves des niveaux 1 et 2).
+# Aucun indice (D36, maintenue pour toutes les épreuves de niveau le
+# 2026-11-18). Les quatre indices payants de D91 sont retirés.
 #
 # DEUX CLUSTERS, comme k8s-challenge-installer-un-cluster et pour la même
 # raison : l'infrastructure ne porte qu'un plan de contrôle kubeadm. P03 et P04

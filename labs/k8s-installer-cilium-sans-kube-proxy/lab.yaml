@@ -82,6 +82,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-kubernetes-with-kubeadm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-join-a-node/
   - id: remplacement-de-kube-proxy
     label: "Cilium 1.20.5 runs on every node with KubeProxyReplacement True"
     tests:
