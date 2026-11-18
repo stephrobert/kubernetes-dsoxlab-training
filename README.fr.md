@@ -408,7 +408,7 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 
 Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Security and Policy pèsent 25 % chacun. Les labs tournent sur un cluster Cilium dédié, sans kube-proxy, ou font tourner Istio en mode ambient sur le cluster kubeadm, agrandi d'un second worker.
 
-13 lab(s).
+14 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -425,8 +425,9 @@ Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Sec
 | 11 | [`k8s-tracer-une-requete-lente`](labs/k8s-tracer-une-requete-lente/) | Tracer une requête lente à travers le maillage Istio | observability | 40m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tracer-requetes-istio/) |
 | 12 | [`k8s-router-des-requetes-d-inference`](labs/k8s-router-des-requetes-d-inference/) | Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension | advanced-traffic-management | 35m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/) |
 | 13 | [`k8s-epreuve-reseau-avance`](labs/k8s-epreuve-reseau-avance/) | Épreuve du niveau 6 : exposer et protéger un service sur Cilium | network-security-policy | 120m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/) |
+| 14 | [`ckne-capstone-relier-deux-sites`](labs/ckne-capstone-relier-deux-sites/) | Capstone : relier deux sites, annoncer un Service au réseau et le servir en HTTPS | capstone, plusieurs domaines | 75m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercices/) |
 
-Total : **155 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **156 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

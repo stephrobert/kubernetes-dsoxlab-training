@@ -616,6 +616,11 @@ sections:
       # du niveau qu'elle croise : Gateway API servie par Cilium, politique
       # L7, chiffrement WireGuard et diagnostic par Hubble, sur net-*.
       - k8s-epreuve-reseau-avance
+      # Le capstone de la CKNE (fiche KUBERN-16-17), en dernier comme ceux du
+      # CKA, du CKAD et de la CKS : il ne nomme aucun objet. Deux sites (ha-cp1,
+      # ha-cp2) reliés par ClusterMesh, annonce BGP au routeur FRR de k8s-cp,
+      # Gateway HTTPS servie par Cilium avec cert-manager.
+      - ckne-capstone-relier-deux-sites
 
 # Envoi des preuves vers le compte facultatif du site, par `dsoxlab login` puis
 # `dsoxlab push`. Rien ne part sans ces deux gestes de l'apprenant. Toutes ces

@@ -1,0 +1,23 @@
+title: "Capstone : relier deux sites, annoncer un Service au réseau et le servir en HTTPS"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercices/
+description: |
+  Deux sites, deux clusters, une boutique. Faites répondre la boutique depuis
+  les deux sites, y compris quand l'un tombe, donnez au routeur de l'équipe
+  réseau une adresse qu'il apprend seul, et servez la boutique en HTTPS sous
+  son nom public avec un certificat de l'autorité interne, le HTTP en clair
+  étant redirigé.
+
+criteria:
+  - id: deux-sites
+    label: "La boutique répond depuis les deux sites, et répond encore quand le site 1 n'a plus de réplica"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/clustermesh/
+  - id: annonce-bgp
+    label: "La boutique du site 1 a une adresse du bloc donné, apprise par le routeur et qui lui répond ; le Service interne n'est pas annoncé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/annoncer-services-bgp/
+  - id: https
+    label: "La boutique est servie en HTTPS sous son nom public, avec un certificat de cert-manager émis par l'autorité des sites, et le HTTP en clair est redirigé en 301"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/tls-gateway-api/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
