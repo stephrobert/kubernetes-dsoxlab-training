@@ -6894,8 +6894,8 @@
    "total": 18
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-15",
-  "duree_s": 1823,
+  "date": "2026-11-18",
+  "duree_s": 1854,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -7236,12 +7236,12 @@
    "total": 19
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-15",
-  "duree_s": 1380,
+  "date": "2026-11-18",
+  "duree_s": 1089,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 36 objets hors kube-system",
    "avant le travail : 0/19",
    "après la solution : 19/19",
    "après clean et run : 0/19",
@@ -7690,7 +7690,7 @@
   },
   "cible": "net-cp.lab",
   "date": "2026-11-18",
-  "duree_s": 560,
+  "duree_s": 638,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
