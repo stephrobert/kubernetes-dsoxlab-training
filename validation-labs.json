@@ -6183,6 +6183,61 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-reseau-avance": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_la_sortie_de_facturation_passe_par_net_w2",
+    "test_le_flux_refuse_est_designe_et_vu_par_hubble",
+    "test_le_service_herite_repond_sans_kube_proxy",
+    "test_panier_atteint_stock_et_lui_seul"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-18",
+  "duree_s": 1036,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-reseau-avance.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_sortie_de_facturation_passe_par_net_w2",
+    "test_le_flux_refuse_est_designe_et_vu_par_hubble",
+    "test_le_service_herite_repond_sans_kube_proxy",
+    "test_panier_atteint_stock_et_lui_seul"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-sauvegarder-et-restaurer": {
   "apres": {
    "echecs": [],
