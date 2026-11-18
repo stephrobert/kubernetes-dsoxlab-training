@@ -1,0 +1,20 @@
+---
+# Joué par `dsoxlab run` : le cluster Cilium sans kube-proxy des hôtes net-*,
+# ramené aux valeurs du socle (ce qui éteint la Gateway API et le chiffrement
+# qu'un passage précédent aurait activés), puis l'état hérité de l'épreuve
+# (fixtures/prepare.sh), qui retire ensuite les CRD de la Gateway API.
+- name: Préparer l'épreuve k8s-epreuve-reseau-avance
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Poser l'état hérité de l'épreuve
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

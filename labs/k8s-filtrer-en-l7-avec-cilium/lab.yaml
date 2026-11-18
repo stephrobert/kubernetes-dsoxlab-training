@@ -1,0 +1,82 @@
+# Lab guidé de la leçon « Servir un Gateway et filtrer en L7 avec Cilium »,
+# niveau 6 « Réseau avancé » (CKNE). Demandé par la session du site le
+# 2026-11-18 : l'épreuve du niveau 6 exige ces gestes, et aucune leçon ne les
+# enseignait.
+#
+# La situation : le cluster Cilium 1.20.5 sans kube-proxy des hôtes net-*, au
+# socle (Gateway API éteinte, aucune CRD Gateway, aucun pool). Dans catalogue,
+# l'application fiches répond en HTTP, et le client lecteur la lit.
+#
+# L'apprenant installe les CRD de la Gateway API v1.6.3, active la Gateway API
+# de Cilium, crée un pool d'adresses (sinon AddressNotAssigned), sert fiches
+# par un Gateway HTTP, puis pose une politique L7 qui laisse passer GET / et
+# refuse POST, sans couper le Gateway (entité ingress).
+#
+# D57 : volontairement plus étroit que l'épreuve k8s-epreuve-reseau-avance
+# (autres noms, HTTP sans TLS, ni chiffrement ni Hubble), pour que l'épreuve
+# ne se refasse pas avec ces manifestes. Chaque geste mesuré le 2026-11-18
+# (captures epreuve-n6).
+id: k8s-filtrer-en-l7-avec-cilium
+title: "Serve a Gateway and filter at L7 with Cilium"
+level: network-security-policy
+section: ckne
+difficulty: advanced
+description: |
+  On a Cilium cluster without kube-proxy, turn on Cilium's Gateway API, serve
+  an application through a Gateway, then write a policy that lets clients read
+  it and refuses writes at the HTTP level, without cutting the Gateway.
+skills:
+  - cilium
+  - gateway-api
+  - network-policy
+  - loadbalancer-ipam
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cilium-gateway-l7/
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: gateway-programme
+    label: "A Gateway of class cilium in catalogue, with an HTTP listener on port 80, is Programmed and has an address"
+    tests:
+      - test_un_gateway_cilium_est_programme
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cilium-gateway-l7/
+  - id: route-fiches
+    label: "http://fiches.formation.test/ through the Gateway reaches the application fiches"
+    tests:
+      - test_la_route_mene_aux_fiches
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cilium-gateway-l7/
+  - id: lecteur-lecture-seule
+    label: "From lecteur, GET / is served and POST / is refused with 403"
+    tests:
+      - test_lecteur_lit_sans_ecrire
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cilium-gateway-l7/
+  - id: gateway-lecture-seule
+    label: "Through the Gateway too, GET / is served and POST / is refused with 403"
+    tests:
+      - test_par_le_gateway_get_passe_et_post_est_refuse
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cilium-gateway-l7/
+
+feedback: full

@@ -1,0 +1,25 @@
+title: "Servir un Gateway et filtrer en L7 avec Cilium"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/cilium-gateway-l7/
+description: |
+  Sur un cluster Cilium sans kube-proxy, activer la Gateway API de Cilium,
+  servir une application par un Gateway, puis écrire une politique qui laisse
+  les clients la lire et refuse l'écriture au niveau HTTP, sans couper le
+  Gateway.
+
+criteria:
+  - id: gateway-programme
+    label: "Un Gateway de classe cilium dans catalogue, avec un listener HTTP sur le port 80, est Programmed et a une adresse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/cilium-gateway-l7/
+  - id: route-fiches
+    label: "http://fiches.formation.test/ par le Gateway mène à l'application fiches"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/cilium-gateway-l7/
+  - id: lecteur-lecture-seule
+    label: "Depuis lecteur, GET / est servi et POST / est refusé en 403"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/cilium-gateway-l7/
+  - id: gateway-lecture-seule
+    label: "Par le Gateway aussi, GET / est servi et POST / est refusé en 403"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/cilium-gateway-l7/

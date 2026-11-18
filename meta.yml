@@ -595,6 +595,9 @@ sections:
       # ha-cp2), autorité de certification partagée. Le cleanup remet les
       # deux hôtes à zéro pour le lab de haute disponibilité.
       - k8s-relier-deux-clusters
+      # Gateway servi par Cilium et politique L7 (entité ingress), sur net-*.
+      # Leçon cilium-gateway-l7, préalable de l'épreuve du niveau.
+      - k8s-filtrer-en-l7-avec-cilium
       # L8 : la Gateway d'Istio en HTTPS, certificat de cert-manager. Suppose
       # joué k8s-emettre-un-certificat-avec-cert-manager (niveau 4, D85).
       - k8s-servir-une-gateway-en-https
@@ -604,6 +607,10 @@ sections:
       - k8s-tracer-une-requete-lente
       # L10 : Gateway API Inference Extension servie par la Gateway d'Istio.
       - k8s-router-des-requetes-d-inference
+      # L'épreuve de fin du niveau 6 (KUBERN-EPREUVE-N6), après tous les labs
+      # du niveau qu'elle croise : Gateway API servie par Cilium, politique
+      # L7, chiffrement WireGuard et diagnostic par Hubble, sur net-*.
+      - k8s-epreuve-reseau-avance
 
 # Envoi des preuves vers le compte facultatif du site, par `dsoxlab login` puis
 # `dsoxlab push`. Rien ne part sans ces deux gestes de l'apprenant. Toutes ces

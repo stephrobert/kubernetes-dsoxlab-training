@@ -1,0 +1,47 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster net-* dans
+# l'état du socle. L'ORDRE est imposé par une mesure du 2026-11-18 :
+#
+# 1. Le namespace de l'épreuve (Gateway, routes, politiques, Pods, Secret) et
+#    les pools LB-IPAM.
+# 2. Cilium ramené aux valeurs du socle : Gateway API, chiffrement WireGuard
+#    éteints. Les CRD de la Gateway API doivent encore exister à ce moment :
+#    la release Cilium en place contient la GatewayClass cilium, et sans sa
+#    CRD Helm refuse toute mise à jour (« resource mapping not found … kind
+#    GatewayClass »).
+# 3. Seulement ensuite : la GatewayClass, puis les CRD de la Gateway API.
+- name: Défaire l'épreuve k8s-epreuve-reseau-avance
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    gwapi: https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/standard-install.yaml
+  tasks:
+    - name: Supprimer le namespace de l'épreuve
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace boutique --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les pools LB-IPAM
+      ansible.builtin.command: >-
+        {{ kubectl }} delete ciliumloadbalancerippools.cilium.io --all --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer la GatewayClass de Cilium
+      ansible.builtin.command: >-
+        {{ kubectl }} delete gatewayclass cilium --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les CRD de la Gateway API
+      ansible.builtin.command: >-
+        {{ kubectl }} delete -f {{ gwapi }} --ignore-not-found
+      changed_when: true
+      failed_when: false

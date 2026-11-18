@@ -1,0 +1,37 @@
+title: "Épreuve du niveau 6 : exposer et protéger un service sur Cilium"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+description: |
+  Sur le cluster Cilium, exposer la vitrine de la boutique en HTTPS par un
+  Gateway servi par Cilium, laisser les clients la lire sans écrire, couper ce
+  qui n'a rien à y faire, chiffrer le trafic entre nœuds, et nommer, d'après
+  Hubble, la requête que votre politique refuse.
+
+criteria:
+  - id: e1-gateway-programme
+    label: "E1 : un Gateway de classe cilium dans boutique est Programmed et a une adresse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e2-certificat-presente
+    label: "E2 : son listener HTTPS présente le certificat de vitrine-tls pour vitrine.formation.test, vérifié contre la CA"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e3-route
+    label: "E3 : https://vitrine.formation.test/ mène à la vitrine par le Gateway, et un autre nom reçoit 404"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e4-lecture-par-le-gateway
+    label: "E4 (critique) : par le Gateway, GET est servi et POST est refusé en 403"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e5-clients
+    label: "E5 : caisse lit sans écrire, publicite est coupée au niveau réseau"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e6-chiffrement
+    label: "E6 (critique) : chaque agent Cilium chiffre en WireGuard vers ses deux pairs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
+  - id: e7-diagnostic-hubble
+    label: "E7 : la ConfigMap diagnostic nomme la méthode et le chemin que la politique refuse à relance"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/
