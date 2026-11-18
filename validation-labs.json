@@ -3348,6 +3348,59 @@
   },
   "verdict": "VALIDE"
  },
+ "ckne-capstone-relier-deux-sites": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_la_gateway_sert_la_vitrine_en_https_et_redirige_http",
+    "test_la_vitrine_est_annoncee_en_bgp_et_repond_au_routeur",
+    "test_la_vitrine_repond_des_deux_sites_et_survit_au_site_1"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "ha-cp1.lab",
+  "date": "2026-11-18",
+  "duree_s": 1335,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, aucun cluster, 0 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-ckne-capstone-relier-deux-sites.log",
+  "kubernetes": "aucun cluster",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_gateway_sert_la_vitrine_en_https_et_redirige_http",
+    "test_la_vitrine_est_annoncee_en_bgp_et_repond_au_routeur",
+    "test_la_vitrine_repond_des_deux_sites_et_survit_au_site_1"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "cks-api-server-hardening": {
   "apres": {
    "echecs": [],
