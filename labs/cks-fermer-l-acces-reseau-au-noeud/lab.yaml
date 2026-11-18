@@ -53,7 +53,7 @@ criteria:
       - test_le_pare_feu_ferme_le_reste
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
-      - https://www.stephane-robert.info/docs/securiser/reseaux/nftables/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/harden-the-nodes/
   - id: flux-du-cluster
     label: "The nodes reach the kubelet, the control plane reaches SSH, and Pods talk across the node through a Service"
     tests:
