@@ -1,0 +1,35 @@
+---
+# Remet UN nœud à l'état « prêt, sans cluster » : kubelet et containerd
+# installés, aucun cluster, aucune trace de Cilium. Joué sur chacun des deux
+# nœuds du lab (ha-cp1.lab, ha-cp2.lab), par le setup (pour repartir d'un état
+# connu, même après un run sans clean) et par le cleanup.
+#
+# C'est l'état qu'attend aussi le lab cka-control-plane-haute-disponibilite,
+# qui se sert des mêmes hôtes.
+#
+# Ce que `kubeadm reset` ne défait pas, et que ce fichier retire, comme
+# shared/cilium-remettre-a-zero.yml pour les nœuds net-* : la configuration
+# CNI, l'état de l'agent Cilium (pas tout /var/run/cilium, qui porte la
+# hiérarchie cgroup v2 du nœud), les interfaces cilium_*, les chaînes iptables
+# KUBE-* et CILIUM_*, les kubeconfig de root et de l'utilisateur du lab.
+- name: Remettre le nœud à zéro (kubeadm reset)
+  ansible.builtin.command: kubeadm reset -f
+  changed_when: true
+  failed_when: false
+
+- name: Retirer la configuration CNI et l'état de Cilium
+  ansible.builtin.shell: |
+    rm -rf /etc/cni/net.d/* /var/run/cilium/state /var/lib/cilium
+    for i in cilium_host cilium_net cilium_vxlan; do ip link del "$i" 2>/dev/null || true; done
+    iptables-save | grep -v -E 'KUBE|CILIUM' | iptables-restore
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+- name: Retirer les kubeconfig de root et de l'utilisateur du lab
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /root/.kube
+    - "/home/{{ ansible_user | default('ubuntu') }}/.kube"

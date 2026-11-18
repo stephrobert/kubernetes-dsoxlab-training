@@ -1,0 +1,91 @@
+# Lab guidé de la leçon L3 du niveau 6 « Réseau avancé » (CKNE), « Donner
+# plusieurs interfaces à un Pod avec Multus ». Geste KUBERN-17-03, issue #222.
+#
+# La situation : le cluster Cilium 1.20.5 sans kube-proxy des hôtes net-*, en
+# cni.exclusive=true (réglage par défaut), le manifeste thick de Multus v4.3.2
+# posé sur le plan de contrôle avec son image épinglée par digest, et un
+# namespace multus-demo vide.
+#
+# L'apprenant passe Cilium en cni.exclusive=false (sinon son agent renomme le
+# fichier de Multus en .cilium_bak, sans un message), installe Multus, décrit
+# un second réseau macvlan par une NetworkAttachmentDefinition, crée deux Pods
+# à deux interfaces sur deux nœuds, et fait passer un échange par le second
+# réseau.
+#
+# Mesuré le 2026-11-17 (captures CKNE 17-03, Cilium 1.20.4, rejoué en 1.20.5 à
+# la validation) : cni.exclusive=true renomme 00-multus.conf ; le retour à
+# false ne le restaure pas, il faut redémarrer le Pod Multus du nœud ; le
+# manifeste du tag v4.3.2 pointe l'image mobile snapshot-thick.
+id: k8s-attacher-une-seconde-interface
+title: "Attach a second network interface to a Pod with Multus"
+level: core-infrastructure-and-cni
+section: ckne
+difficulty: advanced
+description: |
+  On a Cilium cluster without kube-proxy, let Cilium share the CNI
+  configuration, install Multus 4.3.2 in thick mode, describe a macvlan network
+  with a NetworkAttachmentDefinition, give two Pods on two nodes a second
+  interface each, and prove an exchange over that second network.
+skills:
+  - multus
+  - cilium
+  - cni
+  - macvlan
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # client sur net-w1.lab, serveur sur net-w2.lab : l'échange par le
+      # second réseau passe d'un nœud à l'autre.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: cilium-partage
+    label: "Cilium no longer owns the CNI configuration alone: cni-exclusive is false and every agent is ready"
+    tests:
+      - test_cilium_n_est_plus_exclusif
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+  - id: multus-epingle
+    label: "Multus v4.3.2 in thick mode runs on the three nodes, from the image pinned by its digest"
+    tests:
+      - test_multus_v4_3_2_tourne_sur_chaque_noeud
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+  - id: second-reseau-decrit
+    label: "The NetworkAttachmentDefinition reseau-stockage describes a macvlan network on enp1s0 with static addresses"
+    tests:
+      - test_la_definition_du_second_reseau_existe
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+  - id: deux-interfaces
+    label: "The Pods client and serveur, on two nodes, each report the cluster network and the second network with their address"
+    tests:
+      - test_deux_pods_ont_deux_interfaces
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+  - id: echange-second-reseau
+    label: "client reaches serveur through the second network, and the same server still answers on the cluster network"
+    tests:
+      - test_le_client_joint_le_serveur_par_le_second_reseau
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/multus-pod-interfaces/
+
+feedback: full

@@ -9,7 +9,7 @@ l'ordre de la fiche :
 1. le cluster est initialisé SANS kube-proxy : l'API répond, et kube-system ne
    porte ni DaemonSet ni ConfigMap kube-proxy ;
 2. les deux workers sont joints et les trois nœuds sont Ready ;
-3. Cilium 1.20.4 tourne sur chaque nœud et chaque agent annonce
+3. Cilium 1.20.5 tourne sur chaque nœud et chaque agent annonce
    `KubeProxyReplacement: True` (cilium-dbg status) ;
 4. aucun nœud ne porte de règle de kube-proxy (chaînes KUBE-SVC et
    KUBE-SERVICES d'iptables, table nftables kube-proxy), alors que le cluster
@@ -39,7 +39,7 @@ ADMIN = "sudo kubectl --kubeconfig /etc/kubernetes/admin.conf"
 PLAN = "net-cp.lab"
 WORKERS = ("net-w1.lab", "net-w2.lab")
 NOEUDS = (PLAN, *WORKERS)
-VERSION = "v1.20.4"
+VERSION = "v1.20.5"
 POOL = ipaddress.ip_network("10.244.0.0/16")
 NS = "demo"
 APPLI = "web"

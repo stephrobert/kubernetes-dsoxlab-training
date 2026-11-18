@@ -8,7 +8,7 @@
 # NetworkPolicy en refuse un, tiré au sort à chaque passage. L'apprenant
 # retrouve le flux refusé avec Hubble, le consigne, donne à la métrique des
 # refus le contexte qui la fait désigner le Pod, et journalise les seuls refus
-# dans un fichier du nœud (faits vérifiés n°8 du cadrage CKNE, Cilium 1.20.4).
+# dans un fichier du nœud (faits vérifiés n°8 du cadrage CKNE, Cilium 1.20.5).
 #
 # Le cluster est celui du socle shared/cilium-cluster.yml, monté prêt par le
 # setup. Le cleanup ramène Cilium aux valeurs du socle, retire les journaux
@@ -19,7 +19,7 @@
 # côtés exercés), k8s-detecter-une-persistance (un constat jugé contre une
 # référence que seul root lit), ckad-helm-install-upgrade (helm upgrade).
 #
-# RISQUE R3 du cadrage : Cilium 1.20.4 déclare Kubernetes 1.33 à 1.36, et le
+# RISQUE R3 du cadrage : Cilium 1.20.5 déclare Kubernetes 1.33 à 1.36, et le
 # cluster tourne en 1.37.
 id: k8s-auditer-les-flux-avec-hubble
 title: "Audit network flows with Hubble"

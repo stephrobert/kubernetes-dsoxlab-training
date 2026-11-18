@@ -1,0 +1,111 @@
+# Épreuve de fin du niveau 6 « Réseau avancé » de la formation Kubernetes
+# (CKNE) : exposer et protéger la vitrine de la boutique sur le cluster Cilium,
+# à partir d'un état hérité nu, sans procédure.
+#
+# Elle croise le niveau : Gateway API servie par Cilium (CRD v1.6.3,
+# gatewayAPI.enabled, pool LB-IPAM, listener HTTPS), politique L7
+# (CiliumNetworkPolicy à règles http, entité ingress pour le trafic du
+# Gateway), chiffrement WireGuard entre nœuds, et diagnostic par Hubble. Chaque
+# brique a été mesurée sur ce cluster le 2026-11-18 (captures epreuve-n6).
+# D57 : aucune pièce ne se refait avec les manifestes d'un lab. Le lab Hubble
+# fait trouver un client refusé au niveau réseau ; ici, c'est une requête HTTP
+# refusée par la politique de l'apprenant, visible seulement dans l'agent du
+# nœud qui la reçoit.
+#
+# D34 : l'énoncé ne nomme aucun type d'objet à créer. Les tests retrouvent le
+# Gateway par sa classe et son listener, et n'imposent un nom que là où la
+# mesure en a besoin (boutique, vitrine, caisse, publicite, relance,
+# vitrine-tls, diagnostic).
+#
+# Seuil 70 (D06). Deux contrôles bloquants, qu'aucune moyenne ne compense :
+# E4 (la politique L7 laisse lire et refuse d'écrire, Gateway compris) et E6
+# (chiffrement WireGuard sur chaque nœud). Sept états à poids égal. Aucun
+# indice (D36, maintenue pour toutes les épreuves de niveau le 2026-11-18).
+id: k8s-epreuve-reseau-avance
+title: "Level 6 test: expose and protect a service on Cilium"
+level: network-security-policy
+section: ckne
+difficulty: advanced
+description: |
+  On the Cilium cluster, expose the shop's vitrine over HTTPS through a
+  Gateway served by Cilium, let clients read it without writing, cut what has
+  no business there, encrypt the traffic between nodes, and name from Hubble
+  the request your policy refuses.
+skills:
+  - cilium
+  - gateway-api
+  - network-policy
+  - wireguard
+  - hubble
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les deux contrôles critiques (D06), sans compensation.
+  - test_e4_par_le_gateway_get_passe_et_post_est_refuse
+  - test_e6_chaque_agent_chiffre_en_wireguard
+estimated_time: 120m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # La vitrine tourne sur net-w2.lab, les clients sur net-w1.lab.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: e1-gateway-programme
+    label: "E1: a Gateway of class cilium in boutique is Programmed and has an address"
+    tests:
+      - test_e1_un_gateway_cilium_est_programme
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e2-certificat-presente
+    label: "E2: its HTTPS listener presents the certificate of vitrine-tls for vitrine.formation.test, verified against the CA"
+    tests:
+      - test_e2_le_listener_https_presente_le_certificat_de_la_vitrine
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e3-route
+    label: "E3: https://vitrine.formation.test/ reaches the vitrine through the Gateway, and another name gets 404"
+    tests:
+      - test_e3_la_route_mene_a_la_vitrine_et_seulement_pour_son_nom
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e4-lecture-par-le-gateway
+    label: "E4 (critical): through the Gateway, GET is served and POST is refused with 403"
+    tests:
+      - test_e4_par_le_gateway_get_passe_et_post_est_refuse
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e5-clients
+    label: "E5: caisse reads without writing, publicite is cut at the network level"
+    tests:
+      - test_e5_caisse_lit_sans_ecrire_et_publicite_est_coupee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e6-chiffrement
+    label: "E6 (critical): every Cilium agent encrypts with WireGuard towards its two peers"
+    tests:
+      - test_e6_chaque_agent_chiffre_en_wireguard
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/
+  - id: e7-diagnostic-hubble
+    label: "E7: the ConfigMap diagnostic names the method and path that the policy refuses to relance"
+    tests:
+      - test_e7_le_diagnostic_nomme_la_requete_refusee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/

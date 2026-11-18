@@ -1,0 +1,90 @@
+# Lab guidé de la leçon L5 du niveau 6 « Réseau avancé » (CKNE), « Annoncer
+# des Services en BGP ». Geste KUBERN-17-05, issue #223.
+#
+# La situation : le cluster Cilium 1.20.5 sans kube-proxy des hôtes net-*,
+# plan de contrôle BGP désactivé. Un routeur FRR 10.6.2 (AS 65000, adresse
+# 10.10.50.200) tourne HORS du cluster, sur k8s-cp.lab, dans un espace de noms
+# réseau à lui, et attend les trois nœuds en AS 65001. Le Service web de
+# bgp-demo est de type LoadBalancer, sans adresse.
+#
+# L'apprenant active le plan de contrôle BGP, déclare le pair, ce qu'on lui
+# annonce (réseau des Pods et adresses de LoadBalancer) et un pool d'adresses,
+# étiquette les nœuds, puis vérifie depuis le routeur.
+#
+# Mesuré le 2026-11-17 (captures CKNE 17-05, Cilium 1.20.4, rejoué en 1.20.5 à
+# la validation). Le routeur du lab a été éprouvé sur k8s-cp.lab le même soir :
+# BIRD de Calico y écoute déjà sur le port 179, d'où l'espace de noms réseau.
+id: k8s-annoncer-un-service-en-bgp
+title: "Announce Pods and Services to a router with BGP"
+level: service-networking-and-dns
+section: ckne
+difficulty: advanced
+description: |
+  On a Cilium cluster without kube-proxy, turn on the BGP control plane, peer
+  the three nodes with an external FRR router, announce the Pod networks and
+  the LoadBalancer address of a Service, and reach that Service from the
+  router through the route it learnt.
+skills:
+  - cilium
+  - bgp
+  - loadbalancer-ipam
+  - frr
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+lab_type: lab
+estimated_time: 40m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # Les trois nœuds net-* portent une session ; le routeur FRR tourne sur
+      # k8s-cp.lab, hors du cluster net-*.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+        temoin: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: bgp-active
+    label: "The Cilium BGP control plane is on, and every agent is ready"
+    tests:
+      - test_le_plan_de_controle_bgp_est_active
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+  - id: sessions-etablies
+    label: "The external router has an established session with each of the three nodes, AS 65001 facing AS 65000"
+    tests:
+      - test_les_trois_sessions_sont_etablies
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+  - id: pods-annonces
+    label: "The router has learnt the Pod network of every node"
+    tests:
+      - test_le_reseau_des_pods_est_annonce
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+  - id: lb-annonce
+    label: "The Service web has an address from 172.30.0.0/28, and the router has learnt it as a /32"
+    tests:
+      - test_l_adresse_de_loadbalancer_est_annoncee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+  - id: service-joignable
+    label: "From the router's network, the application answers at that address"
+    tests:
+      - test_l_application_repond_depuis_le_routeur
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+
+feedback: full

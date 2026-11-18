@@ -15,8 +15,8 @@ refus Pod par Pod, et un journal des refus sur le nœud, qu'on puisse
 conserver.
 
 Vous êtes sur le plan de contrôle `net-cp.lab`, avec `kubectl` et `helm`. Le
-cluster tourne sans kube-proxy, avec Cilium 1.20.4, Hubble et ses métriques
-activés (port 9965 de chaque nœud). Cilium 1.20.4 déclare prendre en charge
+cluster tourne sans kube-proxy, avec Cilium 1.20.5, Hubble et ses métriques
+activés (port 9965 de chaque nœud). Cilium 1.20.5 déclare prendre en charge
 Kubernetes 1.33 à 1.36, et ce cluster tourne en 1.37.
 
 ## Ce que vous devez obtenir
@@ -75,7 +75,7 @@ et ajoute `hubble.export.static`. Puis, après
 encore le dépôt :
 
 ```bash
-helm upgrade cilium cilium/cilium --version 1.20.4 --namespace kube-system \
+helm upgrade cilium cilium/cilium --version 1.20.5 --namespace kube-system \
   --reuse-values -f <votre fichier> --wait
 ```
 

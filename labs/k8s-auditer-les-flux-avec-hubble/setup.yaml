@@ -2,7 +2,7 @@
 # Joué par `dsoxlab run`.
 #
 #   1. le socle Cilium à l'étape `cluster` : le cluster sans kube-proxy des
-#      hôtes net-*, Cilium 1.20.4 avec Hubble, Relay et les métriques du
+#      hôtes net-*, Cilium 1.20.5 avec Hubble, Relay et les métriques du
 #      socle. Si un passage précédent a changé la configuration de Cilium
 #      (métriques par Pod, export des flux), le socle la ramène à la sienne et
 #      les agents redémarrent : leurs compteurs repartent de zéro ;

@@ -13,8 +13,8 @@ The security team does not want the policy lifted: it wants the refusal
 refusals Pod by Pod, and a log of the refusals on the node, that can be kept.
 
 You are on the control plane `net-cp.lab`, with `kubectl` and `helm`. The
-cluster runs without kube-proxy, with Cilium 1.20.4, Hubble and the Hubble
-metrics enabled (port 9965 of each node). Cilium 1.20.4 declares support for
+cluster runs without kube-proxy, with Cilium 1.20.5, Hubble and the Hubble
+metrics enabled (port 9965 of each node). Cilium 1.20.5 declares support for
 Kubernetes 1.33 to 1.36, and this cluster runs 1.37.
 
 ## What you must obtain
@@ -70,7 +70,7 @@ after `helm repo add cilium https://helm.cilium.io` if your user does not have
 the repository yet:
 
 ```bash
-helm upgrade cilium cilium/cilium --version 1.20.4 --namespace kube-system \
+helm upgrade cilium cilium/cilium --version 1.20.5 --namespace kube-system \
   --reuse-values -f <your file> --wait
 ```
 

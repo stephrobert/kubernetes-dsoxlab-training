@@ -35,7 +35,7 @@
 #             un cluster qu'un lab précédent aurait laissé.
 #   cluster   (défaut) l'étape précédente, puis le cluster prêt : `kubeadm
 #             init --skip-phases=addon/kube-proxy`, jonction des deux
-#             workers, Cilium 1.20.4 par son chart Helm officiel avec
+#             workers, Cilium 1.20.5 par son chart Helm officiel avec
 #             kubeProxyReplacement=true, k8sServiceHost et k8sServicePort,
 #             Hubble et Hubble Relay activés, métriques Hubble exposées.
 #
@@ -72,8 +72,8 @@
 # Multus (leçon L3), dont le lab le passera par `cilium_valeurs_supplementaires`.
 #
 # VERSIONS. Kubernetes 1.37, du dépôt pkgs.k8s.io, par shared/noeud-kubernetes.yml
-# comme le socle partagé. Cilium 1.20.4, dernière stable relevée le 2026-11-14.
-# RISQUE R3 : la page de compatibilité de Cilium 1.20.4 déclare Kubernetes 1.33
+# comme le socle partagé. Cilium 1.20.5, dernière stable relevée le 2026-11-17.
+# RISQUE R3 : la page de compatibilité de Cilium 1.20.5 déclare Kubernetes 1.33
 # à 1.36 et ne cite pas 1.37. Le cluster tourne donc hors du périmètre déclaré
 # par Cilium, ce que les labs disent à l'apprenant, et que seule la validation
 # sur cluster confirme.
@@ -319,13 +319,13 @@
         content: "{{ cilium_valeurs | to_nice_yaml }}"
 
     # Rejoué seulement si la release manque, si son chart n'est pas la
-    # 1.20.4, ou si ses valeurs diffèrent de celles du socle. Les valeurs se
+    # 1.20.5, ou si ses valeurs diffèrent de celles du socle. Les valeurs se
     # comparent en structures, pas en texte : l'ordre des clés ne compte pas.
-    - name: Installer ou ramener Cilium 1.20.4 aux valeurs du socle
+    - name: Installer ou ramener Cilium 1.20.5 aux valeurs du socle
       ansible.builtin.command:
         cmd: >-
           /usr/local/bin/helm upgrade --install cilium cilium/cilium
-          --version 1.20.4 --namespace kube-system
+          --version 1.20.5 --namespace kube-system
           --reset-values -f /root/cilium-socle-valeurs.yaml
           --wait --timeout 10m
       environment:
@@ -333,7 +333,7 @@
       changed_when: true
       when: >-
         cilium_valeurs_en_place.rc != 0
-        or cilium_chart_en_place.stdout | trim != 'cilium-1.20.4'
+        or cilium_chart_en_place.stdout | trim != 'cilium-1.20.5'
         or (cilium_valeurs_en_place.stdout | from_json) != cilium_valeurs
 
     - name: Attendre l'agent Cilium sur les trois nœuds

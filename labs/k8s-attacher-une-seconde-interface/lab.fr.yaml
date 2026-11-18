@@ -1,0 +1,29 @@
+title: "Donner une seconde interface réseau à un Pod avec Multus"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
+description: |
+  Sur un cluster Cilium sans kube-proxy, laisser Cilium partager la
+  configuration CNI, installer Multus 4.3.2 en mode thick, décrire un réseau
+  macvlan par une NetworkAttachmentDefinition, donner une seconde interface à
+  deux Pods sur deux nœuds, et prouver un échange par ce second réseau.
+
+criteria:
+  - id: cilium-partage
+    label: "Cilium ne garde plus la configuration CNI pour lui seul : cni-exclusive vaut false et chaque agent est prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
+  - id: multus-epingle
+    label: "Multus v4.3.2 en mode thick tourne sur les trois nœuds, depuis l'image épinglée par son digest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
+  - id: second-reseau-decrit
+    label: "La NetworkAttachmentDefinition reseau-stockage décrit un réseau macvlan sur enp1s0, à adresses fixes"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
+  - id: deux-interfaces
+    label: "Les Pods client et serveur, sur deux nœuds, déclarent chacun le réseau du cluster et le second réseau avec leur adresse"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
+  - id: echange-second-reseau
+    label: "client joint serveur par le second réseau, et le même serveur répond toujours sur le réseau du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/pods-multi-interfaces/
