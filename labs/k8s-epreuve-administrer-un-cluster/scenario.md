@@ -91,9 +91,7 @@ itself** (it freezes its container) then starts it again, and launches a
 short-lived Pod in the shop, `sonde-placement`, that the scheduler must place
 on the worker. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 
-Four hints are available, from the vaguest to the most precise. They cost 10, 15, 20 and 25 points,
-taken off the grading scale: a hint taken makes the threshold harder to
-reach.
+There is no hint: the test is passed without help, the way it is graded.
 
 ```bash
 dsoxlab check  k8s-epreuve-administrer-un-cluster

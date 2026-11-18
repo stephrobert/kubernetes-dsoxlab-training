@@ -16,6 +16,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/kubeadm-joindre-un-noeud/
   - id: remplacement-de-kube-proxy
     label: "Cilium 1.20.5 tourne sur chaque nœud avec KubeProxyReplacement True"
   - id: aucune-regle-kube-proxy

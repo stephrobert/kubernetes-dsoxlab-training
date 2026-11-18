@@ -8,7 +8,7 @@ migrate manifests off removed APIs, upgrade the cluster from 1.36.4 to 1.37.0,
 keep the shop available during maintenance, repair a node, an API server and
 a component after first recording each cause, carry a live change into the
 repository and renew certificates. Eighteen criteria, threshold 70, seven
-critical, four paid hints (10, 15, 20 and 25 points).
+critical, no hint.
 
 High availability runs on a kind cluster with three control planes, on
 `k8s-kind.lab`, because the catalogue's infrastructure carries a single kubeadm

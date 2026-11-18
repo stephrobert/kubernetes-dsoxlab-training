@@ -20,8 +20,8 @@
 #
 # Seuil 70 (D06). Sept contrôles critiques, qu'aucune moyenne ne compense :
 # P01, P04, P05, P06, P10, P13 et P19. dsoxlab note par test, à poids égal :
-# dix-neuf états, environ 5,3 points chacun. Indices payants, en gradation
-# réelle, du plus vague au plus explicite.
+# dix-neuf états, environ 5,3 points chacun. Aucun indice (D36, maintenue
+# pour toutes les épreuves de niveau le 2026-11-18).
 id: k8s-epreuve-securiser-un-cluster
 title: "Level 5 test: secure a cluster"
 level: cluster-hardening
