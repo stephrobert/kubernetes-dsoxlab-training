@@ -34,6 +34,19 @@
       vars:
         cilium_etape: cluster
 
+    # L'opérateur crée ces trois CRD quand la Gateway API est activée, et ne
+    # les retire jamais : la photographie du validateur les voyait en trop
+    # (réattestation sur main du 2026-11-18, sur le lab L7 qui a le même
+    # cleanup). Retirées APRÈS le retour au socle, quand l'opérateur ne les
+    # recréera plus.
+    - name: Retirer les CRD Envoy de la Gateway API de Cilium
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd --ignore-not-found --wait=true
+        ciliumenvoyconfigs.cilium.io
+        ciliumclusterwideenvoyconfigs.cilium.io
+        ciliumgatewayclassconfigs.cilium.io
+      changed_when: true
+
     - name: Retirer la GatewayClass de Cilium
       ansible.builtin.command: >-
         {{ kubectl }} delete gatewayclass cilium --ignore-not-found
