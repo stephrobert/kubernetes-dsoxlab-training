@@ -65,6 +65,7 @@ SANS_INDICE = {
     "k8s-epreuve-livrer-et-mettre-a-jour": "D36, épreuve du niveau 1 sans indice",
     "k8s-epreuve-deployer-une-application": "D36, épreuve du niveau 2 sans indice",
     "k8s-epreuve-livrer-une-application": "D36, épreuve du niveau 3 sans indice",
+    "k8s-epreuve-reseau-avance": "D36, épreuve du niveau 6 sans indice, décision du 2026-11-18",
     "cka-examen-blanc": "examen blanc CKA sans indice, décision du 2026-11-12",
     "ckad-examen-blanc": "examen blanc CKAD sans indice, décision du 2026-11-12",
     "k8s-challenge-choisir-le-bon-workload": "D91, challenge de module sans indice",

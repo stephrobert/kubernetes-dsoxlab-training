@@ -41,8 +41,8 @@ the network team gives you **`172.31.0.0/28`**.
 
 ## Rules
 
-No step-by-step: the course gave you the tools. Hints exist, and they cost
-points. The test is passed at **70 %**. Two states can't be compensated by
+No step-by-step and no hint: the course gave you the tools. The test is
+passed at **70 %**. Two states can't be compensated by
 the others: the read-only access through the Gateway (4) and the encryption
 (6).
 

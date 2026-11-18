@@ -42,8 +42,8 @@ services exposés, l'équipe réseau vous confie **`172.31.0.0/28`**.
 
 ## Règles
 
-Pas de pas-à-pas : la formation vous a donné les outils. Des indices
-existent, et ils coûtent des points. L'épreuve est réussie à **70 %**. Deux
+Ni pas-à-pas ni indice : la formation vous a donné les outils. L'épreuve est
+réussie à **70 %**. Deux
 états ne se compensent pas par les autres : la lecture seule par le Gateway
 (4) et le chiffrement (6).
 

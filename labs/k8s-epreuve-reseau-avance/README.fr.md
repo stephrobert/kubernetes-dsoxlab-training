@@ -5,7 +5,7 @@
 un accès en lecture seule par une politique L7 qui ne coupe pas le Gateway,
 chiffrer le trafic entre nœuds en WireGuard, et nommer d'après Hubble la
 requête que la politique refuse. Notée sur l'état du cluster, réussie à 70 %,
-avec deux contrôles bloquants et des indices payants.
+avec deux contrôles bloquants et sans indice.
 
 | | |
 |---|---|

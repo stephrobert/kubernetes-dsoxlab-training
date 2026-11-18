@@ -19,8 +19,8 @@
 #
 # Seuil 70 (D06). Deux contrôles bloquants, qu'aucune moyenne ne compense :
 # E4 (la politique L7 laisse lire et refuse d'écrire, Gateway compris) et E6
-# (chiffrement WireGuard sur chaque nœud). Sept états à poids égal. Indices
-# payants de 10, 15, 20 et 25 points (D91).
+# (chiffrement WireGuard sur chaque nœud). Sept états à poids égal. Aucun
+# indice (D36, maintenue pour toutes les épreuves de niveau le 2026-11-18).
 id: k8s-epreuve-reseau-avance
 title: "Level 6 test: expose and protect a service on Cilium"
 level: network-security-policy

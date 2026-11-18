@@ -5,7 +5,7 @@ End-of-level test of level 6 "Advanced networking" of the Kubernetes course
 it read-only access with an L7 policy that does not cut the Gateway, encrypt
 the traffic between nodes with WireGuard, and name from Hubble the request the
 policy refuses. Graded on the state of the cluster, passed at 70 %, with two
-blocking checks and paid hints.
+blocking checks and no hint.
 
 | | |
 |---|---|
