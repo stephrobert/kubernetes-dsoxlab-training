@@ -90,6 +90,7 @@ SANS_INDICE = {
     "k8s-challenge-installer-un-cluster": "D91, challenge de module sans indice",
     "k8s-challenge-maintenir-un-noeud": "D91, challenge de module sans indice",
     "k8s-challenge-confiner-et-detecter": "D91, challenge de module sans indice",
+    "k8s-challenge-reseau-avance": "D91, challenge de module sans indice",
 }
 
 
