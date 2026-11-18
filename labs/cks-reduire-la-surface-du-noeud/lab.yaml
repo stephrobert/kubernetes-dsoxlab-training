@@ -58,7 +58,7 @@ criteria:
       - test_l_outil_de_debogage_ne_redemarre_plus
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
-      - https://www.stephane-robert.info/docs/securiser/durcissement/cis-benchmarks/
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/harden-the-nodes/
   - id: noeud-intact
     label: "The kubelet, containerd and sshd still run, the node is Ready and accepts a Pod"
     tests:
