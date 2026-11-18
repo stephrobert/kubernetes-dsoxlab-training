@@ -1,0 +1,40 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet les deux nœuds à zéro
+# (kubeadm reset, état de Cilium retiré), comme k8s-relier-deux-clusters, pour
+# le lab de haute disponibilité qui part de ha-cp1 et ha-cp2 vierges, puis
+# arrête le routeur FRR de k8s-cp.lab.
+- name: Défaire le capstone sur les deux sites
+  hosts: lab_target:lab_cluster2
+  become: true
+  tasks:
+    - name: Supprimer le namespace du capstone, dans le cluster du nœud
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace boutique
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Remettre le nœud à zéro
+      ansible.builtin.include_tasks: fixtures/remise-a-zero.yml
+
+    - name: Retirer le CLI cilium, le kubeconfig du site 2 et le manifeste de cert-manager
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/cilium
+        - /etc/kubernetes/cluster-2.conf
+        - /tmp/cilium-linux-amd64.tar.gz
+        - /root/cert-manager-v1.21.3.yaml
+
+- name: Arrêter le routeur FRR de l'équipe réseau
+  hosts: lab_target
+  become: true
+  vars:
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+  tasks:
+    - name: Arrêter et retirer le routeur
+      ansible.builtin.script: fixtures/routeur.sh absent
+      args:
+        executable: /bin/bash
+      delegate_to: "{{ temoin_hote }}"

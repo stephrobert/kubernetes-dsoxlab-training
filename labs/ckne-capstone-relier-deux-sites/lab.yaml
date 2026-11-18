@@ -1,0 +1,83 @@
+# Le capstone de la certification CKNE (module certification-ckne, fiche
+# KUBERN-16-17), qui clôt le niveau 6. Il ne nomme plus aucun objet : il
+# donne le besoin de deux sites, d'une équipe réseau et des clients, et
+# l'apprenant choisit ClusterMesh, BGP, la Gateway API et cert-manager.
+#
+# Décisions de la session du site, carte blanche Kubernetes, 2026-11-18 :
+# aucune VM nouvelle (ha-cp1, ha-cp2 et le routeur FRR de k8s-cp.lab), Gateway
+# HTTPS servie par Cilium (Istio tourne sur un autre cluster, D90), annonce et
+# HTTPS sur le site 1 seulement (la panne simulée de l'état 1 ne casse pas
+# l'état 2), HTTP redirigé en 301, trois états tous bloquants, aucun indice
+# (D91).
+#
+# Il reprend les pièces attestées de k8s-relier-deux-clusters (deux clusters
+# d'un nœud, même autorité), k8s-annoncer-un-service-en-bgp (le routeur FRR
+# 10.6.2, ici avec le seul site 1 pour voisin), k8s-filtrer-en-l7-avec-cilium
+# (Gateway API v1.6.3 servie par Cilium) et k8s-servir-une-gateway-en-https
+# (l'autorité interne de cert-manager v1.21.3).
+id: ckne-capstone-relier-deux-sites
+title: "Capstone: link two sites, announce a Service to the network and serve it over HTTPS"
+level: advanced-traffic-management
+section: ckne
+difficulty: advanced
+description: |
+  Two sites, two clusters, one shop. Make the shop answer from both sites and
+  survive the loss of one, give the network team's router an address it
+  learns by itself, and serve the shop over HTTPS under its public name with
+  a certificate from the internal authority, plain HTTP being redirected.
+skills:
+  - cilium
+  - clustermesh
+  - bgp
+  - gateway-api
+  - cert-manager
+  - tls
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercises/
+lab_type: capstone
+exam_passing_score: 70
+exam_blocking_checks:
+  - test_la_vitrine_repond_des_deux_sites_et_survit_au_site_1
+  - test_la_vitrine_est_annoncee_en_bgp_et_repond_au_routeur
+  - test_la_gateway_sert_la_vitrine_en_https_et_redirige_http
+estimated_time: 75m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: site1
+      host: ha-cp1.lab
+      roles:
+        cluster2: ha-cp2.lab
+        temoin: k8s-cp.lab
+  default: site1
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: deux-sites
+    label: "The shop answers from both sites, and still answers when site 1 has no replica left"
+    tests:
+      - test_la_vitrine_repond_des_deux_sites_et_survit_au_site_1
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/clustermesh/
+  - id: annonce-bgp
+    label: "The shop of site 1 has an address of the given block, learnt by the router and answering it; the internal Service is not announced"
+    tests:
+      - test_la_vitrine_est_annoncee_en_bgp_et_repond_au_routeur
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/announce-services-bgp/
+  - id: https
+    label: "The shop is served over HTTPS under its public name, with a cert-manager certificate from the sites' authority, and plain HTTP is redirected with a 301"
+    tests:
+      - test_la_gateway_sert_la_vitrine_en_https_et_redirige_http
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cert-manager/
