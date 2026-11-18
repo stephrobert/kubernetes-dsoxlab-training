@@ -1,0 +1,27 @@
+title: "Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, sans guidage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+description: |
+  Sans procédure, sur un cluster Cilium sans kube-proxy : faire répondre de
+  nouveau un Service qui ne sert personne, sans réinstaller kube-proxy, ouvrir un seul
+  flux entre deux namespaces, faire sortir le trafic d'un namespace par un
+  nœud choisi, et désigner le flux qu'une politique refuse encore, tel que
+  Hubble l'enregistre.
+
+criteria:
+  - id: service-repare
+    label: "Le Service hérité répond de nouveau depuis un Pod client, et kube-proxy est toujours absent"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: un-seul-flux
+    label: "Seul panier atteint stock entre les deux namespaces ; robot et les autres namespaces restent refusés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: sortie-par-la-passerelle
+    label: "Le trafic sortant de facturation arrive au témoin avec l'adresse de net-w2, lue dans son journal"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+  - id: flux-refuse-designe
+    label: "Le flux refusé est désigné (Pod source, destination, port) et correspond au verdict DROPPED que Hubble enregistre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/

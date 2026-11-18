@@ -1,0 +1,88 @@
+# Le challenge du module « Réseau avancé » (niveau 6, CKNE), fiche
+# E-maitriser-les-flux-du-cluster. C'est la preuve sans procédure du module :
+# réparer un Service servi par Cilium sans kube-proxy, ouvrir un seul flux
+# entre deux namespaces, faire sortir un namespace par un nœud choisi, et
+# désigner le flux qu'une politique refuse en le lisant dans Hubble.
+#
+# Hébergé par la leçon egress (KUBERN-17-06), la dernière dont il évalue le
+# geste (D92, point 2). Hors challenge (D92, point 1) : ClusterMesh et BGP, qui
+# demandent des VM de plus, la Gateway HTTPS, le traçage et le trafic
+# d'inférence, qui tournent sur le cluster Istio.
+#
+# Il reprend les pièces attestées de k8s-installer-cilium-sans-kube-proxy,
+# k8s-faire-sortir-le-trafic-par-une-passerelle et
+# k8s-auditer-les-flux-avec-hubble, sans en refaire aucun à l'identique : la
+# politique de sortie vise un namespace et non un Pod, et le flux refusé, comme
+# son motif (étiquette ou port), est tiré au sort à chaque setup.
+#
+# Quatre états, à poids égal, un par état de la fiche. Seuil 70 : trois sur
+# quatre. Aucun bloquant, la fiche n'en désigne pas.
+id: k8s-challenge-reseau-avance
+title: "Repair, open, route out and audit the flows of a Cilium cluster, without guidance"
+level: advanced-traffic-management
+section: ckne
+difficulty: advanced
+description: |
+  Without guidance, on a Cilium cluster without kube-proxy: bring back a
+  Service that serves nobody without reinstalling kube-proxy, open a single
+  flow between two namespaces, route the outbound traffic of a namespace
+  through a chosen exit node, and name the flow a policy still refuses, as
+  Hubble records it.
+skills:
+  - cilium
+  - kube-proxy-replacement
+  - networkpolicy
+  - egress-gateway
+  - hubble
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+lab_type: challenge
+exam_passing_score: 70
+estimated_time: 60m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+        temoin: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: service-repare
+    label: "The inherited Service answers again from a client Pod, and kube-proxy is still absent"
+    tests:
+      - test_le_service_herite_repond_sans_kube_proxy
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/cilium/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
+  - id: un-seul-flux
+    label: "Only panier reaches stock across the two namespaces; robot and the other namespaces stay refused"
+    tests:
+      - test_panier_atteint_stock_et_lui_seul
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: sortie-par-la-passerelle
+    label: "The outbound traffic of facturation reaches the witness with the address of net-w2, read in its log"
+    tests:
+      - test_la_sortie_de_facturation_passe_par_net_w2
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/egress-gateway/
+  - id: flux-refuse-designe
+    label: "The refused flow is named (source Pod, destination, port) and matches the DROPPED verdict Hubble records"
+    tests:
+      - test_le_flux_refuse_est_designe_et_vu_par_hubble
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/

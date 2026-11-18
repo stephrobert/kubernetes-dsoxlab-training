@@ -1,0 +1,54 @@
+---
+# Joué par `dsoxlab run` : le cluster Cilium sans kube-proxy des hôtes net-*,
+# ramené aux valeurs du socle PLUS la passerelle d'egress et le masquage BPF
+# (la fiche du challenge les veut activés : l'apprenant écrit la politique, il
+# n'active pas la fonction), le serveur témoin lancé sur k8s-cp.lab (hors du
+# cluster net-*, sur le même réseau des VM), puis la situation
+# (fixtures/prepare.sh).
+- name: Préparer le challenge k8s-challenge-reseau-avance
+  hosts: lab_target
+  become: true
+  vars:
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+    temoin_url: "http://{{ hostvars[temoin_hote]['ansible_host'] }}:8090"
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy, passerelle d'egress activée
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+        cilium_valeurs_supplementaires:
+          egressGateway:
+            enabled: true
+          bpf:
+            masquerade: true
+
+    - name: Poser le serveur témoin sur l'hôte témoin
+      ansible.builtin.copy:
+        src: fixtures/temoin.py
+        dest: /usr/local/lib/dsoxlab-temoin-reseau.py
+        mode: "0644"
+      delegate_to: "{{ temoin_hote }}"
+
+    # Unité transitoire : elle disparaît au redémarrage de l'hôte et ne
+    # démarre jamais seule. Arrêtée d'abord, et son journal vidé, pour qu'un
+    # second run reparte d'un serveur neuf.
+    - name: Lancer le serveur témoin, port 8090
+      ansible.builtin.shell: |
+        systemctl stop dsoxlab-temoin-reseau 2>/dev/null || true
+        systemctl reset-failed dsoxlab-temoin-reseau 2>/dev/null || true
+        install -m 0644 /dev/null /var/log/dsoxlab-temoin-reseau.log
+        systemd-run --unit dsoxlab-temoin-reseau /usr/bin/python3 /usr/local/lib/dsoxlab-temoin-reseau.py
+        for i in $(seq 1 20); do curl -sf -o /dev/null http://127.0.0.1:8090/setup && exit 0; sleep 1; done
+        exit 1
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ temoin_hote }}"
+
+    - name: Poser les quatre situations
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+        TEMOIN_URL: "{{ temoin_url }}"

@@ -1,0 +1,63 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : remet le cluster net-* dans
+# l'état du socle, et arrête le témoin.
+#
+# 1. Les politiques de passerelle (objets de cluster) et les cinq namespaces.
+# 2. L'étiquette de passerelle sur chaque nœud : la photographie du
+#    validateur lit les étiquettes des nœuds.
+# 3. Cilium ramené aux valeurs du socle (passerelle et masquage BPF éteints),
+#    puis la CRD que l'opérateur a créée à l'activation (même constat que le
+#    lab k8s-faire-sortir-le-trafic-par-une-passerelle, 2026-11-17).
+# 4. Le serveur témoin de k8s-cp.lab, arrêté et retiré, son journal compris.
+# 5. La réponse attendue, sur le plan de contrôle.
+- name: Défaire le challenge k8s-challenge-reseau-avance
+  hosts: lab_target
+  become: true
+  vars:
+    kubectl: kubectl --kubeconfig /etc/kubernetes/admin.conf
+    temoin_hote: "{{ groups['lab_temoin'] | first }}"
+  tasks:
+    - name: Supprimer les politiques de passerelle
+      ansible.builtin.command: >-
+        {{ kubectl }} delete ciliumegressgatewaypolicies.cilium.io --all --ignore-not-found --wait=true
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les namespaces du challenge
+      ansible.builtin.command: >-
+        {{ kubectl }} delete namespace catalogue commandes boutique facturation paiement
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer l'étiquette de passerelle de chaque nœud
+      ansible.builtin.shell: |
+        for n in $({{ kubectl }} get nodes -o name); do {{ kubectl }} label "$n" egress-gateway- 2>/dev/null || true; done
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Ramener Cilium à la configuration du socle
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer la CRD des politiques de passerelle
+      ansible.builtin.command: >-
+        {{ kubectl }} delete crd ciliumegressgatewaypolicies.cilium.io --ignore-not-found --wait=true
+      changed_when: true
+
+    - name: Arrêter le serveur témoin
+      ansible.builtin.shell: |
+        systemctl stop dsoxlab-temoin-reseau 2>/dev/null || true
+        systemctl reset-failed dsoxlab-temoin-reseau 2>/dev/null || true
+        rm -f /usr/local/lib/dsoxlab-temoin-reseau.py /var/log/dsoxlab-temoin-reseau.log
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ temoin_hote }}"
+
+    - name: Retirer la réponse attendue
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab-labs/k8s-challenge-reseau-avance.ref
+        state: absent
