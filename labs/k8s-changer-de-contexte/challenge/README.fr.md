@@ -1,7 +1,6 @@
 # Challenge : Changer de contexte et fixer le namespace par défaut
 
-## La situation
-
+## 📍 La situation
 Votre `kubectl` vise le cluster kind **`boutique`** par le contexte
 **`kind-boutique`**. Votre fichier `~/.kube/config` connaît pourtant un second
 cluster : le contexte **`recette`** y est déjà, à côté du premier. Aucun
@@ -10,8 +9,7 @@ namespace par défaut n'est réglé.
 L'équipe vous demande de travailler désormais sur la recette, dans le namespace
 **`kube-system`**, sans avoir à le répéter à chaque commande.
 
-## Ce que vous devez obtenir
-
+## 🎯 Ce que vous devez obtenir
 1. Le **contexte actif** est **`recette`**.
 
 2. Le **namespace par défaut** du contexte `recette` est **`kube-system`**.
@@ -25,8 +23,7 @@ L'équipe vous demande de travailler désormais sur la recette, dans le namespac
    contient la clé qui vous ouvre les deux clusters. Il est aujourd'hui lisible
    par tous les comptes de la machine.
 
-## Les repères utiles
-
+## 🧭 Les repères utiles
 `kubectl config` lit et modifie votre kubeconfig : il sait lister les contextes,
 dire lequel est actif, basculer de l'un à l'autre, et régler le namespace par
 défaut du contexte courant. Il ne vérifie pas que ce namespace existe : relisez
@@ -36,8 +33,7 @@ La bascule est écrite dans le fichier, sous `current-context` : elle vaut pour
 tous vos terminaux, et pour tous vos scripts. Une ConfigMap se crée en une
 ligne, avec une valeur littérale.
 
-## Comment vous saurez que c'est bon
-
+## ✅ Comment vous saurez que c'est bon
 Les tests lisent votre `~/.kube/config` et ses droits, puis cherchent la
 ConfigMap `preuve` dans les deux clusters. Elle n'atterrit au bon endroit que si la bascule et le
 namespace par défaut sont justes.

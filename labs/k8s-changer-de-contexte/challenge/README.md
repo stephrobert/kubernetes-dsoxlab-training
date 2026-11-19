@@ -1,7 +1,6 @@
 # Challenge: Switch context and set the default namespace
 
-## The situation
-
+## 📍 The situation
 Your `kubectl` points at the kind cluster **`boutique`** through the context
 **`kind-boutique`**. Yet your `~/.kube/config` file knows a second cluster: the
 context **`recette`** is already there, next to the first one. No default
@@ -10,8 +9,7 @@ namespace is set.
 The team asks you to work on the recette cluster from now on, in the
 **`kube-system`** namespace, without repeating it on every command.
 
-## What you must achieve
-
+## 🎯 What you must achieve
 1. The **active context** is **`recette`**.
 
 2. The **default namespace** of the `recette` context is **`kube-system`**.
@@ -24,8 +22,7 @@ The team asks you to work on the recette cluster from now on, in the
    the key that opens both clusters to you. Today it is readable by every
    account on the machine.
 
-## Useful landmarks
-
+## 🧭 Useful landmarks
 `kubectl config` reads and changes your kubeconfig: it can list the contexts,
 say which one is active, switch from one to another, and set the default
 namespace of the current context. It does not check that this namespace exists:
@@ -35,8 +32,7 @@ The switch is written in the file, under `current-context`: it applies to all
 your terminals and all your scripts. A ConfigMap is created in one line, with a
 literal value.
 
-## How you will know it is right
-
+## ✅ How you will know it is right
 The tests read your `~/.kube/config` and its permissions, then look for the
 ConfigMap `preuve` in both clusters. It only lands in the right place if the switch and the default
 namespace are right.
