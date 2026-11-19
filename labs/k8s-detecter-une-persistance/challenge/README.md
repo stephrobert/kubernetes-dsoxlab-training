@@ -49,11 +49,12 @@ and `kubectl get clusterrole <name> -o yaml` what a role grants. The `bind`
 verb deserves attention: it lets someone hand out a role they do not hold.
 
 **Read what changed recently.** `kubectl get events -n facturation
---sort-by=.lastTimestamp` shows Jobs created every minute. On a cluster whose
-API server writes an audit log (lab `cks-audit-log-policy`), the log tells
-which identity created `support-n2` and when: `jq 'select(.objectRef.name ==
-"support-n2")'` on the log file. This lab's cluster does not audit by default,
-so the events and the objects themselves are your evidence here.
+--sort-by=.lastTimestamp` shows Jobs created every minute. There is another
+source of evidence: the API server's audit log, which the course teaches later,
+in the "Detect at runtime" module (lab `cks-audit-log-policy`). On a cluster
+that writes one, it tells which identity created `support-n2` and when. This
+lab's cluster does not audit anything: the events and the objects themselves
+are your evidence here.
 
 **Record before removing.** `kubectl get <kind> <name> -o yaml >
 /root/constat-persistance.yaml` keeps the object as the cluster knows it, with

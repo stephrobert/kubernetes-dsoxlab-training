@@ -49,12 +49,12 @@ et `kubectl get clusterrole <nom> -o yaml` ce qu'un rôle accorde. Le verbe
 `bind` mérite l'attention : il permet de distribuer un rôle qu'on ne détient pas.
 
 **Lire ce qui a changé récemment.** `kubectl get events -n facturation
---sort-by=.lastTimestamp` montre des Jobs créés chaque minute. Sur un cluster
-dont l'API server écrit un journal d'audit (lab `cks-audit-log-policy`), le
-journal dit quelle identité a créé `support-n2` et quand : `jq
-'select(.objectRef.name == "support-n2")'` sur le fichier du journal. Le
-cluster de ce lab n'audite rien par défaut : les événements et les objets
-eux-mêmes sont ici vos preuves.
+--sort-by=.lastTimestamp` montre des Jobs créés chaque minute. Il existe une
+autre source de preuve : le journal d'audit de l'API server, que le parcours
+enseigne plus loin, dans le module « Détecter à l'exécution » (lab
+`cks-audit-log-policy`). Sur un cluster qui en écrit un, il dit quelle identité
+a créé `support-n2` et quand. Le cluster de ce lab n'audite rien : les
+événements et les objets eux-mêmes sont ici vos preuves.
 
 **Consigner avant de retirer.** `kubectl get <type> <nom> -o yaml >
 /root/constat-persistance.yaml` garde l'objet tel que le cluster le connaît,
