@@ -1,31 +1,38 @@
 # Créer un cluster kind multi-nœuds
 
-Ce cours vous fait pratiquer, sur la machine du lab, chaque geste de la leçon :
-créer un cluster kind sur une image épinglée, voir ce qu'il a posé, vérifier
-qu'il est prêt, l'arrêter et le relancer, le décrire dans un fichier,
-travailler avec deux clusters, puis les supprimer. Vous travaillez sur deux
-clusters d'essai, `essai` et `duo` : le cluster `atelier` du challenge reste à
-faire à la fin.
+kind est un outil qui crée un cluster Kubernetes sur votre machine. Chaque
+machine du cluster, qu'on appelle un **nœud**, y est un simple conteneur
+Docker. Dans ce cours, vous refaites les gestes de la leçon : créer un cluster,
+voir ce que kind a créé, vérifier qu'il est prêt, l'arrêter, le décrire dans un
+fichier, passer d'un cluster à l'autre, puis les supprimer.
+
+Vous travaillez sur deux clusters d'essai, `essai` et `duo`. Le challenge vous
+demandera un autre cluster, `atelier` : vous le ferez seul, à la fin.
 
 Page associée : [Créer votre premier cluster Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/premier-cluster/).
 
 ## 🔧 Avant de commencer
 
+Lancez le lab :
+
 ```bash
 dsoxlab run k8s-creer-un-cluster-kind
 ```
 
-La commande prépare la machine `k8s-kind.lab` et vous y connecte. Docker, kind
-et kubectl sont installés. Pour vous laisser la mémoire, le lab a supprimé les
-clusters des autres labs : aucun cluster kind ne tourne, et le répertoire
-`~/atelier/` du challenge est vide. Les sorties ci-dessous ont été relevées sur
-cette machine (Debian 13.7, 4 Go de mémoire, kind `v0.33.0`, Docker `29.9.3`)
-le 19 novembre 2026.
+Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Docker, kind et
+kubectl y sont installés. Pour vous laisser assez de mémoire, le lab a supprimé
+les clusters des autres labs : aucun cluster ne tourne. Le répertoire
+`~/atelier/` du challenge est vide.
 
-## 📚 Exercice 1 : créer un cluster à un nœud, sur une image épinglée
+Les sorties montrées dans ce cours ont été relevées sur cette machine (Debian
+13.7, 4 Go de mémoire, kind `v0.33.0`, Docker `29.9.3`) le 19 novembre 2026.
 
-Créez un cluster nommé `essai`. Précisez toujours l'image du nœud, avec son
-digest : sans elle, kind prend la version figée dans son binaire.
+## 📚 Exercice 1 : créer un cluster d'un seul nœud
+
+Créez un cluster nommé `essai`. L'option `--image` choisit l'image du nœud,
+et donc la version de Kubernetes. La partie `@sha256:...` est le **digest** de
+l'image : il garantit que vous recevez exactement l'image prévue, même si
+quelqu'un republie une image sous le même nom.
 
 ```bash
 kind create cluster --name essai \
@@ -40,15 +47,15 @@ You can now use your cluster with:
 kubectl cluster-info --context kind-essai
 ```
 
-Entre ces lignes, kind affiche ses étapes une à une : image du nœud,
-préparation, configuration, démarrage du control plane, réseau (CNI) et
-stockage. Regardez la ligne `Set kubectl context` : kind a déjà basculé
-kubectl sur le nouveau cluster.
+Entre ces lignes, kind affiche ses étapes une par une, avec des petits
+dessins. Regardez la ligne `Set kubectl context` : kind a réglé kubectl pour
+qu'il parle à ce nouveau cluster. On dit que kubectl utilise le **contexte**
+`kind-essai`.
 
-## 📚 Exercice 2 : voir ce que kind a créé sur la machine
+## 📚 Exercice 2 : voir ce que kind a créé
 
-Un nœud kind n'est qu'un conteneur Docker. Listez-le, puis demandez à kind ses
-clusters.
+Un nœud kind est un conteneur Docker. Listez les conteneurs dont le nom
+contient `essai`, puis demandez à kind la liste de ses clusters :
 
 ```bash
 docker ps --filter "name=essai" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
@@ -61,14 +68,15 @@ essai-control-plane   kindest/node:v1.37.0   Up 9 seconds
 essai
 ```
 
-Le conteneur porte le nom du cluster suivi de son rôle, `control-plane`. kind
-ne connaît que ses propres clusters : un cluster créé par un autre outil
-n'apparaîtrait pas ici.
+Un seul conteneur, `essai-control-plane`. Le **control plane** est le nœud qui
+dirige le cluster. Dans un cluster d'un seul nœud, il fait aussi tourner vos
+applications.
 
 ## 📚 Exercice 3 : vérifier que le cluster est prêt
 
-Un cluster qui répond n'est pas forcément prêt. Contrôlez le contexte, puis
-laissez kubectl attendre que le nœud soit `Ready` avant de le lister.
+Un cluster qui répond n'est pas forcément prêt à travailler. Vérifiez d'abord
+que kubectl vise bien `essai`, puis attendez que le nœud soit prêt avant de
+l'afficher :
 
 ```bash
 kubectl config current-context
@@ -83,8 +91,11 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   20s   v1.37.0
 ```
 
-La colonne `VERSION` confirme `v1.37.0`, la version de l'image épinglée.
-Listez maintenant les composants système :
+`kubectl wait` attend que tous les nœuds soient `Ready`, puis rend la main.
+La colonne `VERSION` affiche `v1.37.0` : c'est la version de l'image que vous
+avez choisie.
+
+Listez maintenant les programmes que Kubernetes fait tourner pour lui-même :
 
 ```bash
 kubectl get pods -A
@@ -103,16 +114,17 @@ kube-system          kube-scheduler-essai-control-plane            1/1     Runni
 local-path-storage   local-path-provisioner-75f7fc7dc5-cj7dr       1/1     Running   0          13s
 ```
 
-Tous les composants sont `Running` avant que vous ayez déployé quoi que ce
-soit : `etcd`, les trois autres composants du control plane, le réseau
-(`kindnet`, `kube-proxy`), la résolution de noms (`coredns`) et le stockage
-local. Juste après la création, certains peuvent encore être en
-`ContainerCreating` : relancez la commande quelques secondes plus tard.
+Vous n'avez encore rien déployé, et pourtant neuf programmes tournent : ce sont
+les composants du cluster lui-même (base de données, réseau, noms, stockage).
+Ils doivent tous être `Running`. Juste après la création, certains peuvent
+encore afficher `ContainerCreating` : attendez quelques secondes et relancez la
+commande.
 
 ## 📚 Exercice 4 : arrêter le cluster, puis le relancer
 
-kind n'a pas de commande `stop`, mais ses nœuds sont des conteneurs. Arrêtez
-celui du cluster `essai`, puis interrogez le cluster.
+kind n'a pas de commande pour arrêter un cluster. Mais comme un nœud est un
+conteneur, Docker peut l'arrêter. Arrêtez le nœud d'`essai`, puis interrogez le
+cluster :
 
 ```bash
 docker stop $(docker ps -q --filter "name=essai-")
@@ -124,9 +136,9 @@ e8568b1489b6
 The connection to the server 127.0.0.1:45357 was refused - did you specify the right host or port?
 ```
 
-Le conteneur arrêté, plus personne ne répond à l'adresse de l'API : c'est le
-message que vous verrez chaque fois qu'un cluster est arrêté ou que le contexte
-pointe ailleurs. Relancez le nœud et attendez qu'il soit prêt.
+Plus rien ne répond. Retenez ce message : vous le verrez chaque fois qu'un
+cluster est arrêté, ou que kubectl vise le mauvais cluster. Relancez le nœud et
+attendez qu'il soit prêt :
 
 ```bash
 docker start $(docker ps -aq --filter "name=essai-")
@@ -141,14 +153,15 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   38s   v1.37.0
 ```
 
-Le nœud est revenu `Ready`, et son `AGE` a continué de courir : rien n'a été
-recréé. Arrêter un cluster libère sa mémoire sans rien perdre de son contenu.
+Le nœud est de nouveau `Ready`. Son âge (`AGE`) a continué d'augmenter : rien
+n'a été recréé. Arrêter un cluster libère de la mémoire sans rien perdre.
 
 ## 📚 Exercice 5 : décrire un cluster dans un fichier
 
-Au-delà d'un nœud, kind attend un fichier de configuration. Écrivez
-`~/essai/kind-duo.yaml` : un control plane et un worker, ce dernier marqué
-d'une zone.
+Pour un cluster de plusieurs nœuds, kind a besoin d'un fichier qui décrit les
+nœuds. Écrivez `~/essai/kind-duo.yaml` : un control plane et un **worker**, un
+nœud qui fait tourner les applications. Le worker reçoit une étiquette de
+**zone**, comme dans un vrai centre de données.
 
 ```bash
 mkdir -p ~/essai
@@ -163,9 +176,9 @@ nodes:
 EOF
 ```
 
-Chaque entrée de la liste `nodes` est un nœud, et son `role` dit lequel.
-L'image du nœud ne figure pas dans le fichier : elle se passe à la commande,
-avec le nom du cluster et le chemin du fichier.
+Chaque élément de la liste `nodes` est un nœud, et `role` dit lequel. L'image
+ne se met pas dans ce fichier : elle se donne à la commande, avec le nom du
+cluster et le chemin du fichier.
 
 ```bash
 kind create cluster --name duo \
@@ -178,9 +191,9 @@ Creating cluster "duo" ...
 Set kubectl context to "kind-duo"
 ```
 
-Parmi les étapes affichées, une seule est nouvelle : `Joining worker nodes`,
-où le worker rejoint le control plane. Attendez les deux nœuds, puis affichez
-leur zone :
+Une étape s'ajoute à celles de l'exercice 1 : `Joining worker nodes`, pendant
+laquelle le worker rejoint le control plane. Attendez les deux nœuds, puis
+affichez-les avec leur zone :
 
 ```bash
 kubectl wait --for=condition=Ready nodes --all --timeout=180s
@@ -195,14 +208,13 @@ duo-control-plane   Ready    control-plane   27s   v1.37.0
 duo-worker          Ready    <none>          13s   v1.37.0   zone-a
 ```
 
-Le worker porte la zone déclarée dans le fichier. Sa colonne `ROLES` vaut
-`<none>` : Kubernetes ne pose aucun libellé de rôle sur un worker, seul le
-control plane en porte un. C'est normal.
+Le worker porte bien la zone écrite dans le fichier. Sa colonne `ROLES` affiche
+`<none>` : c'est normal, Kubernetes n'écrit le rôle que sur le control plane.
 
-## 📚 Exercice 6 : travailler avec deux clusters
+## 📚 Exercice 6 : passer d'un cluster à l'autre
 
 Deux clusters tournent maintenant, mais kubectl ne parle qu'à un seul à la
-fois. Listez les contextes, puis revenez sur `essai`.
+fois. Listez les contextes, puis revenez sur `essai` :
 
 ```bash
 kubectl config get-contexts
@@ -219,14 +231,15 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   75s   v1.37.0
 ```
 
-L'astérisque était sur `kind-duo` : le dernier cluster créé devient le contexte
-actif. Après `use-context`, `kubectl get nodes` montre bien le nœud d'`essai`.
-Vérifier le contexte avant d'agir évite de travailler sur le mauvais cluster.
+L'étoile montre le contexte utilisé : c'était `kind-duo`, le dernier cluster
+créé. Après `use-context`, `kubectl get nodes` montre bien le nœud d'`essai`.
+Prenez l'habitude de vérifier le contexte avant d'agir : c'est ce qui évite de
+travailler sur le mauvais cluster.
 
 ## 📚 Exercice 7 : supprimer un cluster
 
-La suppression est définitive et sans confirmation : relisez le nom avant de
-valider.
+La suppression est définitive, et kind ne demande pas de confirmation. Relisez
+le nom avant de valider.
 
 ```bash
 kind delete cluster --name duo
@@ -240,13 +253,12 @@ CURRENT   NAME         CLUSTER      AUTHINFO     NAMESPACE
 *         kind-essai   kind-essai   kind-essai
 ```
 
-Le contexte `kind-duo` a disparu du kubeconfig avec le cluster. Seul `essai`
-reste, et il est le contexte actif.
+Le contexte `kind-duo` a disparu en même temps que le cluster. Il ne reste
+qu'`essai`.
 
 ## 🧹 Nettoyage
 
-Supprimez le cluster `essai` et le répertoire d'essai, puis vérifiez que la
-machine est revenue à l'état de départ du challenge :
+Supprimez le cluster `essai` et le répertoire d'essai, puis vérifiez :
 
 ```bash
 kind delete cluster --name essai
@@ -262,8 +274,8 @@ No kind clusters found.
 error: current-context is not set
 ```
 
-Plus aucun cluster, et donc plus de contexte actif. Quittez la session et
-vérifiez :
+Il n'y a plus aucun cluster, donc plus aucun contexte. Quittez la machine et
+vérifiez que le lab est revenu à son état de départ :
 
 ```bash
 exit
@@ -277,13 +289,13 @@ dsoxlab check k8s-creer-un-cluster-kind
 ╰────────────────────────────────────────╯
 ```
 
-Zéro sur quatre : rien de ce que les exercices ont fait ne reste sur la
-machine.
+0 sur 4 : c'est le résultat attendu. Rien de ce que vous avez fait dans le
+cours ne reste sur la machine.
 
 ## 🎯 Le challenge
 
-Faites maintenant le challenge seul : le cluster `atelier`, décrit dans son
-propre fichier, avec un control plane et deux workers.
+À vous, seul cette fois : créer le cluster `atelier`, décrit dans son propre
+fichier, avec un control plane et deux workers.
 
 ```bash
 dsoxlab run k8s-creer-un-cluster-kind

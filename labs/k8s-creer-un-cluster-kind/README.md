@@ -1,30 +1,38 @@
 # Create a multi-node kind cluster
 
-This course has you practise, on the lab machine, every move of the lesson:
-create a kind cluster on a pinned image, see what it set up, check that it is
-ready, stop and restart it, describe it in a file, work with two clusters, then
-delete them. You work on two scratch clusters, `essai` and `duo`: the
-challenge's `atelier` cluster is left for the end.
+kind is a tool that creates a Kubernetes cluster on your machine. Each machine
+of the cluster, called a **node**, is just a Docker container there. In this
+course, you redo the moves of the lesson: create a cluster, see what kind
+created, check that it is ready, stop it, describe it in a file, switch from
+one cluster to another, then delete them.
+
+You work on two scratch clusters, `essai` and `duo`. The challenge will ask you
+for another cluster, `atelier`: you will build it on your own, at the end.
 
 Related page: [Create your first Kubernetes cluster](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/fundamentals/first-cluster/).
 
 ## 🔧 Before you start
 
+Start the lab:
+
 ```bash
 dsoxlab run k8s-creer-un-cluster-kind
 ```
 
-The command prepares the `k8s-kind.lab` machine and connects you to it. Docker,
-kind and kubectl are installed. To leave you the memory, the lab deleted the
-clusters of the other labs: no kind cluster is running, and the challenge's
-`~/atelier/` directory is empty. The outputs below were recorded on this
-machine (Debian 13.7, 4 GB of memory, kind `v0.33.0`, Docker `29.9.3`) on
-19 November 2026.
+You are now connected to the `k8s-kind.lab` machine. Docker, kind and kubectl
+are installed there. To leave you enough memory, the lab deleted the clusters
+of the other labs: no cluster is running. The challenge's `~/atelier/`
+directory is empty.
 
-## 📚 Exercise 1: create a single-node cluster, on a pinned image
+The outputs shown in this course were recorded on this machine (Debian 13.7,
+4 GB of memory, kind `v0.33.0`, Docker `29.9.3`) on 19 November 2026.
 
-Create a cluster named `essai`. Always give the node image, with its digest:
-without it, kind uses the version frozen in its binary.
+## 📚 Exercise 1: create a single-node cluster
+
+Create a cluster named `essai`. The `--image` option picks the node image, and
+so the Kubernetes version. The `@sha256:...` part is the image **digest**: it
+guarantees you get exactly the intended image, even if someone republishes an
+image under the same name.
 
 ```bash
 kind create cluster --name essai \
@@ -39,15 +47,14 @@ You can now use your cluster with:
 kubectl cluster-info --context kind-essai
 ```
 
-Between these lines, kind shows its steps one by one: node image, preparation,
-configuration, control plane start, network (CNI) and storage. Look at the
-`Set kubectl context` line: kind has already switched kubectl to the new
-cluster.
+Between these lines, kind shows its steps one by one, with small pictures.
+Look at the `Set kubectl context` line: kind set kubectl up to talk to this new
+cluster. We say kubectl uses the `kind-essai` **context**.
 
-## 📚 Exercise 2: see what kind created on the machine
+## 📚 Exercise 2: see what kind created
 
-A kind node is nothing but a Docker container. List it, then ask kind for its
-clusters.
+A kind node is a Docker container. List the containers whose name contains
+`essai`, then ask kind for the list of its clusters:
 
 ```bash
 docker ps --filter "name=essai" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
@@ -60,14 +67,14 @@ essai-control-plane   kindest/node:v1.37.0   Up 9 seconds
 essai
 ```
 
-The container is named after the cluster, followed by its role,
-`control-plane`. kind only knows its own clusters: a cluster created by
-another tool would not show up here.
+A single container, `essai-control-plane`. The **control plane** is the node
+that runs the cluster. In a single-node cluster, it also runs your
+applications.
 
 ## 📚 Exercise 3: check that the cluster is ready
 
-A cluster that answers is not necessarily ready. Check the context, then let
-kubectl wait for the node to be `Ready` before listing it.
+A cluster that answers is not necessarily ready to work. First check that
+kubectl targets `essai`, then wait for the node to be ready before showing it:
 
 ```bash
 kubectl config current-context
@@ -82,8 +89,10 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   20s   v1.37.0
 ```
 
-The `VERSION` column confirms `v1.37.0`, the version of the pinned image. Now
-list the system components:
+`kubectl wait` waits for every node to be `Ready`, then gives the prompt back.
+The `VERSION` column shows `v1.37.0`: the version of the image you picked.
+
+Now list the programs Kubernetes runs for itself:
 
 ```bash
 kubectl get pods -A
@@ -102,15 +111,15 @@ kube-system          kube-scheduler-essai-control-plane            1/1     Runni
 local-path-storage   local-path-provisioner-75f7fc7dc5-cj7dr       1/1     Running   0          13s
 ```
 
-Every component is `Running` before you have deployed anything: `etcd`, the
-three other control plane components, the network (`kindnet`, `kube-proxy`),
-name resolution (`coredns`) and local storage. Right after creation, some may
-still be in `ContainerCreating`: run the command again a few seconds later.
+You have deployed nothing yet, and still nine programs are running: they are
+the components of the cluster itself (database, network, names, storage). They
+must all be `Running`. Right after creation, some may still show
+`ContainerCreating`: wait a few seconds and run the command again.
 
 ## 📚 Exercise 4: stop the cluster, then restart it
 
-kind has no `stop` command, but its nodes are containers. Stop the one of the
-`essai` cluster, then query the cluster.
+kind has no command to stop a cluster. But since a node is a container, Docker
+can stop it. Stop the node of `essai`, then query the cluster:
 
 ```bash
 docker stop $(docker ps -q --filter "name=essai-")
@@ -122,9 +131,9 @@ e8568b1489b6
 The connection to the server 127.0.0.1:45357 was refused - did you specify the right host or port?
 ```
 
-With the container stopped, nobody answers at the API address anymore: this is
-the message you will see whenever a cluster is stopped or the context points
-elsewhere. Restart the node and wait for it to be ready.
+Nothing answers anymore. Remember this message: you will see it whenever a
+cluster is stopped, or kubectl targets the wrong cluster. Restart the node and
+wait for it to be ready:
 
 ```bash
 docker start $(docker ps -aq --filter "name=essai-")
@@ -139,15 +148,15 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   38s   v1.37.0
 ```
 
-The node is back to `Ready`, and its `AGE` kept running: nothing was
-recreated. Stopping a cluster frees its memory without losing any of its
-content.
+The node is `Ready` again. Its age (`AGE`) kept growing: nothing was
+recreated. Stopping a cluster frees memory without losing anything.
 
 ## 📚 Exercise 5: describe a cluster in a file
 
-Beyond one node, kind expects a configuration file. Write
-`~/essai/kind-duo.yaml`: one control plane and one worker, the latter tagged
-with a zone.
+For a cluster of several nodes, kind needs a file that describes the nodes.
+Write `~/essai/kind-duo.yaml`: one control plane and one **worker**, a node
+that runs applications. The worker gets a **zone** label, as in a real data
+centre.
 
 ```bash
 mkdir -p ~/essai
@@ -162,9 +171,9 @@ nodes:
 EOF
 ```
 
-Each entry of the `nodes` list is a node, and its `role` says which one. The
-node image is not in the file: it is passed to the command, with the cluster
-name and the file path.
+Each item of the `nodes` list is a node, and `role` says which one. The image
+does not go in this file: you give it to the command, with the cluster name and
+the file path.
 
 ```bash
 kind create cluster --name duo \
@@ -177,8 +186,9 @@ Creating cluster "duo" ...
 Set kubectl context to "kind-duo"
 ```
 
-Among the steps shown, only one is new: `Joining worker nodes`, where the
-worker joins the control plane. Wait for both nodes, then show their zone:
+One step is added to those of exercise 1: `Joining worker nodes`, during which
+the worker joins the control plane. Wait for both nodes, then show them with
+their zone:
 
 ```bash
 kubectl wait --for=condition=Ready nodes --all --timeout=180s
@@ -193,14 +203,14 @@ duo-control-plane   Ready    control-plane   27s   v1.37.0
 duo-worker          Ready    <none>          13s   v1.37.0   zone-a
 ```
 
-The worker carries the zone declared in the file. Its `ROLES` column shows
-`<none>`: Kubernetes sets no role label on a worker, only the control plane
-gets one. That is expected.
+The worker carries the zone written in the file. Its `ROLES` column shows
+`<none>`: that is expected, Kubernetes only writes the role on the control
+plane.
 
-## 📚 Exercise 6: work with two clusters
+## 📚 Exercise 6: switch from one cluster to another
 
 Two clusters are now running, but kubectl only talks to one at a time. List
-the contexts, then go back to `essai`.
+the contexts, then go back to `essai`:
 
 ```bash
 kubectl config get-contexts
@@ -217,15 +227,15 @@ NAME                  STATUS   ROLES           AGE   VERSION
 essai-control-plane   Ready    control-plane   75s   v1.37.0
 ```
 
-The asterisk was on `kind-duo`: the last cluster created becomes the active
-context. After `use-context`, `kubectl get nodes` does show the node of
-`essai`. Checking the context before acting keeps you from working on the
-wrong cluster.
+The asterisk shows the context in use: it was `kind-duo`, the last cluster
+created. After `use-context`, `kubectl get nodes` does show the node of
+`essai`. Make a habit of checking the context before acting: it keeps you from
+working on the wrong cluster.
 
 ## 📚 Exercise 7: delete a cluster
 
-Deletion is final and asks for no confirmation: read the name again before
-pressing Enter.
+Deletion is final, and kind asks for no confirmation. Read the name again
+before pressing Enter.
 
 ```bash
 kind delete cluster --name duo
@@ -239,13 +249,12 @@ CURRENT   NAME         CLUSTER      AUTHINFO     NAMESPACE
 *         kind-essai   kind-essai   kind-essai
 ```
 
-The `kind-duo` context left the kubeconfig together with the cluster. Only
-`essai` remains, and it is the active context.
+The `kind-duo` context disappeared together with the cluster. Only `essai` is
+left.
 
 ## 🧹 Clean up
 
-Delete the `essai` cluster and the scratch directory, then check that the
-machine is back to the starting state of the challenge:
+Delete the `essai` cluster and the scratch directory, then check:
 
 ```bash
 kind delete cluster --name essai
@@ -261,7 +270,8 @@ No kind clusters found.
 error: current-context is not set
 ```
 
-No cluster left, and so no active context. Leave the session and check:
+No cluster is left, so no context either. Leave the machine and check that the
+lab is back to its starting state:
 
 ```bash
 exit
@@ -275,12 +285,13 @@ dsoxlab check k8s-creer-un-cluster-kind
 ╰─────────────────────────────────────╯
 ```
 
-Zero out of four: nothing the exercises did is left on the machine.
+0 out of 4: that is the expected result. Nothing you did in the course is left
+on the machine.
 
 ## 🎯 The challenge
 
-Now do the challenge on your own: the `atelier` cluster, described in its own
-file, with one control plane and two workers.
+Your turn, on your own this time: create the `atelier` cluster, described in
+its own file, with one control plane and two workers.
 
 ```bash
 dsoxlab run k8s-creer-un-cluster-kind
