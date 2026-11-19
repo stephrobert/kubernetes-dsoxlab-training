@@ -1,5 +1,5 @@
 title: "Lire l'état d'un Pod en erreur"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/#mettre-en-pratique
 description: |
   Deux applications refusent de démarrer dans le namespace diagnostic. Dites
   pourquoi, preuves lues dans le cluster, sans rien réparer : la raison pour
