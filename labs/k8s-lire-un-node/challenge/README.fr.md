@@ -1,40 +1,39 @@
 # Challenge : Lire ce que déclare un Node worker
 
-## La situation
+## 📍 La situation
 
 Le cluster kind **`architecture`** fait tourner un control plane et trois
-workers. Votre `kubectl` le vise déjà. La fiche
-**`~/lire-un-node/fiche.txt`** attend ce que le worker
-**`architecture-worker2`** dit de lui-même.
+workers. Votre kubectl le vise déjà. La fiche **`~/lire-un-node/fiche.txt`**
+attend ce que le nœud **`architecture-worker2`** dit de lui-même.
 
-## Ce que vous devez obtenir
+## 🎯 Ce que vous devez obtenir
 
-Pour le Node `architecture-worker2` :
+Pour le nœud `architecture-worker2`, complétez la fiche :
 
-1. **`runtime`** porte son runtime de conteneurs et la version de ce runtime.
+1. Après **`runtime`** : le programme qui lance ses conteneurs, et sa version.
 
-2. **`version-kubelet`** porte la version de son kubelet.
+2. Après **`version-kubelet`** : la version de son kubelet.
 
-3. **`cpu`** et **`memoire`** portent sa **capacité** en CPU et en mémoire.
+3. Après **`cpu`** et **`memoire`** : sa **capacité** en processeur et en
+   mémoire.
 
-4. **`condition-ready`** porte le statut de sa condition **Ready**.
+4. Après **`condition-ready`** : la valeur de sa condition **Ready**.
 
-## Les repères utiles
+## 🧭 Les repères utiles
 
-Un Node est un objet comme un autre : son kubelet y écrit sans cesse ce que la
-machine offre et comment elle se porte. `kubectl get nodes -o wide` donne un
-résumé d'une ligne par Node, runtime compris ; `kubectl describe node` donne
-la fiche entière : **Conditions**, **Capacity** et **Allocatable**, puis
-**System Info**, où se trouvent les versions du kubelet et du runtime.
+`kubectl get nodes -o wide` donne une ligne par nœud, avec le runtime et la
+version du kubelet. `kubectl describe node` donne la fiche complète : les
+conditions (`Conditions`), la capacité (`Capacity`), ce qui reste aux Pods
+(`Allocatable`), puis les versions (`System Info`).
 
-Capacity, c'est ce que la machine possède ; Allocatable, ce qu'il reste aux
-Pods une fois le système servi. La fiche demande la **capacité**.
+`Capacity`, c'est ce que la machine possède. `Allocatable`, c'est ce qui reste
+aux Pods. La fiche demande la **capacité**.
 
-## Comment vous saurez que c'est bon
+## ✅ Comment vous saurez que c'est bon
 
-Les tests confrontent votre fiche à ce que déclare `architecture-worker2` au
-moment du contrôle. Les formes équivalentes sont acceptées : une version avec
-ou sans son `v`, une mémoire en Ki, Mi ou Gi.
+Les tests comparent votre fiche à ce que déclare `architecture-worker2` au
+moment du contrôle. Plusieurs façons d'écrire sont acceptées : une version
+avec ou sans son `v`, une mémoire en Ki, Mi ou Gi.
 
 ```bash
 dsoxlab check k8s-lire-un-node
