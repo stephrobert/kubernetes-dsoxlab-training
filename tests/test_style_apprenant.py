@@ -2,7 +2,8 @@
 
 La règle vient du style du blog, et elle est écrite dans `CONTRIBUTING.md` : pas
 d'emoji, pas de tiret cadratin dans l'énoncé `challenge/README.md`, `README.md`, les indices et
-les messages d'assertion. Elle ne tient que si quelque chose la vérifie : une
+les messages d'assertion. Seule exception, depuis le 2026-11-19 : un emoji dans
+les titres du cours (`README.md` d'un lab), comme dans les cours Ansible. Elle ne tient que si quelque chose la vérifie : une
 règle de rédaction sans contrôle dérive au premier lab écrit vite.
 
 Le tiret cadratin mérite une explication, parce qu'il a l'air inoffensif. Il
@@ -104,9 +105,22 @@ def test_il_y_a_des_textes_a_lire() -> None:
     )
 
 
+#: Le cours d'un lab, `labs/<lab>/README(.fr).md`, peut porter un emoji dans
+#: ses TITRES, comme les cours du catalogue Ansible : il y sert de repère dans
+#: un document long, découpé en exercices. Décision de Stéphane du 2026-11-19.
+#: Le corps du cours, l'énoncé, les indices et les messages d'assertion restent
+#: sans emoji : ce sont des consignes, et une consigne se dit avec des mots.
+COURS = re.compile(r"^labs/[^/]+/README(\.fr)?\.md$")
+
+
+def _sans_titres(texte: str) -> str:
+    return "\n".join(ligne for ligne in texte.splitlines() if not ligne.startswith("#"))
+
+
 @pytest.mark.parametrize("origine,texte", TEXTES, ids=[o for o, _ in TEXTES])
 def test_pas_d_emoji(origine: str, texte: str) -> None:
-    trouves = sorted(set(EMOJI.findall(texte)))
+    lu = _sans_titres(texte) if COURS.match(origine) else texte
+    trouves = sorted(set(EMOJI.findall(lu)))
 
     assert not trouves, (
         f"{origine} porte {len(trouves)} emoji ou pictogramme : {trouves}.\n"
