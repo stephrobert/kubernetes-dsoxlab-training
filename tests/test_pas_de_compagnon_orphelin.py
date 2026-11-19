@@ -34,9 +34,10 @@ import pytest
 RACINE = Path(__file__).resolve().parent.parent
 LABS = RACINE / "labs"
 
-#: Ce que `challenge/` porte forcément, et que personne n'appelle par son nom :
+#: Ce que `challenge/` porte forcément, et que personne n'appelle par son nom
+#: (README.md et README.fr.md, l'énoncé, depuis blog-roadmap#198) :
 #: le moteur les connaît.
-ATTENDUS = {"solution.sh", "hints.yaml"}
+ATTENDUS = {"solution.sh", "hints.yaml", "README.md", "README.fr.md"}
 
 CHALLENGES = sorted(d for d in LABS.glob("*/challenge") if d.is_dir())
 

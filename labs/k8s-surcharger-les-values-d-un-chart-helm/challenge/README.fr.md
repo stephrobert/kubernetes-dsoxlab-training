@@ -1,0 +1,40 @@
+# Challenge : Surcharger les values d'un chart Helm sans tomber dans le piège du typage
+
+## La situation
+
+Dans le namespace **`helm-values`**, la release **`catalogue`** déploie le
+chart **podinfo 6.16.0**. L'exploitation lui a posé deux réglages par `--set` :
+**trois réplicas** et la couleur d'interface **`#ff6b00`**.
+
+On vous demande de la monter en **6.17.0** et de fixer le message de
+l'interface à **`2026`**, l'année du catalogue.
+
+Vous êtes sur le control plane, avec `kubectl` et `helm` 4.3.2. Le dépôt
+`podinfo` est déjà déclaré. Travaillez dans **`~/catalogue`** si vous écrivez
+des fichiers de values.
+
+## Ce que vous devez obtenir
+
+1. Les values de la release portent **`ui.message`** égal à la **chaîne**
+   `"2026"`, pas à l'entier 2026.
+2. La release tourne en **podinfo 6.17.0**, déployée, et garde les réglages de
+   l'exploitation : **trois réplicas** et la couleur **`#ff6b00`**.
+3. podinfo **répond** le message `2026`.
+
+## Les repères
+
+`helm get values` montre les values qu'une release a reçues ; `--all` y ajoute
+les défauts du chart. `-f` lit un fichier de values, `--set` pose une valeur en
+ligne de commande. `--set` devine le type : un nombre devient un entier, et
+`true`, `false` et `null` deviennent des booléens ou rien. `--set-string`
+garde une chaîne. Un `helm upgrade` sans values repart des défauts du chart ;
+`--reuse-values` reprend celles de la révision précédente.
+
+## Comment vous saurez que ça marche
+
+Les tests lisent les values et le statut de la release, puis interrogent
+l'application.
+
+```bash
+dsoxlab check k8s-surcharger-les-values-d-un-chart-helm
+```

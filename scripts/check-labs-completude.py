@@ -82,31 +82,31 @@ def defauts(lab: Path) -> list[str]:
     # des deux côtés. dsoxlab validate-structure refuse déjà une traduction
     # unilatérale (content_missing_english) ; ici on nomme le fichier manquant,
     # parce que ce contrôle sert à dire ce qu'il RESTE à faire.
-    for nom in ("scenario.md", "scenario.fr.md", "README.md", "README.fr.md"):
+    for nom in ("challenge/README.md", "challenge/README.fr.md", "README.md", "README.fr.md"):
         if not (lab / nom).is_file():
             out.append(f"{nom} absent")
 
     if not (lab / "lab.fr.yaml").is_file():
         out.append("lab.fr.yaml absent : le titre et la description ne sont pas traduits")
 
-    for nom in ("scenario.md", "scenario.fr.md"):
+    for nom in ("challenge/README.md", "challenge/README.fr.md"):
         fichier = lab / nom
         if fichier.is_file() and MARQUEUR in fichier.read_text(encoding="utf-8"):
             out.append(f"{nom} : marqueur à lever")
 
     # Le contrôle de langue porte désormais sur la version FRANÇAISE : c'est
     # elle qui reste une copie de l'anglais tant que personne n'est passé. Le
-    # `scenario.md`, lui, DOIT être en anglais.
+    # L'énoncé anglais, lui, DOIT être en anglais.
     #
-    # L'identifiant du lab apparaît dans le scénario (la commande `dsoxlab
+    # L'identifiant du lab apparaît dans l'énoncé (la commande `dsoxlab
     # check <id>`), et huit labs CKA portent « troubleshoot » dans le leur : on
     # le retire avant de chercher de l'anglais, sinon un scénario entièrement
     # français est déclaré anglais.
-    scen_fr = lab / "scenario.fr.md"
+    scen_fr = lab / "challenge" / "README.fr.md"
     if scen_fr.is_file():
         texte = scen_fr.read_text(encoding="utf-8")
         if MARQUEUR not in texte and ANGLAIS.search(texte.replace(lab.name, "")):
-            out.append("scenario.fr.md : encore en anglais, la traduction n'est pas faite")
+            out.append("challenge/README.fr.md : encore en anglais, la traduction n'est pas faite")
 
     clean = lab / "cleanup.yaml"
     if not clean.is_file():
