@@ -485,10 +485,11 @@ sections:
       # une CA interne, après le TLS d'un Ingress (cks-ingress-tls).
       - k8s-emettre-un-certificat-avec-cert-manager
       # Module Modèle de menaces et cadres (niveau 5, KCSA), sur le cluster
-      # kubeadm : le lab guidé de la leçon Persistance. Il suppose joués
-      # cks-rbac-least-privilege et cks-audit-log-policy. Le parcours du site
-      # place pourtant la leçon Audit Logs après celle-ci : écart signalé dans
-      # la PR qui a aligné ce fichier sur le parcours, en attente de décision.
+      # kubeadm : le lab guidé de la leçon Persistance. Il s'appuie sur les
+      # droits RBAC (cks-rbac-least-privilege). Il cite le journal d'audit
+      # (cks-audit-log-policy, plus loin dans le parcours) comme une piste en
+      # plus, sans en dépendre : son cluster n'audite rien, et les événements et
+      # les objets y suffisent comme preuves.
       - k8s-detecter-une-persistance
       # Le lab guidé de la leçon Déni de service, qui suit la Persistance dans
       # le module et s'appuie sur cka-resourcequota-limitrange.
