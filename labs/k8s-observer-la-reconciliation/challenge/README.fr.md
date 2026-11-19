@@ -1,53 +1,52 @@
 # Challenge : Observer la réconciliation du control plane
 
-## La situation
+## 📍 La situation
 
 Le cluster kind **`architecture`** fait tourner un control plane et trois
-workers. Votre `kubectl` le vise déjà. Dans le namespace **`reconciliation`**,
-le Deployment **`vitrine`** fait tourner trois réplicas. Le relevé
+workers. Votre kubectl le vise déjà. Dans le namespace **`reconciliation`**,
+le Deployment **`vitrine`** fait tourner trois Pods. Le fichier
 **`~/reconciliation/releve.txt`** attend vos réponses.
 
-## Ce que vous devez obtenir
+## 🎯 Ce que vous devez obtenir
 
-Deux suppressions, **dans cet ordre**, chacune suivie d'un retour à l'état
-demandé :
+Deux suppressions, **dans cet ordre**. Après chacune, le cluster doit revenir
+à l'état demandé.
 
-1. Un Pod de `vitrine` a été **supprimé**, et son ReplicaSet l'a recréé.
+1. Vous avez **supprimé un Pod** de `vitrine`, et son ReplicaSet l'a recréé.
 
-2. Puis le **ReplicaSet** de `vitrine` a été supprimé, il a été remplacé, et
-   `vitrine` est revenu à **trois réplicas disponibles**, sans que le
-   Deployment ait été modifié.
+2. Vous avez ensuite **supprimé le ReplicaSet** de `vitrine`. Il a été
+   remplacé, et `vitrine` est revenu à **trois Pods disponibles**, sans que
+   le Deployment ait été modifié.
 
-3. **`pod-recree-par`** nomme le contrôleur qui a recréé le Pod.
+3. Après **`pod-recree-par`** : le nom du contrôleur qui a recréé le Pod.
 
-4. **`replicaset-recree-par`** nomme le contrôleur qui a recréé le ReplicaSet.
+4. Après **`replicaset-recree-par`** : le nom du contrôleur qui a recréé le
+   ReplicaSet.
 
-## Les repères utiles
+## 🧭 Les repères utiles
 
-Personne ne relance rien à la main : les contrôleurs du control plane
-comparent sans cesse l'état demandé à l'état observé, et agissent sur l'écart.
-Regardez-le se produire avec `kubectl get pods -w` dans un second terminal
-pendant que vous supprimez.
+Vous n'avez rien à relancer à la main : les contrôleurs corrigent l'écart
+tout seuls. Pour le voir se produire, lancez `kubectl get pods -w` dans un
+second terminal pendant que vous supprimez.
 
-Chaque contrôleur signe ce qu'il fait. Un ReplicaSet qui crée un Pod écrit un
-événement `SuccessfulCreate` sur lui-même ; un Deployment qui crée un
-ReplicaSet écrit un événement `ScalingReplicaSet` sur lui-même.
-`kubectl describe` les montre dans la colonne **From**,
-`kubectl get events -o wide` dans la colonne SOURCE : c'est le nom exact à
-consigner.
+Chaque contrôleur signe ce qu'il fait. Quand un ReplicaSet crée un Pod, il
+écrit un événement `SuccessfulCreate` sur lui-même. Quand un Deployment crée
+un ReplicaSet, il écrit un événement `ScalingReplicaSet` sur lui-même. Le nom
+à recopier est dans la colonne `From` de `kubectl describe`, ou dans la
+colonne `SOURCE` de `kubectl get events -o wide`.
 
-Supprimez seulement le Pod, puis seulement le ReplicaSet. Un
-`kubectl rollout restart` créerait lui aussi un nouveau ReplicaSet, mais en
-modifiant le Deployment : ce n'est pas ce que vous observez ici.
+Supprimez seulement le Pod, puis seulement le ReplicaSet. N'utilisez pas
+`kubectl rollout restart` : il crée lui aussi un nouveau ReplicaSet, mais en
+modifiant le Deployment.
 
-Les événements sont conservés **24 heures** sur ce cluster (une heure par
-défaut dans Kubernetes). Après une pause plus longue, ceux du lab ont disparu :
-`dsoxlab reset k8s-observer-la-reconciliation` repose la situation.
+Sur ce cluster, les événements sont gardés **24 heures** (une heure par défaut
+dans Kubernetes). Après une longue pause, ceux du lab ont disparu : relancez
+alors `dsoxlab reset k8s-observer-la-reconciliation`.
 
-## Comment vous saurez que c'est bon
+## ✅ Comment vous saurez que c'est bon
 
-Les tests comparent le cluster à l'état de départ du lab : le ReplicaSet
-initial, ses événements, et la génération du Deployment.
+Les tests comparent le cluster à l'état de départ du lab : le ReplicaSet du
+départ, ses événements, et le Deployment, qui ne doit pas avoir été modifié.
 
 ```bash
 dsoxlab check k8s-observer-la-reconciliation

@@ -1,45 +1,47 @@
 # Challenge: Read the state of a failing Pod
 
-## The situation
+## 📍 The situation
 
-In the **`diagnostic`** namespace of the `lab` kind cluster, three applications
-were started. **`web`** answers. **`api`** and **`batch`** do not start.
-Before fixing anything, the team wants to know **why**, with evidence read
-from the cluster: a blind fix erases the failure you had to understand.
+In the **`diagnostic`** namespace of the kind cluster `lab`, three
+applications were started. **`web`** works. **`api`** and **`batch`** do not
+start.
 
-Your `kubectl` already points at this cluster. The **`~/diagnostic`**
-directory exists and is empty.
+Before fixing anything, the team wants to know **why**, with evidence read in
+the cluster. A blind fix would erase the failure you needed to understand.
 
-## What you must achieve
+Your kubectl already targets this cluster. The **`~/diagnostic`** directory
+exists and is empty.
 
-1. A file **`~/diagnostic/api.txt`** that names the **reason** the `api`
-   container is waiting, and the faulty **image**.
+## 🎯 What you must obtain
 
-2. A file **`~/diagnostic/batch.txt`** that quotes the **error** `batch` wrote
-   before stopping, and the **exit code** of its last terminated container,
-   written as `exit code: N`.
+1. A **`~/diagnostic/api.txt`** file that gives the **reason** why the `api`
+   container is waiting, and the **image** at fault.
 
-3. A file **`~/diagnostic/top.txt`** that names the **Pod** of the namespace
-   that uses the most **memory**.
+2. A **`~/diagnostic/batch.txt`** file that copies the **error message**
+   written by `batch` before it stopped, and the **exit code** of its last
+   stop, written as `exit code: N`.
 
-4. **Nothing is repaired**: `api` and `batch` keep their original image and
+3. A **`~/diagnostic/top.txt`** file that gives the name of the namespace's
+   **Pod** that uses the most **memory**.
+
+4. **Nothing is fixed**: `api` and `batch` keep their starting image and
    command.
 
-## Useful landmarks
+## 🧭 Useful landmarks
 
-A status is not enough: it says a Pod is unwell, not why. The detailed state
-of a container, its reason and the Pod events say what blocks; the logs say
-what the program wrote before stopping. When a container has been restarted,
-the useful logs are often those of the **previous** run.
+A Pod's status says it is failing, not why. For the reason, read the
+container's state and the events with `kubectl describe`. For what the program
+wrote, read its logs with `kubectl logs`. If the container restarted, the
+useful message is often in the **previous** run (`--previous`).
 
-Resource usage comes from metrics-server, already installed. A Pod that is not
-running has no measurement.
+`kubectl top` measures memory. metrics-server is already installed. A Pod that
+does not run has no measurement.
 
-## How you will know it works
+## ✅ How you will know it works
 
-The tests compare your three files with what the cluster says itself: waiting
-reason, actual exit code, memory measured at check time. They also check that
-the two Deployments were not modified.
+The tests compare your three files with what the cluster says: the reason for
+the wait, the real exit code, the memory measured at check time. They also
+check that both Deployments were not changed.
 
 ```bash
 dsoxlab check k8s-lire-l-etat-d-un-pod-en-erreur
