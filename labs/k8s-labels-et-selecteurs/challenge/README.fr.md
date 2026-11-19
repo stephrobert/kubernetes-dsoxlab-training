@@ -1,44 +1,48 @@
 # Challenge : Étiqueter et sélectionner des Pods
 
-## La situation
+## 📍 La situation
 
-Le cluster kind **`boutique`** tourne sur la machine, et votre `kubectl` le vise
-déjà. Dans le namespace **`etiquettes`**, deux Deployments tournent :
-**`web`**, à trois réplicas, et **`api`**, à deux. Aucun de leurs Pods ne porte
-de label `env`.
+Le cluster kind **`boutique`** tourne sur la machine, et votre kubectl le vise
+déjà. Dans le namespace **`etiquettes`** :
 
-Le relevé **`~/etiquettes/releve.txt`** attend un sélecteur.
+- le Deployment **`web`** fait tourner trois Pods ;
+- le Deployment **`api`** fait tourner deux Pods.
 
-## Ce que vous devez obtenir
+Aucun de ces Pods n'a de label `env`. Le fichier
+**`~/etiquettes/releve.txt`** attend un sélecteur.
 
-1. **Tous les Pods de `web` portent le label `env=prod`**, et ils le gardent
-   quand ils sont remplacés.
+## 🎯 Ce que vous devez obtenir
 
-2. **Le Deployment `web` porte une annotation `description`**, avec une phrase
-   qui dit à quoi il sert.
+1. **Tous les Pods de `web` ont le label `env=prod`**, et ils le gardent quand
+   ils sont remplacés.
 
-3. **`selecteur`** contient un sélecteur de labels qui utilise une négation
-   (`!=` ou `!clé`) et qui rend **exactement les Pods de `api`**.
+2. **Le Deployment `web` a une annotation `description`**, avec une phrase qui
+   dit à quoi il sert.
 
-## Les repères utiles
+3. Après **`selecteur`**, dans le fichier : un sélecteur de labels qui utilise
+   une négation (`!=` ou `!clé`) et qui rend **exactement les Pods de `api`**.
 
-Un label posé sur un Pod vit et meurt avec ce Pod. Les Pods d'un Deployment
-sont remplacés à chaque mise à jour, à chaque suppression, à chaque panne de
-nœud : un label qui doit durer s'écrit là d'où les Pods sont fabriqués. Un
-label posé sur le Deployment lui-même, lui, ne descend pas jusqu'aux Pods.
+## 🧭 Les repères utiles
 
-Avant de décider entre label et annotation, posez-vous la question qui tranche :
-faudra-t-il un jour sélectionner des objets par cette information ? Une phrase
-de description ne sert pas à sélectionner, et un label n'accepte pas d'espaces.
+Un label posé sur un Pod disparaît avec lui. Or les Pods d'un Deployment sont
+remplacés souvent : à chaque mise à jour, à chaque suppression, à chaque panne
+de nœud. Un label qui doit durer s'écrit donc dans le modèle de Pod du
+Deployment. Un label posé sur le Deployment lui-même ne descend pas jusqu'aux
+Pods.
 
-Pour le sélecteur, essayez-le avec `kubectl get pods -n etiquettes -l` avant
-de le consigner, et comptez ce qu'il rend : une négation retient aussi les
-objets qui n'ont pas du tout la clé.
+Pour choisir entre un label et une annotation, demandez-vous si vous devrez un
+jour choisir des objets par cette information. Une phrase de description ne
+sert pas à choisir, et un label n'accepte pas d'espaces.
 
-## Comment vous saurez que c'est bon
+Essayez votre sélecteur avec `kubectl get pods -n etiquettes -l` avant de
+l'écrire dans le fichier, et comptez les Pods qu'il rend. Attention : une
+négation garde aussi les Pods qui n'ont pas du tout la clé. Écrivez le
+sélecteur seul, tel qu'il suit `-l`.
 
-Les tests lisent le modèle de Pod et les annotations de `web`, puis rejouent
-votre sélecteur tel quel.
+## ✅ Comment vous saurez que c'est bon
+
+Les tests lisent le modèle de Pod et les annotations de `web`. Ils rejouent
+ensuite votre sélecteur tel quel et comparent les Pods rendus à ceux de `api`.
 
 ```bash
 dsoxlab check k8s-labels-et-selecteurs
