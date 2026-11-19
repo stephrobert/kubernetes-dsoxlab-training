@@ -29,23 +29,26 @@ installé**, et aucune complétion n'est configurée.
 
 ## 🧭 Les repères utiles
 
-Ne téléchargez jamais « la dernière version » sans la nommer : une version
-épinglée se réinstalle à l'identique, sur votre poste comme dans une CI. Le
-client et le serveur peuvent différer d'**une version mineure au plus**, dans
-un sens ou dans l'autre : un client 1.37 parle donc à ce cluster 1.37.0.
+Écrivez le numéro de version dans vos commandes, par exemple `v1.37.2`. Ne
+prenez pas « la dernière version » sans savoir laquelle c'est : demain, ce ne
+sera plus la même. Le client kubectl peut avoir une version mineure d'écart
+avec le cluster, pas plus. Un kubectl 1.37 convient donc à ce cluster en
+1.37.0.
 
-Une empreinte se vérifie **avant** d'installer, jamais après. Elle prouve que
-le fichier reçu est bien celui que le projet a publié.
+Vérifiez l'empreinte du binaire **avant** de l'installer. Si elle ne
+correspond pas, le fichier téléchargé n'est pas celui que le projet a publié :
+supprimez-le et recommencez.
 
-Ce que vous tapez dans votre shell disparaît à sa fermeture. Une complétion ou
-un alias qui doit servir demain s'écrit dans un fichier que bash lit à chaque
-démarrage. Pour vérifier, ouvrez un **nouveau** shell. Sous Debian, la
-complétion de kubectl a besoin d'un paquet que la leçon nomme : sans lui,
-la tabulation ne propose que des noms de fichiers.
+Une commande tapée dans le terminal est oubliée quand vous le fermez. Pour
+garder l'alias et la complétion, écrivez-les dans `~/.bashrc` : bash lit ce
+fichier à chaque ouverture. Ouvrez ensuite un **nouveau** terminal pour
+vérifier. Sous Debian, la complétion de kubectl a aussi besoin du paquet
+`bash-completion`. Sans lui, la touche Tab ne propose que des noms de
+fichiers.
 
-`kubectl version` affiche deux versions, celle du client et celle du serveur.
-Si la seconde manque, kubectl n'a pas atteint le cluster.
-`kubectl cluster-info` dit à quelle adresse il le cherche.
+Pour savoir si kubectl atteint le cluster, lancez `kubectl version`. La ligne
+`Server Version` doit apparaître. Si elle manque, `kubectl cluster-info` vous
+montre à quelle adresse kubectl cherche le cluster.
 
 ## ✅ Comment vous saurez que c'est bon
 

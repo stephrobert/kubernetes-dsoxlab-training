@@ -28,22 +28,24 @@ configured.
 
 ## 🧭 Useful landmarks
 
-Never download "the latest version" without naming it: a pinned version
-reinstalls identically, on your workstation as in a CI. The client and the
-server may differ by **one minor version at most**, in either direction: a 1.37
-client therefore talks to this 1.37.0 cluster.
+Write the version number in your commands, for example `v1.37.2`. Do not take
+"the latest version" without knowing which one it is: tomorrow it will not be
+the same. The kubectl client may be one minor version away from the cluster,
+no more. A 1.37 kubectl is therefore fine for this 1.37.0 cluster.
 
-A fingerprint is checked **before** installing, never after. It proves that the
-file you received is the one the project published.
+Check the binary's fingerprint **before** installing it. If it does not match,
+the downloaded file is not the one the project published: delete it and start
+again.
 
-What you type in your shell disappears when it closes. A completion or an alias
-meant for tomorrow is written in a file that bash reads at every start. To
-check, open a **new** shell. On Debian, kubectl completion needs a package
-that the lesson names: without it, Tab only offers file names.
+A command typed in the terminal is forgotten when you close it. To keep the
+alias and the completion, write them in `~/.bashrc`: bash reads this file every
+time it starts. Then open a **new** terminal to check. On Debian, kubectl
+completion also needs the `bash-completion` package. Without it, the Tab key
+only offers file names.
 
-`kubectl version` shows two versions, the client's and the server's. If the
-second is missing, kubectl did not reach the cluster. `kubectl cluster-info`
-tells at which address it looks for it.
+To know whether kubectl reaches the cluster, run `kubectl version`. The
+`Server Version` line must show. If it is missing, `kubectl cluster-info`
+shows you at which address kubectl looks for the cluster.
 
 ## ✅ How you will know it works
 
