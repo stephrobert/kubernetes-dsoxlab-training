@@ -258,27 +258,20 @@ qu'`essai`.
 
 ## 🧹 Nettoyage
 
-Supprimez le cluster `essai` et le répertoire d'essai, puis vérifiez :
+Supprimez d'abord ce que vous avez créé pendant les exercices : le cluster `essai` et le répertoire `~/essai`.
 
 ```bash
 kind delete cluster --name essai
 rm -r ~/essai
-kind get clusters
-kubectl config current-context
 ```
 
-```text
-Deleting cluster "essai" ...
-Deleted nodes: ["essai-control-plane"]
-No kind clusters found.
-error: current-context is not set
-```
-
-Il n'y a plus aucun cluster, donc plus aucun contexte. Quittez la machine et
-vérifiez que le lab est revenu à son état de départ :
+Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
+le nettoyage puis la préparation du lab : vous retrouvez exactement l'état de
+départ du challenge. Il vous demande de confirmer : répondez `y`.
 
 ```bash
 exit
+dsoxlab reset k8s-creer-un-cluster-kind
 dsoxlab check k8s-creer-un-cluster-kind
 ```
 
@@ -289,8 +282,7 @@ dsoxlab check k8s-creer-un-cluster-kind
 ╰────────────────────────────────────────╯
 ```
 
-0 sur 4 : c'est le résultat attendu. Rien de ce que vous avez fait dans le
-cours ne reste sur la machine.
+0 sur 4 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 

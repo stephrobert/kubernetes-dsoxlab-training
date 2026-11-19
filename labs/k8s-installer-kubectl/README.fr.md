@@ -308,13 +308,20 @@ change à chaque création de cluster : le vôtre sera différent.
 
 ## 🧹 Nettoyage
 
-Supprimez ce que vous avez installé, quittez la machine, puis vérifiez que le
-lab est revenu à son état de départ :
+Supprimez d'abord ce que vous avez créé pendant les exercices : le programme `kubectl136`.
 
 ```bash
 rm ~/.local/bin/kubectl136
 rmdir ~/.local/bin
+```
+
+Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
+le nettoyage puis la préparation du lab : vous retrouvez exactement l'état de
+départ du challenge. Il vous demande de confirmer : répondez `y`.
+
+```bash
 exit
+dsoxlab reset k8s-installer-kubectl
 dsoxlab check k8s-installer-kubectl
 ```
 
@@ -325,8 +332,7 @@ dsoxlab check k8s-installer-kubectl
 ╰────────────────────────────────────╯
 ```
 
-0 sur 6 : c'est le résultat attendu. Rien de ce que vous avez fait dans le
-cours ne reste sur la machine.
+0 sur 6 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 

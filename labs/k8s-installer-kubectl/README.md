@@ -306,13 +306,20 @@ time a cluster is created: yours will be different.
 
 ## 🧹 Clean up
 
-Delete what you installed, leave the machine, then check that the lab is back
-to its starting state:
+First delete what you created during the exercises: the `kubectl136` program.
 
 ```bash
 rm ~/.local/bin/kubectl136
 rmdir ~/.local/bin
+```
+
+Then leave the machine and reset the lab. `dsoxlab reset` replays the lab's
+clean-up then its preparation: you get back exactly the starting state of the
+challenge. It asks you to confirm: answer `y`.
+
+```bash
 exit
+dsoxlab reset k8s-installer-kubectl
 dsoxlab check k8s-installer-kubectl
 ```
 
@@ -323,8 +330,7 @@ dsoxlab check k8s-installer-kubectl
 ╰───────────────────────────────────╯
 ```
 
-0 out of 6: that is the expected result. Nothing you did in the course is left
-on the machine.
+0 out of 6: that is the expected result. The challenge is waiting for you, untouched.
 
 ## 🎯 The challenge
 

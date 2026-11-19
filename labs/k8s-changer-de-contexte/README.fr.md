@@ -1,30 +1,41 @@
 # Changer de contexte et fixer le namespace par défaut
 
-Ce cours vous fait pratiquer, sur la machine du lab, chaque geste de la leçon :
-lire le contexte actif, viser un autre namespace ou un autre contexte pour une
-seule commande, fixer le namespace par défaut, créer et supprimer un contexte,
-créer un objet là où le contexte le dit, et protéger un kubeconfig. Vous
-travaillez sur le contexte `kind-boutique` et sur des objets d'essai : la
-bascule vers `recette` est le challenge, il reste pour la fin.
+kubectl sait parler à plusieurs clusters. Il trouve leurs adresses et vos
+identifiants dans un fichier, `~/.kube/config`, qu'on appelle le
+**kubeconfig**. Un **contexte** est une entrée de ce fichier qui dit : tel
+cluster, avec tel utilisateur, et éventuellement tel namespace. Un
+**namespace** est un espace de rangement à l'intérieur d'un cluster.
+
+Dans ce cours, vous refaites les gestes de la leçon : voir quel contexte est
+utilisé, en viser un autre le temps d'une commande, fixer le namespace par
+défaut, créer et supprimer un contexte, créer un objet au bon endroit, et
+protéger un kubeconfig.
+
+Vous travaillez sur le contexte `kind-boutique` et sur des objets d'essai. Le
+challenge vous demandera de passer sur `recette` : vous le ferez seul, à la
+fin.
 
 Page associée : [kubeconfig et contextes kubectl](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-contexte/).
 
 ## 🔧 Avant de commencer
 
+Lancez le lab :
+
 ```bash
 dsoxlab run k8s-changer-de-contexte
 ```
 
-La commande prépare la machine `k8s-kind.lab` et vous y connecte. Deux
-clusters kind tournent, et votre `~/.kube/config` connaît deux contextes :
-`kind-boutique`, actif, et `recette`. Les sorties ci-dessous ont été relevées
-sur cette machine (Debian 13.7, kubectl et clusters en `v1.37.0`) le
-19 novembre 2026.
+Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Deux clusters y
+tournent. Votre kubeconfig connaît deux contextes : `kind-boutique`, utilisé
+en ce moment, et `recette`.
 
-## 📚 Exercice 1 : lire où vous êtes
+Les sorties montrées dans ce cours ont été relevées sur cette machine (Debian
+13.7, kubectl et clusters en `v1.37.0`) le 19 novembre 2026.
 
-Avant toute commande qui modifie, on regarde quel cluster on vise. Listez les
-contextes, puis demandez le seul nom du contexte actif.
+## 📚 Exercice 1 : voir quel contexte est utilisé
+
+Avant de modifier quoi que ce soit, regardez quel cluster vous visez. Listez
+les contextes, puis affichez seulement celui qui est utilisé :
 
 ```bash
 kubectl config get-contexts
@@ -38,19 +49,19 @@ CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
 kind-boutique
 ```
 
-L'astérisque marque le contexte actif, `kind-boutique`. La colonne
-`NAMESPACE` est vide pour les deux contextes : sans réglage, kubectl travaille
-dans `default`. Vérifiez-le sur le seul contexte courant :
+L'étoile montre le contexte utilisé : `kind-boutique`. La colonne `NAMESPACE`
+est vide : aucun namespace n'est fixé, donc kubectl travaille dans le namespace
+`default`. Vous pouvez le vérifier ainsi :
 
 ```bash
 kubectl config view --minify -o jsonpath='{..namespace}'; echo
 ```
 
-La sortie est une ligne vide : aucun namespace n'est fixé.
+La commande affiche une ligne vide : aucun namespace n'est fixé.
 
-## 📚 Exercice 2 : changer de namespace pour une seule commande
+## 📚 Exercice 2 : viser un autre namespace le temps d'une commande
 
-Listez les Pods sans option, puis dans le namespace `local-path-storage`.
+Listez les Pods sans option, puis dans le namespace `local-path-storage` :
 
 ```bash
 kubectl get pods
@@ -63,15 +74,14 @@ NAME                                      READY   STATUS    RESTARTS   AGE
 local-path-provisioner-75f7fc7dc5-75hhh   1/1     Running   0          33s
 ```
 
-La première commande interroge `default`, qui est vide. La seconde vise un
-autre namespace pour elle seule : l'option `-n` ne modifie rien dans le
-fichier.
+Le namespace `default` est vide. L'option `-n` vise un autre namespace, pour
+cette commande seulement : elle ne change rien dans le kubeconfig.
 
-## 📚 Exercice 3 : viser un contexte pour une seule commande
+## 📚 Exercice 3 : viser un autre contexte le temps d'une commande
 
-`--context` fait la même chose que `-n`, pour le contexte : il vaut pour une
-commande, sans toucher au contexte actif. C'est la forme à employer dans un
-script.
+L'option `--context` fait la même chose pour le contexte : elle vaut pour une
+seule commande, sans changer le contexte utilisé. C'est la bonne façon de faire
+dans un script.
 
 ```bash
 kubectl --context=kind-boutique get nodes
@@ -82,7 +92,7 @@ NAME                     STATUS   ROLES           AGE   VERSION
 boutique-control-plane   Ready    control-plane   43s   v1.37.0
 ```
 
-Tapez maintenant un nom de contexte qui n'existe pas, sous les deux formes :
+Tapez maintenant un nom de contexte qui n'existe pas, de deux façons :
 
 ```bash
 kubectl --context=xxx get nodes
@@ -96,13 +106,13 @@ error: no context exists with the name: "xxx"
 kind-boutique
 ```
 
-Les deux formes refusent le nom, avec un message différent : apprenez à les
-reconnaître. Le contexte actif n'a pas bougé.
+Les deux commandes refusent le nom, chacune avec son message : apprenez à les
+reconnaître. Le contexte utilisé n'a pas changé.
 
-## 📚 Exercice 4 : fixer le namespace par défaut du contexte courant
+## 📚 Exercice 4 : fixer le namespace par défaut
 
-Quand vous passez du temps dans le même namespace, fixez-le sur le contexte
-actif plutôt que de répéter `-n`.
+Si vous travaillez longtemps dans le même namespace, fixez-le sur le contexte
+utilisé. Vous n'aurez plus à taper `-n` :
 
 ```bash
 kubectl config set-context --current --namespace=local-path-storage
@@ -117,9 +127,11 @@ NAME                                      READY   STATUS    RESTARTS   AGE
 local-path-provisioner-75f7fc7dc5-75hhh   1/1     Running   0          33s
 ```
 
-`kubectl get pods`, sans `-n`, liste maintenant le namespace fixé. Voyez le
-piège : kubectl ne vérifie pas que le namespace existe. Faites exprès une faute
-de frappe :
+Sans `-n`, `kubectl get pods` liste maintenant le namespace que vous avez
+fixé.
+
+Attention à un piège : kubectl ne vérifie pas que le namespace existe. Faites
+exprès une faute de frappe :
 
 ```bash
 kubectl config set-context --current --namespace=local-path-storag
@@ -135,15 +147,15 @@ CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
           recette         recette         recette
 ```
 
-La faute est acceptée sans un mot, et la commande suivante répond comme si le
-namespace était vide. Quand une ressource semble avoir disparu, regardez d'abord
-la colonne `NAMESPACE` : elle montre ici le nom mal tapé.
+kubectl accepte le nom mal tapé sans rien dire, et la commande suivante répond
+comme si le namespace était vide. Si un objet semble avoir disparu, regardez
+d'abord la colonne `NAMESPACE` : ici, elle montre la faute.
 
-## 📚 Exercice 5 : créer un contexte, basculer, revenir, le supprimer
+## 📚 Exercice 5 : créer un contexte, l'utiliser, puis le supprimer
 
-Un contexte n'est qu'un nom posé sur un cluster, un utilisateur et un
-namespace. Créez `boutique-stockage`, sur le même cluster que `kind-boutique`,
-directement dans `local-path-storage`. Basculez dessus, puis revenez.
+Créez un contexte `boutique-stockage`. Il vise le même cluster que
+`kind-boutique`, avec le même utilisateur, mais directement dans le namespace
+`local-path-storage`. Passez dessus, puis revenez :
 
 ```bash
 kubectl config set-context boutique-stockage \
@@ -161,8 +173,8 @@ local-path-provisioner-75f7fc7dc5-75hhh   1/1     Running   0          34s
 Switched to context "kind-boutique".
 ```
 
-`use-context` réécrit `current-context` dans le fichier : la bascule vaut pour
-tous vos terminaux. Supprimez maintenant le contexte d'essai :
+`use-context` enregistre le changement dans le kubeconfig. Il vaut donc pour
+tous vos terminaux en même temps. Supprimez ensuite le contexte d'essai :
 
 ```bash
 kubectl config delete-context boutique-stockage
@@ -176,14 +188,15 @@ CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
           recette         recette         recette
 ```
 
-Supprimer un contexte ne supprime que ce raccourci : le cluster et
-l'utilisateur restent dans le fichier. Et `kind-boutique` garde le namespace
-mal tapé de l'exercice précédent : on le corrige à l'exercice suivant.
+Supprimer un contexte ne supprime ni le cluster ni l'utilisateur : seulement
+l'entrée. Remarquez que `kind-boutique` garde la faute de frappe de l'exercice
+4 : vous la corrigez à l'exercice suivant.
 
-## 📚 Exercice 6 : créer un objet là où le contexte le dit
+## 📚 Exercice 6 : créer un objet au bon endroit
 
-Remettez le namespace `default` sur le contexte courant, puis créez une
-ConfigMap sans nommer ni contexte ni namespace.
+Remettez le namespace `default` sur le contexte utilisé. Créez ensuite une
+**ConfigMap**, un petit objet qui stocke des réglages, sans préciser ni
+contexte ni namespace :
 
 ```bash
 kubectl config set-context --current --namespace=default
@@ -195,7 +208,7 @@ Context "kind-boutique" modified.
 configmap/essai created
 ```
 
-Cherchez maintenant où elle a atterri :
+Cherchez où elle a été créée :
 
 ```bash
 kubectl get configmap essai -n default
@@ -208,14 +221,14 @@ essai   1      0s
 Error from server (NotFound): configmaps "essai" not found
 ```
 
-Une commande sans option crée l'objet dans le contexte actif et dans son
+Sans option, kubectl crée l'objet dans le contexte utilisé et dans son
 namespace par défaut, et nulle part ailleurs. C'est pour cela qu'on vérifie le
 contexte avant d'agir.
 
 ## 📚 Exercice 7 : protéger un kubeconfig
 
 Un kubeconfig contient de quoi agir sur le cluster avec vos droits. Regardez
-l'identité qu'il porte :
+quelle identité il vous donne :
 
 ```bash
 kubectl auth whoami
@@ -228,8 +241,9 @@ Groups                                              [kubeadm:cluster-admins syst
 Extra: authentication.kubernetes.io/credential-id   [X509SHA256=8cf552b482997b7b400d7673cd364a6bdb0ef0046946c01837da00bc5cbd3b8e]
 ```
 
-Le groupe `kubeadm:cluster-admins` donne tous les droits sur le cluster. Un tel
-fichier se protège comme une clé SSH. Exercez-vous sur une copie :
+Le groupe `kubeadm:cluster-admins` donne tous les droits sur le cluster. Ce
+fichier se protège donc comme un mot de passe : vous seul devez pouvoir le
+lire. Entraînez-vous sur une copie :
 
 ```bash
 cp ~/.kube/config ~/essai-kubeconfig
@@ -243,34 +257,26 @@ ls -l ~/essai-kubeconfig
 -rw------- 1 ansible ansible 11119 Nov 19 09:50 /home/ansible/essai-kubeconfig
 ```
 
-Avant, `-rw-r--r--` : tous les comptes de la machine pouvaient le lire. Après,
-`-rw-------` : lecture et écriture pour vous, rien pour les autres.
+Avant, `-rw-r--r--` : tous les comptes de la machine pouvaient lire le
+fichier. Après `chmod 600`, `-rw-------` : vous seul pouvez le lire et le
+modifier.
 
 ## 🧹 Nettoyage
 
-Retirez ce que les exercices ont posé et remettez le contexte comme vous l'avez
-trouvé :
+Supprimez d'abord ce que vous avez créé pendant les exercices : la ConfigMap `essai` et la copie du kubeconfig.
 
 ```bash
 kubectl delete configmap essai
-kubectl config unset contexts.kind-boutique.namespace
 rm ~/essai-kubeconfig
-kubectl config get-contexts
 ```
 
-```text
-configmap "essai" deleted from default namespace
-Property "contexts.kind-boutique.namespace" unset.
-CURRENT   NAME            CLUSTER         AUTHINFO        NAMESPACE
-*         kind-boutique   kind-boutique   kind-boutique
-          recette         recette         recette
-```
-
-`unset` retire le namespace du contexte : la colonne est de nouveau vide,
-comme au départ. Quittez la session et vérifiez :
+Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
+le nettoyage puis la préparation du lab : vous retrouvez exactement l'état de
+départ du challenge. Il vous demande de confirmer : répondez `y`.
 
 ```bash
 exit
+dsoxlab reset k8s-changer-de-contexte
 dsoxlab check k8s-changer-de-contexte
 ```
 
@@ -281,12 +287,12 @@ dsoxlab check k8s-changer-de-contexte
 ╰──────────────────────────────────────╯
 ```
 
-Zéro sur quatre : la machine est revenue à l'état de départ du challenge.
+0 sur 4 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 
-Faites maintenant le challenge seul : passer sur la recette, y fixer le bon
-namespace, y créer la preuve, et protéger votre kubeconfig.
+À vous, seul cette fois : passer sur le cluster de recette, y fixer le bon
+namespace, y créer la ConfigMap demandée, et protéger votre kubeconfig.
 
 ```bash
 dsoxlab run k8s-changer-de-contexte

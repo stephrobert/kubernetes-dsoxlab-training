@@ -254,27 +254,20 @@ left.
 
 ## 🧹 Clean up
 
-Delete the `essai` cluster and the scratch directory, then check:
+First delete what you created during the exercises: the `essai` cluster and the `~/essai` directory.
 
 ```bash
 kind delete cluster --name essai
 rm -r ~/essai
-kind get clusters
-kubectl config current-context
 ```
 
-```text
-Deleting cluster "essai" ...
-Deleted nodes: ["essai-control-plane"]
-No kind clusters found.
-error: current-context is not set
-```
-
-No cluster is left, so no context either. Leave the machine and check that the
-lab is back to its starting state:
+Then leave the machine and reset the lab. `dsoxlab reset` replays the lab's
+clean-up then its preparation: you get back exactly the starting state of the
+challenge. It asks you to confirm: answer `y`.
 
 ```bash
 exit
+dsoxlab reset k8s-creer-un-cluster-kind
 dsoxlab check k8s-creer-un-cluster-kind
 ```
 
@@ -285,8 +278,7 @@ dsoxlab check k8s-creer-un-cluster-kind
 ╰─────────────────────────────────────╯
 ```
 
-0 out of 4: that is the expected result. Nothing you did in the course is left
-on the machine.
+0 out of 4: that is the expected result. The challenge is waiting for you, untouched.
 
 ## 🎯 The challenge
 
