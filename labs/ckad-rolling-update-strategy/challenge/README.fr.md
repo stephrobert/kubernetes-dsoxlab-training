@@ -1,23 +1,26 @@
 # Challenge : Régler une mise à jour progressive : maxSurge et maxUnavailable
 
-## La situation
+## 📍 La situation
 
-Dans le namespace **`lab`**, le Deployment **`webapp`** tourne en cinq
-replicas, image `nginx:1.30.5`. La prochaine mise à jour doit passer en
-`nginx:1.30.6`, et l'équipe a des contraintes : le cluster n'a pas de
-place pour plus de **deux Pods en trop** pendant la bascule, et le service
-ne tolère pas plus d'**un Pod indisponible** à la fois.
+Vous êtes sur le control plane du cluster kubeadm, et votre kubectl est
+configuré. Dans le namespace **`lab`**, le Deployment **`webapp`** tourne avec
+cinq Pods, en `nginx:1.30.5`.
 
-Le Deployment a été créé avec une stratégie explicite
-**`strategy.type: Recreate`**, qui ne respecte ni l'une ni l'autre :
-`Recreate` tue *tous* les Pods avant d'en démarrer un seul nouveau, le
-service tombe donc pendant toute la bascule, et cette stratégie n'a ni
-`maxSurge` ni `maxUnavailable` à régler.
+La prochaine mise à jour doit passer en `nginx:1.30.6`. L'équipe a deux
+contraintes :
 
-## Ce que vous devez obtenir
+- le cluster n'a pas la place pour plus de **deux Pods en trop** pendant la
+  bascule ;
+- le service ne supporte pas plus d'**un Pod indisponible** à la fois.
 
-1. Le Deployment `webapp` a une stratégie **`RollingUpdate`**, à la place du
-   `Recreate` qu'il porte aujourd'hui.
+Or `webapp` a été créé avec la stratégie **`Recreate`**. Elle arrête tous les
+Pods avant d'en démarrer un seul nouveau : le service tombe pendant toute la
+bascule. Et elle n'a ni `maxSurge` ni `maxUnavailable` à régler.
+
+## 🎯 Ce que vous devez obtenir
+
+1. Le Deployment `webapp` a la stratégie **`RollingUpdate`**, à la place de
+   `Recreate`.
 
 2. Son `maxSurge` vaut **2**.
 
@@ -25,49 +28,40 @@ service tombe donc pendant toute la bascule, et cette stratégie n'a ni
 
 4. Son image est passée à **`nginx:1.30.6`**.
 
-5. Ses **cinq** replicas sont **prêts, à jour et sur la nouvelle image**.
-   L'exercice change la stratégie et l'image, pas la taille du Deployment :
-   il demande toujours cinq replicas, et c'est contrôlé ici aussi.
+5. Ses **cinq** Pods sont **prêts, à jour et sur la nouvelle image**. Vous
+   changez la stratégie et l'image, pas le nombre de Pods : il en faut
+   toujours cinq.
 
-6. **Deux révisions de `webapp` existent**, produites par ce Deployment,
-   celle de la nouvelle image venant après celle de l'ancienne dans
-   l'historique.
+6. **Deux révisions de `webapp` existent**, créées par ce Deployment. Celle de
+   la nouvelle image vient après celle de l'ancienne.
 
-7. Le ReplicaSet de `nginx:1.30.6` porte **cinq replicas prêts**.
+7. Le ReplicaSet de `nginx:1.30.6` a **cinq Pods prêts**.
 
-8. Les anciens ReplicaSets sont **conservés à zéro**.
+8. Les anciens ReplicaSets sont **gardés, à zéro Pod**.
 
-## Les repères utiles
+## 🧭 Les repères utiles
 
-`Recreate` et `RollingUpdate` sont les deux stratégies qu'un Deployment peut
-porter, et seule la seconde remplace les Pods progressivement. C'est pour
-cela que `maxSurge` et `maxUnavailable` vivent sous
-`spec.strategy.rollingUpdate` : ils ne veulent dire quelque chose que si le
-type vaut `RollingUpdate`.
+`maxSurge` et `maxUnavailable` se rangent sous `spec.strategy.rollingUpdate`.
+Ils n'ont de sens qu'avec le type `RollingUpdate`.
 
-Un Deployment garde ses anciens ReplicaSets, à zéro replica : c'est ce qui
-permet le retour arrière, et c'est aussi ce qui montre qu'un remplacement a
-eu lieu. Chaque déploiement donne au ReplicaSet qu'il active un numéro
-`deployment.kubernetes.io/revision` plus élevé, et chacun de ces ReplicaSets
-porte un `ownerReferences` qui désigne le Deployment qui l'a produit. Les
-tests lisent les deux : un ReplicaSet écrit à la main n'est pas une
-révision.
+Un Deployment garde ses anciens ReplicaSets, à zéro Pod. Chaque changement
+d'image donne au nouveau ReplicaSet un numéro de révision plus grand
+(l'annotation `deployment.kubernetes.io/revision`). Chaque ReplicaSet désigne
+aussi le Deployment qui l'a créé (le champ `ownerReferences`). Les tests lisent
+les deux : un ReplicaSet écrit à la main ne compte pas comme une révision.
 
-**Un conseil, et celui-là n'est pas noté.** Réglez la stratégie *avant* de
-déclencher la mise à jour : c'est la stratégie en place à cet instant qui
-pilote le remplacement. Rien ne peut le mesurer après coup, un Deployment ne
-gardant aucune trace de la stratégie sous laquelle un déploiement passé s'est
-joué. Le jour de l'examen, personne ne contrôlera l'ordre non plus, et une
-bascule jouée sous la stratégie par défaut est une bascule pour laquelle le
-cluster n'avait peut-être pas la place.
+**Un conseil, qui n'est pas noté :** réglez la stratégie **avant** de changer
+l'image. C'est la stratégie en place au moment du changement qui décide comment
+les Pods sont remplacés. Aucun test ne peut le vérifier après coup : un
+Deployment ne garde pas trace de la stratégie utilisée lors d'une bascule
+passée.
 
-## Comment vous saurez que c'est bon
+## ✅ Comment vous saurez que c'est bon
 
-Les tests lisent la stratégie du Deployment, son image, son nombre de
-replicas et ses replicas prêts, puis les ReplicaSets qui lui appartiennent,
-avec leurs numéros de révision. Le nombre de replicas est lu en même temps
-que l'état de la révision que le Deployment déclare active : être prêt, c'est
-être prêt sur la nouvelle image, pas sur celle dont vous êtes parti.
+Les tests lisent la stratégie du Deployment, son image, son nombre de Pods et
+ses Pods prêts. Ils lisent ensuite les ReplicaSets qui lui appartiennent, avec
+leurs numéros de révision. Les Pods prêts doivent l'être sur la nouvelle
+image, pas sur l'ancienne.
 
 ```bash
 dsoxlab check ckad-rolling-update-strategy

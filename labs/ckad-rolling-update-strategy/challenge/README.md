@@ -1,22 +1,24 @@
 # Challenge: Tune a rolling update: maxSurge and maxUnavailable
 
-## The situation
+## 📍 The situation
 
-In the **`lab`** namespace, the Deployment **`webapp`** runs five replicas,
-image `nginx:1.30.5`. The next update must move to
-`nginx:1.30.6`, and the team has constraints: the cluster has no room
-for more than **two extra Pods** during the switch, and the service
-tolerates no more than **one unavailable Pod** at a time.
+You are on the control plane of the kubeadm cluster, and your kubectl is
+configured. In the **`lab`** namespace, the **`webapp`** Deployment runs five
+Pods, on `nginx:1.30.5`.
 
-The Deployment was created with an explicit **`strategy.type: Recreate`**,
-which respects neither of the two: `Recreate` kills *every* Pod before
-starting a single new one, so the service goes down for the whole switch,
-and it has no `maxSurge` nor `maxUnavailable` to tune.
+The next update must move to `nginx:1.30.6`. The team has two constraints:
 
-## What you must achieve
+- the cluster has no room for more than **two extra Pods** during the switch;
+- the service cannot bear more than **one unavailable Pod** at a time.
 
-1. The Deployment `webapp` has a **`RollingUpdate`** strategy, in place of
-   the `Recreate` it carries today.
+But `webapp` was created with the **`Recreate`** strategy. It stops all the
+Pods before starting a single new one: the service is down during the whole
+switch. And it has neither `maxSurge` nor `maxUnavailable` to tune.
+
+## 🎯 What you must obtain
+
+1. The `webapp` Deployment has the **`RollingUpdate`** strategy, instead of
+   `Recreate`.
 
 2. Its `maxSurge` is **2**.
 
@@ -24,46 +26,38 @@ and it has no `maxSurge` nor `maxUnavailable` to tune.
 
 4. Its image has moved to **`nginx:1.30.6`**.
 
-5. Its **five** replicas are **ready, up to date, and running the new
-   image**. The exercise changes the strategy and the image, not the size of
-   the Deployment: it still asks for five, and that is checked here too.
+5. Its **five** Pods are **ready, up to date and on the new image**. You change
+   the strategy and the image, not the number of Pods: five are still needed.
 
-6. **Two revisions of `webapp` exist**, produced by this Deployment, the new
-   image's one coming after the old image's one in the history.
+6. **Two revisions of `webapp` exist**, created by this Deployment. The one of
+   the new image comes after the one of the old image.
 
-7. The ReplicaSet of `nginx:1.30.6` carries **five ready replicas**.
+7. The ReplicaSet of `nginx:1.30.6` has **five ready Pods**.
 
-8. The old ReplicaSets are **kept at zero**.
+8. The old ReplicaSets are **kept, with zero Pods**.
 
-## Useful bearings
+## 🧭 Useful landmarks
 
-`Recreate` and `RollingUpdate` are the two strategies a Deployment can have,
-and only the second one replaces Pods gradually. That is why `maxSurge` and
-`maxUnavailable` live under `spec.strategy.rollingUpdate`: they only mean
-something once the type is `RollingUpdate`.
+`maxSurge` and `maxUnavailable` go under `spec.strategy.rollingUpdate`. They
+only make sense with the `RollingUpdate` type.
 
-A Deployment keeps its old ReplicaSets, at zero replicas: that is what makes
-the rollback possible, and it is also what shows a replacement took place.
-Each rollout gives the ReplicaSet it activates a higher
-`deployment.kubernetes.io/revision` number, and every one of those
-ReplicaSets carries an `ownerReferences` pointing back at the Deployment
-that produced it. The tests read both: a ReplicaSet written by hand is not
-a revision.
+A Deployment keeps its old ReplicaSets, with zero Pods. Each image change gives
+the new ReplicaSet a higher revision number (the
+`deployment.kubernetes.io/revision` annotation). Each ReplicaSet also points to
+the Deployment that created it (the `ownerReferences` field). The tests read
+both: a ReplicaSet written by hand does not count as a revision.
 
-**Advice, and this one is not graded.** Set the strategy *before* triggering
-the update: it is the strategy in place at that moment that drives the
-replacement. Nothing can measure this after the fact, because a Deployment
-keeps no trace of the strategy a past rollout ran under. On the exam nobody
-will check the order either, and a switch played under the default strategy
-is a switch the cluster may not have had room for.
+**A piece of advice, not graded:** set the strategy **before** changing the
+image. The strategy in place at the time of the change decides how the Pods
+are replaced. No test can check it afterwards: a Deployment keeps no trace of
+the strategy used during a past switch.
 
-## How you will know it works
+## ✅ How you will know it is right
 
-The tests read the Deployment's strategy, its image, its replica count and
-its ready replicas, then the ReplicaSets that belong to it, with their
-revision numbers. The replica count is read together with the state of the
-revision the Deployment declares active: being ready means being ready on
-the new image, not on the one you started from.
+The tests read the Deployment's strategy, its image, its number of Pods and
+its ready Pods. They then read the ReplicaSets that belong to it, with their
+revision numbers. The ready Pods must be ready on the new image, not on the
+old one.
 
 ```bash
 dsoxlab check ckad-rolling-update-strategy
