@@ -1,15 +1,13 @@
 # Challenge : Créer un cluster kind multi-nœuds
 
-## La situation
-
+## 📍 La situation
 La machine `k8s-kind.lab` a Docker, kind et kubectl, et vous êtes dans le
 groupe `docker`. **Pour vous laisser la mémoire nécessaire, le lab a supprimé
 les clusters kind des autres labs** (`lab`, `boutique`, `architecture`) : vous
 n'avez rien cassé, chaque lab recrée le sien quand vous le lancez. Le
 répertoire **`~/atelier/`** est vide.
 
-## Ce que vous devez obtenir
-
+## 🎯 Ce que vous devez obtenir
 1. **`~/atelier/kind-atelier.yaml`** est un fichier de configuration kind qui
    décrit **un control plane et deux workers**.
 
@@ -21,8 +19,7 @@ répertoire **`~/atelier/`** est vide.
 
 4. Ses nœuds ont les bons rôles : un **control-plane** et deux **workers**.
 
-## Les repères utiles
-
+## 🧭 Les repères utiles
 Un cluster multi-nœuds ne se décrit pas sur la ligne de commande : il se décrit
 dans un fichier, que l'on versionne comme du code. La leçon en donne la forme,
 avec une liste `nodes` dont chaque entrée porte un `role`.
@@ -35,8 +32,7 @@ Un cluster qui répond n'est pas forcément prêt : comptez les nœuds, lisez le
 colonne STATUS et leur VERSION, et attendez qu'ils soient tous Ready. La colonne
 ROLES d'un worker vaut `<none>`, c'est normal.
 
-## Comment vous saurez que c'est bon
-
+## ✅ Comment vous saurez que c'est bon
 Les tests lisent votre fichier, puis interrogent le cluster `atelier`
 directement.
 

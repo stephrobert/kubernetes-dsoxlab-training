@@ -1,15 +1,13 @@
 # Challenge: Create a multi-node kind cluster
 
-## The situation
-
+## 📍 The situation
 The machine `k8s-kind.lab` has Docker, kind and kubectl, and you are in the
 `docker` group. **To leave you the memory you need, the lab deleted the kind
 clusters of the other labs** (`lab`, `boutique`, `architecture`): you broke
 nothing, each lab recreates its own when you start it. The directory
 **`~/atelier/`** is empty.
 
-## What you must obtain
-
+## 🎯 What you must obtain
 1. **`~/atelier/kind-atelier.yaml`** is a kind configuration file that
    describes **one control plane and two workers**.
 
@@ -21,8 +19,7 @@ nothing, each lab recreates its own when you start it. The directory
 
 4. Its nodes have the right roles: one **control-plane** and two **workers**.
 
-## Useful landmarks
-
+## 🧭 Useful landmarks
 A multi-node cluster is not described on the command line: it is described in
 a file, versioned like code. The lesson gives its shape, with a `nodes` list
 whose entries each carry a `role`.
@@ -35,8 +32,7 @@ A cluster that answers is not necessarily ready: count the nodes, read their
 STATUS and VERSION columns, and wait until they are all Ready. The ROLES column
 of a worker is `<none>`, which is normal.
 
-## How you will know it is right
-
+## ✅ How you will know it is right
 The tests read your file, then query the `atelier` cluster directly.
 
 ```bash
