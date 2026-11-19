@@ -2,30 +2,28 @@
 
 ## 📍 La situation
 
-La machine `k8s-kind.lab` fait tourner un cluster kind, **`lab`**, en
-Kubernetes **`v1.37.0`**, et votre fichier **`~/.kube/config`** pointe déjà
-dessus. Vous n'avez pas à créer ce cluster : la leçon suivante vous apprendra à
-le faire. Il vous manque l'outil pour lui parler, puisque **kubectl n'est pas
-installé**, et aucune complétion n'est configurée.
+Sur la machine `k8s-kind.lab`, un cluster kind nommé **`lab`** tourne, en
+Kubernetes **`v1.37.0`**. Votre fichier **`~/.kube/config`** sait déjà s'y
+connecter. Vous n'avez pas à créer ce cluster : c'est le sujet de la leçon
+suivante. Il vous manque seulement l'outil pour lui parler : **kubectl n'est
+pas installé**, et sa complétion non plus.
 
 ## 🎯 Ce que vous devez obtenir
 
-1. **kubectl est installé dans `/usr/local/bin`**, appartient à `root`, est
-   exécutable par tous et modifiable par root seul, et c'est lui que votre
-   `PATH` trouve.
+1. **kubectl est installé dans `/usr/local/bin`.** Le fichier appartient à
+   `root`. Tout le monde peut le lancer, mais seul `root` peut le modifier.
+   C'est lui que le shell trouve quand vous tapez `kubectl`.
 
-2. Le client est en **version 1.37**, épinglée. La leçon utilise la
-   **`v1.37.2`**.
+2. kubectl est en **version 1.37**. La leçon utilise la **`v1.37.2`**.
 
-3. Le binaire installé est **le binaire officiel** de sa version : son
-   empreinte est celle que publie `dl.k8s.io`, et vous l'avez vérifiée avant de
-   l'installer.
+3. C'est **le fichier officiel** : son empreinte est celle que publie
+   `dl.k8s.io`. Vérifiez-la avant d'installer.
 
-4. La **complétion bash** de kubectl est active dans **chaque nouveau shell**.
+4. La **complétion** de kubectl marche dans **chaque nouveau terminal**.
 
-5. L'**alias `k`** lance kubectl et se **complète** comme lui.
+5. L'**alias `k`** lance kubectl, et la touche Tab le complète comme kubectl.
 
-6. kubectl **atteint le serveur** du cluster.
+6. kubectl **joint le cluster**.
 
 ## 🧭 Les repères utiles
 
@@ -52,12 +50,13 @@ montre à quelle adresse kubectl cherche le cluster.
 
 ## ✅ Comment vous saurez que c'est bon
 
-Les tests lisent le binaire installé, son empreinte, un nouveau shell
-interactif et la réponse du serveur.
+Les tests regardent le fichier installé, son empreinte, ce que voit un nouveau
+terminal, et la réponse du cluster.
 
 ```bash
 dsoxlab check k8s-installer-kubectl
 ```
 
-`dsoxlab clean k8s-installer-kubectl` retire votre complétion et votre alias,
-puis remet sur la machine le kubectl dont les labs suivants ont besoin.
+`dsoxlab clean k8s-installer-kubectl` retire ensuite votre alias et votre
+complétion, et remet sur la machine le kubectl dont les labs suivants ont
+besoin.

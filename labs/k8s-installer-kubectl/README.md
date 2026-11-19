@@ -1,30 +1,40 @@
 # Install and configure kubectl
 
-This course has you practise, on the lab machine, every move of the lesson:
-pick a version, download a pinned binary, check its fingerprint, install it,
-wire a completion and an alias, then reach the cluster. You work on **another
-version** and under **another name** than the challenge does: the challenge is
-left whole for the end.
+kubectl is the command you use to talk to a Kubernetes cluster. In this
+course, you redo the moves of the lesson one by one: pick a version, download
+the program, check that it was not damaged, install it, give it a shortcut,
+then check that it reaches the cluster.
+
+To practise, you install **another version** of kubectl, under **another
+name**. The challenge will ask you for the real installation: you will do it on
+your own, at the end.
 
 Related page: [Install and configure kubectl](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/install-and-configure-kubectl/).
 
 ## 🔧 Before you start
 
+Start the lab:
+
 ```bash
 dsoxlab run k8s-installer-kubectl
 ```
 
-The command prepares the `k8s-kind.lab` machine and connects you to it. A kind
-cluster named `lab` is already running, on Kubernetes `v1.37.0`, and your
-`~/.kube/config` file points at it. kubectl itself has been removed: that is
-what the lab is about. The outputs below were recorded on this machine
-(Debian 13.7, amd64) on 19 November 2026.
+You are now connected to the `k8s-kind.lab` machine. A cluster named `lab` is
+already running there, on Kubernetes `v1.37.0`. Your `~/.kube/config` file
+holds what it takes to connect to it. Only one thing is missing: kubectl,
+which the lab removed.
 
-## 📚 Exercise 1: pick a version within the allowed skew
+The outputs shown in this course were recorded on this machine (Debian 13.7)
+on 19 November 2026.
 
-The kubectl client may differ from the server by **one minor version at
-most**. The cluster runs 1.37: a 1.36, 1.37 or 1.38 client talks to it. Look up
-the current stable version, then the latest release of the 1.36 branch.
+## 📚 Exercise 1: pick a kubectl version
+
+Kubernetes versions are written as three numbers, for example `1.37.2`. The
+second number, `37`, is called the **minor version**. kubectl and the cluster
+may be one minor version apart, no more. The cluster runs 1.37: kubectl can
+therefore be 1.36, 1.37 or 1.38.
+
+Ask the Kubernetes site for the latest stable version:
 
 ```bash
 curl -fsSL https://dl.k8s.io/release/stable.txt
@@ -34,6 +44,8 @@ curl -fsSL https://dl.k8s.io/release/stable.txt
 v1.37.2
 ```
 
+Then for the latest version of the 1.36 branch:
+
 ```bash
 curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
 ```
@@ -42,18 +54,23 @@ curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
 v1.36.6
 ```
 
-The server's answer does not end with a line break: your prompt shows right
-after the version, that is expected.
+The answer does not end with a line break. Your prompt therefore shows right
+after the version: that is expected.
 
-The first version is the one the challenge will ask for. For the exercise,
-take the second one, `v1.36.6`: one minor version below the cluster, so within
-the allowed skew. The `stable-1.36.txt` file gives the latest patch of a given
-branch, which is what you need when you must stay on one minor version.
+`v1.37.2` is the one the challenge will ask for. To practise, you take
+`v1.36.6`: it is only one minor version away from the cluster, so it can talk
+to it.
 
-## 📚 Exercise 2: download the binary and its fingerprint, pinned
+## 📚 Exercise 2: download kubectl and its fingerprint
 
-Write the version once, then download the binary and the `.sha256` file
-published next to it, in a scratch directory.
+kubectl is downloaded as a single file, ready to run: this is called a
+**binary**. The site also publishes its **fingerprint** next to it: a string of
+digits and letters computed from the content of the file. It is used to check
+that the file was not damaged on the way.
+
+Create a scratch directory and download both files. The version is written
+only once, in a variable: you are sure the binary and the fingerprint come from
+the same version.
 
 ```bash
 mkdir ~/essai-kubectl && cd ~/essai-kubectl
@@ -70,9 +87,10 @@ total 58204
 -rw-rw-r-- 1 ansible ansible       64 Nov 19 09:21 kubectl.sha256
 ```
 
-Both files necessarily come from the same version, since the `BASE` variable
-names them both. Now make a typo in the version on purpose, to see what the
-`-f` option does:
+You have the `kubectl` binary (about 57 MB) and its fingerprint,
+`kubectl.sha256` (64 characters).
+
+Now make a typo in the version on purpose, to see what happens:
 
 ```bash
 curl -fsSLO "https://dl.k8s.io/release/v1.36.66/bin/linux/amd64/kubectl"
@@ -82,13 +100,13 @@ curl -fsSLO "https://dl.k8s.io/release/v1.36.66/bin/linux/amd64/kubectl"
 curl: (22) The requested URL returned error: 404
 ```
 
-`curl` fails with code 22 instead of saving the error page under the name
-`kubectl`. Without `-f`, you would get a `kubectl` file that is not a program.
+Version `v1.36.66` does not exist, and `curl` stops on an error. The `-f`
+option is what makes it stop. Without it, `curl` would have saved the error
+page under the name `kubectl`, and you would have a fake kubectl.
 
 ## 📚 Exercise 3: check the fingerprint before installing
 
-The `.sha256` file only holds the fingerprint: `echo` adds the file name that
-`sha256sum --check` expects.
+Compare the downloaded binary with the published fingerprint:
 
 ```bash
 echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
@@ -98,8 +116,10 @@ echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
 kubectl: OK
 ```
 
-Now see what an altered file gives. Copy the binary, add a single byte to it,
-and check the copy against the same fingerprint:
+`OK`: the file is indeed the one the project published.
+
+Now see what happens with a damaged file. Copy the binary, add a single letter
+at its end, and check the copy:
 
 ```bash
 cp kubectl kubectl-abime
@@ -112,14 +132,15 @@ kubectl-abime: FAILED
 sha256sum: WARNING: 1 computed checksum did NOT match
 ```
 
-One byte of difference is enough to change the fingerprint. On a `FAILED`, you
-delete the file and download again: you never install a binary whose
-fingerprint does not match.
+One extra letter is enough: the fingerprint no longer matches, and the check
+shows `FAILED`. If this happens to you, do not install the file. Delete it and
+download it again.
 
-## 📚 Exercise 4: install the binary without sudo, under another name
+## 📚 Exercise 4: install kubectl in your home directory
 
-Install the checked copy in your home directory, under the name `kubectl136`,
-then remove the scratch directory.
+Install the checked copy in `~/.local/bin`, under the name `kubectl136`.
+`install` copies the file and makes it runnable in a single command. Then
+delete the scratch directory.
 
 ```bash
 mkdir -p ~/.local/bin
@@ -132,12 +153,12 @@ cd ~ && rm -r ~/essai-kubectl
 -rwxr-xr-x 1 ansible ansible 59592866 Nov 19 09:21 /home/ansible/.local/bin/kubectl136
 ```
 
-`install` copies the file and sets its permissions in a single command. Here
-the binary belongs to you, since you installed it without `sudo`: your account
-can modify it. The challenge asks for the opposite, a binary owned by `root`,
-in `/usr/local/bin`.
+The file belongs to your account (`ansible`), since you installed it without
+`sudo`. The challenge will ask for the opposite: an installation for the whole
+machine, in `/usr/local/bin`, with `sudo`.
 
-Now ask the shell where it looks for programs:
+When you type a command, the shell looks for it in a list of directories. This
+list is called the **PATH**. Show it, one directory per line:
 
 ```bash
 echo "$PATH" | tr ":" "\n"
@@ -150,8 +171,9 @@ echo "$PATH" | tr ":" "\n"
 /usr/games
 ```
 
-`~/.local/bin` is not there: your session was opened before the directory
-existed. Debian's `~/.profile` adds it at every login, provided it exists:
+`~/.local/bin` is not in the list. The PATH was set when your session opened,
+and at that time the directory did not exist yet. On Debian, the `~/.profile`
+file adds it, if it exists:
 
 ```bash
 grep -n -A2 "local/bin" ~/.profile
@@ -163,8 +185,8 @@ grep -n -A2 "local/bin" ~/.profile
 27-fi
 ```
 
-So replace your shell with a login shell, which reads `~/.profile` again, then
-ask which file runs:
+This file is only read when a session opens. Open a new one with
+`exec bash -l`, then ask where `kubectl136` is:
 
 ```bash
 exec bash -l
@@ -178,13 +200,14 @@ Client Version: v1.36.6
 Kustomize Version: v5.8.1
 ```
 
-`command -v` gives the path of the program the shell finds. It is the first
-thing to check when a command answers `command not found` or shows an
-unexpected version.
+`command -v` shows the path of the program the shell is going to run. Think of
+it when a command answers `command not found`, or shows another version than
+the one you expected.
 
-## 📚 Exercise 5: see what the PATH does not find
+## 📚 Exercise 5: check that `kubectl` is still not found
 
-Your client is called `kubectl136`. Ask the shell whether it knows `kubectl`:
+Your program is called `kubectl136`. Ask the shell whether it knows a
+`kubectl` command:
 
 ```bash
 command -v kubectl || echo "kubectl introuvable"
@@ -197,15 +220,21 @@ total 10288
 -rwxr-xr-x 1 root root 10530942 Nov 19 09:19 kind
 ```
 
-No program is named `kubectl`, and `/usr/local/bin` only holds `kind`.
-Installing a binary somewhere else and under another name does not make it
-available to everyone under its expected name: that is what the challenge will
-ask you to do properly.
+The shell finds no `kubectl` command, and `/usr/local/bin` only holds `kind`.
+What you installed only serves you, under another name. The challenge will ask
+you for a `kubectl` command everyone can use.
 
-## 📚 Exercise 6: wire a completion and an alias, for this shell only
+## 📚 Exercise 6: create a shortcut and a completion, then see them disappear
 
-kubectl's bash completion relies on the `bash-completion` package. First check
-whether it is there:
+Two helpers make kubectl nicer to use:
+
+- an **alias**, that is a shortcut: you type `kc`, the shell runs
+  `kubectl136`;
+- **completion**: you type the start of a command, the Tab key completes the
+  rest.
+
+On Debian, completion needs the `bash-completion` package. Check whether it is
+installed:
 
 ```bash
 type _init_completion
@@ -215,13 +244,12 @@ type _init_completion
 bash: type: _init_completion: not found
 ```
 
-The package is not installed on this machine: without it, the Tab key does not
-really complete subcommands. The challenge will ask you to install it. Here,
-you only learn to **register** a completion and an alias, and to see what
-becomes of them.
+It is not: the Tab key will not really complete commands. The challenge will
+ask you to install it. Here, you only learn to create the alias and to declare
+the completion.
 
-Load your client's completion script, create the alias `kc` and wire it to
-kubectl's completion:
+Load kubectl's completion, create the `kc` alias, then tell the shell that
+`kc` completes like kubectl:
 
 ```bash
 source <(kubectl136 completion bash)
@@ -234,8 +262,8 @@ complete -p kc
 complete -o default -F __start_kubectl kc
 ```
 
-The alias `kc` is wired to kubectl's completion function. Now open a **new**
-interactive shell and ask the same question:
+The last line confirms that `kc` uses kubectl's completion. Now open a **new**
+shell and ask the same question:
 
 ```bash
 bash -i -c 'complete -p kc; alias kc'
@@ -246,14 +274,15 @@ bash: complete: kc: no completion specification
 bash: alias: kc: not found
 ```
 
-The new shell knows neither the completion nor the alias. What you type in a
-shell disappears with it. For a completion or an alias to work in every new
-terminal, it has to be written in `~/.bashrc`: that is what the challenge
-checks, in a new shell.
+The new shell knows neither the alias nor the completion. Everything you type
+in a terminal is forgotten when it closes. To keep them, you must write them in
+the `~/.bashrc` file, which bash reads every time it opens. That is what the
+challenge will check, in a new shell.
 
-## 📚 Exercise 7: reach the server and read the version skew
+## 📚 Exercise 7: check that kubectl reaches the cluster
 
-Run `version` without `--client`: kubectl also queries the server.
+Run `version` without `--client`: kubectl also asks the cluster for its
+version.
 
 ```bash
 kubectl136 version
@@ -270,15 +299,15 @@ CoreDNS is running at https://127.0.0.1:39177/api/v1/namespaces/kube-system/serv
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
 
-The `Server Version` line proves that kubectl reached the cluster API: client
-on 1.36, server on 1.37, one minor version apart, so compatible.
-`cluster-info` gives the API address. The port is picked at random when the
-cluster is created, yours will differ.
+The `Server Version` line shows that kubectl did reach the cluster. You also
+see the gap: kubectl on 1.36, cluster on 1.37, a single minor version apart.
+`cluster-info` gives the address of the cluster. The port number changes every
+time a cluster is created: yours will be different.
 
 ## 🧹 Clean up
 
-Remove what the exercises set up, then check that the machine is back to the
-starting state of the challenge:
+Delete what you installed, leave the machine, then check that the lab is back
+to its starting state:
 
 ```bash
 rm ~/.local/bin/kubectl136
@@ -294,13 +323,14 @@ dsoxlab check k8s-installer-kubectl
 ╰───────────────────────────────────╯
 ```
 
-Zero out of six: nothing the exercises did counts for the challenge, and
-nothing is left on the machine.
+0 out of 6: that is the expected result. Nothing you did in the course is left
+on the machine.
 
 ## 🎯 The challenge
 
-Now do the challenge on your own: install kubectl `v1.37` for the whole system,
-with its completion and the alias `k` in every new shell.
+Your turn, on your own this time: install kubectl `v1.37` for the whole
+machine, with the `k` alias and completion, which must work in every new
+terminal.
 
 ```bash
 dsoxlab run k8s-installer-kubectl

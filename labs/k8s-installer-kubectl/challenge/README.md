@@ -2,29 +2,28 @@
 
 ## 📍 The situation
 
-The machine `k8s-kind.lab` runs a kind cluster, **`lab`**, on Kubernetes
-**`v1.37.0`**, and your **`~/.kube/config`** file already points to it. You do
-not have to create this cluster: the next lesson teaches you how. What you lack
-is the tool to talk to it: **kubectl is not installed**, and no completion is
-configured.
+On the `k8s-kind.lab` machine, a kind cluster named **`lab`** is running, on
+Kubernetes **`v1.37.0`**. Your **`~/.kube/config`** file already knows how to
+connect to it. You do not have to create this cluster: that is the subject of
+the next lesson. All you lack is the tool to talk to it: **kubectl is not
+installed**, and neither is its completion.
 
 ## 🎯 What you must obtain
 
-1. **kubectl is installed in `/usr/local/bin`**, belongs to `root`, is
-   executable by everyone and writable by root only, and it is the one your
-   `PATH` finds.
+1. **kubectl is installed in `/usr/local/bin`.** The file belongs to `root`.
+   Everyone can run it, but only `root` can modify it. It is the one the shell
+   finds when you type `kubectl`.
 
-2. The client is a **1.37 version**, pinned. The lesson uses **`v1.37.2`**.
+2. kubectl is **version 1.37**. The lesson uses **`v1.37.2`**.
 
-3. The installed binary is **the official binary** of its version: its
-   fingerprint is the one `dl.k8s.io` publishes, and you checked it before
-   installing it.
+3. It is **the official file**: its fingerprint is the one `dl.k8s.io`
+   publishes. Check it before installing.
 
-4. kubectl **bash completion** is active in **every new shell**.
+4. kubectl **completion** works in **every new terminal**.
 
-5. The **alias `k`** runs kubectl and **completes** like it.
+5. The **`k` alias** runs kubectl, and the Tab key completes it like kubectl.
 
-6. kubectl **reaches the server** of the cluster.
+6. kubectl **reaches the cluster**.
 
 ## 🧭 Useful landmarks
 
@@ -49,12 +48,12 @@ shows you at which address kubectl looks for the cluster.
 
 ## ✅ How you will know it works
 
-The tests read the installed binary, its fingerprint, a new interactive shell
-and the answer of the server.
+The tests look at the installed file, its fingerprint, what a new terminal
+sees, and the answer of the cluster.
 
 ```bash
 dsoxlab check k8s-installer-kubectl
 ```
 
-`dsoxlab clean k8s-installer-kubectl` removes your completion and your alias,
-then puts back on the machine the kubectl the next labs need.
+`dsoxlab clean k8s-installer-kubectl` then removes your alias and your
+completion, and puts back on the machine the kubectl the next labs need.
