@@ -1,6 +1,6 @@
 # Challenge : Installer et configurer kubectl
 
-## La situation
+## 📍 La situation
 
 La machine `k8s-kind.lab` fait tourner un cluster kind, **`lab`**, en
 Kubernetes **`v1.37.0`**, et votre fichier **`~/.kube/config`** pointe déjà
@@ -8,7 +8,7 @@ dessus. Vous n'avez pas à créer ce cluster : la leçon suivante vous apprendra
 le faire. Il vous manque l'outil pour lui parler, puisque **kubectl n'est pas
 installé**, et aucune complétion n'est configurée.
 
-## Ce que vous devez obtenir
+## 🎯 Ce que vous devez obtenir
 
 1. **kubectl est installé dans `/usr/local/bin`**, appartient à `root`, est
    exécutable par tous et modifiable par root seul, et c'est lui que votre
@@ -27,7 +27,7 @@ installé**, et aucune complétion n'est configurée.
 
 6. kubectl **atteint le serveur** du cluster.
 
-## Les repères utiles
+## 🧭 Les repères utiles
 
 Ne téléchargez jamais « la dernière version » sans la nommer : une version
 épinglée se réinstalle à l'identique, sur votre poste comme dans une CI. Le
@@ -47,7 +47,7 @@ la tabulation ne propose que des noms de fichiers.
 Si la seconde manque, kubectl n'a pas atteint le cluster.
 `kubectl cluster-info` dit à quelle adresse il le cherche.
 
-## Comment vous saurez que c'est bon
+## ✅ Comment vous saurez que c'est bon
 
 Les tests lisent le binaire installé, son empreinte, un nouveau shell
 interactif et la réponse du serveur.
