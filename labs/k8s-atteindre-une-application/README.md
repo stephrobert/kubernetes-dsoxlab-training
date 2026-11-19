@@ -12,7 +12,7 @@ You work in a scratch namespace, `essai-acces`, with a `miroir` application.
 The challenge will ask you for the same work on another application: you will
 do it on your own, at the end.
 
-Related page: [kubectl expose, port-forward and proxy](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/outils/kubectl-expose-port-forward-proxy/).
+Related page: [kubectl expose, port-forward and proxy](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/).
 
 ## 🔧 Before you start
 

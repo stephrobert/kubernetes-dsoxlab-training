@@ -12,7 +12,7 @@ You work in a scratch namespace, `essai-attente`, with an `accueil` Deployment
 and two trial Jobs. The challenge will ask you for the same thing on another
 application: you will do it on your own, at the end.
 
-Related page: [kubectl wait and diff](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/).
+Related page: [kubectl wait and diff](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/).
 
 ## 🔧 Before you start
 

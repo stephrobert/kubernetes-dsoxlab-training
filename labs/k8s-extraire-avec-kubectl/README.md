@@ -12,7 +12,7 @@ You work in a scratch namespace, `essai-extraction`, with an `inventaire`
 application. The challenge will ask you for other fields on another
 application: you will do it on your own, at the end.
 
-Related page: [kubectl](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/outils/kubectl/).
+Related page: [kubectl](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-cheat-sheet/).
 
 ## 🔧 Before you start
 

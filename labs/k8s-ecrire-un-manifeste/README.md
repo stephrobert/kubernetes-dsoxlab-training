@@ -11,7 +11,7 @@ You work in a scratch namespace, `essai-manifeste`, with an `annuaire`
 application. The challenge will ask you for another application, in another
 namespace: you will do it on your own, at the end.
 
-Related page: [Writing Manifests](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/).
+Related page: [Writing Manifests](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/).
 
 ## 🔧 Before you start
 

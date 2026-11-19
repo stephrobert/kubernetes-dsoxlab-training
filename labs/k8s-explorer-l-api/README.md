@@ -12,7 +12,7 @@ yourself, and a scratch namespace, `essai-api`. The challenge will ask you to
 discover another type, set up by the lab: you will do it on your own, at the
 end.
 
-Related page: [kubectl api-resources and explain](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/).
+Related page: [kubectl api-resources and explain](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/).
 
 ## 🔧 Before you start
 

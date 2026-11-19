@@ -11,7 +11,7 @@ You work in a scratch namespace, `essai-apply`, with a `colis` application and
 an `etiquettes` Deployment. The challenge will ask you for the same thing on
 other objects: you will do it on your own, at the end.
 
-Related page: [kubectl create and apply](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/).
+Related page: [kubectl create and apply](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-create-apply/).
 
 ## 🔧 Before you start
 
