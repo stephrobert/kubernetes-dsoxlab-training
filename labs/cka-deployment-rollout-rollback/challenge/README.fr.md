@@ -1,69 +1,67 @@
 # Challenge : Revenir en arrière sur un déploiement bloqué, puis livrer la bonne version
 
-## La situation
+## 📍 La situation
 
-Dans le namespace **`lab`**, le Deployment **`webapp`** tourne en trois
-replicas. Un collègue a lancé la mise à jour vers la nouvelle image ce
-matin, avec une faute de frappe dans son nom. Depuis, `kubectl rollout
-status` ne rend pas la main : un Pod neuf n'arrive pas à tirer son image,
-les trois anciens tiennent le service, et le Deployment n'avance plus.
+Vous êtes sur le control plane du cluster kubeadm, et votre kubectl est
+configuré. Dans le namespace **`lab`**, le Deployment **`webapp`** tourne avec
+trois Pods, en `nginx:1.30.5`.
 
-L'image attendue est **`nginx:1.30.6`**. C'est son tag qui compte : un
-digest ajouté à ce tag est accepté, un autre tag ne l'est pas.
+Ce matin, un collègue l'a mis à jour vers la nouvelle image, mais il a fait
+une faute de frappe dans son nom. Depuis, la mise à jour est bloquée :
 
-Vous êtes sur le control plane, avec `kubectl` configuré.
+- un Pod neuf n'arrive pas à télécharger son image ;
+- les trois anciens Pods tiennent toujours le service ;
+- `kubectl rollout status` ne rend pas la main.
 
-## Ce que vous devez obtenir
+L'image attendue est **`nginx:1.30.6`**. C'est son tag qui compte : vous
+pouvez ajouter un digest à ce tag, mais pas choisir un autre tag.
 
-1. **D'abord**, la version qui marchait, celle d'avant la mise à jour,
-   remise en service : `nginx:1.30.5`, en **révision 3** du Deployment.
-   Le déploiement bloqué doit être quitté avant de livrer quoi que ce soit
-   d'autre.
+## 🎯 Ce que vous devez obtenir
 
-2. **Ensuite**, la bonne image livrée : `webapp` en `nginx:1.30.6`, en
-   **révision 4** du Deployment, trois replicas demandés, trois replicas
-   disponibles et à jour, et aucun Pod resté en erreur d'image.
+1. **D'abord**, remettez en service la version qui marchait, `nginx:1.30.5`.
+   Elle doit devenir la **révision 3** du Deployment. Quittez la mise à jour
+   bloquée avant de livrer quoi que ce soit d'autre.
 
-3. Le Deployment porte une **cause de changement** : l'annotation
-   `kubernetes.io/change-cause` sur le **Deployment lui-même**, avec un
-   texte qui dit ce qui a été livré. C'est là que les tests la lisent.
+2. **Ensuite**, livrez la bonne image : `webapp` en `nginx:1.30.6`, en
+   **révision 4**, avec trois Pods demandés, trois Pods disponibles et à jour,
+   et plus aucun Pod en erreur d'image.
 
-4. Une fois la livraison faite, l'historique est intact. Le ReplicaSet de la
-   version qui marchait et celui de l'image fautive sont tous les deux encore
-   là, et le fautif, qui reste en **révision 2**, est réduit à **zéro** : rien
-   n'a été supprimé à la main, et le Deployment n'a été ni supprimé ni recréé.
-   Cet état se lit sur ce que le retour arrière et la livraison ont laissé
-   derrière eux, il se juge donc avec la révision finale présente, jamais
-   avant.
+3. Le Deployment `webapp` porte une **cause de changement** : l'annotation
+   `kubernetes.io/change-cause`, posée sur le Deployment lui-même, avec un
+   texte qui dit ce qui a été livré.
 
-Soit, à la fin, quatre révisions : la 1 de l'application d'origine, la 2 de
-la mise à jour fautive de ce matin à zéro, la 3 de la version qui marchait
-remise en service à zéro, la 4 de la bonne image avec ses trois replicas.
+4. L'historique est intact. Ne supprimez aucun ReplicaSet à la main, et ne
+   supprimez pas le Deployment. À la fin, l'historique compte donc quatre
+   révisions :
 
-## Les repères utiles
+   - la 2, la mise à jour fautive de ce matin, gardée à zéro Pod ;
+   - la 3, la version qui marchait remise en service, à zéro Pod ;
+   - la 4, la bonne image, avec ses trois Pods.
 
-Un Deployment garde ses anciens ReplicaSets, à zéro, et numérote chaque
-changement de template. Revenir à la révision précédente ne détruit rien :
-l'ancien ReplicaSet est réactivé et reçoit un nouveau numéro de révision.
+   La révision 1 n'apparaît plus : quand vous revenez à la version qui
+   marchait, son ReplicaSet reçoit le numéro 3.
 
-`kubectl rollout history`, `kubectl rollout undo` et `kubectl set image`
-sont les trois gestes, et `rollout undo` est celui que l'examen attend pour
-l'étape 1 ; `kubectl describe deployment` dit pourquoi le déploiement est
-bloqué, et `kubectl get pods` montre le Pod qui n'a pas d'image. Le
-conteneur du template s'appelle `nginx`.
+## 🧭 Les repères utiles
 
-## Comment vous saurez que c'est bon
+Un Deployment garde ses anciens ReplicaSets, à zéro Pod, et donne un numéro à
+chaque changement de ses Pods. Revenir en arrière ne détruit rien : l'ancien
+ReplicaSet reprend du service et reçoit un nouveau numéro.
 
-Les tests lisent le cluster réel : le Deployment, les Pods et les
-ReplicaSets qui lui **appartiennent**, avec leurs annotations de révision.
-Ils jugent l'état atteint, pas les commandes tapées, et ils ne savent pas
-distinguer un `rollout undo` d'un `set image` vers l'image précédente : les
-deux laissent le même historique.
+Trois commandes suffisent : `kubectl rollout history`, `kubectl rollout undo`
+et `kubectl set image`. Le conteneur du Deployment s'appelle `nginx`.
+`kubectl describe deployment` dit pourquoi la mise à jour est bloquée, et
+`kubectl get pods` montre le Pod qui n'a pas d'image.
 
-Chacun d'eux juge un état que seul le travail produit. Conserver les trois
-replicas se lit donc **avec** la révision finale, et non comme une exigence
-à part : la situation en demande déjà trois, un contrôle séparé donnerait
-des points pour l'état de départ.
+La cause de changement reste sur le Deployment, et chaque nouvelle révision
+la recopie. Un retour en arrière, lui, remet la cause de la révision choisie.
+Posez donc la vôtre après la livraison finale.
+
+## ✅ Comment vous saurez que c'est bon
+
+Les tests lisent le cluster : le Deployment, ses Pods et ses ReplicaSets, avec
+leurs numéros de révision. Ils jugent l'état obtenu, pas les commandes tapées.
+Ils ne distinguent donc pas un `rollout undo` d'un `set image` vers l'ancienne
+image : les deux laissent le même historique.
 
 ```bash
 dsoxlab check cka-deployment-rollout-rollback
