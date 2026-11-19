@@ -61,7 +61,6 @@ CITATION = re.compile(
 FICHIERS = sorted(
     [p for p in (RACINE / "labs").rglob("*.yaml") if p.name.startswith("lab")]
     + list((RACINE / "labs").rglob("README*.md"))
-    + list((RACINE / "labs").rglob("scenario*.md"))
     + [RACINE / "README.md", RACINE / "README.fr.md"]
 )
 
