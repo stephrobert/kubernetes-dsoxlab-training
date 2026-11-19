@@ -28,20 +28,24 @@ version stable du moment, puis la dernière version de la branche 1.36.
 
 ```bash
 curl -fsSL https://dl.k8s.io/release/stable.txt
-echo
-curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
-echo
 ```
 
 ```text
 v1.37.2
+```
+
+```bash
+curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
+```
+
+```text
 v1.36.6
 ```
 
-Chaque `echo` ajoute le retour à la ligne que la réponse du serveur n'a pas. Il
-est sur sa propre ligne : collé derrière l'URL avec un `;`, zsh le protégerait
-au collage, et `curl` recevrait une URL fausse. La première ligne est la
-version que le challenge vous demandera. Pour
+La réponse du serveur ne se termine pas par un retour à la ligne : votre
+invite s'affiche juste derrière la version, c'est normal.
+
+La première version est celle que le challenge vous demandera. Pour
 l'exercice, vous prenez la seconde, `v1.36.6` : une version mineure sous le
 cluster, donc dans l'écart permis. Le fichier `stable-1.36.txt` donne le
 dernier correctif d'une branche précise, ce qui sert quand on doit rester sur

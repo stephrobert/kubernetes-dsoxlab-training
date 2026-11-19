@@ -108,6 +108,16 @@ repos:
         pass_filenames: false
         always_run: true
 
+      # Une commande d'un cours ou d'un énoncé se colle telle quelle, sous
+      # zsh aussi : url-quote-magic protège un `;` collé à une URL, et curl
+      # reçoit une URL fausse (relevé le 2026-11-19 sur k8s-installer-kubectl).
+      - id: commandes-collables
+        name: les commandes des cours se collent sous bash comme sous zsh
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_commandes_collables.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       # Les quatre pièges que ce dépôt a payés au moins une fois : un ssh sans
       # -n dans une solution lue par `bash -s`, un prepare.sh qui ne trace pas,
       # un setup qui n'installe pas le socle, un namespace jamais supprimé.

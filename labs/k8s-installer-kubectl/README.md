@@ -28,20 +28,24 @@ the current stable version, then the latest release of the 1.36 branch.
 
 ```bash
 curl -fsSL https://dl.k8s.io/release/stable.txt
-echo
-curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
-echo
 ```
 
 ```text
 v1.37.2
+```
+
+```bash
+curl -fsSL https://dl.k8s.io/release/stable-1.36.txt
+```
+
+```text
 v1.36.6
 ```
 
-Each `echo` adds the line break the server's answer lacks. It sits on its own
-line: glued after the URL with a `;`, zsh would escape it on paste, and `curl`
-would get a wrong URL. The first line is the version the challenge will ask
-for. For the exercise,
+The server's answer does not end with a line break: your prompt shows right
+after the version, that is expected.
+
+The first version is the one the challenge will ask for. For the exercise,
 take the second one, `v1.36.6`: one minor version below the cluster, so within
 the allowed skew. The `stable-1.36.txt` file gives the latest patch of a given
 branch, which is what you need when you must stay on one minor version.
