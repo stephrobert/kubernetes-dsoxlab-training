@@ -1,66 +1,67 @@
 # Challenge: Roll back a stuck rollout, then ship the right version
 
-## The situation
+## 📍 The situation
 
-In the namespace **`lab`**, the Deployment **`webapp`** runs with three
-replicas. A colleague started the update to the new image this morning, with a
-typo in its name. Since then, `kubectl rollout status` never returns: a new Pod
-cannot pull its image, the three old ones keep the service up, and the
-Deployment is going nowhere.
+You are on the control plane of the kubeadm cluster, and your kubectl is
+configured. In the **`lab`** namespace, the **`webapp`** Deployment runs three
+Pods, on `nginx:1.30.5`.
 
-The expected image is **`nginx:1.30.6`**. Its tag is what counts: a digest
-appended to that tag is accepted, any other tag is not.
+This morning, a colleague updated it to the new image, but made a typo in its
+name. Since then, the update is stuck:
 
-You are on the control plane, with `kubectl` configured.
+- a new Pod cannot download its image;
+- the three old Pods still serve the traffic;
+- `kubectl rollout status` does not give the prompt back.
 
-## What you must achieve
+The expected image is **`nginx:1.30.6`**. Its tag is what counts: you may add
+a digest to this tag, but not pick another tag.
 
-1. **First**, the version that worked, the one before the update, back in
-   service: `nginx:1.30.5`, as the Deployment's **revision 3**. The stuck
-   rollout must be left before anything else is shipped.
+## 🎯 What you must obtain
 
-2. **Then**, the right image shipped: `webapp` on `nginx:1.30.6`, as the
-   Deployment's **revision 4**, three replicas asked for, three replicas
-   available and up to date, and no Pod left in image error.
+1. **First**, put the version that worked, `nginx:1.30.5`, back in service. It
+   must become **revision 3** of the Deployment. Leave the stuck update before
+   shipping anything else.
 
-3. The Deployment carries a **change cause**: the annotation
-   `kubernetes.io/change-cause` on the **Deployment itself**, with text that
-   says what was shipped. That is where the tests read it.
+2. **Then**, ship the right image: `webapp` on `nginx:1.30.6`, as
+   **revision 4**, with three Pods requested, three Pods available and up to
+   date, and no Pod left in image error.
 
-4. Once the delivery is done, the history is intact. The ReplicaSet of the
-   version that worked and the one of the faulty image are both still there,
-   and the faulty one, which stays **revision 2**, is scaled down to **zero**:
-   nothing was deleted by hand, and the Deployment was neither deleted nor
-   recreated. That state is read on what the rollback and the delivery left
-   behind, so it is judged with the final revision present, never before.
+3. The `webapp` Deployment carries a **change cause**: the
+   `kubernetes.io/change-cause` annotation, set on the Deployment itself, with
+   a text that says what was shipped.
 
-So, at the end, four revisions: 1 the original application, 2 this morning's
-faulty update at zero, 3 the version that worked back in service at zero, 4 the
-right image with its three replicas.
+4. The history is intact. Do not delete any ReplicaSet by hand, and do not
+   delete the Deployment. At the end, the history therefore has four
+   revisions:
 
-## Useful bearings
+   - revision 2, this morning's faulty update, kept with zero Pods;
+   - revision 3, the version that worked put back in service, with zero Pods;
+   - revision 4, the right image, with its three Pods.
 
-A Deployment keeps its old ReplicaSets, at zero, and numbers every template
-change. Going back to the previous revision destroys nothing: the old
-ReplicaSet is reactivated and receives a new revision number.
+   Revision 1 no longer shows: when you go back to the version that worked,
+   its ReplicaSet gets number 3.
 
-`kubectl rollout history`, `kubectl rollout undo` and `kubectl set image` are
-the three moves, and `rollout undo` is the one the exam expects for step 1;
-`kubectl describe deployment` says why the rollout is stuck, and
-`kubectl get pods` shows the Pod that has no image. The container of the
-template is named `nginx`.
+## 🧭 Useful landmarks
 
-## How you will know it works
+A Deployment keeps its old ReplicaSets, with zero Pods, and gives a number to
+each change of its Pods. Rolling back destroys nothing: the old ReplicaSet
+comes back into service and gets a new number.
 
-The tests read the live cluster: the Deployment, the Pods and the ReplicaSets
-that **belong** to it, with their revision annotations. They judge the state
-reached, not the commands you typed, and they cannot tell a `rollout undo` from
-a `set image` back to the previous image: both leave the same history.
+Three commands are enough: `kubectl rollout history`, `kubectl rollout undo`
+and `kubectl set image`. The Deployment's container is called `nginx`.
+`kubectl describe deployment` says why the update is stuck, and
+`kubectl get pods` shows the Pod that has no image.
 
-Every one of them judges a state that only the work produces. Keeping the three
-replicas is therefore read **with** the final revision, not as a requirement of
-its own: the situation already asks for three, so a separate check would hand
-out points for the starting state.
+The change cause stays on the Deployment, and each new revision copies it. A
+rollback, on the other hand, brings back the cause of the chosen revision. So
+set yours after the final delivery.
+
+## ✅ How you will know it is right
+
+The tests read the cluster: the Deployment, its Pods and its ReplicaSets, with
+their revision numbers. They judge the state reached, not the commands typed.
+So they cannot tell a `rollout undo` from a `set image` back to the old image:
+both leave the same history.
 
 ```bash
 dsoxlab check cka-deployment-rollout-rollback

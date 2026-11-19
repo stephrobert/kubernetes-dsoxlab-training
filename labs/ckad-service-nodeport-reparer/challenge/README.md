@@ -1,18 +1,20 @@
 # Challenge: Repair a NodePort Service
 
-## The situation
+## 📍 The situation
 
-In the **`guichet`** namespace, the **`accueil`** application runs with two
-replicas, and each of its Pods answers its name, `accueil`, on its container
-port. So that users outside the cluster can reach it, a colleague wrote a
-Service **`accueil`** of type NodePort. Yet nobody reaches it.
+You are on the control plane of the kubeadm cluster, and your kubectl is
+configured. In the **`guichet`** namespace, the **`accueil`** application runs
+in two Pods. Each one answers its name, `accueil`, on its container port.
+
+So that users outside the cluster can reach it, a colleague wrote a NodePort
+Service named **`accueil`**. Yet nobody reaches it.
 
 The cluster has two nodes, **`k8s-cp.lab`** and **`k8s-w1.lab`**.
 
-## What you must achieve
+## 🎯 What you must obtain
 
-1. The Service `accueil` is of type **NodePort**, and its NodePort is
-   **`30091`**, the address promised to users.
+1. The `accueil` Service is of type **NodePort**, and its node port is
+   **`30091`**: that is the address promised to the users.
 
 2. Its **endpoints** are the ready Pods of the `accueil` Deployment, reached on
    the **port their container listens on**.
@@ -21,22 +23,22 @@ The cluster has two nodes, **`k8s-cp.lab`** and **`k8s-w1.lab`**.
 
 4. `http://<address of k8s-w1.lab>:30091/` answers **`accueil`** too.
 
-## Useful bearings
+## 🧭 Useful landmarks
 
-A Service is only a selector and ports. A Service without endpoints is a
-selector matching no Pod's labels. Endpoints but nothing answering is often the
-port it sends to.
+A Service is a selector and some ports. No endpoint: the selector matches the
+labels of no Pod. Endpoints, but nothing answers: it is often the port it sends
+to.
 
-A NodePort Service has **three** ports: the Service's own inside the cluster,
-the container's one it sends to, and the one it opens on **every node**.
-Without a declared value, Kubernetes draws the latter at random from its range.
+A NodePort Service has **three** ports: the Service port inside the cluster,
+the container port it sends to, and the one it opens on **every node**. If you
+do not give the last one, Kubernetes picks it at random in its range.
 
-Each node's address is read in the `INTERNAL-IP` column of
+The address of each node shows in the `INTERNAL-IP` column of
 `kubectl get nodes -o wide`.
 
-## How you will know it works
+## ✅ How you will know it is right
 
-Each test checks one of the four states above. The last two make a real
+Each test checks one of the four states above. The last two send a real
 request, one to the control plane, the other to the worker: a NodePort opens on
 every node, wherever the Pods run.
 

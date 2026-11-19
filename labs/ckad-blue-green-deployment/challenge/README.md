@@ -1,59 +1,60 @@
-# Challenge: Switch traffic from one version to the other: blue-green
+# Challenge: Ship a new version with no downtime, blue-green style
 
-## The situation
+## 📍 The situation
 
-In the **`lab`** namespace, the team wants to ship a new version of its
-application with no downtime at all and with an instant rollback. The method
-they picked: two versions running **at the same time**, `blue` in production
-and `green` ready to take over, and a single Service, **`app-prod`**, that
-decides which one receives the traffic.
+You are on the control plane of the kubeadm cluster, and your kubectl is
+configured. In the **`lab`** namespace, the team wants to ship a new version of
+its application with no downtime at all, and to be able to roll back at once.
 
-So that the switch can be seen, each version answers with its own name. A Pod
-named **`client`** is already there to query it: it is the measuring
-instrument of this lab, not part of what you have to build, so leave it
-alone.
+The chosen method:
 
-## What you must achieve
+- two versions run **at the same time**: `blue` in production, `green` ready to
+  take over;
+- a single Service, **`app-prod`**, decides which one receives the traffic.
 
-1. A Deployment **`app-blue`** with 2 replicas available, whose Pods carry the
-   labels `app=myapp` and `version=blue`, and **each of which answers `blue`
-   over HTTP on port 8080**.
+So that the switch can be seen, each version answers its name. A **`client`**
+Pod is already there to query the Service. It is used to measure the result:
+leave it alone.
 
-2. A Deployment **`app-green`** with 2 replicas available, labels `app=myapp`
-   and `version=green`, each Pod answering `green` on the same port.
+## 🎯 What you must obtain
 
-3. A Service **`app-prod`** listening on port **8080**, whose selector names
+1. A Deployment **`app-blue`** with 2 available Pods. Its Pods have the labels
+   `app=myapp` and `version=blue`, and **each one answers `blue` over HTTP on
+   port 8080**.
+
+2. A Deployment **`app-green`** with 2 available Pods, labels `app=myapp` and
+   `version=green`. Each one answers `green`, on the same port.
+
+3. A Service **`app-prod`** listening on port **8080**. Its selector asks for
    **both** `app=myapp` and `version=green`.
 
-4. The endpoints of `app-prod` are **exactly** the ready green Pods, and from
+4. The endpoints of `app-prod` are **exactly** the ready green Pods. From
    `client`, **every** request to `http://app-prod:8080/` answers `green`.
 
-Read item 1 again: it is measured **after** the switch. `app-blue` must still
-be standing and still answering `blue` when you run the check. That is not a
-detail, it is the whole point of blue-green: the rollback is instant only
-because the old version never stopped serving.
+Watch out for item 1: it is checked **after** the switch. `app-blue` must
+therefore still be running and answering `blue` when the check runs. That is
+the very principle of blue-green: the rollback is immediate only because the
+old version never stopped serving.
 
-## Useful bearings
+## 🧭 Useful landmarks
 
-A server that answers with its own name fits in one line of busybox: `httpd -f`
-serves a directory, and an `echo` into `index.html` before starting it is
-enough. A container that only sleeps carries the right labels and serves
-nothing.
+A server that answers its name fits in one line of busybox: an `echo` into
+`index.html`, then `httpd -f` to serve the directory. A container that only
+sleeps has the right labels, but serves nothing.
 
-In real life, you create `app-prod` pointing at blue, you watch it, then you
-switch it to green. The tests measure the end state, so nothing forces you
-through that intermediate step; the trace the method leaves is blue still
-standing and still serving.
+In real life, you first create `app-prod` pointing at blue, you watch it, then
+you switch it to green. The tests only look at the end state: you do not have
+to go through the blue step. But blue must stay up and keep answering.
 
-A Service selector can be changed in place, and the endpoints follow within a
-few seconds: that is the whole switch, and it is also the rollback.
+A Service selector can be changed without recreating it, and the endpoints
+follow within a few seconds. That is the whole switch, and it is also the
+rollback.
 
-## How you will know it works
+## ✅ How you will know it is right
 
-The tests read both Deployments and the labels of their Pods, query **each
-Pod on its own address** to check it serves its version, then read the
-Service selector and its endpoints, and finally make six requests from
-`client`.
+The tests read both Deployments and the labels of their Pods. They query **each
+Pod on its own address**, to check that it answers its version. They then read
+the Service selector and its endpoints, and send six requests from `client`.
 
 ```bash
 dsoxlab check ckad-blue-green-deployment
