@@ -1,61 +1,63 @@
-# Challenge : Basculer le trafic d'une version à l'autre : blue-green
+# Challenge : Livrer une nouvelle version sans coupure, en blue-green
 
-## La situation
+## 📍 La situation
 
-Dans le namespace **`lab`**, l'équipe veut livrer une nouvelle version de
-son application sans la moindre coupure et avec un retour arrière
-instantané. La méthode retenue : deux versions qui tournent **en même
-temps**, `blue` en production et `green` prête à prendre le relais, et un
-seul Service, **`app-prod`**, qui décide laquelle reçoit le trafic.
+Vous êtes sur le control plane du cluster kubeadm, et votre kubectl est
+configuré. Dans le namespace **`lab`**, l'équipe veut livrer une nouvelle
+version de son application sans aucune coupure, et pouvoir revenir en arrière
+tout de suite.
 
-Pour que la bascule se voie, chaque version répond avec son nom. Un Pod
-**`client`** est déjà là pour l'interroger : c'est l'instrument de mesure de
-ce lab, pas une partie de ce qui est à construire, donc n'y touchez pas.
+La méthode choisie :
 
-## Ce que vous devez obtenir
+- deux versions tournent **en même temps** : `blue` en production, `green`
+  prête à prendre le relais ;
+- un seul Service, **`app-prod`**, décide laquelle reçoit le trafic.
 
-1. Un Deployment **`app-blue`** avec 2 replicas disponibles, dont les Pods
-   portent les labels `app=myapp` et `version=blue`, et dont **chacun répond
-   `blue` en HTTP sur le port 8080**.
+Pour qu'on voie la bascule, chaque version répond son nom. Un Pod **`client`**
+est déjà là pour interroger le Service. Il sert à mesurer le résultat : n'y
+touchez pas.
 
-2. Un Deployment **`app-green`** avec 2 replicas disponibles, labels
-   `app=myapp` et `version=green`, dont chaque Pod répond `green` sur le même
-   port.
+## 🎯 Ce que vous devez obtenir
 
-3. Un Service **`app-prod`** qui écoute sur le port **8080**, et dont le
-   selector nomme **à la fois** `app=myapp` et `version=green`.
+1. Un Deployment **`app-blue`** avec 2 Pods disponibles. Ses Pods ont les
+   labels `app=myapp` et `version=blue`, et **chacun répond `blue` en HTTP sur
+   le port 8080**.
 
-4. Les endpoints de `app-prod` sont **exactement** les Pods green prêts, et
-   depuis `client`, **toutes** les requêtes vers `http://app-prod:8080/`
-   répondent `green`.
+2. Un Deployment **`app-green`** avec 2 Pods disponibles, labels `app=myapp`
+   et `version=green`. Chacun répond `green`, sur le même port.
 
-Relisez le point 1 : il est mesuré **après** la bascule. `app-blue` doit
-encore être debout et répondre encore `blue` au moment du contrôle. Ce n'est
-pas un détail, c'est tout le sujet du blue-green : le retour arrière n'est
-instantané que parce que l'ancienne version n'a jamais cessé de servir.
+3. Un Service **`app-prod`** qui écoute sur le port **8080**. Son sélecteur
+   demande **à la fois** `app=myapp` et `version=green`.
 
-## Les repères utiles
+4. Les endpoints de `app-prod` sont **exactement** les Pods green prêts. Depuis
+   `client`, **toutes** les requêtes vers `http://app-prod:8080/` répondent
+   `green`.
 
-Un serveur qui répond son nom tient en une ligne de busybox : `httpd -f`
-sert un répertoire, et un `echo` dans `index.html` avant de le lancer
-suffit. Un conteneur qui ne fait que dormir porte les bons labels et ne sert
-rien.
+Attention au point 1 : il est vérifié **après** la bascule. `app-blue` doit
+donc encore tourner et répondre `blue` au moment du contrôle. C'est le principe
+même du blue-green : le retour arrière n'est immédiat que parce que l'ancienne
+version n'a jamais cessé de servir.
 
-Dans la vraie vie, on crée `app-prod` en visant blue, on l'observe, puis on
-le bascule vers green. Les tests mesurent l'état final, rien ne vous oblige
-donc à passer par cette étape intermédiaire ; la trace que la méthode laisse,
-c'est blue encore debout et encore servante.
+## 🧭 Les repères utiles
 
-Le selector d'un Service se change en place, et les endpoints suivent en
-quelques secondes : c'est toute la bascule, et c'est aussi le retour
-arrière.
+Un serveur qui répond son nom tient en une ligne de busybox : un `echo` dans
+`index.html`, puis `httpd -f` pour servir le répertoire. Un conteneur qui ne
+fait que dormir a les bons labels, mais ne sert rien.
 
-## Comment vous saurez que c'est bon
+En vrai, on crée d'abord `app-prod` vers blue, on l'observe, puis on le bascule
+vers green. Les tests ne regardent que l'état final : vous n'êtes pas obligé de
+passer par l'étape vers blue. Mais blue doit rester debout et continuer à
+répondre.
 
-Les tests lisent les deux Deployments et les labels de leurs Pods,
-interrogent **chaque Pod sur sa propre adresse** pour vérifier qu'il sert sa
-version, puis lisent le selector et les endpoints du Service, et font enfin
-six requêtes depuis `client`.
+Le sélecteur d'un Service se change sans le recréer, et les endpoints suivent
+en quelques secondes. C'est toute la bascule, et c'est aussi le retour arrière.
+
+## ✅ Comment vous saurez que c'est bon
+
+Les tests lisent les deux Deployments et les labels de leurs Pods. Ils
+interrogent **chaque Pod sur sa propre adresse**, pour vérifier qu'il répond sa
+version. Ils lisent ensuite le sélecteur du Service et ses endpoints, puis
+envoient six requêtes depuis `client`.
 
 ```bash
 dsoxlab check ckad-blue-green-deployment
