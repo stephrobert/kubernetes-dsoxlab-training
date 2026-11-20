@@ -1,7 +1,5 @@
 title: "Router des requêtes d'inférence selon la charge des réplicas avec la Gateway API Inference Extension"
-# Page provisoire, comme dans lab.yaml. URL cible (cadrage CKNE, L10) :
-# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
 description: |
   Derrière une Gateway d'Istio, regrouper trois réplicas d'un serveur de modèle
   simulé dans un InferencePool piloté par un sélecteur d'endpoints, y router
@@ -11,6 +9,8 @@ description: |
 criteria:
   - id: pool-d-inference
     label: "Un InferencePool d'inference regroupe les trois réplicas du modèle sur le port 8000 et désigne le sélecteur d'endpoints selecteur, qui est prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
   - id: gateway-programmee
     label: "Une Gateway de classe istio dans inference porte un listener HTTP et le cluster la déclare Programmed"
     lessons:
@@ -18,7 +18,13 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-vers-le-pool
     label: "Une HTTPRoute attachée à la Gateway a l'InferencePool pour backend, Accepted et avec ses références résolues"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
   - id: requetes-servies
     label: "Des requêtes de complétion envoyées à la Gateway reçoivent la réponse des réplicas du modèle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
   - id: repartition-selon-la-charge
     label: "Sur 30 requêtes, le réplica saturé en reçoit 10 % au plus, là où un Service ordinaire lui en enverrait un tiers"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/

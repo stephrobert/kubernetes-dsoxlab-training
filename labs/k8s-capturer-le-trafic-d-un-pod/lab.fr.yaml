@@ -1,7 +1,5 @@
 title: "Capturer le trafic d'un Pod et désigner la cause de chaque échec"
-# Page provisoire, comme dans lab.yaml. URL cible (cadrage CKNE, L2) :
-# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
 description: |
   Trois Pods clients du namespace boutique n'arrivent pas à joindre leur
   service, chacun d'une façon différente, et leurs journaux ne disent
@@ -15,7 +13,13 @@ description: |
 criteria:
   - id: capture-du-bon-pod
     label: "Chaque client a une capture lisible dans ~/captures, prise sur sa propre interface : les paquets viennent de l'adresse actuelle de ce Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
   - id: signature-de-la-panne
     label: "Chaque capture contient les paquets qui prouvent la panne de son client : un reset, un SYN renvoyé sans réponse, ou des réponses NXDomain"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
   - id: cause-designee
     label: "~/captures/diagnostic.yaml désigne la bonne cause pour chaque client, et aucune des trois pannes n'a été réparée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/

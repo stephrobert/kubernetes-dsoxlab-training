@@ -1,5 +1,5 @@
 title: "Sauvegarder etcd, puis restaurer le cluster depuis un instantané"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/etcd/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/backup-restore/
 description: |
   Un namespace a disparu. Prendre d'abord une sauvegarde fraîche de l'état
   courant, puis restaurer le cluster depuis l'instantané de la veille, sans
