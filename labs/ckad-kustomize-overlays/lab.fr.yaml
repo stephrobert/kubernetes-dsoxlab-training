@@ -1,23 +1,23 @@
-title: "Une base Kustomize et deux overlays, dev et prod"
+title: "Une base Kustomize et deux overlays, recette et production"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/#mettre-en-pratique
 description: |
-  Décrire une application une seule fois, dans une base Kustomize avec une
-  ConfigMap générée, et la déployer dans deux namespaces avec des overlays qui
-  changent le nombre de réplicas, préfixent les noms, ajoutent un label
-  d'environnement et, pour dev seulement, la version de l'image. Laisser le
-  cluster conforme au dossier.
+  Décrire l'application catalogue une seule fois, dans une base Kustomize avec
+  une ConfigMap générée, et la déployer en recette et en production avec des
+  overlays qui changent le nombre de réplicas, préfixent les noms, ajoutent un
+  label palier, passent la seule recette en version 2 et fusionnent une valeur
+  de la configuration en production. Laisser le cluster conforme au dossier.
 
 criteria:
-  - id: dev-un-replica
-    label: "dev-app tourne avec un réplica disponible dans dev"
+  - id: recette-deux-replicas
+    label: "rec-catalogue tourne avec deux réplicas disponibles dans recette"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
-  - id: prod-trois-replicas
-    label: "prod-app tourne avec trois réplicas disponibles dans prod"
+  - id: production-quatre-replicas
+    label: "prd-catalogue tourne avec quatre réplicas disponibles dans production"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: label-sur-les-pods
-    label: "Les Pods de chaque environnement portent son label env"
+    label: "Les Pods de chaque environnement portent son label palier"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: service-trouve-ses-pods
@@ -29,11 +29,11 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: image-changee-par-l-overlay
-    label: "Seul dev passe en version 2, par son overlay, sans modifier la base"
+    label: "Seule recette passe en version 2, par son overlay, sans modifier la base"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
-  - id: configmap-generee
-    label: "La configuration vient d'une ConfigMap générée par Kustomize"
+  - id: configmap-generee-et-fusionnee
+    label: "La configuration vient d'une ConfigMap générée, où production fusionne MODE=ecriture"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
   - id: une-base-commune

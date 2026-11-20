@@ -5,10 +5,10 @@
   hosts: lab_target
   become: true
   tasks:
-    - name: Supprimer les namespaces dev et prod
+    - name: Supprimer les namespaces du lab
       ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace dev prod
-        --ignore-not-found --wait=false
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace
+        recette production dev prod --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
 
