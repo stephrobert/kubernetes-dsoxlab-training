@@ -8,16 +8,16 @@
     - name: Supprimer le namespace du lab
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
-        acces --ignore-not-found --wait=false
+        guichet --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
 
     - name: Arrêter le tunnel laissé ouvert pour la vérification
-      ansible.builtin.command: pkill -f "port-forwar[d].*18080:"
+      ansible.builtin.command: pkill -f "port-forwar[d].*19081:"
       changed_when: true
       failed_when: false
 
     - name: Retirer le relevé
       ansible.builtin.file:
-        path: "/home/{{ ansible_user | default('ansible') }}/acces"
+        path: "/home/{{ ansible_user | default('ansible') }}/guichet"
         state: absent

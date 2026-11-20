@@ -13,3 +13,4 @@
         executable: /bin/bash
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

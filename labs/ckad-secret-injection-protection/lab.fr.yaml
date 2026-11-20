@@ -1,18 +1,18 @@
-title: "Sortir un mot de passe d'un manifeste, sans que l'application s'en aperçoive"
+title: "Changer un mot de passe qui a fuité et le sortir du manifeste"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/#mettre-en-pratique
 description: |
-  Un mot de passe est écrit en clair dans un manifeste de Deployment, que
-  quiconque peut lire le lit aussi. Déplacez-le dans un Secret, injectez-le à la
-  fois en variable d'environnement et en fichier monté, et laissez l'application
-  tourner.
+  Le mot de passe d'une application a fuité : il est écrit en clair dans son
+  Deployment, posé par kubectl apply. Rangez le nouveau mot de passe dans un
+  Secret, injectez-le en variable d'environnement et en fichier monté, et
+  vérifiez que l'ancien n'apparaît plus nulle part dans le manifeste.
 
 criteria:
   - id: le-secret-porte-le-mot-de-passe
-    label: "Un Secret du namespace porte le mot de passe comme contenu d'une de ses clés"
+    label: "Un Secret du namespace porte le nouveau mot de passe comme contenu d'une de ses clés"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: db-password-vient-du-secret-par-reference
-    label: "DB_PASSWORD tire sa valeur de ce Secret, par référence"
+    label: "DATABASE_PASSWORD tire sa valeur de ce Secret, par référence"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-secret-est-monte-sous-etc-passerelle
@@ -20,11 +20,11 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-mot-de-passe-a-quitte-le-manifeste
-    label: "Le mot de passe n'apparaît plus dans le manifeste du Deployment"
+    label: "Ni l'ancien ni le nouveau mot de passe n'apparaît dans le manifeste du Deployment, annotation last-applied-configuration comprise"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: le-mot-de-passe-n-est-en-clair-nulle-part-ailleurs
-    label: "Le mot de passe est porté par un Secret et n'est en clair nulle part ailleurs dans le namespace, dans aucun ConfigMap en particulier"
+    label: "Le nouveau mot de passe est porté par un Secret, et aucun des deux n'est en clair dans un ConfigMap"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
@@ -39,10 +39,10 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-db-password-vient-du-secret-et-vaut-la-valeur
-    label: "Dans le conteneur, DB_PASSWORD porte la valeur attendue, et le Pod qui tourne la tire du Secret par référence"
+    label: "Dans le conteneur, DATABASE_PASSWORD porte le nouveau mot de passe, et le Pod qui tourne le tire du Secret par référence"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/
   - id: dans-le-conteneur-le-fichier-porte-la-valeur
-    label: "Dans le conteneur, le fichier de /etc/passerelle porte la valeur attendue"
+    label: "Dans le conteneur, le fichier de /etc/passerelle porte le nouveau mot de passe"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/secrets/

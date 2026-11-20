@@ -3,22 +3,22 @@
 ## 📍 The situation
 
 The kind cluster **`boutique`** is running on the machine, and your kubectl
-already targets it. In the **`acces`** namespace, the **`echo`** Deployment runs
-two agnhost Pods listening on **port 8080**. On the `/hostname` path, each Pod
-answers its own name. No Service exposes them yet.
+already targets it. In the **`guichet`** namespace, the **`annonces`**
+Deployment runs two agnhost Pods listening on **port 9376**. On the `/hostname`
+path, each Pod answers its own name. No Service exposes them yet.
 
-The file **`~/acces/releve.txt`** is waiting for what you will read through the
-tunnel.
+The file **`~/guichet/releve.txt`** is waiting for what you will read through
+the tunnel.
 
 ## 🎯 What you must obtain
 
-1. A Service **`echo`** exposes the Deployment on **port 80**, to **port 8080**
-   of the Pods.
+1. A Service **`annonces`** exposes the Deployment on **port 8081**, to **port
+   9376** of the Pods.
 
 2. The Service counts **both Pods** as ready endpoints.
 
-3. A **`kubectl port-forward` tunnel to the Service** `echo` listens on local
-   port **`18080`**. It is **still open** when you run the check.
+3. A **`kubectl port-forward` tunnel to the Service** `annonces` listens on
+   local port **`19081`**. It is **still open** when you run the check.
 
 4. After **`pod-du-tunnel`**, in the file: the name of the Pod that answers you
    through **this** tunnel.
@@ -38,7 +38,7 @@ attaches to a single Pod, picked at start-up.
 ## ✅ How you will know it is right
 
 The tests read the Service and its EndpointSlices. They look for your tunnel
-among the processes of the machine, send a request through port 18080, and
+among the processes of the machine, send a request through port 19081, and
 compare your file with the Pod that answers. A name copied from
 `kubectl get pods` is not enough.
 

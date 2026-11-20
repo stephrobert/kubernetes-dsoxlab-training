@@ -2,14 +2,15 @@
 
 Une bonne image de conteneur ne contient pas ses réglages : la même image sert
 en test et en production, avec des réglages différents. Kubernetes range ces
-réglages dans un objet à part, le **ConfigMap**, et les donne au conteneur de
-deux façons : en **variables d'environnement**, ou en **fichiers** dans un
-dossier. Dans ce cours, vous créez des ConfigMaps, vous les donnez à une
-application, puis vous mesurez ce qui se met à jour, et quand, après une
-modification.
+réglages dans un objet à part, le **ConfigMap**, et les donne au conteneur en
+**variables d'environnement** ou en **fichiers** dans un dossier. La leçon
+montre `envFrom`, un volume, et ce qui se met à jour après une modification.
+Ce cours va plus loin : donner à une variable un autre nom que sa clé, choisir
+le nom d'un fichier monté, voir ce que cache `optional: true`, et changer de
+configuration par un ConfigMap versionné.
 
-Vous travaillez dans un namespace d'essai, `essai-config`, avec une application
-`meteo`. Le challenge vous demandera le même travail sur une autre
+Vous travaillez dans un namespace d'essai, `essai-config`, avec une
+application `meteo`. Le challenge vous demandera de configurer une autre
 application : vous le ferez seul, à la fin.
 
 Page associée : [ConfigMaps Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/).
@@ -26,72 +27,51 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `boutique` y tourne, et votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+20 novembre 2026.
 
-## 📚 Exercice 1 : un ConfigMap à partir de valeurs
+## 📚 Exercice 1 : deux ConfigMaps
 
-Créez le namespace d'essai, puis un ConfigMap `meteo-reglages` avec deux
-valeurs. Chaque `--from-literal` ajoute une paire `clé=valeur` :
+Créez le namespace d'essai et deux ConfigMaps :
+
+- `meteo-reglages`, avec deux valeurs, dont les clés sont en minuscules :
+  `ville` et `unite` ;
+- `meteo-fichiers`, avec deux fichiers, `station.conf` et `alertes.conf`.
+  Chaque `--from-file` ajoute un fichier, et son nom devient la clé.
 
 ```bash
 kubectl create namespace essai-config
-kubectl create configmap meteo-reglages --from-literal=VILLE=Lyon --from-literal=UNITE=celsius -n essai-config
-kubectl get configmap meteo-reglages -n essai-config -o jsonpath='{.data}{"\n"}'
+kubectl create configmap meteo-reglages --from-literal=ville=Lyon --from-literal=unite=celsius -n essai-config
+printf 'station=lyon-bron\nfrequence=10\n' > ~/station.conf
+printf 'seuil-vent=90\n' > ~/alertes.conf
+kubectl create configmap meteo-fichiers --from-file=$HOME/station.conf --from-file=$HOME/alertes.conf -n essai-config
+kubectl get configmap meteo-reglages meteo-fichiers -n essai-config
 ```
 
 ```text
 namespace/essai-config created
 configmap/meteo-reglages created
-{"UNITE":"celsius","VILLE":"Lyon"}
+configmap/meteo-fichiers created
+NAME             DATA   AGE
+meteo-reglages   2      0s
+meteo-fichiers   2      0s
 ```
 
-Les réglages sont rangés dans le champ `data` du ConfigMap.
+La colonne `DATA` compte les clés : deux dans chaque ConfigMap.
 
-## 📚 Exercice 2 : un ConfigMap à partir d'un fichier
+## 📚 Exercice 2 : une variable qui ne porte pas le nom de sa clé
 
-Un réglage peut aussi être un fichier entier. Écrivez un petit fichier de
-configuration, puis créez un ConfigMap à partir de lui avec `--from-file` :
+L'application `meteo` attend deux variables, `METEO_VILLE` et `METEO_UNITE`.
+Les clés du ConfigMap s'appellent `ville` et `unite`. Avec `envFrom`, chaque
+clé devient une variable **sous son nom exact** : vous obtiendriez `ville` et
+`unite`, que l'application ne lit pas.
+
+Le champ `env` avec `configMapKeyRef` donne le nom de votre choix : `name` est
+le nom de la variable, `configMapKeyRef` dit quel ConfigMap et quelle clé la
+remplissent. Le même Deployment monte aussi `meteo-fichiers`, ce que
+l'exercice 3 détaille. Écrivez le manifeste dans un fichier, puis appliquez-le :
 
 ```bash
-printf 'station=lyon-bron\nfrequence=10\n' > ~/station.conf; cat ~/station.conf
-kubectl create configmap meteo-fichier --from-file=$HOME/station.conf -n essai-config
-kubectl describe configmap meteo-fichier -n essai-config | sed -n '/^Data/,/^BinaryData/p'
-```
-
-```text
-station=lyon-bron
-frequence=10
-configmap/meteo-fichier created
-Data
-====
-station.conf:
-----
-station=lyon-bron
-frequence=10
-
-
-
-BinaryData
-```
-
-Le **nom du fichier**, `station.conf`, est devenu la clé, et son contenu la
-valeur. (`sed` ne garde que la partie `Data` de la sortie de `describe`.)
-
-## 📚 Exercice 3 : donner les ConfigMaps à l'application
-
-Le Deployment `meteo` reçoit les deux ConfigMaps, de trois façons :
-
-- `envFrom` : chaque clé de `meteo-reglages` devient une variable
-  d'environnement ;
-- un volume monté **en dossier** sur `/etc/meteo` : chaque clé de
-  `meteo-fichier` y devient un fichier ;
-- le même volume, monté avec `subPath` sur `/etc/station.conf` : un seul
-  fichier, posé à un endroit précis.
-
-Son conteneur ne fait que dormir : on vient seulement lire ce qu'il voit.
-
-```bash
-cat <<'YAML' | kubectl apply -n essai-config -f -
+cat > ~/meteo.yaml <<'YAML'
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -111,100 +91,109 @@ spec:
         - name: meteo
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command: ["sleep", "86400"]
-          envFrom:
-            - configMapRef:
-                name: meteo-reglages
+          env:
+            - name: METEO_VILLE
+              valueFrom:
+                configMapKeyRef:
+                  name: meteo-reglages
+                  key: ville
+            - name: METEO_UNITE
+              valueFrom:
+                configMapKeyRef:
+                  name: meteo-reglages
+                  key: unite
           volumeMounts:
-            - name: fichier
+            - name: fichiers
               mountPath: /etc/meteo
-            - name: fichier
-              mountPath: /etc/station.conf
-              subPath: station.conf
+            - name: fichiers
+              mountPath: /etc/capteur.ini
+              subPath: capteur.ini
       volumes:
-        - name: fichier
+        - name: fichiers
           configMap:
-            name: meteo-fichier
+            name: meteo-fichiers
+            items:
+              - key: station.conf
+                path: capteur.ini
 YAML
+kubectl apply -n essai-config -f ~/meteo.yaml
 kubectl rollout status deployment/meteo -n essai-config --timeout=120s | tail -1
+kubectl exec deploy/meteo -n essai-config -- env | grep -i -E 'ville|unite'
 ```
 
 ```text
 deployment.apps/meteo created
 deployment "meteo" successfully rolled out
+METEO_VILLE=Lyon
+METEO_UNITE=celsius
 ```
 
-Vérifiez toujours depuis le conteneur : la spécification dit ce qui est
-demandé, le conteneur dit ce qui est vu. `kubectl exec deploy/meteo` entre dans
-un Pod du Deployment :
+Les deux variables portent le nom attendu par l'application, et aucune
+variable `ville` ou `unite` n'existe : `configMapKeyRef` ne crée que les
+variables que vous nommez.
+
+## 📚 Exercice 3 : choisir les fichiers montés et leur nom
+
+Dans le volume, le champ `items` liste les clés à monter, et `path` donne le
+nom du fichier. Ici, seule la clé `station.conf` est montée, sous le nom
+`capteur.ini`. Regardez le dossier :
 
 ```bash
-kubectl exec deploy/meteo -n essai-config -- sh -c 'echo VILLE=$VILLE UNITE=$UNITE'
 kubectl exec deploy/meteo -n essai-config -- ls /etc/meteo
-kubectl exec deploy/meteo -n essai-config -- cat /etc/meteo/station.conf /etc/station.conf
+kubectl exec deploy/meteo -n essai-config -- cat /etc/meteo/capteur.ini
 ```
 
 ```text
-VILLE=Lyon UNITE=celsius
-station.conf
-station=lyon-bron
-frequence=10
+capteur.ini
 station=lyon-bron
 frequence=10
 ```
 
-Les deux variables sont là, et le fichier aussi, aux deux endroits.
+Un seul fichier, `capteur.ini`. `alertes.conf` n'est pas monté : avec `items`,
+une clé absente de la liste n'apparaît pas dans le dossier.
 
-## 📚 Exercice 4 : changer une valeur
+Le Deployment monte aussi ce fichier une seconde fois, sur `/etc/capteur.ini`,
+avec `subPath`. `subPath` nomme un chemin **dans le volume** : comme le volume
+a renommé la clé, ce chemin est `capteur.ini`, et non `station.conf`.
 
-Passez `UNITE` à `fahrenheit` dans le ConfigMap :
+## 📚 Exercice 4 : modifier, puis mesurer ce qui suit
+
+Passez `unite` à `fahrenheit`, puis changez la fréquence dans `station.conf`
+et remplacez `meteo-fichiers`. `--dry-run=client -o yaml` fabrique le nouveau
+ConfigMap sans le créer, et `kubectl replace` remplace l'ancien. Les deux
+fichiers sont redonnés : un ConfigMap remplacé ne garde que les clés que vous
+lui passez.
 
 ```bash
-kubectl patch configmap meteo-reglages -n essai-config -p '{"data":{"UNITE":"fahrenheit"}}'
-kubectl get configmap meteo-reglages -n essai-config -o jsonpath='{.data.UNITE}{"\n"}'
-kubectl exec deploy/meteo -n essai-config -- sh -c 'echo UNITE=$UNITE'
+kubectl patch configmap meteo-reglages -n essai-config -p '{"data":{"unite":"fahrenheit"}}'
+printf 'station=lyon-bron\nfrequence=5\n' > ~/station.conf
+kubectl create configmap meteo-fichiers --from-file=$HOME/station.conf --from-file=$HOME/alertes.conf -n essai-config --dry-run=client -o yaml | kubectl replace -f -
 ```
 
 ```text
 configmap/meteo-reglages patched
-fahrenheit
-UNITE=celsius
+configmap/meteo-fichiers replaced
 ```
 
-Le ConfigMap dit `fahrenheit`, mais le conteneur voit toujours `celsius`. Une
-variable d'environnement se lit **une seule fois**, au démarrage du conteneur.
-Ensuite, elle reste figée.
-
-## 📚 Exercice 5 : changer le fichier
-
-Modifiez le fichier, puis remplacez le ConfigMap par la nouvelle version.
-`--dry-run=client -o yaml` fabrique le nouveau ConfigMap sans le créer, et
-`kubectl replace` remplace l'ancien :
+Mesurez combien de temps le dossier met à se mettre à jour. La boucle relit
+le fichier toutes les 5 secondes, et s'arrête après 36 essais, soit 3 minutes,
+même si rien ne change :
 
 ```bash
-printf 'station=lyon-bron\nfrequence=5\n' > ~/station.conf; kubectl create configmap meteo-fichier --from-file=$HOME/station.conf -n essai-config --dry-run=client -o yaml | kubectl replace -f -
+debut=$SECONDS; for i in $(seq 1 36); do kubectl exec deploy/meteo -n essai-config -- grep -q frequence=5 /etc/meteo/capteur.ini 2>/dev/null && break; sleep 5; done; echo "attente : $((SECONDS - debut)) s"
 ```
 
 ```text
-configmap/meteo-fichier replaced
+attente : 86 s
 ```
 
-Mesurez combien de temps le dossier met à se mettre à jour. La boucle relit le
-fichier toutes les 5 secondes, jusqu'à y trouver `frequence=5` :
+Le dossier s'est mis à jour **tout seul**, ici en 86 secondes : Kubernetes ne
+relit les ConfigMaps qu'à intervalles réguliers. Le renommage par `items` ne
+change rien à ce rafraîchissement. Comparez maintenant les trois endroits :
 
 ```bash
-debut=$SECONDS; until kubectl exec deploy/meteo -n essai-config -- grep -q frequence=5 /etc/meteo/station.conf 2>/dev/null; do sleep 5; done; echo "dossier à jour après $((SECONDS - debut)) s"
-```
-
-```text
-dossier à jour après 71 s
-```
-
-Le dossier se met à jour **tout seul**, mais avec un délai, ici 71 secondes :
-Kubernetes ne relit les ConfigMaps qu'à intervalles réguliers. Comparez
-maintenant les deux emplacements :
-
-```bash
-kubectl exec deploy/meteo -n essai-config -- cat /etc/meteo/station.conf /etc/station.conf
+kubectl exec deploy/meteo -n essai-config -- cat /etc/meteo/capteur.ini /etc/capteur.ini
+kubectl exec deploy/meteo -n essai-config -- printenv METEO_UNITE
 ```
 
 ```text
@@ -212,88 +201,157 @@ station=lyon-bron
 frequence=5
 station=lyon-bron
 frequence=10
+celsius
 ```
 
 Le fichier du dossier dit `frequence=5`. Celui posé par `subPath` dit encore
-`frequence=10` : un montage par `subPath` ne se met **jamais** à jour.
+`frequence=10`, et la variable dit encore `celsius`. Pour donner un nom choisi
+à un fichier **et** garder la mise à jour, utilisez `items` plutôt que
+`subPath`.
 
-## 📚 Exercice 6 : redémarrer pour tout relire
+## 📚 Exercice 5 : une faute de frappe, avec et sans `optional`
 
-`kubectl rollout restart` remplace les Pods du Deployment. Les nouveaux
-conteneurs relisent tout au démarrage :
-
-```bash
-kubectl rollout restart deployment/meteo -n essai-config
-kubectl rollout status deployment/meteo -n essai-config --timeout=120s | tail -1
-sleep 3; kubectl exec deploy/meteo -n essai-config -- sh -c 'echo UNITE=$UNITE; cat /etc/station.conf'
-```
-
-```text
-deployment.apps/meteo restarted
-deployment "meteo" successfully rolled out
-UNITE=fahrenheit
-station=lyon-bron
-frequence=5
-```
-
-La variable et le fichier `subPath` sont enfin à jour. Retenez la règle :
-
-| Où arrive le réglage | Après une modification du ConfigMap |
-|---|---|
-| Variable d'environnement | rien ne change, jusqu'au redémarrage |
-| Dossier monté | mis à jour tout seul, avec un délai |
-| Fichier `subPath` | rien ne change, jusqu'au redémarrage |
-
-## 📚 Exercice 7 : un ConfigMap qui manque
-
-Que se passe-t-il si un Pod demande un ConfigMap qui n'existe pas ? Créez un
-Pod qui attend `meteo-absent` :
+Créez un Pod dont la variable vise `meteo-reglage`, sans le `s` final : ce
+ConfigMap n'existe pas.
 
 ```bash
-cat <<'YAML' | kubectl apply -n essai-config -f -
+cat > ~/sans-config.yaml <<'YAML'
 apiVersion: v1
 kind: Pod
 metadata:
   name: sans-config
 spec:
+  terminationGracePeriodSeconds: 2
   containers:
     - name: sans-config
       image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
       command: ["sleep", "3600"]
-      envFrom:
-        - configMapRef:
-            name: meteo-absent
+      env:
+        - name: METEO_UNITE
+          valueFrom:
+            configMapKeyRef:
+              name: meteo-reglage
+              key: unite
 YAML
+kubectl apply -n essai-config -f ~/sans-config.yaml
 sleep 8; kubectl get pod sans-config -n essai-config
+kubectl get pod sans-config -n essai-config -o jsonpath='{.status.containerStatuses[0].state.waiting.message}{"\n"}'
 ```
 
 ```text
 pod/sans-config created
 NAME          READY   STATUS                       RESTARTS   AGE
-sans-config   0/1     CreateContainerConfigError   0          8s
+sans-config   0/1     CreateContainerConfigError   0          9s
+configmap "meteo-reglage" not found
 ```
 
-Le conteneur ne démarre pas : `CreateContainerConfigError`. Les événements du
-Pod de type `Warning` disent pourquoi :
+Le conteneur ne démarre pas, et le message nomme le ConfigMap introuvable. La
+faute se voit tout de suite. Supprimez le Pod, ajoutez `optional: true` sous
+`key: unite`, puis recréez-le :
 
 ```bash
-kubectl get events -n essai-config --field-selector involvedObject.name=sans-config,type=Warning -o custom-columns=RAISON:.reason,MESSAGE:.message
+kubectl delete pod sans-config -n essai-config
+sed -i 's/key: unite/key: unite\n              optional: true/' ~/sans-config.yaml
+grep -A4 configMapKeyRef ~/sans-config.yaml
+kubectl apply -n essai-config -f ~/sans-config.yaml
+kubectl wait --for=condition=Ready pod/sans-config -n essai-config --timeout=60s
+kubectl exec sans-config -n essai-config -- sh -c 'echo METEO_UNITE=[$METEO_UNITE]'
 ```
 
 ```text
-RAISON   MESSAGE
-Failed   Error: configmap "meteo-absent" not found
+pod "sans-config" deleted from essai-config namespace
+            configMapKeyRef:
+              name: meteo-reglage
+              key: unite
+              optional: true
+pod/sans-config created
+pod/sans-config condition met
+METEO_UNITE=[]
 ```
 
-D'où la règle pratique : créez les ConfigMaps **avant** les Pods qui en ont
-besoin.
+Le Pod démarre, et la variable n'existe pas : les crochets sont vides. La même
+faute de frappe ne produit plus **aucune erreur**. `optional: true` convient à
+un réglage vraiment facultatif. Ailleurs, il cache les erreurs de nom.
+
+## 📚 Exercice 6 : changer de configuration par un ConfigMap versionné
+
+Un ConfigMap `immutable: true` refuse toute modification. Pour changer de
+configuration, on crée une nouvelle version sous un autre nom, et on fait
+pointer le Deployment dessus. Créez `meteo-reglages-v2`, immuable, avec
+l'unité `kelvin` :
+
+```bash
+cat > ~/meteo-v2.yaml <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: meteo-reglages-v2
+data:
+  ville: Lyon
+  unite: kelvin
+immutable: true
+YAML
+kubectl apply -n essai-config -f ~/meteo-v2.yaml
+```
+
+```text
+configmap/meteo-reglages-v2 created
+```
+
+Faites pointer les deux variables du Deployment sur `meteo-reglages-v2`.
+`kubectl patch --type=json` remplace une valeur précise, désignée par son
+chemin : `env/0` est la première variable, `env/1` la seconde. Le modèle de
+Pod change, donc le Deployment remplace son Pod tout seul :
+
+```bash
+kubectl patch deployment meteo -n essai-config --type=json -p '[
+  {"op": "replace", "path": "/spec/template/spec/containers/0/env/0/valueFrom/configMapKeyRef/name", "value": "meteo-reglages-v2"},
+  {"op": "replace", "path": "/spec/template/spec/containers/0/env/1/valueFrom/configMapKeyRef/name", "value": "meteo-reglages-v2"}
+]'
+kubectl rollout status deployment/meteo -n essai-config --timeout=120s | tail -1
+sleep 3; kubectl exec deploy/meteo -n essai-config -- printenv METEO_UNITE
+```
+
+```text
+deployment.apps/meteo patched
+deployment "meteo" successfully rolled out
+kelvin
+```
+
+Pas besoin de `rollout restart` : changer de ConfigMap change le Deployment,
+qui remplace ses Pods. Revenez maintenant à la version précédente du
+Deployment :
+
+```bash
+kubectl rollout undo deployment/meteo -n essai-config
+kubectl rollout status deployment/meteo -n essai-config --timeout=120s | tail -1
+sleep 3; kubectl exec deploy/meteo -n essai-config -- printenv METEO_UNITE
+```
+
+```text
+Warning: resource deployments/meteo was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/meteo rolled back
+deployment "meteo" successfully rolled out
+fahrenheit
+```
+
+Le Deployment pointe de nouveau sur `meteo-reglages`. Mais le Pod d'avant
+voyait `celsius`, et le Pod rétabli voit `fahrenheit` : `meteo-reglages` a
+été modifié à l'exercice 4. Le retour arrière rend le Deployment d'avant, pas
+la configuration d'avant. Avec des ConfigMaps versionnés et immuables, chaque
+version du Deployment retrouve exactement ses réglages.
+
+L'avertissement dit que `rollout undo` ne met pas à jour l'annotation dont se
+sert `kubectl apply`. Si vous réappliquez un jour `~/meteo.yaml`, c'est ce
+fichier qui fera foi.
 
 ## 🧹 Nettoyage
 
-Supprimez le fichier de travail et le namespace d'essai :
+Supprimez les fichiers de travail et le namespace d'essai :
 
 ```bash
-rm -f ~/station.conf; kubectl delete namespace essai-config
+rm -f ~/station.conf ~/alertes.conf ~/meteo.yaml ~/sans-config.yaml ~/meteo-v2.yaml
+kubectl delete namespace essai-config
 ```
 
 ```text

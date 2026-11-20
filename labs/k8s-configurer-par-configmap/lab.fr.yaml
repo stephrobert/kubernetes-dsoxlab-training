@@ -1,7 +1,7 @@
 title: "Configurer une application par ConfigMap"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/#mettre-en-pratique
 description: |
-  Dans le namespace configuration, donnez au Deployment app deux valeurs d'un
+  Dans le namespace tarification, donnez au Deployment tarifs deux valeurs d'un
   ConfigMap en variables d'environnement et un fichier de configuration d'un
   autre ConfigMap par un volume, modifiez les deux ConfigMaps, puis redémarrez
   le Deployment pour que les variables suivent, sans écrire aucune valeur dans
@@ -9,11 +9,11 @@ description: |
 
 criteria:
   - id: les-variables-viennent-du-configmap
-    label: "APP_MODE et LOG_LEVEL viennent du ConfigMap app-config, lus dans le Pod"
+    label: "DEVISE et TAUX_TVA viennent du ConfigMap tarifs-env, lus dans le Pod"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-fichier-vient-du-volume
-    label: "app.properties vient du ConfigMap app-fichier par un volume, à jour dans le Pod"
+    label: "grille.ini vient du ConfigMap tarifs-grille par un volume, à jour dans le Pod"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/configmaps/
   - id: le-redemarrage-rafraichit-les-variables

@@ -10,3 +10,8 @@
         --ignore-not-found --wait=true --timeout=180s
       changed_when: true
       failed_when: false
+
+    - name: Retirer le dossier de travail de l'apprenant
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user | default('ansible') }}/paiement"
+        state: absent

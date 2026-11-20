@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Pose la situation du lab sur le cluster kind « boutique » :
 #
-#   - le namespace acces, neuf, avec le Deployment echo de la démonstration de
-#     la leçon : deux réplicas d'agnhost netexec sur le port 8080, label
-#     app=echo. Sur /hostname, chaque Pod répond son propre nom ;
+#   - le namespace guichet, neuf, avec le Deployment annonces, autre que celui de
+#     la leçon (echo sur 8080) : deux réplicas d'agnhost netexec sur le port
+#     9376, label app=annonces. Sur /hostname, chaque Pod répond son propre nom ;
 #   - aucun Service : l'apprenant le crée ;
-#   - le relevé à compléter, ~/acces/releve.txt.
+#   - le relevé à compléter, ~/guichet/releve.txt.
 #
 # Ne touche ni aux Nodes, ni à kube-system, ni aux namespaces des autres labs.
 # Rejouable.
@@ -15,16 +15,17 @@ set -x
 
 LAB_USER="${LAB_USER:-ansible}"
 LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
-NS=acces
+NS=guichet
 AGNHOST="registry.k8s.io/e2e-test-images/agnhost:2.61@sha256:101f3357d1ad890c3090e78ea6c6a47dc5137cbe19836796e13d5dcb2b84d2e6"
 
 # --ignore-not-found plutôt qu'un get préalable : un namespace encore en
 # Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
 kubectl delete namespace "$NS" --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace "$NS"
-kubectl -n "$NS" create deployment echo --replicas=2 --port=8080 --image="$AGNHOST" \
-  -- /agnhost netexec --http-port=8080
-kubectl -n "$NS" rollout status deployment/echo --timeout=180s
+# La leçon montre echo sur 8080 : le challenge prend annonces sur 9376.
+kubectl -n "$NS" create deployment annonces --replicas=2 --port=9376 --image="$AGNHOST" \
+  -- /agnhost netexec --http-port=9376
+kubectl -n "$NS" rollout status deployment/annonces --timeout=180s
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/${NS}"
 cat > "${LAB_HOME}/${NS}/releve.txt" <<'RELEVE'
@@ -35,4 +36,4 @@ cat > "${LAB_HOME}/${NS}/releve.txt" <<'RELEVE'
 pod-du-tunnel:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/${NS}/releve.txt"
-echo "Situation posée : echo à 2 réplicas, aucun Service."
+echo "Situation posée : annonces à 2 réplicas sur 9376, aucun Service."

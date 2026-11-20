@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
-# Pose la situation : une application qui tourne avec son mot de passe ecrit en
-# clair dans son propre manifeste.
+# Pose la situation : une application qui tourne avec son mot de passe écrit en
+# clair dans son propre manifeste, posé par `kubectl apply` (l'annotation
+# last-applied-configuration en garde donc une copie). Ce mot de passe a
+# fuité : le nouveau, tiré au hasard à chaque préparation, est posé dans
+# ~/paiement/nouveau-mot-de-passe.txt, lisible par le seul utilisateur du lab.
 #
-# Le Deployment est REPOSE a l'identique a chaque passage, et le Secret d'un
-# passage precedent est retire : sans cela, le lab rendrait 100 avant le
+# Le Deployment est REPOSÉ à l'identique à chaque passage, et le Secret d'un
+# passage précédent est retiré : sans cela, le lab rendrait 100 avant le
 # travail.
 set -euo pipefail
-# La trace complete va dans un journal sur le noeud : dsoxlab ne rend que
-# « non-zero return code » quand ce script echoue, et le validateur relit
+# La trace complète va dans un journal sur le nœud : dsoxlab ne rend que
+# « non-zero return code » quand ce script échoue, et le validateur relit
 # ce fichier pour dire pourquoi.
 exec > >(tee /var/log/dsoxlab-prepare.log) 2>&1
 set -x
+
+LAB_USER="${LAB_USER:-ansible}"
+LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
 
 if [[ "$(kubectl get namespace paiement -o jsonpath='{.status.phase}' 2>/dev/null)" == "Terminating" ]]; then
   kubectl wait --for=delete namespace/paiement --timeout=180s
@@ -41,10 +47,20 @@ spec:
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command: ["sh", "-c", "sleep 86400"]
           env:
-            - name: DB_PASSWORD
+            - name: DATABASE_PASSWORD
               value: "Tr3s0r-2026"
 YAML
 
 kubectl -n paiement rollout status deployment/passerelle --timeout=240s
-kubectl -n paiement get deployment passerelle -o yaml | grep -A2 DB_PASSWORD || true
-echo "Situation posee : l'application tourne, et son mot de passe est dans son manifeste."
+
+# Le nouveau mot de passe : 20 caractères tirés au hasard, sans la trace (set +x).
+set +x
+nouveau="Pa-$(head -c 64 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 20)"
+install -d -o "$LAB_USER" -g "$LAB_USER" -m 0700 "${LAB_HOME}/paiement"
+# Sans retour à la ligne final, comme le password.txt de la leçon : --from-file
+# donne alors la valeur exacte.
+printf '%s' "$nouveau" > "${LAB_HOME}/paiement/nouveau-mot-de-passe.txt"
+chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/paiement/nouveau-mot-de-passe.txt"
+chmod 0600 "${LAB_HOME}/paiement/nouveau-mot-de-passe.txt"
+set -x
+echo "Situation posée : l'application tourne avec l'ancien mot de passe dans son manifeste, le nouveau est dans ~/paiement/nouveau-mot-de-passe.txt."

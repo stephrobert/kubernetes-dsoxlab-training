@@ -4,15 +4,15 @@
 # targetPort, ses endpoints, puis un tunnel kubectl port-forward vers le Service,
 # qui s'attache à un seul Pod.
 #
-# Il tourne sur le cluster kind « boutique », dans son propre namespace (acces).
+# Il tourne sur le cluster kind « boutique », dans son propre namespace (guichet).
 id: k8s-atteindre-une-application
 title: "Reach an application: expose and port-forward"
 level: services-networking
 section: ckad
 difficulty: beginner
 description: |
-  In the acces namespace, expose the echo Deployment through a Service on port
-  80 towards the port 8080 of its Pods, check that it counts its endpoints, then
+  In the guichet namespace, expose the annonces Deployment through a Service on
+  port 8081 towards the port 9376 of its Pods, check that it counts its endpoints, then
   open a kubectl port-forward tunnel to the Service and record which Pod
   answers through it.
 skills:
@@ -42,21 +42,21 @@ validation:
 
 criteria:
   - id: le-service-a-les-bons-ports
-    label: "The echo Service exposes port 80 towards the port 8080 of the echo Pods"
+    label: "The annonces Service exposes port 8081 towards the port 9376 of the annonces Pods"
     tests:
-      - test_le_service_echo_expose_80_vers_8080
+      - test_le_service_annonces_expose_8081_vers_9376
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: le-service-compte-ses-endpoints
-    label: "The echo Service counts the two ready echo Pods as endpoints"
+    label: "The annonces Service counts the two ready annonces Pods as endpoints"
     tests:
-      - test_le_service_echo_compte_deux_endpoints_prets
+      - test_le_service_annonces_compte_deux_endpoints_prets
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: le-tunnel-repond
-    label: "A port-forward tunnel to the echo Service answers on local port 18080 during the check"
+    label: "A port-forward tunnel to the annonces Service answers on local port 19081 during the check"
     tests:
-      - test_un_tunnel_vers_le_service_repond_sur_18080
+      - test_un_tunnel_vers_le_service_repond_sur_19081
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-expose-port-forward-proxy/
   - id: la-reponse-du-tunnel-est-consignee
