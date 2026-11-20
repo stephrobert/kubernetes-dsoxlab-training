@@ -6862,11 +6862,11 @@
   "avant": {
    "echecs": [
     "test_api_a_deux_replicas_disponibles_sur_l_image_demandee",
+    "test_api_est_mis_a_jour_sans_avoir_ete_recree",
     "test_le_conteneur_recoit_sa_configuration_de_api_config",
     "test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default",
     "test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte",
-    "test_le_service_api_trouve_les_deux_pods",
-    "test_rapport_est_corrige_sans_avoir_ete_recree"
+    "test_le_service_api_trouve_les_deux_pods"
    ],
    "passed": 0,
    "recorded": true,
@@ -6876,12 +6876,12 @@
    "total": 6
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 273,
+  "date": "2026-11-20",
+  "duree_s": 483,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 84 objets hors kube-system",
    "avant le travail : 0/6",
    "après la solution : 6/6",
    "après clean et run : 0/6",
@@ -6893,11 +6893,11 @@
   "rejeu": {
    "echecs": [
     "test_api_a_deux_replicas_disponibles_sur_l_image_demandee",
+    "test_api_est_mis_a_jour_sans_avoir_ete_recree",
     "test_le_conteneur_recoit_sa_configuration_de_api_config",
     "test_le_fichier_nomme_son_namespace_et_rien_n_est_dans_default",
     "test_le_fichier_porte_les_trois_objets_et_le_serveur_l_accepte",
-    "test_le_service_api_trouve_les_deux_pods",
-    "test_rapport_est_corrige_sans_avoir_ete_recree"
+    "test_le_service_api_trouve_les_deux_pods"
    ],
    "passed": 0,
    "recorded": true,
@@ -7401,8 +7401,8 @@
   },
   "avant": {
    "echecs": [
-    "test_catalogue_porte_une_sonde_de_disponibilite_http",
-    "test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes",
+    "test_annuaire_porte_une_sonde_de_disponibilite_http",
+    "test_l_export_ventes_hebdo_existe_avec_les_champs_demandes",
     "test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd",
     "test_le_releve_dresse_l_inventaire_complet_du_namespace"
    ],
@@ -7414,12 +7414,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 89,
+  "date": "2026-11-20",
+  "duree_s": 123,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 74 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -7430,8 +7430,8 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_catalogue_porte_une_sonde_de_disponibilite_http",
-    "test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes",
+    "test_annuaire_porte_une_sonde_de_disponibilite_http",
+    "test_l_export_ventes_hebdo_existe_avec_les_champs_demandes",
     "test_le_releve_donne_l_apiversion_et_le_kind_de_la_crd",
     "test_le_releve_dresse_l_inventaire_complet_du_namespace"
    ],
@@ -7468,12 +7468,12 @@
    "total": 3
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 91,
+  "date": "2026-11-20",
+  "duree_s": 107,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 69 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -7900,9 +7900,9 @@
   },
   "avant": {
    "echecs": [
-    "test_api_est_dans_equipe_api_et_rien_dans_default",
-    "test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne",
-    "test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie"
+    "test_caisse_joint_inventaire_par_son_nom_qualifie",
+    "test_inventaire_est_dans_stock_et_plus_rien_dans_default",
+    "test_le_nom_court_echoue_depuis_caisse_et_le_constat_est_consigne"
    ],
    "passed": 0,
    "recorded": true,
@@ -7912,12 +7912,12 @@
    "total": 3
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 93,
+  "date": "2026-11-20",
+  "duree_s": 252,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 60 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -7928,9 +7928,9 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_api_est_dans_equipe_api_et_rien_dans_default",
-    "test_le_nom_court_echoue_depuis_equipe_front_et_le_constat_est_consigne",
-    "test_un_client_d_equipe_front_joint_api_par_son_nom_qualifie"
+    "test_caisse_joint_inventaire_par_son_nom_qualifie",
+    "test_inventaire_est_dans_stock_et_plus_rien_dans_default",
+    "test_le_nom_court_echoue_depuis_caisse_et_le_constat_est_consigne"
    ],
    "passed": 0,
    "recorded": true,
