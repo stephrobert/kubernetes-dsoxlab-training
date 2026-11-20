@@ -186,7 +186,7 @@
   },
   "avant": {
    "echecs": [
-    "test_aucun_pod_n_est_en_erreur_d_image",
+    "test_aucun_pod_n_est_en_panne",
     "test_l_historique_du_deploiement_est_intact",
     "test_la_revision_finale_est_celle_de_la_bonne_image",
     "test_la_version_fautive_est_conservee_a_zero",
@@ -203,12 +203,12 @@
    "total": 8
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 163,
+  "date": "2026-11-20",
+  "duree_s": 176,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/8",
    "après la solution : 8/8",
    "après clean et run : 0/8",
@@ -219,7 +219,7 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_aucun_pod_n_est_en_erreur_d_image",
+    "test_aucun_pod_n_est_en_panne",
     "test_l_historique_du_deploiement_est_intact",
     "test_la_revision_finale_est_celle_de_la_bonne_image",
     "test_la_version_fautive_est_conservee_a_zero",
@@ -2331,16 +2331,16 @@
   "avant": {
    "echecs": [
     "test_chaque_pod_repond_son_propre_nom",
-    "test_le_deployment_demande_trois_replicas",
-    "test_le_service_a_trois_endpoints_prets",
-    "test_le_service_ecoute_sur_80_vers_8080",
+    "test_le_deployment_demande_quatre_replicas",
+    "test_le_service_a_quatre_endpoints_prets",
+    "test_le_service_ecoute_sur_8081_vers_9090",
     "test_le_service_est_de_type_clusterip",
     "test_le_service_repartit_entre_plusieurs_pods",
     "test_le_service_repond_sous_son_nom_depuis_le_client",
-    "test_le_service_selectionne_app_web",
-    "test_les_pods_portent_le_label_app_web",
+    "test_le_service_selectionne_app_contacts",
+    "test_les_pods_portent_le_label_app_contacts",
     "test_les_pods_tournent_avec_l_image_demandee",
-    "test_les_trois_replicas_sont_disponibles"
+    "test_les_quatre_replicas_sont_disponibles"
    ],
    "passed": 0,
    "recorded": true,
@@ -2350,12 +2350,12 @@
    "total": 11
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 538,
+  "date": "2026-11-20",
+  "duree_s": 537,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/11",
    "après la solution : 11/11",
    "après clean et run : 0/11",
@@ -2367,16 +2367,16 @@
   "rejeu": {
    "echecs": [
     "test_chaque_pod_repond_son_propre_nom",
-    "test_le_deployment_demande_trois_replicas",
-    "test_le_service_a_trois_endpoints_prets",
-    "test_le_service_ecoute_sur_80_vers_8080",
+    "test_le_deployment_demande_quatre_replicas",
+    "test_le_service_a_quatre_endpoints_prets",
+    "test_le_service_ecoute_sur_8081_vers_9090",
     "test_le_service_est_de_type_clusterip",
     "test_le_service_repartit_entre_plusieurs_pods",
     "test_le_service_repond_sous_son_nom_depuis_le_client",
-    "test_le_service_selectionne_app_web",
-    "test_les_pods_portent_le_label_app_web",
+    "test_le_service_selectionne_app_contacts",
+    "test_les_pods_portent_le_label_app_contacts",
     "test_les_pods_tournent_avec_l_image_demandee",
-    "test_les_trois_replicas_sont_disponibles"
+    "test_les_quatre_replicas_sont_disponibles"
    ],
    "passed": 0,
    "recorded": true,
@@ -3024,9 +3024,9 @@
   },
   "avant": {
    "echecs": [
-    "test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur",
+    "test_dans_le_conteneur_database_password_vient_du_secret_et_vaut_la_valeur",
     "test_dans_le_conteneur_le_fichier_porte_la_valeur",
-    "test_db_password_vient_du_secret_par_reference",
+    "test_database_password_vient_du_secret_par_reference",
     "test_le_deployment_a_ete_modifie_pas_remplace",
     "test_le_mot_de_passe_a_quitte_le_manifeste",
     "test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs",
@@ -3042,12 +3042,12 @@
    "total": 9
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 260,
+  "date": "2026-11-20",
+  "duree_s": 258,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 40 objets hors kube-system",
    "avant le travail : 0/9",
    "après la solution : 9/9",
    "après clean et run : 0/9",
@@ -3058,9 +3058,9 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur",
+    "test_dans_le_conteneur_database_password_vient_du_secret_et_vaut_la_valeur",
     "test_dans_le_conteneur_le_fichier_porte_la_valeur",
-    "test_db_password_vient_du_secret_par_reference",
+    "test_database_password_vient_du_secret_par_reference",
     "test_le_deployment_a_ete_modifie_pas_remplace",
     "test_le_mot_de_passe_a_quitte_le_manifeste",
     "test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs",
@@ -4958,9 +4958,9 @@
   "avant": {
    "echecs": [
     "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
-    "test_le_service_echo_compte_deux_endpoints_prets",
-    "test_le_service_echo_expose_80_vers_8080",
-    "test_un_tunnel_vers_le_service_repond_sur_18080"
+    "test_le_service_annonces_compte_deux_endpoints_prets",
+    "test_le_service_annonces_expose_8081_vers_9376",
+    "test_un_tunnel_vers_le_service_repond_sur_19081"
    ],
    "passed": 0,
    "recorded": true,
@@ -4970,12 +4970,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-12",
-  "duree_s": 100,
+  "date": "2026-11-20",
+  "duree_s": 117,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "cluster photographié, v1.37.0, 102 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -4987,9 +4987,9 @@
   "rejeu": {
    "echecs": [
     "test_le_pod_qui_repond_par_le_tunnel_est_consigne",
-    "test_le_service_echo_compte_deux_endpoints_prets",
-    "test_le_service_echo_expose_80_vers_8080",
-    "test_un_tunnel_vers_le_service_repond_sur_18080"
+    "test_le_service_annonces_compte_deux_endpoints_prets",
+    "test_le_service_annonces_expose_8081_vers_9376",
+    "test_un_tunnel_vers_le_service_repond_sur_19081"
    ],
    "passed": 0,
    "recorded": true,
@@ -6418,9 +6418,9 @@
   "avant": {
    "echecs": [
     "test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment",
-    "test_le_fichier_monte_depuis_app_fichier_est_a_jour",
+    "test_le_fichier_monte_depuis_tarifs_grille_est_a_jour",
     "test_le_rollout_restart_a_rafraichi_les_variables",
-    "test_les_variables_viennent_du_configmap_app_config"
+    "test_les_variables_viennent_du_configmap_tarifs_env"
    ],
    "passed": 0,
    "recorded": true,
@@ -6430,12 +6430,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 109,
+  "date": "2026-11-20",
+  "duree_s": 120,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 100 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -6447,9 +6447,9 @@
   "rejeu": {
    "echecs": [
     "test_aucune_valeur_n_est_ecrite_en_dur_dans_le_deployment",
-    "test_le_fichier_monte_depuis_app_fichier_est_a_jour",
+    "test_le_fichier_monte_depuis_tarifs_grille_est_a_jour",
     "test_le_rollout_restart_a_rafraichi_les_variables",
-    "test_les_variables_viennent_du_configmap_app_config"
+    "test_les_variables_viennent_du_configmap_tarifs_env"
    ],
    "passed": 0,
    "recorded": true,
@@ -6751,10 +6751,10 @@
   },
   "avant": {
    "echecs": [
-    "test_image_fausse_tourne_avec_son_image_corrigee_en_place",
-    "test_la_raison_d_attente_de_image_fausse_est_consignee",
-    "test_le_code_de_sortie_de_plante_est_consigne",
-    "test_plante_tourne_avec_sa_commande_corrigee"
+    "test_importeur_tourne_avec_sa_commande_corrigee",
+    "test_la_raison_d_attente_de_vignettes_est_consignee",
+    "test_le_code_de_sortie_d_importeur_est_consigne",
+    "test_vignettes_tourne_avec_son_image_corrigee_en_place"
    ],
    "passed": 0,
    "recorded": true,
@@ -6764,12 +6764,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-12",
-  "duree_s": 152,
+  "date": "2026-11-20",
+  "duree_s": 156,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "cluster photographié, v1.37.0, 96 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -6780,10 +6780,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_image_fausse_tourne_avec_son_image_corrigee_en_place",
-    "test_la_raison_d_attente_de_image_fausse_est_consignee",
-    "test_le_code_de_sortie_de_plante_est_consigne",
-    "test_plante_tourne_avec_sa_commande_corrigee"
+    "test_importeur_tourne_avec_sa_commande_corrigee",
+    "test_la_raison_d_attente_de_vignettes_est_consignee",
+    "test_le_code_de_sortie_d_importeur_est_consigne",
+    "test_vignettes_tourne_avec_son_image_corrigee_en_place"
    ],
    "passed": 0,
    "recorded": true,
@@ -7953,9 +7953,9 @@
   },
   "avant": {
    "echecs": [
-    "test_env_prod_est_dans_le_modele_de_pod_de_web",
-    "test_le_selecteur_consigne_rend_exactement_les_pods_de_api",
-    "test_une_annotation_description_est_posee_sur_web"
+    "test_le_selecteur_consigne_rend_exactement_les_pods_de_facturation",
+    "test_palier_front_est_dans_le_modele_de_pod_de_vitrine",
+    "test_une_annotation_contact_est_posee_sur_vitrine"
    ],
    "passed": 0,
    "recorded": true,
@@ -7965,12 +7965,12 @@
    "total": 3
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 81,
+  "date": "2026-11-20",
+  "duree_s": 109,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 85 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -7981,9 +7981,9 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_env_prod_est_dans_le_modele_de_pod_de_web",
-    "test_le_selecteur_consigne_rend_exactement_les_pods_de_api",
-    "test_une_annotation_description_est_posee_sur_web"
+    "test_le_selecteur_consigne_rend_exactement_les_pods_de_facturation",
+    "test_palier_front_est_dans_le_modele_de_pod_de_vitrine",
+    "test_une_annotation_contact_est_posee_sur_vitrine"
    ],
    "passed": 0,
    "recorded": true,
@@ -8006,9 +8006,9 @@
   },
   "avant": {
    "echecs": [
-    "test_l_erreur_de_batch_est_consignee",
-    "test_la_cause_de_api_est_consignee",
-    "test_le_code_de_sortie_de_batch_est_consigne",
+    "test_l_erreur_d_export_est_consignee",
+    "test_la_cause_de_catalogue_est_consignee",
+    "test_le_code_de_sortie_d_export_est_consigne",
     "test_le_pod_le_plus_gourmand_est_consigne",
     "test_rien_n_a_ete_repare"
    ],
@@ -8020,12 +8020,12 @@
    "total": 5
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-10",
-  "duree_s": 312,
+  "date": "2026-11-20",
+  "duree_s": 181,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "cluster photographié, v1.37.0, 76 objets hors kube-system",
    "avant le travail : 0/5",
    "après la solution : 5/5",
    "après clean et run : 0/5",
@@ -8036,9 +8036,9 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_l_erreur_de_batch_est_consignee",
-    "test_la_cause_de_api_est_consignee",
-    "test_le_code_de_sortie_de_batch_est_consigne",
+    "test_l_erreur_d_export_est_consignee",
+    "test_la_cause_de_catalogue_est_consignee",
+    "test_le_code_de_sortie_d_export_est_consigne",
     "test_le_pod_le_plus_gourmand_est_consigne",
     "test_rien_n_a_ete_repare"
    ],
@@ -8118,10 +8118,10 @@
   },
   "avant": {
    "echecs": [
-    "test_compte_absent_repare_a_ses_deux_replicas_disponibles",
-    "test_l_ancien_replicaset_de_api_est_consigne",
+    "test_l_ancien_replicaset_de_paiement_est_consigne",
     "test_la_cause_du_failedcreate_est_consignee",
-    "test_le_replicaset_actif_de_api_est_consigne"
+    "test_le_replicaset_actif_de_paiement_est_consigne",
+    "test_rapports_repare_a_ses_deux_replicas_disponibles"
    ],
    "passed": 0,
    "recorded": true,
@@ -8131,12 +8131,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 88,
+  "date": "2026-11-20",
+  "duree_s": 114,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 68 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -8147,10 +8147,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_compte_absent_repare_a_ses_deux_replicas_disponibles",
-    "test_l_ancien_replicaset_de_api_est_consigne",
+    "test_l_ancien_replicaset_de_paiement_est_consigne",
     "test_la_cause_du_failedcreate_est_consignee",
-    "test_le_replicaset_actif_de_api_est_consigne"
+    "test_le_replicaset_actif_de_paiement_est_consigne",
+    "test_rapports_repare_a_ses_deux_replicas_disponibles"
    ],
    "passed": 0,
    "recorded": true,
@@ -8173,10 +8173,10 @@
   },
   "avant": {
    "echecs": [
-    "test_la_capacite_en_cpu_et_en_memoire_est_consignee",
-    "test_la_condition_ready_est_consignee",
-    "test_la_version_du_kubelet_est_consignee",
-    "test_le_runtime_du_worker_est_consigne"
+    "test_l_adresse_interne_est_consignee",
+    "test_l_heure_du_passage_a_ready_est_consignee",
+    "test_la_plage_des_pods_est_consignee",
+    "test_le_machine_id_est_consigne"
    ],
    "passed": 0,
    "recorded": true,
@@ -8186,12 +8186,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-10",
-  "duree_s": 53,
+  "date": "2026-11-20",
+  "duree_s": 61,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 60 objets hors kube-system",
+   "cluster photographié, v1.37.0, 68 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -8202,10 +8202,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_la_capacite_en_cpu_et_en_memoire_est_consignee",
-    "test_la_condition_ready_est_consignee",
-    "test_la_version_du_kubelet_est_consignee",
-    "test_le_runtime_du_worker_est_consigne"
+    "test_l_adresse_interne_est_consignee",
+    "test_l_heure_du_passage_a_ready_est_consignee",
+    "test_la_plage_des_pods_est_consignee",
+    "test_le_machine_id_est_consigne"
    ],
    "passed": 0,
    "recorded": true,
@@ -8283,8 +8283,8 @@
   },
   "avant": {
    "echecs": [
-    "test_le_controleur_qui_recree_le_pod_est_consigne",
-    "test_le_controleur_qui_recree_le_replicaset_est_consigne",
+    "test_l_uid_du_nouveau_replicaset_est_consigne",
+    "test_le_pod_recree_est_consigne",
     "test_le_pod_supprime_a_ete_recree_par_son_replicaset",
     "test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande"
    ],
@@ -8296,12 +8296,12 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 138,
+  "date": "2026-11-20",
+  "duree_s": 108,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "cluster photographié, v1.37.0, 62 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -8312,8 +8312,8 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_le_controleur_qui_recree_le_pod_est_consigne",
-    "test_le_controleur_qui_recree_le_replicaset_est_consigne",
+    "test_l_uid_du_nouveau_replicaset_est_consigne",
+    "test_le_pod_recree_est_consigne",
     "test_le_pod_supprime_a_ete_recree_par_son_replicaset",
     "test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande"
    ],
@@ -8778,10 +8778,10 @@
   },
   "avant": {
    "echecs": [
-    "test_l_etape_scheduled_est_attribuee_au_scheduler",
+    "test_le_conteneur_releve_est_celui_du_pod",
     "test_le_deployment_suivi_a_un_replica_disponible",
     "test_le_kubelet_qui_agit_est_celui_du_node_du_pod",
-    "test_les_etapes_du_conteneur_sont_attribuees_au_kubelet"
+    "test_le_pod_releve_est_celui_de_suivi"
    ],
    "passed": 0,
    "recorded": true,
@@ -8791,8 +8791,8 @@
    "total": 4
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-10",
-  "duree_s": 83,
+  "date": "2026-11-20",
+  "duree_s": 98,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -8807,10 +8807,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_l_etape_scheduled_est_attribuee_au_scheduler",
+    "test_le_conteneur_releve_est_celui_du_pod",
     "test_le_deployment_suivi_a_un_replica_disponible",
     "test_le_kubelet_qui_agit_est_celui_du_node_du_pod",
-    "test_les_etapes_du_conteneur_sont_attribuees_au_kubelet"
+    "test_le_pod_releve_est_celui_de_suivi"
    ],
    "passed": 0,
    "recorded": true,
