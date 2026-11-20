@@ -2,10 +2,10 @@
 
 A Helm chart is tuned through its **values**: the number of replicas, a colour,
 a message. The chart holds default values, and you **override** them (you
-replace them) with a file or on the command line. In this course, you read the
-default values of a chart, you install with a values file, you read what the
-application answers, you see how `--set` guesses the type of a value, and you
-upgrade without losing your settings.
+replace them) with a file or on the command line. In this course, you compare
+the values of two versions of a chart, you read the settings of a release
+someone else installed, you see how `--set` guesses the type of a value, then
+you upgrade while taking those settings back, in two ways.
 
 You work with a trial release, `vitrail`, of the podinfo chart, in a scratch
 namespace, `essai-values`. The challenge is about another release: you will do
@@ -25,16 +25,39 @@ You are now connected to `k8s-cp.lab`, the node that runs the kubeadm cluster
 (the control plane). Your kubectl already targets it, the lab installed Helm
 and declared the `podinfo` repository.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026, with Kubernetes v1.37.2 and Helm 4.3.2.
 
-## 📚 Exercise 1: the default values of a chart
+## 📚 Exercise 1: what a version adds to the values
 
 `helm show values` shows the default values of a chart, without installing
-anything. `grep` keeps a few of them:
+anything. Compare those of versions 6.16.0 and 6.17.0 of podinfo:
 
 ```bash
-helm show values podinfo/podinfo --version 6.16.0 | grep -n -E '^replicaCount|^ui:|^  color|^  message|^  logo'
+diff <(helm show values podinfo/podinfo --version 6.16.0) <(helm show values podinfo/podinfo --version 6.17.0); echo "diff : code $?"
+```
+
+```text
+11c11
+<   tag: 6.16.0
+---
+>   tag: 6.17.0
+98a99,103
+>   # call the https backends with SPIFFE mTLS, presenting podinfo's SVID
+>   backendMTLS: false
+>   # the server SPIFFE IDs accepted from https backends, when empty any ID in podinfo's trust domain is accepted
+>   # requires backendMTLS
+>   backendIDs: []
+diff : code 1
+```
+
+Two changes. The image tag follows the version. And 6.17.0 **adds** two
+values under `spiffe`, `backendMTLS` and `backendIDs`, which did not exist in
+6.16.0. Keep them in mind: exercise 7 shows that an upgrade can forget them.
+A few values you are going to change:
+
+```bash
+helm show values podinfo/podinfo --version 6.17.0 | grep -n -E '^replicaCount|^ui:|^  color|^  message|^  logo'
 ```
 
 ```text
@@ -45,60 +68,30 @@ helm show values podinfo/podinfo --version 6.16.0 | grep -n -E '^replicaCount|^u
 20:  logo: ""
 ```
 
-Values are organised as in YAML: `color` is **under** `ui`, so you write it
-`ui.color`. By default: 1 replica, a blue colour, no message. The chart offers
-many more:
+Values are laid out as in YAML: `color` is **under** `ui`, so you write it
+`ui.color`. By default: 1 replica, a blue colour, no message.
 
-```bash
-helm show values podinfo/podinfo --version 6.16.0 | wc -l
-```
+## 📚 Exercise 2: a release installed by someone else
 
-```text
-322
-```
-
-322 lines. You change only a few of them, the rest keeps its default value.
-
-## 📚 Exercise 2: install with a values file
-
-Write your settings in a file: 2 replicas, a green colour and a message
-("Bonjour" means "Hello"). The quotes around the colour are needed: in YAML, an
-unprotected `#` starts a comment.
-
-```bash
-mkdir -p ~/essai-values && cat > ~/essai-values/reglages.yaml <<'YAML'
-replicaCount: 2
-ui:
-  color: "#2a9d8f"
-  message: Bonjour
-YAML
-cat ~/essai-values/reglages.yaml
-```
-
-```text
-replicaCount: 2
-ui:
-  color: "#2a9d8f"
-  message: Bonjour
-```
-
-Create the scratch namespace, then install the chart with this file (`-f`):
+A colleague installs a release with their settings, passed on the command
+line ("Bonjour" means "Hello"). They leave no file behind:
 
 ```bash
 kubectl create namespace essai-values
-helm install vitrail podinfo/podinfo --version 6.16.0 -n essai-values -f ~/essai-values/reglages.yaml --wait --timeout 180s | head -5
+helm install vitrail podinfo/podinfo --version 6.16.0 -n essai-values --set replicaCount=2 --set ui.color=#2a9d8f --set ui.message=Bonjour --wait --timeout 180s | head -5
 ```
 
 ```text
 namespace/essai-values created
 NAME: vitrail
-LAST DEPLOYED: Thu Nov 19 19:57:07 2026
+LAST DEPLOYED: Fri Nov 20 19:12:39 2026
 NAMESPACE: essai-values
 STATUS: deployed
 REVISION: 1
 ```
 
-`helm get values` shows the values the release received from you:
+You take this release over. The settings are nowhere on disk, but Helm keeps
+them in the cluster. `helm get values` shows the values the release received:
 
 ```bash
 helm get values vitrail -n essai-values
@@ -125,8 +118,8 @@ helm get values vitrail -n essai-values --all | grep -n -E '^replicaCount|^  col
 183:  message: Bonjour
 ```
 
-Your three values replaced the defaults. `logo`, which you did not touch, keeps
-its own.
+The colleague's three values replaced the defaults. `logo`, which nobody
+touched, keeps its own.
 
 ## 📚 Exercise 3: read what the application answers
 
@@ -143,12 +136,12 @@ IP=$(kubectl get service vitrail-podinfo -n essai-values -o jsonpath='{.spec.clu
   "message": "Bonjour",
 ```
 
-The application does apply your values.
+The application does apply these values.
 
 ## 📚 Exercise 4: --set guesses the type
 
 `--set` sets a value on the command line. `--reuse-values` keeps the values
-already passed. Change the message to `1984`:
+already passed. Change the message to `1984`, without changing version:
 
 ```bash
 helm upgrade vitrail podinfo/podinfo --version 6.16.0 -n essai-values --reuse-values --set ui.message=1984 --wait --timeout 180s > /dev/null; echo "upgrade : code $?"
@@ -178,7 +171,7 @@ kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.templ
 ```
 
 ```text
-2       	Thu Nov 19 19:57:16 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
+2       	Fri Nov 20 19:12:41 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
 [{"name":"PODINFO_UI_MESSAGE","value":"1984"},{"name":"PODINFO_UI_COLOR","value":"#2a9d8f"}]
 ```
 
@@ -201,23 +194,11 @@ upgrade : code 0
 ```
 
 This time, `"1984"` is in quotes: it is a string. A values file where the value
-is written in quotes (`message: "1984"`) gives the same result. The
-application shows the message:
+is written in quotes (`message: "1984"`) gives the same result.
 
-```bash
-IP=$(kubectl get service vitrail-podinfo -n essai-values -o jsonpath='{.spec.clusterIP}'); curl -s "http://$IP:9898" | grep -E '"(version|color|message)"'
-```
+## 📚 Exercise 6: the upgrade that loses the settings, and taking them back
 
-```text
-  "version": "6.16.0",
-  "color": "#2a9d8f",
-  "message": "1984",
-```
-
-## 📚 Exercise 6: upgrade without losing your settings
-
-Move to version 6.17.0 of the chart with a new message ("Salut" means "Hi"),
-**without** `--reuse-values`:
+Move to version 6.17.0 with a new message, and nothing else:
 
 ```bash
 helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values --set-string ui.message=Salut --wait --timeout 180s > /dev/null; helm get values vitrail -n essai-values; kubectl get deployment vitrail-podinfo -n essai-values
@@ -228,16 +209,44 @@ USER-SUPPLIED VALUES:
 ui:
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   1/1     1            1           29s
+vitrail-podinfo   1/1     1            1           8s
 ```
 
 The 2 replicas and the colour are gone: back to 1 replica. As soon as an
 `upgrade` receives a value, Helm starts again from the chart's defaults, plus
-only the values of this command. To keep your settings, pass the values file
-again on top of the new message:
+only the values of this command. The colleague's settings are not lost,
+though: each revision keeps its own.
 
 ```bash
-helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values -f ~/essai-values/reglages.yaml --set-string ui.message=Salut --wait --timeout 180s > /dev/null; helm get values vitrail -n essai-values; kubectl get deployment vitrail-podinfo -n essai-values
+helm history vitrail -n essai-values | cut -c1-110
+```
+
+```text
+REVISION	UPDATED                 	STATUS    	CHART         	APP VERSION	DESCRIPTION     
+1       	Fri Nov 20 19:12:39 2026	superseded	podinfo-6.16.0	6.16.0     	Install complete
+2       	Fri Nov 20 19:12:41 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+3       	Fri Nov 20 19:12:44 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+4       	Fri Nov 20 19:12:45 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+```
+
+Revision 3 is the last one that carried the full settings. Save its values in
+a file (`-o yaml` gives a reusable values file):
+
+```bash
+helm get values vitrail -n essai-values --revision 3 -o yaml > ~/reprise.yaml; cat ~/reprise.yaml
+```
+
+```text
+replicaCount: 2
+ui:
+  color: '#2a9d8f'
+  message: "1984"
+```
+
+Pass this file back with `-f`, then the new message ("Salut" means "Hi"):
+
+```bash
+helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values -f ~/reprise.yaml --set-string ui.message=Salut --wait --timeout 180s > /dev/null; helm get values vitrail -n essai-values; kubectl get deployment vitrail-podinfo -n essai-values
 ```
 
 ```text
@@ -247,30 +256,102 @@ ui:
   color: '#2a9d8f'
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   2/2     2            2           41s
+vitrail-podinfo   2/2     2            2           11s
 ```
 
-The file brings back the 2 replicas and the colour. `--set-string`, read after
-the file, wins for the message: `Salut` replaces `Bonjour`. When a value is
-given twice, the last one wins. The application runs 6.17.0 with all your
-settings:
+The file gives back the 2 replicas and the colour. `--set-string`, read after
+the file, wins for the message: `Salut` replaces `1984`. When a value is given
+twice, the last one wins. And since Helm started again from the 6.17.0
+defaults, the two values added by this version are there:
 
 ```bash
-IP=$(kubectl get service vitrail-podinfo -n essai-values -o jsonpath='{.spec.clusterIP}'); curl -s "http://$IP:9898" | grep -E '"(version|color|message)"'
+helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'
+```
+
+```text
+171:  backendIDs: []
+172:  backendMTLS: false
+```
+
+## 📚 Exercise 7: --reuse-values or --reset-then-reuse-values
+
+Why not simply upgrade with `--reuse-values`? Go back to revision 3, in
+6.16.0, and check that the two 6.17.0 values are not there (`grep -c` counts
+the lines found):
+
+```bash
+helm rollback vitrail 3 -n essai-values --wait --timeout 180s; helm get values vitrail -n essai-values --all | grep -c -E 'backend(MTLS|IDs)'
+```
+
+```text
+Rollback was a success! Happy Helming!
+0
+```
+
+Upgrade to 6.17.0 with `--reuse-values`:
+
+```bash
+helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values --reuse-values --set ui.message=Reprise --wait --timeout 180s > /dev/null; helm history vitrail -n essai-values | tail -1 | cut -c1-110; helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'; echo "grep : code $?"
+```
+
+```text
+7       	Fri Nov 20 19:12:53 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+grep : code 1
+```
+
+The release runs 6.17.0, but `grep` finds nothing (code 1): the two values
+added by 6.17.0 are missing. `--reuse-values` takes back **all** the values of
+the previous revision, the old version's defaults included, and ignores
+those of the new version. Here, the chart copes. Another chart, whose
+template reads a new value, may fail or produce a wrong manifest.
+
+`--reset-then-reuse-values` sorts this out: it starts again from the new
+version's defaults, then puts back only the values the release had received.
+Go back to revision 3 and start again with this option:
+
+```bash
+helm rollback vitrail 3 -n essai-values --wait --timeout 180s > /dev/null; helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values --reset-then-reuse-values --set ui.message=Reprise --wait --timeout 180s > /dev/null; helm history vitrail -n essai-values | tail -1 | cut -c1-110; helm get values vitrail -n essai-values
+```
+
+```text
+9       	Fri Nov 20 19:13:18 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+USER-SUPPLIED VALUES:
+replicaCount: 2
+ui:
+  color: '#2a9d8f'
+  message: Reprise
+```
+
+The settings are taken back, and so are the new 6.17.0 values:
+
+```bash
+helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'
+```
+
+```text
+171:  backendIDs: []
+172:  backendMTLS: false
+```
+
+The application runs 6.17.0 with all its settings (the `sleep` gives the old
+Pods time to stop):
+
+```bash
+sleep 10; IP=$(kubectl get service vitrail-podinfo -n essai-values -o jsonpath='{.spec.clusterIP}'); curl -s "http://$IP:9898" | grep -E '"(version|color|message)"'
 ```
 
 ```text
   "version": "6.17.0",
   "color": "#2a9d8f",
-  "message": "Salut",
+  "message": "Reprise",
 ```
 
 ## 🧹 Clean up
 
-Uninstall the release, delete its namespace and the values file:
+Uninstall the release, delete its namespace and the saved values file:
 
 ```bash
-helm uninstall vitrail -n essai-values --wait; kubectl delete namespace essai-values; rm -rf ~/essai-values
+helm uninstall vitrail -n essai-values --wait; kubectl delete namespace essai-values; rm -f ~/reprise.yaml
 ```
 
 ```text

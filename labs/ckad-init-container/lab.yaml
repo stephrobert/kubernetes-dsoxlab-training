@@ -1,12 +1,13 @@
 id: ckad-init-container
-title: "Wait for a dependency with an init container"
+title: "Repair the gatekeeper of an application with an init container"
 level: application-design
 section: ckad
 difficulty: intermediate
 description: |
-  Keep an application from starting before the Service it depends on answers,
-  with an init container that waits. Watch the Pod held in Init, put the
-  dependency in place, and see the application start on its own.
+  An application already runs although its dependency does not answer: its
+  init container only resolves a name. Diagnose the gatekeeper and the
+  Service, recreate the Pod with a gatekeeper that waits for a real answer,
+  then put the dependency in place and see the application start on its own.
 skills:
   - init-container
   - pod-design
@@ -38,15 +39,15 @@ validation:
 
 criteria:
   - id: gardien-qui-attend-le-service
-    label: "app has an init container that waits for config-svc, then its main container"
+    label: "facturation has an init container that waits for an answer from tarifs-svc on its port, then its main container"
     tests:
-      - test_app_a_un_init_container_qui_attend_config_svc
+      - test_facturation_a_un_gardien_qui_attend_tarifs_svc
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: dependance-derriere-le-service
-    label: "config-server answers behind config-svc"
+    label: "tarifs answers behind tarifs-svc, on port 8080"
     tests:
-      - test_config_server_repond_derriere_config_svc
+      - test_tarifs_repond_derriere_tarifs_svc
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: init-termine-avec-succes
@@ -56,8 +57,8 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
   - id: running-seul-quand-la-dependance-repond
-    label: "app went Running on its own once the dependency answered"
+    label: "facturation went Running on its own once tarifs answered"
     tests:
-      - test_app_est_passe_seul_en_running_quand_la_dependance_a_repondu
+      - test_facturation_est_passe_seul_en_running_quand_tarifs_a_repondu
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/

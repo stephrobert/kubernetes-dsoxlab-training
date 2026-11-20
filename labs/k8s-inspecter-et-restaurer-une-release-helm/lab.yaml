@@ -4,10 +4,10 @@ level: application-deployment
 section: ckad
 difficulty: intermediate
 description: |
-  The release vitrine (podinfo chart) failed when it was upgraded. Find the
-  latest version of the chart with a search, name the failed revision from
-  the history, go back to the last healthy revision, then make the chart's
-  tests pass on it.
+  The release vitrine (podinfo chart) failed twice when it was upgraded. Find
+  the latest 6.14 version of the chart with a filtered search, name the
+  failed revisions from the history, go back to the last healthy revision,
+  not to the previous one, then make the chart's tests pass on it.
 skills:
   - helm
   - helm-history
@@ -15,9 +15,7 @@ skills:
   - helm-test
 distros:
   - ubuntu24
-# La leçon n'a pas encore de jumelle anglaise (404 relevé le 2026-11-16) : le
-# lab pointe la page française.
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
 lab_type: lab
 estimated_time: 20m
 
@@ -41,28 +39,28 @@ validation:
 
 criteria:
   - id: derniere-version
-    label: "derniere-version.txt holds the latest version of the podinfo chart, as helm search repo gives it"
+    label: "derniere-version.txt holds the latest 6.14 version of the podinfo chart, as a filtered helm search repo gives it"
     tests:
       - test_la_derniere_version_du_chart_est_relevee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
   - id: revision-en-echec
-    label: "revision-en-echec.txt names the failed revision of the history"
+    label: "revisions-en-echec.txt names every failed revision of the history"
     tests:
-      - test_la_revision_en_echec_est_nommee
+      - test_les_revisions_en_echec_sont_nommees
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
   - id: retour-arriere
     label: "The last revision is a deployed rollback to the last healthy revision, and the application is available"
     tests:
       - test_la_release_est_revenue_a_la_revision_saine
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
   - id: tests-du-chart
     label: "The chart's tests succeeded on the current revision"
     tests:
       - test_les_tests_du_chart_passent
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
 
 feedback: full

@@ -1,15 +1,25 @@
 title: "Inspecter une release Helm en échec et la restaurer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
 description: |
-  La release vitrine (chart podinfo) a échoué lors de sa montée de version.
-  Trouvez la dernière version du chart par une recherche, nommez la révision
-  en échec d'après l'historique, revenez à la dernière révision saine, puis
-  faites passer les tests du chart sur elle.
+  La release vitrine (chart podinfo) a échoué deux fois lors de ses montées de
+  version. Trouvez la dernière version 6.14 du chart par une recherche
+  filtrée, nommez les révisions en échec d'après l'historique, revenez à la
+  dernière révision saine, et non à la précédente, puis faites passer les
+  tests du chart sur elle.
 criteria:
   - id: derniere-version
-    label: "derniere-version.txt porte la dernière version du chart podinfo, telle que helm search repo la donne"
+    label: "derniere-version.txt porte la dernière version 6.14 du chart podinfo, telle qu'une recherche filtrée la donne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
   - id: revision-en-echec
-    label: "revision-en-echec.txt nomme la révision en échec de l'historique"
+    label: "revisions-en-echec.txt nomme chaque révision en échec de l'historique"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
   - id: retour-arriere
     label: "La dernière révision est un rollback déployé vers la dernière révision saine, et l'application est disponible"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/
   - id: tests-du-chart
     label: "Les tests du chart ont réussi sur la révision courante"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/commande-helm/

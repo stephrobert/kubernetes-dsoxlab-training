@@ -2,10 +2,10 @@
 
 `kubectl create` creates an object, once. `kubectl apply` brings an object to
 the state described in a file, as many times as you replay it. In this course,
-you compare the two, you apply a whole folder, you see the trap of a field
-removed from the file, you find out who "owns" each field of an object, you
-take over a field with server-side apply, then you delete what is no longer in
-the folder.
+you see what `create --save-config` changes for `apply`, a file that an applied
+folder ignores without saying so, the trap of a field removed from the file,
+you find out who "owns" each field of an object, you take over a field with
+server-side apply, then you delete what is no longer in the folder.
 
 You work in a scratch namespace, `essai-apply`, with a `colis` application and
 an `etiquettes` Deployment. The challenge will ask you for the same thing on
@@ -25,7 +25,7 @@ You are now connected to the `k8s-kind.lab` machine. The kind cluster `lab` is
 running there, and your kubectl already targets it.
 
 The outputs shown in this course were recorded on this machine on 19 November
-2026, with Kubernetes 1.37.
+2026, with Kubernetes v1.37.0.
 
 Prepare the scratch namespace and an `appli` folder with two files: the
 `colis` Deployment at the root, and its ConfigMap in an `extra` subfolder. Both
@@ -75,13 +75,12 @@ namespace/essai-apply created
 /home/ansible/essai-apply/appli/extra/colis-config.yaml
 ```
 
-## 📚 Exercise 1: create, then apply
+## 📚 Exercise 1: create, create --save-config, then apply
 
 Create the Deployment with `create`, twice in a row:
 
 ```bash
-kubectl create -f ~/essai-apply/appli/colis.yaml
-kubectl create -f ~/essai-apply/appli/colis.yaml
+kubectl create -f ~/essai-apply/appli/colis.yaml; kubectl create -f ~/essai-apply/appli/colis.yaml
 ```
 
 ```text
@@ -89,56 +88,117 @@ deployment.apps/colis created
 Error from server (AlreadyExists): error when creating "/home/ansible/essai-apply/appli/colis.yaml": deployments.apps "colis" already exists
 ```
 
-`create` refuses an object that already exists. Now do the same with `apply`:
+`create` refuses an object that already exists. Make a copy of the file under
+the name `colis-bis`, and create it with `create --save-config`:
+
+```bash
+sed -e 's/name: colis$/name: colis-bis/' -e 's/app: colis$/app: colis-bis/' ~/essai-apply/appli/colis.yaml > ~/essai-apply/colis-bis.yaml
+kubectl create -f ~/essai-apply/colis-bis.yaml --save-config
+```
+
+```text
+deployment.apps/colis-bis created
+```
+
+`--save-config` asks `create` to also write the
+`kubectl.kubernetes.io/last-applied-configuration` annotation, a copy of the
+file that `apply` uses to know what it set itself. Compare both objects (`cut`
+trims long lines):
+
+```bash
+kubectl get deployment colis colis-bis -n essai-apply -o custom-columns="NOM:.metadata.name,LAST-APPLIED:.metadata.annotations.kubectl\.kubernetes\.io/last-applied-configuration" | cut -c1-80
+```
+
+```text
+NOM         LAST-APPLIED
+colis       <none>
+colis-bis   {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations
+```
+
+`colis` does not have the annotation, `colis-bis` does. Now apply both files,
+then the first one a second time:
 
 ```bash
 kubectl apply -f ~/essai-apply/appli/colis.yaml
+kubectl apply -f ~/essai-apply/colis-bis.yaml
 kubectl apply -f ~/essai-apply/appli/colis.yaml
 ```
 
 ```text
 Warning: resource deployments/colis is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
 deployment.apps/colis configured
+deployment.apps/colis-bis unchanged
 deployment.apps/colis unchanged
 ```
 
-The first `apply` warns you: the object was created by `create`, it lacks the
-`last-applied-configuration` annotation, and `apply` adds it. The second
-`apply` changes nothing (`unchanged`): you can replay it safely.
-
-This annotation keeps a copy of the file applied last time. Here is its
-beginning:
+On `colis`, created by a plain `create`, the first `apply` warns that the
+annotation is missing and sets it. On `colis-bis`, nothing to report: the
+object is ready for `apply` from its creation. The second `apply` of `colis`
+changes nothing (`unchanged`): you can replay it safely. Delete `colis-bis`,
+which is no longer needed:
 
 ```bash
-kubectl get deployment colis -n essai-apply -o jsonpath='{.metadata.annotations.kubectl\.kubernetes\.io/last-applied-configuration}' | cut -c1-90
+kubectl delete deployment colis-bis -n essai-apply; rm -f ~/essai-apply/colis-bis.yaml
 ```
 
 ```text
-{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"
+deployment.apps "colis-bis" deleted from essai-apply namespace
 ```
 
-## 📚 Exercise 2: a folder and its subfolders
+## 📚 Exercise 2: a file kubectl ignores without saying so
 
-`apply -f` accepts a folder. Apply `appli`:
+Add a Service in `extra`, but in a file ending with `.old`, as people often
+leave behind:
+
+```bash
+cat > ~/essai-apply/appli/extra/colis-service.yaml.old <<'YAML'
+apiVersion: v1
+kind: Service
+metadata:
+  name: colis
+  namespace: essai-apply
+  labels:
+    app: colis
+spec:
+  selector:
+    app: colis
+  ports:
+    - port: 80
+YAML
+```
+
+`apply -f` accepts a directory. Apply `appli`, then the same with `-R`
+(recursive), which goes down into subdirectories:
 
 ```bash
 kubectl apply -f ~/essai-apply/appli/
-```
-
-```text
-deployment.apps/colis unchanged
-```
-
-Only `colis.yaml` was read: the ConfigMap in the `extra` subfolder is ignored.
-`-R` (recursive) goes down into subfolders:
-
-```bash
 kubectl apply -f ~/essai-apply/appli/ -R
 ```
 
 ```text
 deployment.apps/colis unchanged
+deployment.apps/colis unchanged
 configmap/colis-config created
+```
+
+Without `-R`, only `colis.yaml` is read. With `-R`, the ConfigMap of `extra`
+is created. And the Service?
+
+```bash
+kubectl get service colis -n essai-apply
+```
+
+```text
+Error from server (NotFound): services "colis" not found
+```
+
+It does not exist, and no command reported it. In a directory, kubectl only
+reads files ending in `.yaml`, `.yml` and `.json`: the others are ignored
+without a word. One badly named file, and an object is missing without any
+error. Remove this file:
+
+```bash
+rm ~/essai-apply/appli/extra/colis-service.yaml.old
 ```
 
 ## 📚 Exercise 3: remove a field from the file
@@ -155,7 +215,10 @@ deployment.apps/colis scaled
 deployment "colis" successfully rolled out
 ```
 
-So the file must no longer set `replicas`. Remove the line:
+So the file must no longer set `replicas`. Mind the order: as long
+as the file writes `replicas: 2`, applying it again, alone or with the whole
+directory, brings `colis` back to 2 replicas, and no real autoscaler would
+be there to go back to 5. First remove the line:
 
 ```bash
 sed -i '/^  replicas:/d' ~/essai-apply/appli/colis.yaml; grep -c replicas ~/essai-apply/appli/colis.yaml
@@ -355,7 +418,7 @@ NAME               DATA   AGE   APP
 autre              1      0s    autre
 colis-config       1      3s    colis
 colis-vieux        1      0s    colis
-kube-root-ca.crt   1      3s    
+kube-root-ca.crt   1      4s
 ```
 
 `-L app` adds a column with the value of the `app` label. `--prune` deletes the
@@ -381,13 +444,13 @@ kubectl apply -f ~/essai-apply/appli -R --prune -l app=colis --dry-run=server
 ```text
 deployment.apps/colis unchanged (server dry run)
 configmap/colis-config unchanged (server dry run)
-W1119 19:24:06.068201   49079 prune.go:71] Deprecated: kubectl apply will no longer prune non-namespaced resources by default when used with the --namespace flag in a future release. To preserve the current behaviour, list the resources you want to target explicitly in the --prune-allowlist flag.
+W1120 16:48:01.930875  208638 prune.go:71] Deprecated: kubectl apply will no longer prune non-namespaced resources by default when used with the --namespace flag in a future release. To preserve the current behaviour, list the resources you want to target explicitly in the --prune-allowlist flag.
 configmap/colis-vieux pruned (server dry run)
 Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
 ```
 
 Only `colis-vieux` would go (`pruned`). `autre` is not listed: its label does
-not match. The `W1119` and `Warning` lines are kubectl warnings about future
+not match. The `W1120` and `Warning` lines are kubectl warnings about future
 changes, with no effect here. Run the pruning for real, then check:
 
 ```bash
@@ -398,13 +461,13 @@ kubectl get configmap -n essai-apply -L app
 ```text
 deployment.apps/colis unchanged
 configmap/colis-config unchanged
-W1119 19:24:07.616119   49090 prune.go:71] Deprecated: kubectl apply will no longer prune non-namespaced resources by default when used with the --namespace flag in a future release. To preserve the current behaviour, list the resources you want to target explicitly in the --prune-allowlist flag.
+W1120 16:48:03.490282  208725 prune.go:71] Deprecated: kubectl apply will no longer prune non-namespaced resources by default when used with the --namespace flag in a future release. To preserve the current behaviour, list the resources you want to target explicitly in the --prune-allowlist flag.
 configmap/colis-vieux pruned
 Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
 NAME               DATA   AGE   APP
-autre              1      4s    autre
-colis-config       1      7s    colis
-kube-root-ca.crt   1      7s    
+autre              1      3s    autre
+colis-config       1      6s    colis
+kube-root-ca.crt   1      7s
 ```
 
 `colis-vieux` is gone, `autre` is untouched.

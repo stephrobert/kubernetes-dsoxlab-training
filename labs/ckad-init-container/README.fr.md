@@ -1,17 +1,17 @@
-# Attendre une dépendance avec un init container
+# Réparer le gardien d'une application avec un init container
 
 Un **init container** est un conteneur qui s'exécute **avant** les conteneurs
 principaux d'un Pod, jusqu'au bout. Tant qu'il n'a pas réussi, les conteneurs
 principaux ne démarrent pas. On s'en sert pour préparer quelque chose, ou pour
-attendre qu'une dépendance réponde. Dans ce cours, vous écrivez un init
-container qui prépare un fichier, vous voyez qu'un Service peut exister sans
-personne derrière, vous faites attendre un Pod, vous faites arriver sa
-dépendance, puis vous voyez ce qui se passe quand un init container échoue.
+attendre qu'une dépendance réponde. Dans ce cours, vous voyez ce que devient
+un Pod dont l'init container échoue, selon qu'il est relancé ou non. Vous
+voyez aussi qu'un Service peut exister sans personne derrière. Puis vous
+écrivez une attente bornée, vous la laissez expirer, et vous faites arriver la
+dépendance.
 
 Vous travaillez dans un namespace d'essai, `essai-init`, avec une application
-`boutique` qui attend un service `stock-svc`. Le challenge vous demandera la
-même chose avec d'autres noms, dans un autre namespace : vous le ferez seul, à
-la fin.
+`boutique` qui attend un service `stock-svc`. Le challenge porte sur une autre
+application, dans un autre namespace : vous le ferez seul, à la fin.
 
 Page associée : [Init containers et sidecars](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/).
 
@@ -27,14 +27,14 @@ Vous êtes maintenant connecté à `k8s-cp.lab`, le nœud qui pilote le cluster
 kubeadm (le control plane). Votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026, avec Kubernetes v1.37.2.
+20 novembre 2026, avec Kubernetes v1.37.2.
 
-## 📚 Exercice 1 : un init container qui réussit
+## 📚 Exercice 1 : un init container qui échoue, sans relance
 
-Créez le namespace d'essai, puis un Pod `preparation`. Son init container
-`ecrire-page` écrit une page dans un volume partagé (`emptyDir`). Le conteneur
-principal `web`, un nginx, sert ce même volume. Les init containers se
-déclarent sous `initContainers`, à côté de `containers` :
+Créez le namespace d'essai, puis un Pod `unique`. Son init container
+`verifier` sort avec le code 3. Le Pod déclare `restartPolicy: Never` : rien
+n'y est relancé. Les init containers se déclarent sous `initContainers`, à
+côté de `containers` :
 
 ```bash
 kubectl create namespace essai-init
@@ -42,81 +42,111 @@ cat <<'YAML' | kubectl apply -n essai-init -f -
 apiVersion: v1
 kind: Pod
 metadata:
-  name: preparation
+  name: unique
 spec:
+  restartPolicy: Never
   initContainers:
-    - name: ecrire-page
+    - name: verifier
       image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
-      command: ["sh", "-c", "echo page preparee par l init container > /travail/index.html"]
-      volumeMounts:
-        - name: travail
-          mountPath: /travail
+      command: ["sh", "-c", "echo verification impossible; exit 3"]
   containers:
     - name: web
       image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-      volumeMounts:
-        - name: travail
-          mountPath: /usr/share/nginx/html
-  volumes:
-    - name: travail
-      emptyDir: {}
 YAML
 ```
 
 ```text
 namespace/essai-init created
-pod/preparation created
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unique
+spec:
+  restartPolicy: Never
+  initContainers:
+    - name: verifier
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+      command: ["sh", "-c", "echo verification impossible; exit 3"]
+  containers:
+    - name: web
+      image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+YAML
+pod/unique created
 ```
 
-Attendez que le Pod soit prêt :
+Après 10 secondes :
 
 ```bash
-kubectl wait --for=condition=Ready pod/preparation -n essai-init --timeout=120s; kubectl get pod preparation -n essai-init
+sleep 10; kubectl get pod unique -n essai-init
 ```
 
 ```text
-pod/preparation condition met
-NAME          READY   STATUS    RESTARTS   AGE
-preparation   1/1     Running   0          1s
+NAME     READY   STATUS       RESTARTS   AGE
+unique   0/1     Init:Error   0          10s
 ```
 
-`READY 1/1` ne compte que le conteneur principal. L'état de l'init container
-se lit dans `status.initContainerStatuses` :
+`Init:Error` : l'init container a échoué. La phase du Pod, le code de sortie
+et le nombre de relances se lisent dans son statut :
 
 ```bash
-kubectl get pod preparation -n essai-init -o jsonpath='{.status.initContainerStatuses[0].name} {.status.initContainerStatuses[0].state.terminated.reason} {.status.initContainerStatuses[0].state.terminated.exitCode}{"\n"}'
+kubectl get pod unique -n essai-init -o jsonpath='{.status.phase} {.status.initContainerStatuses[0].state.terminated.exitCode} {.status.initContainerStatuses[0].restartCount}{"\n"}'
 ```
 
 ```text
-ecrire-page Completed 0
+Failed 3 0
 ```
 
-Il est terminé (`Completed`), avec le code 0. Le conteneur principal sert bien
-la page qu'il a écrite :
+Le Pod est en phase `Failed`, avec le code 3 et aucune relance. 20 secondes
+plus tard, rien n'a bougé :
 
 ```bash
-kubectl exec preparation -n essai-init -c web -- cat /usr/share/nginx/html/index.html
+sleep 20; kubectl get pod unique -n essai-init
 ```
 
 ```text
-page preparee par l init container
+NAME     READY   STATUS       RESTARTS   AGE
+unique   0/1     Init:Error   0          30s
 ```
+
+Avec `restartPolicy: Never`, un init container en échec fait échouer tout le
+Pod, définitivement. Le conteneur `web` ne démarrera jamais.
 
 ## 📚 Exercice 2 : un Service sans personne derrière
 
-Créez un Service `stock-svc` qui sélectionne les Pods `app=stock`.
-`kubectl create service` met par défaut le sélecteur `app: stock-svc` : `sed`
-le remplace par `app: stock` avant l'envoi :
+Créez un Service `stock-svc` qui sélectionne les Pods `app=stock`, sur le
+port 80 :
 
 ```bash
-kubectl create service clusterip stock-svc --tcp=80:80 -n essai-init -o yaml --dry-run=client | sed 's/app: stock-svc/app: stock/' | kubectl apply -f - -n essai-init
+cat <<'YAML' | kubectl apply -n essai-init -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-svc
+spec:
+  selector:
+    app: stock
+  ports:
+    - port: 80
+      targetPort: 80
+YAML
 kubectl get endpointslices -n essai-init -l kubernetes.io/service-name=stock-svc
 ```
 
 ```text
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-svc
+spec:
+  selector:
+    app: stock
+  ports:
+    - port: 80
+      targetPort: 80
+YAML
 service/stock-svc created
 NAME              ADDRESSTYPE   PORTS     ENDPOINTS   AGE
-stock-svc-jhcjx   IPv4          <unset>   <unset>     0s
+stock-svc-qb8zx   IPv4          <unset>   <unset>     0s
 ```
 
 Aucun Pod ne porte `app=stock` : le Service n'a aucune adresse derrière lui
@@ -129,9 +159,9 @@ kubectl run sonde --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52
 
 ```text
 Name:	stock-svc.essai-init.svc.cluster.local
-Address: 10.100.162.100
+Address: 10.100.1.209
 
-wget: can't connect to remote host (10.100.162.100): Connection refused
+wget: can't connect to remote host (10.100.1.209): Connection refused
 wget : code 1
 ```
 
@@ -139,11 +169,13 @@ Le nom se résout : le Service existe dans le DNS dès sa création. Mais la
 requête HTTP est refusée, car personne ne répond derrière. Attendre que le nom
 se résolve n'attend donc rien. Il faut attendre une **réponse**.
 
-## 📚 Exercice 3 : un init container qui attend
+## 📚 Exercice 3 : une attente bornée qui expire
 
-Créez le Pod `boutique`. Son init container `attendre-stock` répète une
-requête HTTP vers `stock-svc` toutes les 3 secondes (`until … do … done`),
-jusqu'à ce qu'elle réussisse :
+Créez le Pod `boutique`. Son init container `attendre-stock` interroge
+`stock-svc` en HTTP 5 fois, à 2 secondes d'intervalle. Il sort avec le code 0
+dès qu'une requête réussit, et avec le code 1 après le cinquième échec. Une
+attente sans limite ne se terminerait jamais, et rien ne signalerait le
+problème :
 
 ```bash
 cat <<'YAML' | kubectl apply -n essai-init -f -
@@ -155,7 +187,17 @@ spec:
   initContainers:
     - name: attendre-stock
       image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
-      command: ["sh", "-c", "until wget -qO- -T 2 http://stock-svc/ > /dev/null; do echo stock-svc ne repond pas encore; sleep 3; done; echo stock-svc repond"]
+      command:
+        - sh
+        - -c
+        - |
+          for i in 1 2 3 4 5; do
+            wget -qO- -T 2 http://stock-svc/ > /dev/null && echo stock-svc repond && exit 0
+            echo essai $i : stock-svc ne repond pas
+            sleep 2
+          done
+          echo abandon apres 5 essais
+          exit 1
   containers:
     - name: web
       image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
@@ -163,42 +205,83 @@ YAML
 ```
 
 ```text
+apiVersion: v1
+kind: Pod
+metadata:
+  name: boutique
+spec:
+  initContainers:
+    - name: attendre-stock
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+      command:
+        - sh
+        - -c
+        - |
+          for i in 1 2 3 4 5; do
+            wget -qO- -T 2 http://stock-svc/ > /dev/null && echo stock-svc repond && exit 0
+            echo essai $i : stock-svc ne repond pas
+            sleep 2
+          done
+          echo abandon apres 5 essais
+          exit 1
+  containers:
+    - name: web
+      image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+YAML
 pod/boutique created
 ```
 
-Après 15 secondes, regardez le Pod :
+Après 25 secondes, regardez le Pod :
 
 ```bash
-sleep 15; kubectl get pod boutique -n essai-init
+sleep 25; kubectl get pod boutique -n essai-init
 ```
 
 ```text
-NAME       READY   STATUS     RESTARTS   AGE
-boutique   0/1     Init:0/1   0          15s
+NAME       READY   STATUS     RESTARTS      AGE
+boutique   0/1     Init:0/1   1 (10s ago)   25s
 ```
 
-`Init:0/1` : 0 init container terminé sur 1. Ses journaux montrent qu'il
-attend :
+`Init:0/1` : 0 init container terminé sur 1. La colonne `RESTARTS` dit que
+l'init container a déjà été relancé une fois : la première attente a expiré.
+Ce Pod n'a pas de `restartPolicy`, il vaut donc `Always`, et Kubernetes relance
+l'init container en échec. `--previous` montre les journaux de la tentative
+d'avant :
 
 ```bash
-kubectl logs boutique -n essai-init -c attendre-stock | tail -3
+kubectl logs boutique -n essai-init -c attendre-stock --previous | tail -2
 ```
 
 ```text
-stock-svc ne repond pas encore
-wget: can't connect to remote host (10.100.162.100): Connection refused
-stock-svc ne repond pas encore
+wget: can't connect to remote host (10.100.1.209): Connection refused
+abandon apres 5 essais
 ```
 
-Et le conteneur principal n'a pas démarré du tout :
+40 secondes plus tard :
 
 ```bash
-kubectl logs boutique -n essai-init -c web 2>&1 | tail -1
+sleep 40; kubectl get pod boutique -n essai-init
 ```
 
 ```text
-Error from server (BadRequest): container "web" in pod "boutique" is waiting to start: PodInitializing
+NAME       READY   STATUS       RESTARTS      AGE
+boutique   0/1     Init:Error   2 (34s ago)   65s
 ```
+
+Une deuxième attente a expiré, et le Pod affiche `Init:Error`. Le compteur de
+relances et le code de la dernière sortie le confirment :
+
+```bash
+kubectl get pod boutique -n essai-init -o jsonpath='{.status.initContainerStatuses[0].restartCount} {.status.initContainerStatuses[0].lastState.terminated.exitCode}{"\n"}'
+```
+
+```text
+2 1
+```
+
+Une attente bornée se voit : le Pod passe en erreur et ses relances
+s'additionnent. Une attente sans limite resterait en `Init:0/1` sans fin, sans
+aucune relance.
 
 ## 📚 Exercice 4 : la dépendance arrive
 
@@ -206,47 +289,44 @@ Lancez un Pod nginx `stock` avec le label `app=stock` :
 
 ```bash
 kubectl run stock --image=nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb --labels=app=stock --port=80 -n essai-init; kubectl wait --for=condition=Ready pod/stock -n essai-init --timeout=120s
-kubectl get endpointslices -n essai-init -l kubernetes.io/service-name=stock-svc
 ```
 
 ```text
 pod/stock created
 pod/stock condition met
-NAME              ADDRESSTYPE   PORTS   ENDPOINTS      AGE
-stock-svc-jhcjx   IPv4          80      10.244.38.87   20s
 ```
 
 Le Service a maintenant une adresse. Sans rien toucher d'autre, attendez que
-`boutique` soit prêt :
+`boutique` soit prêt. Selon le moment où l'init container sera relancé, cela
+peut prendre plus d'une minute :
 
 ```bash
-kubectl wait --for=condition=Ready pod/boutique -n essai-init --timeout=120s; kubectl get pod boutique -n essai-init
+kubectl wait --for=condition=Ready pod/boutique -n essai-init --timeout=300s; kubectl get pod boutique -n essai-init
 ```
 
 ```text
 pod/boutique condition met
 NAME       READY   STATUS    RESTARTS   AGE
-boutique   1/1     Running   0          17s
+boutique   1/1     Running   0          89s
 ```
 
-L'init container a vu la réponse, s'est terminé, et le conteneur principal a
-démarré :
+La relance suivante a trouvé `stock-svc` qui répond, l'init container s'est
+terminé et le conteneur principal a démarré. La colonne `RESTARTS` est
+revenue à 0 : elle ne compte que les conteneurs principaux une fois le Pod
+démarré. Les journaux de la dernière tentative :
 
 ```bash
 kubectl logs boutique -n essai-init -c attendre-stock | tail -2
-kubectl get pod boutique -n essai-init -o jsonpath='{.status.initContainerStatuses[0].state.terminated.reason} {.status.initContainerStatuses[0].state.terminated.exitCode}{"\n"}'
 ```
 
 ```text
-stock-svc ne repond pas encore
 stock-svc repond
-Completed 0
 ```
 
-## 📚 Exercice 5 : un init container qui échoue
+## 📚 Exercice 5 : un init container qui échoue, avec relance
 
-Que se passe-t-il si l'init container sort en erreur ? Créez un Pod `rate`
-dont l'init container sort avec le code 1 :
+Comparez avec l'exercice 1. Créez un Pod `rate` dont l'init container sort
+avec le code 1, sans `restartPolicy`, donc en `Always` :
 
 ```bash
 cat <<'YAML' | kubectl apply -n essai-init -f -
@@ -266,6 +346,19 @@ YAML
 ```
 
 ```text
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rate
+spec:
+  initContainers:
+    - name: verifier
+      image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+      command: ["sh", "-c", "echo verification impossible; exit 1"]
+  containers:
+    - name: web
+      image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+YAML
 pod/rate created
 ```
 
@@ -283,10 +376,10 @@ rate   0/1     Init:Error   2 (24s ago)   25s
 verification impossible
 ```
 
-`Init:Error` : l'init container a échoué. Kubernetes le relance (déjà 2 fois),
-et le conteneur principal attend toujours. Un init container doit donc
-**réussir** pour que le Pod démarre. C'est ce qui permet de bloquer une
-application tant que sa dépendance manque.
+Même `Init:Error` qu'à l'exercice 1, mais cette fois Kubernetes relance
+l'init container (déjà 2 fois), et le Pod n'est pas en échec définitif. Un
+init container doit **réussir** pour que le Pod démarre : c'est ce qui permet
+de bloquer une application tant que sa dépendance manque.
 
 ## 🧹 Nettoyage
 
@@ -321,8 +414,9 @@ dsoxlab check ckad-init-container
 
 ## 🎯 Le challenge
 
-À vous, seul cette fois : une autre application, qui doit attendre son serveur
-de configuration avant de démarrer.
+À vous, seul cette fois : une application tourne déjà alors que sa
+dépendance ne répond pas. Son gardien n'a rien retenu : trouvez pourquoi, et
+réparez-le.
 
 ```bash
 dsoxlab run ckad-init-container

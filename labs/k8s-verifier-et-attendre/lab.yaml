@@ -1,6 +1,10 @@
 # Lab guidé de la leçon « kubectl diff et wait » (KUBERN-06-04) du module
 # « Déployer ses applications ». Il fait prévoir avant d'appliquer, attendre
-# après, et écrire un script de déploiement qui s'arrête au bon moment.
+# après, et écrire un script de déploiement qui s'arrête au bon moment. Depuis
+# le 2026-11-20, le relevé demande une révision propre au cluster (plus les
+# codes de diff, que la leçon imprime), et le script doit aussi attendre les
+# Jobs du dossier en s'arrêtant au premier échec (la leçon en donne les pièces
+# sans les assembler).
 id: k8s-verifier-et-attendre
 title: "Preview with diff, wait with wait"
 level: application-deployment
@@ -10,7 +14,8 @@ description: |
   Move an application to its version 2 and run its migration Job, previewing
   each change with kubectl diff and waiting for the real end of the rollout,
   then write a deployment script that exits cleanly when nothing differs and
-  stops before applying when kubectl diff fails.
+  stops before applying when kubectl diff fails, and waits for the Jobs of the
+  folder, stopping at the first one that fails.
 skills:
   - kubectl-diff
   - kubectl-wait
@@ -43,10 +48,10 @@ criteria:
       - test_le_cluster_correspond_au_dossier
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
-  - id: codes-de-diff
-    label: "The record gives the three exit codes of kubectl diff"
+  - id: revision-de-la-version-2
+    label: "The record gives the revision facturation is at once version 2 is deployed"
     tests:
-      - test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff
+      - test_le_releve_donne_la_revision_de_la_version_2
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
   - id: nouvelle-version-en-place
@@ -59,5 +64,11 @@ criteria:
     label: "deployer.sh exits in 0 without differences, and stops on error before applying"
     tests:
       - test_deployer_sh_sait_s_arreter
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/
+  - id: script-qui-attend-les-jobs
+    label: "deployer.sh waits for the Jobs of the folder, exits in 0 when they succeed, and stops on error as soon as one fails"
+    tests:
+      - test_deployer_sh_attend_les_jobs_et_s_arrete_sur_un_echec
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/

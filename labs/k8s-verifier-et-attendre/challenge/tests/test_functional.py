@@ -3,8 +3,15 @@
 Ces tests comparent le dossier ~/deploiement/ au cluster « lab » avec
 kubectl diff, lisent le relevé des codes de sortie, vérifient que la nouvelle
 version tourne réellement (pas seulement que le Deployment se dit Available),
-puis rejouent le script deployer.sh de l'apprenant sur le dossier inchangé.
-Un test vérifie un seul état demandé par l'énoncé.
+puis rejouent le script deployer.sh de l'apprenant sur le dossier inchangé,
+sur un dossier refusé, et sur deux copies portant un Job qui réussit et un Job
+qui échoue. Un test vérifie un seul état demandé par l'énoncé.
+
+Depuis le 2026-11-20, le relevé ne demande plus les codes 0, 1 et 2 de
+kubectl diff, des constantes que la leçon imprime : il demande la révision
+actuelle de facturation, que la préparation rend différente à chaque fois (de 1
+à 3 redémarrages). Et le script doit attendre les Jobs du dossier, en sortant
+en erreur dès qu'un Job échoue : la leçon donne les pièces sans les assembler.
 
 Tous échouent avant le travail : le Job de migration du dossier n'est pas
 appliqué, le relevé et le script n'existent pas, et facturation tourne en
@@ -76,16 +83,20 @@ def test_le_cluster_correspond_au_dossier(host):
 
 
 # ----------------------------------------------------------------------
-# 2. Le relevé donne les trois codes de sortie de kubectl diff.
+# 2. Le relevé donne la révision de facturation qui porte la version 2.
 # ----------------------------------------------------------------------
-def test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff(releve):
-    attendus = {"aucune-difference": "0", "differences": "1", "erreur": "2"}
-    lus = {cle: releve.get(cle, "") for cle in attendus}
-    assert lus == attendus, message(
-        en=f"~/deploiement/releve.txt gives {lus}. Expected the exit code of kubectl diff in each "
-        "of the three cases, as you measured it.",
-        fr=f"~/deploiement/releve.txt donne {lus}. Attendu le code de sortie de kubectl diff dans "
-        "chacun des trois cas, tel que vous l'avez mesuré.",
+def test_le_releve_donne_la_revision_de_la_version_2(host, releve):
+    d = _json(host, f"-n {NS} get deployment facturation") or {}
+    image = ((d.get("spec") or {}).get("template") or {}).get("spec", {}).get("containers", [{}])[0].get("image")
+    revision = ((d.get("metadata") or {}).get("annotations") or {}).get("deployment.kubernetes.io/revision", "")
+    lue = releve.get("revision-v2", "")
+    assert image == V2 and lue and lue == revision, message(
+        en=f"~/deploiement/releve.txt gives revision-v2 {lue or '(empty)'!r}. Expected the revision "
+        "facturation is at once version 2 is deployed, as the cluster gives it. It is not the "
+        "same from one preparation of the lab to the next.",
+        fr=f"~/deploiement/releve.txt donne revision-v2 {lue or '(vide)'!r}. Attendu la révision où "
+        "en est facturation une fois la version 2 déployée, telle que le cluster la donne. Elle "
+        "n'est pas la même d'une préparation du lab à l'autre.",
     )
 
 
@@ -216,4 +227,72 @@ def test_deployer_sh_sait_s_arreter(host):
         fr=f"Lancé sur un dossier que kubectl diff ne peut pas comparer (un objet refusé par le serveur), "
         f"deployer.sh sort en code {res.rc} et {constat_fr}. "
         "Attendu : un arrêt en erreur, avant d'appliquer quoi que ce soit.",
+    )
+
+
+# ----------------------------------------------------------------------
+# 5. deployer.sh attend les Jobs du dossier, et sort au plus tôt si l'un échoue.
+# ----------------------------------------------------------------------
+#: Un Job qui échoue doit arrêter le script bien avant les délais d'attente
+#: habituels (120 s pour un rollout) : 60 s couvrent le démarrage du Pod.
+DELAI_ECHEC = 60
+
+
+def _job(nom: str, commande: str) -> str:
+    return f"""apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {nom}
+  namespace: paiements
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {nom}
+          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          command: ["sh", "-c", "{commande}"]
+"""
+
+
+def _lancer_avec_job(host, nom: str, commande: str) -> tuple[int, float]:
+    maison = _maison(host)
+    copie = host.check_output("sudo mktemp -d /tmp/deployer-job-XXXXXX").strip()
+    try:
+        host.run(f"sudo cp {maison}/deploiement/*.yaml {copie}/")
+        contenu = base64.b64encode(_job(nom, commande).encode()).decode()
+        host.run(f"echo {contenu} | base64 -d | sudo tee {copie}/zz-{nom}.yaml > /dev/null")
+        host.run(f"sudo chmod -R a+rX {copie}")
+        debut = time.monotonic()
+        res = host.run(f"{APPRENANT} timeout 150 {maison}/deploiement/deployer.sh {copie} < /dev/null")
+        duree = time.monotonic() - debut
+    finally:
+        host.run(f"{ADMIN} -n {NS} delete job {nom} --ignore-not-found --wait=false")
+        host.run(f"sudo rm -rf {copie}")
+    return res.rc, duree
+
+
+def test_deployer_sh_attend_les_jobs_et_s_arrete_sur_un_echec(host):
+    script = f"{_maison(host)}/deploiement/deployer.sh"
+    f = host.file(script)
+    assert f.exists and f.mode & 0o100, message(
+        en="~/deploiement/deployer.sh does not exist or is not executable.",
+        fr="~/deploiement/deployer.sh n'existe pas ou n'est pas exécutable.",
+    )
+    rc, duree = _lancer_avec_job(host, "essai-deployer-echec", "echo echec; exit 1")
+    assert rc != 0 and duree < DELAI_ECHEC, message(
+        en=f"Run on a folder whose Job fails, deployer.sh exits with code {rc} after "
+        f"{duree:.0f}s. Expected: an error, in less than {DELAI_ECHEC}s. A wait on the "
+        "Complete condition alone never sees a failed Job, and only stops at its timeout.",
+        fr=f"Lancé sur un dossier dont le Job échoue, deployer.sh sort en code {rc} après "
+        f"{duree:.0f} s. Attendu : une erreur, en moins de {DELAI_ECHEC} s. Une attente sur la "
+        "seule condition Complete ne voit jamais un Job en échec, et ne s'arrête qu'à son délai.",
+    )
+    rc, duree = _lancer_avec_job(host, "essai-deployer-reussite", "sleep 3; echo fini")
+    assert rc == 0, message(
+        en=f"Run on a folder whose Job succeeds, deployer.sh exits with code {rc} after "
+        f"{duree:.0f}s. Expected code 0 once the Job is complete.",
+        fr=f"Lancé sur un dossier dont le Job réussit, deployer.sh sort en code {rc} après "
+        f"{duree:.0f} s. Attendu le code 0 une fois le Job terminé.",
     )

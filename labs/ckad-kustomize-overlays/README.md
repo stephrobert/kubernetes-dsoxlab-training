@@ -1,17 +1,18 @@
 # One Kustomize base and two overlays
 
 The same application often runs in several environments: test, demo,
-production. Copying its manifests for each one always ends in copies that drift
-apart. **Kustomize**, built into kubectl, starts from a common **base** and
-applies **overlays** to it: small files that describe only the differences. In
-this course, you write a base, you see the name of a generated ConfigMap change
-with its content, you write an overlay, you check that a label does reach the
-Service's selector, you change the image in a second overlay, you apply both,
-then you change the configuration.
+production. Copying its manifests for each one always ends in copies that
+diverge. **Kustomize**, built into kubectl, starts from a common **base** and
+applies **overlays** to it: small files that only describe the differences.
+The lesson shows how to write them. This course starts from a ready-made base
+and stops on what catches people out: a label added afterwards that the
+cluster refuses, a patch that only targets one environment, and a badly named
+patch that says nothing.
 
-You work with a `site` application and two trial environments, `essai-qualif`
-and `essai-demo`. The challenge will ask you for another application, in `dev`
-and `prod`: you will do it on your own, at the end.
+You work with a `site` application and two scratch environments,
+`essai-qualif` and `essai-demo`. The challenge will ask you for another
+application, in two other environments: you will do it on your own, at the
+end.
 
 Related page: [Kustomize](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/).
 
@@ -23,36 +24,22 @@ Start the lab:
 dsoxlab run ckad-kustomize-overlays
 ```
 
-You are now connected to `k8s-cp.lab`, the node that runs the kubeadm cluster
-(the control plane). Your kubectl already targets it.
+You are now connected to `k8s-cp.lab`, the node that drives the kubeadm
+cluster (the control plane). Your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
-2026, with Kubernetes v1.37.2 and the Kustomize version built into kubectl,
+The outputs shown in this course were recorded on this machine on 20 November
+2026, with Kubernetes v1.37.2 and the version of Kustomize built into kubectl,
 v5.8.1.
 
-## 📚 Exercise 1: a base
+## 📚 Exercise 1: a ready-made base
 
-Create the two trial namespaces and the work tree: one base, and one folder
-per overlay:
+Create both scratch namespaces, the work tree and the base: a Deployment, a
+Service and a `kustomization.yaml` that lists them and generates a
+`site-config` ConfigMap. The lesson details each of these files:
 
 ```bash
 kubectl create namespace essai-qualif; kubectl create namespace essai-demo; mkdir -p ~/essai-kustomize/base ~/essai-kustomize/overlays/qualif ~/essai-kustomize/overlays/demo
-```
-
-```text
-namespace/essai-qualif created
-namespace/essai-demo created
-```
-
-The base holds the ordinary manifests, **without a namespace**, and a
-`kustomization.yaml` file. That file lists the manifests under `resources`, and
-asks Kustomize to **generate** a `site-config` ConfigMap
-(`configMapGenerator`). The Deployment reads this ConfigMap through `envFrom`
-(`COULEUR=bleu` means "COLOUR=blue"):
-
-```bash
-cd ~/essai-kustomize/base
-cat > deployment.yaml <<'YAML'
+cat > ~/essai-kustomize/base/deployment.yaml <<'YAML'
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -76,7 +63,7 @@ spec:
             - configMapRef:
                 name: site-config
 YAML
-cat > service.yaml <<'YAML'
+cat > ~/essai-kustomize/base/service.yaml <<'YAML'
 apiVersion: v1
 kind: Service
 metadata:
@@ -88,7 +75,7 @@ spec:
     - port: 80
       targetPort: 80
 YAML
-cat > kustomization.yaml <<'YAML'
+cat > ~/essai-kustomize/base/kustomization.yaml <<'YAML'
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -99,102 +86,37 @@ configMapGenerator:
     literals:
       - COULEUR=bleu
 YAML
-ls
 ```
 
 ```text
-deployment.yaml
-kustomization.yaml
-service.yaml
+namespace/essai-qualif created
+namespace/essai-demo created
 ```
 
-`kubectl kustomize` shows what Kustomize produces, **without applying
-anything**:
+`kubectl kustomize` shows what Kustomize produces, without applying anything.
+`grep` only keeps the type and the name of each object:
 
 ```bash
-kubectl kustomize ~/essai-kustomize/base
+kubectl kustomize ~/essai-kustomize/base | grep -E '^kind:|^  name:|name: site-config'
 ```
 
 ```text
-apiVersion: v1
-data:
-  COULEUR: bleu
 kind: ConfigMap
-metadata:
   name: site-config-mgm6hf9htk
----
-apiVersion: v1
 kind: Service
-metadata:
   name: site-svc
-spec:
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: site
----
-apiVersion: apps/v1
 kind: Deployment
-metadata:
   name: site
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: site
-  template:
-    metadata:
-      labels:
-        app: site
-    spec:
-      containers:
-      - envFrom:
-        - configMapRef:
             name: site-config-mgm6hf9htk
-        image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-        name: nginx
-        ports:
-        - containerPort: 80
 ```
 
-Three objects separated by `---`. The ConfigMap is called
-`site-config-mgm6hf9htk`: Kustomize added a **hash** of its content. It also
-rewrote the name in the Deployment's `envFrom`.
+The ConfigMap carries a hash of its content, and Kustomize rewrote this name
+in the `envFrom` of the Deployment.
 
-## 📚 Exercise 2: the name changes with the content
+## 📚 Exercise 2: a label added afterwards
 
-Note the name of the generated ConfigMap, change the colour, then note it
-again (`vert` means "green"):
-
-```bash
-kubectl kustomize ~/essai-kustomize/base | grep -E '^  name: site-config|^                name: site-config'
-sed -i 's/COULEUR=bleu/COULEUR=vert/' ~/essai-kustomize/base/kustomization.yaml; kubectl kustomize ~/essai-kustomize/base | grep -E '^  name: site-config'
-```
-
-```text
-  name: site-config-mgm6hf9htk
-  name: site-config-g7gd24m975
-```
-
-Another content gives another name. Since the Deployment names it, its Pod
-template changes too: applying the new configuration restarts its Pods, which
-then read the new value. Put the original colour back, and the hash comes back:
-
-```bash
-sed -i 's/COULEUR=vert/COULEUR=bleu/' ~/essai-kustomize/base/kustomization.yaml; kubectl kustomize ~/essai-kustomize/base | grep -E '^  name: site-config'
-```
-
-```text
-  name: site-config-mgm6hf9htk
-```
-
-## 📚 Exercise 3: an overlay that holds only the differences
-
-The `qualif` overlay takes the base (`resources: ../../base`), then only says
-what changes: the namespace, a prefix added to the names (`namePrefix`), an
-`env: qualif` label, and the number of replicas. `grep` keeps only the lines
-that carry these changes:
+Write the `qualif` overlay **without a label**: a namespace, a prefix and 2
+replicas. Apply it, and look at the addresses of the Service:
 
 ```bash
 cat > ~/essai-kustomize/overlays/qualif/kustomization.yaml <<'YAML'
@@ -204,63 +126,34 @@ resources:
   - ../../base
 namespace: essai-qualif
 namePrefix: qualif-
+replicas:
+  - name: site
+    count: 2
+YAML
+kubectl apply -k ~/essai-kustomize/overlays/qualif; kubectl rollout status deployment/qualif-site -n essai-qualif --timeout=120s | tail -1
+kubectl get endpointslices -n essai-qualif -l kubernetes.io/service-name=qualif-site-svc
+```
+
+```text
+configmap/qualif-site-config-mgm6hf9htk created
+service/qualif-site-svc created
+deployment.apps/qualif-site created
+deployment "qualif-site" successfully rolled out
+NAME                    ADDRESSTYPE   PORTS   ENDPOINTS                     AGE
+qualif-site-svc-dx6kk   IPv4          80      10.244.38.108,10.244.163.46   0s
+```
+
+The Service finds both Pods. Now add the `env: qualif` label, with
+`includeSelectors: true`, so that it also goes into the selectors. First look
+at the selector the overlay would produce:
+
+```bash
+cat >> ~/essai-kustomize/overlays/qualif/kustomization.yaml <<'YAML'
 labels:
   - pairs:
       env: qualif
     includeSelectors: true
-replicas:
-  - name: site
-    count: 1
 YAML
-kubectl kustomize ~/essai-kustomize/overlays/qualif | grep -E '^kind:|^  name:|^  namespace:|^    env:|^      env:|^        env:|name: qualif-site-config'
-```
-
-```text
-kind: ConfigMap
-    env: qualif
-  name: qualif-site-config-mgm6hf9htk
-  namespace: essai-qualif
-kind: Service
-    env: qualif
-  name: qualif-site-svc
-  namespace: essai-qualif
-    env: qualif
-kind: Deployment
-    env: qualif
-  name: qualif-site
-  namespace: essai-qualif
-      env: qualif
-        env: qualif
-            name: qualif-site-config-mgm6hf9htk
-```
-
-Every object got the `qualif-` prefix, the `essai-qualif` namespace and the
-`env: qualif` label. The Service carries the label twice: on itself, and in its
-selector. The Deployment carries it three times: on itself, in its selector,
-and on its Pod template. The name of the ConfigMap is rewritten everywhere,
-prefix included. The base, for its part, has not changed.
-
-## 📚 Exercise 4: the label must reach the selector
-
-`includeSelectors: true` asks Kustomize to put the label in the selectors too.
-See what happens without it. Create a `sans-selecteur` overlay ("without
-selector"), a copy of `qualif` with `includeSelectors: false`, and look at the
-selector of its Service:
-
-```bash
-mkdir -p ~/essai-kustomize/overlays/sans-selecteur; sed 's/includeSelectors: true/includeSelectors: false/' ~/essai-kustomize/overlays/qualif/kustomization.yaml > ~/essai-kustomize/overlays/sans-selecteur/kustomization.yaml; kubectl kustomize ~/essai-kustomize/overlays/sans-selecteur | sed -n '/^kind: Service/,/^---/p' | grep -A3 'selector:'
-```
-
-```text
-  selector:
-    app: site
----
-```
-
-The selector only names `app: site`. If two environments shared a namespace,
-this Service would find the Pods of both. With `qualif`:
-
-```bash
 kubectl kustomize ~/essai-kustomize/overlays/qualif | sed -n '/^kind: Service/,/^---/p' | grep -A3 'selector:'
 ```
 
@@ -271,13 +164,66 @@ kubectl kustomize ~/essai-kustomize/overlays/qualif | sed -n '/^kind: Service/,/
 ---
 ```
 
-The Service only finds the Pods of its own environment.
+That is what we want. Apply:
 
-## 📚 Exercise 5: a second overlay that changes the image
+```bash
+kubectl apply -k ~/essai-kustomize/overlays/qualif; echo "code $?"
+```
 
-The `demo` overlay does the same with 2 replicas, and moves the image to
-version 1.30.6 with an `images` block. That block targets the images named
-`nginx` and gives them a new tag and a new digest:
+```text
+configmap/qualif-site-config-mgm6hf9htk configured
+service/qualif-site-svc configured
+The Deployment "qualif-site" is invalid: spec.selector: Invalid value: {"matchLabels":{"app":"site","env":"qualif"}}: field is immutable
+code 1
+```
+
+The selector of a Deployment can no longer be changed after its creation:
+`field is immutable`. The Deployment is refused, but the Service, for its
+part, was changed. Look where that leads:
+
+```bash
+sleep 3; kubectl get service qualif-site-svc -n essai-qualif -o jsonpath='{.spec.selector}{"\n"}'; kubectl get pods -n essai-qualif --show-labels
+kubectl get endpointslices -n essai-qualif -l kubernetes.io/service-name=qualif-site-svc
+```
+
+```text
+{"app":"site","env":"qualif"}
+NAME                           READY   STATUS    RESTARTS   AGE   LABELS
+qualif-site-858dd798db-h46rq   1/1     Running   0          4s    app=site,pod-template-hash=858dd798db
+qualif-site-858dd798db-l8fps   1/1     Running   0          4s    app=site,pod-template-hash=858dd798db
+NAME                    ADDRESSTYPE   PORTS     ENDPOINTS   AGE
+qualif-site-svc-dx6kk   IPv4          <unset>   <unset>     4s
+```
+
+The Service now looks for `env=qualif`, which the Pods do not have: it no
+longer has any address. The Pods run, but the application no longer answers
+through its Service. To change the selector, the Deployment must be created
+again. Delete it, then apply again:
+
+```bash
+kubectl delete deployment qualif-site -n essai-qualif; kubectl apply -k ~/essai-kustomize/overlays/qualif; kubectl rollout status deployment/qualif-site -n essai-qualif --timeout=120s | tail -1
+sleep 3; kubectl get endpointslices -n essai-qualif -l kubernetes.io/service-name=qualif-site-svc
+```
+
+```text
+deployment.apps "qualif-site" deleted from essai-qualif namespace
+configmap/qualif-site-config-mgm6hf9htk unchanged
+service/qualif-site-svc unchanged
+deployment.apps/qualif-site created
+deployment "qualif-site" successfully rolled out
+NAME                    ADDRESSTYPE   PORTS   ENDPOINTS                     AGE
+qualif-site-svc-dx6kk   IPv4          80      10.244.38.114,10.244.163.47   8s
+```
+
+The Service finds two Pods again. Between the deletion and the end of the
+rollout, the application had no Pod: decide the labels of an environment
+**before** its first deployment.
+
+## 📚 Exercise 3: an overlay that changes the image
+
+The `demo` overlay carries its label from the start this time, 2 replicas,
+and moves the image to version 1.30.6 through an `images` block. It targets the
+images named `nginx` and gives them a new tag and a new digest:
 
 ```bash
 cat > ~/essai-kustomize/overlays/demo/kustomization.yaml <<'YAML'
@@ -300,150 +246,126 @@ images:
     digest: sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
 YAML
 kubectl kustomize ~/essai-kustomize/overlays/demo | grep -E 'image:|replicas:'
+kubectl kustomize ~/essai-kustomize/base | grep -E 'image:|replicas:'
 ```
 
 ```text
   replicas: 2
         image: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
-```
-
-The base still describes version 1.30.5 and 1 replica:
-
-```bash
-kubectl kustomize ~/essai-kustomize/base | grep -E 'image:|replicas:'
-```
-
-```text
   replicas: 1
         image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-A change that belongs to one environment goes into its overlay, never into the
-base.
+`demo` moves to 1.30.6 with 2 replicas, and the base stays on 1.30.5 with 1
+replica.
 
-## 📚 Exercise 6: apply and check
+## 📚 Exercise 4: a patch for a single environment
 
-`kubectl apply -k` applies a Kustomize folder. Apply both overlays, then wait
-for both rollouts:
+`namespace`, `replicas` or `images` cover the usual changes. For any other
+field, an overlay applies a **patch**: a piece of manifest that only holds what
+changes, and that Kustomize merges with the object of the base. Add resource
+requests and limits to `demo`, with a patch in the `patches` field. The patch
+names the Deployment by its name in the base, `site`, and the container by its
+name, `nginx`:
 
 ```bash
-kubectl apply -k ~/essai-kustomize/overlays/qualif; kubectl apply -k ~/essai-kustomize/overlays/demo
-kubectl rollout status deployment/qualif-site -n essai-qualif --timeout=180s | tail -1; kubectl rollout status deployment/demo-site -n essai-demo --timeout=180s | tail -1
+cat > ~/essai-kustomize/overlays/demo/limites.yaml <<'YAML'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site
+spec:
+  template:
+    spec:
+      containers:
+        - name: nginx
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+YAML
+cat >> ~/essai-kustomize/overlays/demo/kustomization.yaml <<'YAML'
+patches:
+  - path: limites.yaml
+YAML
+kubectl kustomize ~/essai-kustomize/overlays/demo | sed -n '/^kind: Deployment/,$p' | grep -A7 'resources:'
+kubectl kustomize ~/essai-kustomize/overlays/qualif | grep -c 'resources:'
 ```
 
 ```text
-configmap/qualif-site-config-mgm6hf9htk created
-service/qualif-site-svc created
-deployment.apps/qualif-site created
+        resources:
+          limits:
+            cpu: 200m
+            memory: 64Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+0
+```
+
+`demo` gets the resources, `qualif` has none: the patch only touches the
+overlay that cites it. What happens if the patch gets the name of the
+container wrong? Try with a copy that calls it `web`:
+
+```bash
+sed 's/name: nginx$/name: web/' ~/essai-kustomize/overlays/demo/limites.yaml > ~/essai-kustomize/overlays/demo/limites-faux.yaml
+sed -i 's/path: limites.yaml/path: limites-faux.yaml/' ~/essai-kustomize/overlays/demo/kustomization.yaml; kubectl kustomize ~/essai-kustomize/overlays/demo | sed -n '/^kind: Deployment/,$p' | grep -A12 'containers:'
+```
+
+```text
+      containers:
+      - name: web
+        resources:
+          limits:
+            cpu: 200m
+            memory: 64Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+      - envFrom:
+        - configMapRef:
+            name: demo-site-config-mgm6hf9htk
+        image: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+```
+
+No error. Kustomize found no `web` container, so it **added** one, without an
+image, next to `nginx`, which did not get its resources. A patch merges by
+name: a wrong name creates an object instead of changing one. Always read the
+output of `kubectl kustomize`. Put the right patch back:
+
+```bash
+sed -i 's/path: limites-faux.yaml/path: limites.yaml/' ~/essai-kustomize/overlays/demo/kustomization.yaml; rm ~/essai-kustomize/overlays/demo/limites-faux.yaml
+```
+
+## 📚 Exercise 5: apply and compare
+
+Apply `demo`, check the resources of the container, then compare each overlay
+with the cluster:
+
+```bash
+kubectl apply -k ~/essai-kustomize/overlays/demo; kubectl rollout status deployment/demo-site -n essai-demo --timeout=120s | tail -1
+kubectl get deployment demo-site -n essai-demo -o jsonpath='{.spec.template.spec.containers[0].resources}{"\n"}'
+kubectl diff -k ~/essai-kustomize/overlays/demo; echo "demo : code $?"; kubectl diff -k ~/essai-kustomize/overlays/qualif; echo "qualif : code $?"
+```
+
+```text
 configmap/demo-site-config-mgm6hf9htk created
 service/demo-site-svc created
 deployment.apps/demo-site created
-deployment "qualif-site" successfully rolled out
 deployment "demo-site" successfully rolled out
-```
-
-Look at what `essai-demo` holds:
-
-```bash
-kubectl get deploy,svc,configmap -n essai-demo
-```
-
-```text
-NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/demo-site   2/2     2            2           1s
-
-NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
-service/demo-site-svc   ClusterIP   10.99.212.73   <none>        80/TCP    1s
-
-NAME                                    DATA   AGE
-configmap/demo-site-config-mgm6hf9htk   1      1s
-configmap/kube-root-ca.crt              1      2s
-```
-
-The Pods carry their environment label (`-L env` adds the column, and `awk`
-keeps only five columns):
-
-```bash
-kubectl get pods -n essai-demo -L env -o wide | awk '{print $1, $2, $3, $6, $NF}' | column -t
-```
-
-```text
-NAME                       READY  STATUS   IP             ENV
-demo-site-b668c76c4-22529  1/1    Running  10.244.163.42  demo
-demo-site-b668c76c4-g5q5q  1/1    Running  10.244.38.124  demo
-```
-
-The Service finds both Pods, and the container received its configuration:
-
-```bash
-kubectl get endpointslices -n essai-demo -l kubernetes.io/service-name=demo-site-svc -o jsonpath='{range .items[*].endpoints[*]}{.addresses[0]}{"\n"}{end}'
-kubectl exec -n essai-demo deploy/demo-site -- printenv COULEUR
-```
-
-```text
-10.244.38.124
-10.244.163.42
-bleu
-```
-
-Finally, `kubectl diff -k` compares each overlay with the cluster:
-
-```bash
-kubectl diff -k ~/essai-kustomize/overlays/qualif > /dev/null; echo "qualif : code $?"; kubectl diff -k ~/essai-kustomize/overlays/demo > /dev/null; echo "demo : code $?"
-```
-
-```text
-qualif : code 0
+{"limits":{"cpu":"200m","memory":"64Mi"},"requests":{"cpu":"50m","memory":"32Mi"}}
 demo : code 0
+qualif : code 0
 ```
 
-Code 0: the cluster matches the folder.
-
-## 📚 Exercise 7: changing the configuration restarts the Pods
-
-Change the colour in the base, then apply the `demo` overlay again:
-
-```bash
-sed -i 's/COULEUR=bleu/COULEUR=vert/' ~/essai-kustomize/base/kustomization.yaml; kubectl apply -k ~/essai-kustomize/overlays/demo
-```
-
-```text
-configmap/demo-site-config-g7gd24m975 created
-service/demo-site-svc unchanged
-deployment.apps/demo-site configured
-```
-
-A **new** ConfigMap is created, and the Deployment is changed to name it. So
-its Pods are replaced:
-
-```bash
-kubectl rollout status deployment/demo-site -n essai-demo --timeout=180s | tail -1; kubectl exec -n essai-demo deploy/demo-site -- printenv COULEUR
-```
-
-```text
-deployment "demo-site" successfully rolled out
-vert
-```
-
-The new Pods read `vert`. The old ConfigMap is still there:
-
-```bash
-kubectl get configmap -n essai-demo
-```
-
-```text
-NAME                          DATA   AGE
-demo-site-config-g7gd24m975   1      2s
-demo-site-config-mgm6hf9htk   1      3s
-kube-root-ca.crt              1      4s
-```
-
-`apply` deletes nothing on its own. That is rather useful: a rollback finds the
-old configuration untouched.
+Code 0 for both: the cluster matches the folder exactly.
 
 ## 🧹 Clean up
 
-Delete both trial namespaces and the work tree:
+Delete both scratch namespaces and the work folder:
 
 ```bash
 kubectl delete namespace essai-qualif essai-demo; rm -rf ~/essai-kustomize
@@ -477,7 +399,8 @@ untouched.
 ## 🎯 The challenge
 
 Your turn, on your own this time: another application, one base and two
-overlays, `dev` and `prod`, only one of which moves to version 2.
+overlays, `recette` and `production`, only one of which moves to version 2, and
+a configuration merged in production.
 
 ```bash
 dsoxlab run ckad-kustomize-overlays
