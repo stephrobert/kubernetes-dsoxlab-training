@@ -4,7 +4,7 @@ level: application-observability
 section: ckad
 difficulty: beginner
 description: |
-  Two applications will not start in the diagnostic namespace. Find out why,
+  Two applications will not start in the incident namespace. Find out why,
   with evidence read from the cluster, without repairing anything: the reason
   an image will not pull, the error a crashing container wrote before it
   stopped, its exit code, and which running Pod uses the most memory.
@@ -39,22 +39,22 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: la-cause-de-api-est-consignee
-    label: "api.txt names why the api container is waiting and the faulty image"
+  - id: la-cause-de-catalogue-est-consignee
+    label: "catalogue.txt names why the catalogue container is waiting and the faulty image"
     tests:
-      - test_la_cause_de_api_est_consignee
+      - test_la_cause_de_catalogue_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/
-  - id: l-erreur-de-batch-est-consignee
-    label: "batch.txt quotes the error written by the previous run of batch"
+  - id: l-erreur-d-export-est-consignee
+    label: "export.txt quotes the error written by the previous run of export"
     tests:
-      - test_l_erreur_de_batch_est_consignee
+      - test_l_erreur_d_export_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/
-  - id: le-code-de-sortie-de-batch-est-consigne
-    label: "batch.txt gives the exit code of the last terminated batch container"
+  - id: le-code-de-sortie-d-export-est-consigne
+    label: "export.txt gives the exit code of the last terminated export container"
     tests:
-      - test_le_code_de_sortie_de_batch_est_consigne
+      - test_le_code_de_sortie_d_export_est_consigne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/
   - id: le-pod-le-plus-gourmand-est-consigne
@@ -64,7 +64,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/
   - id: rien-n-a-ete-repare
-    label: "Nothing was repaired: api and batch keep their original image and command"
+    label: "Nothing was repaired: catalogue and export keep their original image and command"
     tests:
       - test_rien_n_a_ete_repare
     lessons:

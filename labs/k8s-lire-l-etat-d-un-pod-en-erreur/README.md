@@ -12,7 +12,7 @@ this order:
 In this course, you create three small applications yourself in a scratch
 namespace, `essai-panne`: one that works, one whose image does not exist, and
 one that stops on an error. Then you diagnose them. The challenge will ask you
-to diagnose other failures, in the `diagnostic` namespace: you will do it on
+to diagnose other failures, in the `incident` namespace: you will do it on
 your own, at the end.
 
 Related page: [kubectl get, describe, logs and top](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-get-describe-logs-top/).
@@ -54,8 +54,8 @@ deployment.apps/tache created
 which does not exist. `tache` writes an error message, then stops with code
 `3`. Wait a minute before going on, while Kubernetes tries to start them.
 
-The outputs shown in this course were recorded on this machine on 19 November
-2026.
+The outputs shown in this course were recorded on this machine on 19 and 20
+November 2026.
 
 ## 📚 Exercise 1: spot the failing Pod
 
@@ -210,10 +210,74 @@ tache: lancement
 ```
 
 There is the cause: a configuration file is missing. The two lines are not in
-the order they were written: the normal message and the error message go
-through two different channels, which kubectl mixes.
+the order they were written. The program writes on two channels, the normal
+output and the error output. containerd, the engine that records the logs on
+the node, reads these two channels separately: two lines written at the same
+moment can therefore swap.
 
-Now try the logs of `cache`:
+`tache` has already crashed several times. The `--previous` option reads the
+run before. Try it:
+
+```bash
+kubectl logs deployment/tache -n essai-panne --previous
+echo "code: $?"
+```
+
+```text
+unable to retrieve container logs for containerd://3e4e5d03ad17114b5855d4320021e844031b8ffa737f8270aa1d22b33d71f59ccode: 0
+```
+
+No log, and yet the exit code is `0`. The message does not end with a line
+break: `code: 0` is printed right after it. `tache` stops as soon as it starts:
+its container is almost always stopped, and its last run, the one that just
+failed, is what `kubectl logs` shows without any option. `--previous` targets
+the run before that one, and the node no longer keeps its log. Here,
+`kubectl logs` without any option was enough.
+
+`--previous` is useful when the container runs again after a crash. Start
+`lente`, which starts, works for 25 seconds, then stops on an error:
+
+```bash
+kubectl create deployment lente \
+  --image=busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e \
+  -n essai-panne \
+  -- sh -c 'echo "lente: démarrage"; sleep 25; echo "erreur: délai dépassé pour joindre le stockage" >&2; exit 4'
+```
+
+Wait about thirty seconds, until the `RESTARTS` column of
+`kubectl get pods -n essai-panne` shows `1` and the `STATUS` column `Running`.
+Then read both logs:
+
+```bash
+kubectl get pods -n essai-panne -l app=lente
+kubectl logs deployment/lente -n essai-panne
+kubectl logs deployment/lente -n essai-panne --previous
+```
+
+```text
+NAME                    READY   STATUS    RESTARTS     AGE
+lente-b567f8667-djmw8   1/1     Running   1 (2s ago)   27s
+lente: démarrage
+lente: démarrage
+erreur: délai dépassé pour joindre le stockage
+```
+
+Without any option, you read the current run: it has just started and has not
+said anything useful yet. With `--previous`, you read the one that crashed,
+and its error message. The exit code of that crash is in `Last State`:
+
+```bash
+kubectl describe pod -n essai-panne -l app=lente | grep -A3 "Last State"
+```
+
+```text
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    4
+      Started:      Fri, 20 Nov 2026 07:21:49 +0000
+```
+
+Finally, try the logs of `cache`:
 
 ```bash
 kubectl logs deployment/cache -n essai-panne
@@ -225,19 +289,6 @@ Error from server (BadRequest): container "nginx" in pod "cache-6bcb8d84c5-4hhx5
 
 There is no log: a container that never started wrote nothing. For it,
 `describe` gave the answer.
-
-The `--previous` option reads the logs of the previous run, the one that
-crashed. On `front`, which never restarted, it finds nothing:
-
-```bash
-kubectl logs deployment/front -n essai-panne --previous
-```
-
-```text
-Error from server (BadRequest): previous terminated container "nginx" in pod "front-545fdfbcf8-8v4ph" not found
-```
-
-This message means "no restart", so no crash to explain.
 
 ## 📚 Exercise 7: measure the consumption
 
@@ -274,7 +325,7 @@ The first of the list is the one that uses the most memory.
 
 ## 🧹 Clean up
 
-Delete the scratch namespace. Its three applications go with it:
+Delete the scratch namespace. Its four applications go with it:
 
 ```bash
 kubectl delete namespace essai-panne
@@ -307,7 +358,7 @@ untouched.
 ## 🎯 The challenge
 
 Your turn, on your own this time: diagnose the two failing applications of the
-`diagnostic` namespace, and find the one that uses the most memory, without
+`incident` namespace, and find the one that uses the most memory, without
 fixing anything.
 
 ```bash
