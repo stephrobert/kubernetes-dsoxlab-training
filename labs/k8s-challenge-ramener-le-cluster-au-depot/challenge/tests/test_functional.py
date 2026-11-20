@@ -127,7 +127,14 @@ def test_les_modifications_en_direct_non_voulues_ont_disparu(host, memoire):
 # ----------------------------------------------------------------------
 # 4. Les objets ont été modifiés, pas recréés.
 # ----------------------------------------------------------------------
-def test_les_objets_n_ont_pas_ete_recrees(host, memoire):
+def test_les_objets_n_ont_pas_ete_recrees(host, memoire, depot):
+    # Le test ne compte qu'une fois le dépôt et le cluster alignés : au
+    # départ, rien n'est recréé, mais rien n'est fait non plus.
+    aligne = host.run(f"{ADMIN} diff -f {depot}").rc == 0
+    assert aligne, message(
+        en="The cluster is not yet brought back to the repository: kubectl diff still finds a gap.",
+        fr="Le cluster n'est pas encore ramené au dépôt : kubectl diff trouve encore un écart.",
+    )
     uid_dep = ((_json(host, f"-n {NS} get deployment {DEPLOIEMENT}") or {}).get("metadata") or {}).get("uid")
     uid_cm = ((_json(host, f"-n {NS} get configmap {CONFIG}") or {}).get("metadata") or {}).get("uid")
     assert uid_dep == memoire["uid_deployment"] and uid_cm == memoire["uid_configmap"], message(

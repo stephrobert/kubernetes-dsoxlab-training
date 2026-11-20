@@ -22,7 +22,7 @@ raised during the incident, and **nothing else**.
    repository is clean. **Blocking requirement.**
 3. All the **other** live changes are gone.
 4. The Deployment and the ConfigMap are the **original objects**: changed,
-   never deleted or recreated.
+   never deleted or recreated. **Blocking requirement.**
 5. Every replica of the directory runs on the **configuration of the
    repository**.
 
@@ -35,7 +35,7 @@ A live change does not always show in `kubectl diff`.
 The tests read the cluster and the git repository, run `kubectl diff` against
 the repository again, and read the configuration of each Pod. The replica
 count and the changed values are drawn at random during the preparation. The
-pass mark is 80%, and both blocking requirements must be met.
+pass mark is 80%, and the three blocking requirements must be met.
 
 ```bash
 dsoxlab check k8s-challenge-ramener-le-cluster-au-depot

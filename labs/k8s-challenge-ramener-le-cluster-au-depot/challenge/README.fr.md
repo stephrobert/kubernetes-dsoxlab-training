@@ -22,7 +22,7 @@ l'incident, et **rien d'autre**.
    est propre. **Exigence bloquante.**
 3. Toutes les **autres** modifications faites en direct ont disparu.
 4. Le Deployment et la ConfigMap sont les **objets d'origine** : modifiés,
-   jamais supprimés ni recréés.
+   jamais supprimés ni recréés. **Exigence bloquante.**
 5. Chaque réplica de l'annuaire tourne sur la **configuration du dépôt**.
 
 ## 🧭 Les repères utiles
@@ -34,7 +34,7 @@ Une modification faite en direct ne se voit pas toujours dans `kubectl diff`.
 Les tests lisent le cluster et le dépôt git, rejouent `kubectl diff` sur le
 dépôt, et lisent la configuration de chaque Pod. Le nombre de réplicas et les
 valeurs modifiées sont tirés au sort à la préparation. Le seuil de réussite
-est de 80 %, et les deux exigences bloquantes doivent être tenues.
+est de 80 %, et les trois exigences bloquantes doivent être tenues.
 
 ```bash
 dsoxlab check k8s-challenge-ramener-le-cluster-au-depot

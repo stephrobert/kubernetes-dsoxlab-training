@@ -3,7 +3,7 @@
 Challenge de la formation Kubernetes, dans la section Mettre en pratique de la
 leçon « kubectl edit, patch et replace » : retrouver les modifications faites
 en direct sur un cluster, reporter dans Git celle que l'équipe garde, défaire
-les autres, sans recréer aucun objet. Cinq exigences, seuil 80 %, deux
+les autres, sans recréer aucun objet. Cinq exigences, seuil 80 %, trois
 bloquantes.
 
 | | |

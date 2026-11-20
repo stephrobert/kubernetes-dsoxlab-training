@@ -3,7 +3,7 @@
 Challenge of the Kubernetes training, in the Put it into practice section of
 the "kubectl edit, patch and replace" lesson: find the changes made live on a
 cluster, carry into Git the one the team keeps, undo the others, without
-recreating any object. Five requirements, pass mark 80%, two of them
+recreating any object. Five requirements, pass mark 80%, three of them
 blocking.
 
 | | |
