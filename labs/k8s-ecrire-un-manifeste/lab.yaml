@@ -1,17 +1,19 @@
 # Lab guidé de la leçon « Écrire des Manifests » (KUBERN-06-02) du module
-# « Déployer ses applications ». Il fait suivre le workflow de la leçon :
-# générer, compléter, valider côté serveur, appliquer, sur un fichier
-# multi-documents qui nomme son namespace, puis corriger en place un Deployment
-# existant, sans le recréer.
+# « Déployer ses applications ». Le challenge part d'un manifeste fourni et
+# faux (namespace oublié, valeur que seul le serveur refuse, sélecteur qui ne
+# trouve aucun Pod) : l'apprenant le valide côté serveur, le répare, puis
+# l'applique pour mettre à jour en place l'ancienne version d'api, sans la
+# recréer. Avant le 2026-11-20, il déroulait le scénario de la leçon.
 id: k8s-ecrire-un-manifeste
 title: "Write and validate a manifest"
 level: application-deployment
 section: ckad
 difficulty: intermediate
 description: |
-  Write in one multi-document file a ConfigMap, a Deployment and a Service that
-  name their namespace, have the API server validate it, apply it, then correct
-  an existing faulty Deployment in place, without recreating it.
+  Repair a colleague's multi-document manifest (a ConfigMap, a Deployment and
+  a Service) until the API server accepts it, every object names its
+  namespace and the Service finds its Pods, then apply it to update the
+  running old version of the Deployment in place, without recreating it.
 skills:
   - kubernetes-manifest
   - dry-run-server
@@ -69,8 +71,8 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
   - id: corrige-sans-recreer
-    label: "rapport is corrected in place, without being recreated"
+    label: "api is updated in place, without being recreated"
     tests:
-      - test_rapport_est_corrige_sans_avoir_ete_recree
+      - test_api_est_mis_a_jour_sans_avoir_ete_recree
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
