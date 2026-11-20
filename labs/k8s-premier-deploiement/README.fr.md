@@ -1,8 +1,9 @@
 # Déployer, exposer et mettre à l'échelle une première application
 
-Ce cours vous fait déployer votre première application dans Kubernetes, geste
-par geste, comme dans la leçon : créer un namespace, lancer l'application,
-la rendre joignable, vérifier qu'elle répond, puis en lancer une copie de plus.
+La leçon déploie une application, l'expose par un Service et la met à
+l'échelle. Ce cours vous fait diagnostiquer ce qui se passe quand l'un de ces
+gestes est mal fait, puis passer à un fichier que `kubectl diff` relit avant
+chaque `kubectl apply`.
 
 Quelques mots reviennent tout le long :
 
@@ -32,32 +33,12 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `boutique` y tourne, en Kubernetes `v1.37.0`, et votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+20 novembre 2026.
 
-## 📚 Exercice 1 : créer un namespace
+## 📚 Exercice 1 : créer dans un namespace qui n'existe pas
 
-Créez le namespace `essai-web`, puis vérifiez qu'il existe :
-
-```bash
-kubectl create namespace essai-web
-kubectl get namespace essai-web
-```
-
-```text
-namespace/essai-web created
-NAME        STATUS   AGE
-essai-web   Active   0s
-```
-
-`Active` : le namespace est prêt. Toutes les commandes suivantes portent
-l'option `-n essai-web`. Sans elle, vos objets iraient dans le namespace
-`default`.
-
-## 📚 Exercice 2 : lancer l'application avec un Deployment
-
-Créez un Deployment `accueil` qui lance le serveur web nginx. L'image est
-donnée avec son digest (`@sha256:...`) : vous êtes sûr d'avoir exactement
-celle de la leçon.
+Lancez l'application `accueil` dans le namespace `essai-web`, sans l'avoir
+créé :
 
 ```bash
 kubectl create deployment accueil \
@@ -66,218 +47,255 @@ kubectl create deployment accueil \
 ```
 
 ```text
-deployment.apps/accueil created
+error: failed to create deployment: namespaces "essai-web" not found
 ```
 
-Attendez que l'application soit disponible, puis regardez le Deployment :
+Kubernetes ne crée pas le namespace à votre place. Créez-le, puis relancez la
+même commande et attendez que l'application soit disponible :
 
 ```bash
+kubectl create namespace essai-web
+kubectl create deployment accueil \
+  --image=nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
+  -n essai-web
 kubectl wait --for=condition=Available deployment/accueil -n essai-web --timeout=120s
-kubectl get deployment accueil -n essai-web
 ```
 
 ```text
+namespace/essai-web created
+deployment.apps/accueil created
 deployment.apps/accueil condition met
-NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-accueil   1/1     1            1           0s
 ```
 
-La colonne `READY` affiche `1/1` : un Pod demandé, un Pod prêt.
-
-Le Deployment n'a pas créé le Pod lui-même. Il a créé un **ReplicaSet**, qui
-a créé le Pod. Voyez les deux :
+Pour interroger l'application de l'intérieur du cluster, lancez un Pod
+`outil` qui reste allumé une heure. L'image busybox contient la commande
+`wget` :
 
 ```bash
-kubectl get replicasets -n essai-web
-kubectl get pods -n essai-web
+kubectl run outil \
+  --image=busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e \
+  -n essai-web -- sleep 3600
+kubectl wait --for=condition=Ready pod/outil -n essai-web --timeout=120s
 ```
 
 ```text
-NAME                 DESIRED   CURRENT   READY   AGE
-accueil-654cbccb8f   1         1         1       0s
-NAME                       READY   STATUS    RESTARTS   AGE
-accueil-654cbccb8f-stcjv   1/1     Running   0          0s
+pod/outil created
+pod/outil condition met
 ```
 
-Le nom du Pod commence par celui du ReplicaSet, qui commence par celui du
-Deployment. La fin du nom est tirée au hasard : la vôtre sera différente.
+`kubectl exec outil -- <commande>` lance une commande dans ce Pod. Vous vous en
+servez dans les exercices suivants.
 
-## 📚 Exercice 3 : rendre l'application joignable avec un Service
+## 📚 Exercice 2 : un Service qui trouve le Pod mais vise le mauvais port
 
-Un Pod peut disparaître et revenir avec une autre adresse. Pour le joindre de
-façon stable, on crée un Service. Celui-ci écoute sur le port `8080` et
-transmet au port `80`, celui de nginx :
+Exposez `accueil` sur le port `8080`, sans préciser `--target-port` :
 
 ```bash
-kubectl expose deployment accueil --port=8080 --target-port=80 -n essai-web
-kubectl get service accueil -n essai-web
+kubectl expose deployment accueil --port=8080 -n essai-web
+kubectl get endpointslice -n essai-web -l kubernetes.io/service-name=accueil
 ```
 
 ```text
 service/accueil exposed
-NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-accueil   ClusterIP   10.96.209.14   <none>        8080/TCP   0s
+NAME            ADDRESSTYPE   PORTS   ENDPOINTS    AGE
+accueil-zbtbn   IPv4          8080    10.244.0.5   0s
 ```
 
-Le type `ClusterIP` veut dire que le Service n'est joignable que depuis
-l'intérieur du cluster. Son adresse (`CLUSTER-IP`) sera différente chez vous.
-
-## 📚 Exercice 4 : voir comment le Service trouve les Pods
-
-Le Service ne connaît pas les Pods par leur nom. Il les trouve grâce à une
-**étiquette** (label) posée sur eux. Affichez les étiquettes du Pod :
+Le Service a trouvé le Pod : son adresse figure dans `ENDPOINTS`. La panne
+« sélecteur qui ne trouve rien » de la leçon n'est donc pas en cause.
+Interrogez pourtant l'application :
 
 ```bash
-kubectl get pods -n essai-web --show-labels
+kubectl exec outil -n essai-web -- wget -qO- -T 3 http://accueil:8080
 ```
 
 ```text
-NAME                       READY   STATUS    RESTARTS   AGE   LABELS
-accueil-654cbccb8f-stcjv   1/1     Running   0          1s    app=accueil,pod-template-hash=654cbccb8f
+wget: can't connect to remote host (10.96.187.78): Connection refused
+command terminated with exit code 1
 ```
 
-Le Pod porte l'étiquette `app=accueil`, posée automatiquement d'après le nom du
-Deployment. Regardez maintenant ce que cherche le Service :
+`Connection refused` : la demande arrive bien au Pod, mais rien n'y écoute sur
+le port visé. Lisez les deux ports du Service :
 
 ```bash
-kubectl describe service accueil -n essai-web | grep -E "^(Selector|Port|TargetPort|Endpoints)"
+kubectl describe service accueil -n essai-web | grep -E "^(Port|TargetPort|Endpoints)"
 ```
 
 ```text
-Selector:                 app=accueil
 Port:                     <unset>  8080/TCP
-TargetPort:               80/TCP
-Endpoints:                10.244.0.9:80
+TargetPort:               8080/TCP
+Endpoints:                10.244.0.5:8080
 ```
 
-`Selector` dit quelle étiquette le Service cherche : `app=accueil`, celle du
-Pod. `Endpoints` donne l'adresse du Pod trouvé.
-
-Créez maintenant un Service qui ne trouve rien, pour voir à quoi ressemble la
-panne :
+Sans `--target-port`, kubectl reprend la valeur de `--port`. Le Service envoie
+donc vers le port `8080` du Pod, alors que nginx écoute sur le `80`.
+Recréez-le avec le bon port, puis enregistrez la page dans un fichier, sur la
+machine du lab :
 
 ```bash
-kubectl create service clusterip vide --tcp=80:80 -n essai-web
-kubectl describe service vide -n essai-web | grep -E "^(Selector|Endpoints)"
-kubectl get endpointslice -n essai-web
-```
-
-```text
-service/vide created
-Selector:                 app=vide
-Endpoints:
-NAME            ADDRESSTYPE   PORTS     ENDPOINTS    AGE
-accueil-qnnz4   IPv4          80        10.244.0.9   1s
-vide-ccv5r      IPv4          <unset>   <unset>      0s
-```
-
-Le Service `vide` cherche l'étiquette `app=vide`, qu'aucun Pod ne porte : sa
-ligne `Endpoints` est vide. Aucune erreur ne s'affiche pourtant, ni à la
-création ni après. Retenez ce réflexe : un Service qui ne répond pas, on
-regarde d'abord ses endpoints.
-
-## 📚 Exercice 5 : interroger l'application depuis un Pod
-
-Le nom `accueil` d'un Service n'existe qu'à l'intérieur du cluster. Lancez un
-Pod temporaire avec l'image busybox, qui contient la commande `wget`, et
-demandez la page :
-
-```bash
-kubectl run client \
-  --image=busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e \
-  --rm -i --restart=Never -n essai-web -- wget -qO- http://accueil:8080
+kubectl delete service accueil -n essai-web
+kubectl expose deployment accueil --port=8080 --target-port=80 -n essai-web
+kubectl exec outil -n essai-web -- wget -qO- -T 3 http://accueil:8080 > ~/essai-reponse.html
+head -4 ~/essai-reponse.html
 ```
 
 ```text title="Extrait de la sortie"
-All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.
-If you don't see a command prompt, try pressing enter.
+service/accueil exposed
 <!DOCTYPE html>
 <html>
 <head>
 <title>Welcome to nginx!</title>
-...
-pod "client" deleted from essai-web namespace
 ```
 
-Les deux premières lignes sont des messages de kubectl, pas une erreur. Vient
-ensuite la page d'accueil de nginx : l'application répond. L'option `--rm`
-supprime le Pod `client` dès qu'il a fini, d'où la dernière ligne.
+La redirection `>` est lue par votre shell, pas par le Pod : le fichier
+`~/essai-reponse.html` est écrit sur la machine où vous tapez la commande.
 
-## 📚 Exercice 6 : lancer une copie de plus
+## 📚 Exercice 3 : un Service sans aucun Pod derrière
 
-Demandez deux Pods au lieu d'un, puis attendez qu'ils soient prêts :
+Passez le Deployment à zéro Pod, attendez que le Pod soit supprimé, puis
+regardez le Service :
+
+```bash
+kubectl scale deployment accueil --replicas=0 -n essai-web
+kubectl wait --for=delete pod -l app=accueil -n essai-web --timeout=60s
+kubectl get endpointslice -n essai-web -l kubernetes.io/service-name=accueil
+kubectl exec outil -n essai-web -- wget -qO- -T 3 http://accueil:8080
+```
+
+```text
+deployment.apps/accueil scaled
+pod/accueil-654cbccb8f-w726j condition met
+NAME            ADDRESSTYPE   PORTS     ENDPOINTS   AGE
+accueil-8657t   IPv4          <unset>   <unset>     4s
+wget: download timed out
+command terminated with exit code 1
+```
+
+Le Service existe toujours, avec son adresse, mais il n'a plus aucun endpoint.
+Comparez avec l'exercice 2 : un port faux donne `Connection refused`, aucun
+Pod donne `download timed out`, au bout des 3 secondes fixées par `-T 3`. Le
+message de `wget` vous dit donc où chercher.
+
+## 📚 Exercice 4 : voir à quel Pod va chaque requête
+
+Repassez à deux Pods, puis envoyez six requêtes au Service :
 
 ```bash
 kubectl scale deployment accueil --replicas=2 -n essai-web
 kubectl wait --for=condition=Available deployment/accueil -n essai-web --timeout=120s
-kubectl get pods -n essai-web -l app=accueil
+for i in 1 2 3 4 5 6; do kubectl exec outil -n essai-web -- wget -qO /dev/null "http://accueil:8080"; done
 ```
 
 ```text
 deployment.apps/accueil scaled
 deployment.apps/accueil condition met
-NAME                       READY   STATUS    RESTARTS   AGE
-accueil-654cbccb8f-stcjv   1/1     Running   0          6s
-accueil-654cbccb8f-t8j4n   1/1     Running   0          0s
 ```
 
-Un second Pod est apparu. L'option `-l app=accueil` ne liste que les Pods qui
-portent cette étiquette. Le Service, lui, a trouvé le nouveau Pod tout seul :
+`kubectl logs deployment/accueil` ne lit le journal que d'un seul Pod. Avec
+`-l app=accueil`, kubectl lit tous les Pods qui portent cette étiquette, et
+`--prefix` écrit devant chaque ligne le Pod d'où elle vient :
 
 ```bash
-kubectl get endpointslice -n essai-web -l kubernetes.io/service-name=accueil
+kubectl logs -l app=accueil -n essai-web --prefix | grep GET
 ```
 
 ```text
-NAME            ADDRESSTYPE   PORTS   ENDPOINTS                AGE
-accueil-qnnz4   IPv4          80      10.244.0.9,10.244.0.12   6s
+[pod/accueil-654cbccb8f-sdswl/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:41 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+[pod/accueil-654cbccb8f-sdswl/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:42 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+[pod/accueil-654cbccb8f-sdswl/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:42 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+[pod/accueil-654cbccb8f-vvhdx/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:41 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+[pod/accueil-654cbccb8f-vvhdx/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:42 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+[pod/accueil-654cbccb8f-vvhdx/nginx] 10.244.0.6 - - [20/Nov/2026:07:07:42 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
 ```
 
-Deux adresses maintenant : le Service répartit les demandes entre les deux
-Pods, sans que vous ayez rien changé.
+Ici, trois requêtes par Pod. Le Service choisit un Pod au hasard pour chaque
+connexion : chez vous, la répartition peut être de quatre et deux. Toutes les
+requêtes viennent de `10.244.0.6`, l'adresse du Pod `outil`. Ce sont
+seulement les requêtes de cet exercice : les Pods ont été recréés à
+l'exercice 3, avec un journal vide.
 
-## 📚 Exercice 7 : suivre ce que fait l'application
+## 📚 Exercice 5 : passer à un fichier, et lire avant d'appliquer
 
-Lisez les dernières lignes du journal de l'application :
+Jusqu'ici, vous avez donné vos ordres un par un. Le challenge du module vous
+demandera de corriger un Deployment dans son fichier, puis de l'appliquer avec
+`kubectl apply -f`. Faites écrire un fichier par kubectl : `--dry-run=client`
+prépare l'objet sans l'envoyer au cluster, et `-o yaml` l'affiche.
 
 ```bash
-kubectl logs deployment/accueil -n essai-web --tail=3
+kubectl create deployment accueil \
+  --image=nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
+  -n essai-web --dry-run=client -o yaml > ~/essai-accueil.yaml
+grep -E "replicas|image:" ~/essai-accueil.yaml
 ```
 
 ```text
-Found 2 pods, using pod/accueil-654cbccb8f-stcjv
-2026/11/19 10:45:23 [notice] 1#1: start worker process 37
-10.244.0.10 - - [19/Nov/2026:10:45:25 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
-10.244.0.11 - - [19/Nov/2026:10:45:27 +0000] "GET / HTTP/1.1" 200 896 "-" "Wget" "-"
+  replicas: 1
+      - image: nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-Le journal vient toujours d'un Pod : kubectl en a choisi un des deux. On y voit
-les demandes `GET /` faites par `wget` à l'exercice 5, avec le code `200`
-(réussite).
-
-Regardez enfin ce que Kubernetes a fait, dans l'ordre :
+Avant d'appliquer un fichier, demandez ce qu'il changerait. `kubectl diff`
+compare le fichier à l'objet du cluster, sans rien modifier :
 
 ```bash
-kubectl get events -n essai-web --sort-by=.lastTimestamp | tail -6
+kubectl diff -f ~/essai-accueil.yaml
+echo "code de kubectl diff : $?"
 ```
 
 ```text title="Extrait de la sortie"
-1s          Normal   ScalingReplicaSet   deployment/accueil              Scaled up replica set accueil-654cbccb8f from 1 to 2
-1s          Normal   SuccessfulCreate    replicaset/accueil-654cbccb8f   Created pod: accueil-654cbccb8f-t8j4n
-1s          Normal   Scheduled           pod/accueil-654cbccb8f-t8j4n    Successfully assigned essai-web/accueil-654cbccb8f-t8j4n to boutique-control-plane
-1s          Normal   Started             pod/accueil-654cbccb8f-t8j4n    Container started
+-  replicas: 2
++  replicas: 1
+code de kubectl diff : 1
 ```
 
-Vous y lisez la chaîne de l'exercice 6 : le Deployment demande un Pod de plus
-au ReplicaSet, qui le crée, puis le Pod est placé sur un nœud et démarre.
+Les lignes `-` montrent le cluster, les lignes `+` ce que deviendrait l'objet.
+Le fichier généré porte `replicas: 1`, la valeur par défaut. L'appliquer
+supprimerait donc un de vos deux Pods. Le code de sortie `1` signale une
+différence. Corrigez le fichier pour trois Pods, relisez la différence, puis
+appliquez :
+
+```bash
+sed -i "s/replicas: 1/replicas: 3/" ~/essai-accueil.yaml
+kubectl diff -f ~/essai-accueil.yaml
+kubectl apply -f ~/essai-accueil.yaml
+```
+
+```text title="Extrait de la sortie"
+-  replicas: 2
++  replicas: 3
+Warning: resource deployments/accueil is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+deployment.apps/accueil configured
+```
+
+`configured` : l'objet existait, et `apply` l'a modifié. L'avertissement est
+normal la première fois, comme l'explique la leçon : l'objet a été créé par
+`kubectl create`, et `apply` lui ajoute l'annotation où il garde la dernière
+configuration appliquée. Relancez `kubectl diff` :
+
+```bash
+kubectl diff -f ~/essai-accueil.yaml
+echo "code de kubectl diff : $?"
+kubectl get deployment accueil -n essai-web
+```
+
+```text
+code de kubectl diff : 0
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+accueil   2/3     3            2           25s
+```
+
+Plus aucune différence, et le code de sortie vaut `0` : le cluster correspond
+au fichier. `READY 2/3` : le troisième Pod démarre, il sera prêt quelques
+secondes plus tard.
 
 ## 🧹 Nettoyage
 
-Supprimez le namespace d'essai. Tout ce qu'il contient disparaît avec lui :
-le Deployment, ses Pods et les deux Services.
+Supprimez ce que vous avez créé pendant les exercices : le namespace d'essai
+et les deux fichiers. Tout ce que contient le namespace disparaît avec lui :
+le Deployment, ses Pods, le Pod `outil` et le Service.
 
 ```bash
 kubectl delete namespace essai-web
+rm ~/essai-reponse.html ~/essai-accueil.yaml
 ```
 
 ```text
