@@ -4,8 +4,9 @@
 # un champ chacun, en JSONPath (range ... end) et en custom-columns.
 #
 # Le Deployment web est mis en pause, puis son image change : son modèle dit
-# 1.30.6 alors que ses Pods tournent encore en 1.30.5. Lire l'image d'un Pod au
-# lieu du modèle donne donc la mauvaise réponse.
+# une variante de 1.30.6, tirée au hasard à chaque préparation, alors que ses
+# Pods tournent encore en 1.30.5. Lire l'image d'un Pod au lieu du modèle donne
+# donc la mauvaise réponse.
 #
 # Il tourne sur le cluster kind « boutique », dans son propre namespace
 # (extraction).
