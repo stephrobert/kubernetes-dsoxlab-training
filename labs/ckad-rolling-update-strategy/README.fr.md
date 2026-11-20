@@ -198,7 +198,11 @@ deployment.apps/paiement patched
 
 Les pourcentages s'écrivent entre guillemets : `"50%"` est un texte, `1` est un
 nombre. Sur 4 Pods, 50 % donne **2** Pods en plus, et 25 % donne **1** Pod qui
-peut manquer. Vérifiez-le sur les événements :
+peut manquer. Quand le calcul ne tombe pas juste, Kubernetes arrondit
+`maxSurge` au-dessus et `maxUnavailable` au-dessous : sur 5 Pods, 25 %
+donne 2 Pods en plus (1,25 arrondi au-dessus) et 1 Pod qui peut manquer
+(1,25 arrondi au-dessous). Vérifiez le calcul sur 4 Pods dans les
+événements :
 
 ```bash
 kubectl set image deployment/paiement \
