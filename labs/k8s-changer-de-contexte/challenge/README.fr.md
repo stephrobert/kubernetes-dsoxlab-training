@@ -21,8 +21,10 @@ namespace **`kube-system`**, sans avoir à le préciser à chaque commande.
    part sur le cluster `boutique`.
 
 4. Votre **`~/.kube/config`** n'est lisible et modifiable **que par vous**. Il
-   contient de quoi agir sur les deux clusters, et aujourd'hui tous les
-   comptes de la machine peuvent le lire.
+   contient de quoi agir sur les deux clusters, et aujourd'hui ses droits,
+   `-rw-r--r--`, laissent tous les comptes de la machine le lire : seuls les
+   répertoires qui le contiennent le protègent, et une copie ailleurs serait
+   lisible par tous.
 
 ## 🧭 Les repères utiles
 

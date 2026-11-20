@@ -42,9 +42,10 @@ Set kubectl context to "kind-kind"
 ```
 
 Without `--name`, the cluster is called `kind`, and the kubectl context
-`kind-kind`. Between these two lines, kind prints its steps, among them
-`Ensuring node image (kindest/node:v1.37.0)`: the image it picked. Without
-`--image`, kind takes the image chosen when it was built. Look at it:
+`kind-kind`. Between these two lines, kind prints its steps. One of them,
+`Ensuring node image (kindest/node:v1.37.0)`, names the node image. Without
+`--image`, kind takes the image set when the kind binary was built. Look at
+it:
 
 ```bash
 docker ps --format "table {{.Names}}\t{{.Image}}"

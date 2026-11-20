@@ -21,8 +21,10 @@ The team asks you to work on the recette cluster from now on, in the
    cluster.
 
 4. Your **`~/.kube/config`** is readable and writable **by you only**. It holds
-   what it takes to act on both clusters, and today every account on the
-   machine can read it.
+   what it takes to act on both clusters, and today its permissions,
+   `-rw-r--r--`, let every account on the machine read it: only the directories
+   that contain it protect it, and a copy elsewhere would be readable by
+   everyone.
 
 ## 🧭 Useful landmarks
 
