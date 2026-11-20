@@ -85,6 +85,19 @@ def test_la_montee_garde_les_reglages_de_l_exploitation(host):
         "du chart ; les values de la release, enregistrées par helm get values -o yaml et repassées par -f, "
         "les gardent.",
     )
+    # La release peut annoncer podinfo-6.17.0 et faire tourner l'ancienne
+    # image : --reuse-values reprend aussi les défauts de l'ancien chart, dont
+    # image.tag. Ce sont les Pods qui disent la version qui tourne.
+    image = host.run(
+        f"{KUBECTL} -n {NAMESPACE} get deploy/{RELEASE}-podinfo -o jsonpath='{{.spec.template.spec.containers[0].image}}'"
+    ).stdout.strip()
+    assert image.endswith(":6.17.0"), message(
+        en=f"The release announces podinfo-6.17.0, but its Pods run {image or 'no image'}. The defaults of the "
+        "new chart version were not applied: the upgrade kept those of the previous version.",
+        fr=f"La release annonce podinfo-6.17.0, mais ses Pods font tourner {image or 'aucune image'}. Les "
+        "valeurs par défaut de la nouvelle version du chart n'ont pas été appliquées : la montée a gardé "
+        "celles de la version précédente.",
+    )
 
 
 # ----------------------------------------------------------------------

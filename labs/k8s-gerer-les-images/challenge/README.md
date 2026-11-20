@@ -20,8 +20,9 @@ The **`~/galerie/`** directory is waiting for your record.
 1. **`affiche`** is **pinned by digest** on the image **it runs today**:
    neither another version nor a similar image. All its Pods run that digest.
 2. **Before any repair**, **`~/galerie/releve.txt`** says on a **`cause:`**
-   line why `vignettes` cannot pull its image: what the registry answers, as
-   it says it. After that, leave this file alone.
+   line why `vignettes` cannot pull its image: the request the registry
+   refuses, and what it answers, as the event of the Pod gives them. After
+   that, leave this file alone.
 3. **`vignettes`** is available. Its credentials still come from a
    **docker-registry Secret carried by its ServiceAccount**, and are not
    written into the Pod.

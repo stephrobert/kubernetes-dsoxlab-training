@@ -21,8 +21,9 @@ Les identifiants du registre : utilisateur **`galerie`**, mot de passe
    aujourd'hui** : ni une autre version, ni une image voisine. Tous ses Pods
    tournent sur ce digest.
 2. **Avant toute réparation**, **`~/galerie/releve.txt`** dit sur une ligne
-   **`cause:`** pourquoi `vignettes` ne tire pas son image : ce que le registre
-   répond, tel qu'il le dit. Ensuite, n'y touchez plus.
+   **`cause:`** pourquoi `vignettes` ne tire pas son image : la requête que le
+   registre refuse, et ce qu'il répond, tels que l'événement du Pod les donne.
+   Ensuite, n'y touchez plus.
 3. **`vignettes`** est disponible. Ses identifiants viennent toujours d'un
    **Secret docker-registry porté par son ServiceAccount**, et ne sont pas
    écrits dans le Pod.

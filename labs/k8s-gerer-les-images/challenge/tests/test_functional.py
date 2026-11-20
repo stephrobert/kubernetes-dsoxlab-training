@@ -11,8 +11,11 @@ pull, posé par la préparation avec un mot de passe faux : le registre répond
 401 Unauthorized (mesuré sur kind, registry 3.1.2). La cause attendue n'est
 plus le « no basic auth credentials » que la leçon imprime, et les mots
 génériques (secret, identifiant) ne suffisent plus. La réparation corrige un
-Secret qui existe : sa date de création ne dit plus rien, c'est la naissance
-du Pod qui tourne qui la marque.
+Secret qui existe : sa date de création ne dit plus rien. Ce n'est pas non
+plus la naissance des Pods, puisqu'un Pod existant démarre seul une fois le
+Secret corrigé (le kubelet le relit à chaque tentative de pull, relevé par
+le blog le 2026-11-20). C'est la dernière écriture du ServiceAccount et de
+ses Secrets de pull qui la marque.
 
 Tous échouent avant le travail : affiche tourne sur un tag, le relevé n'existe
 pas, et vignettes est en ImagePullBackOff.
@@ -38,6 +41,11 @@ REGISTRE = "localhost:30500"
 #: Ce qui dit la cause d'un pull refusé pour un mauvais mot de passe : le code
 #: et le mot que le registre renvoie, lus dans les événements du Pod.
 CAUSE = re.compile(r"401|unauthori[sz]ed", re.IGNORECASE)
+#: La requête que le registre refuse, telle que l'événement la donne (mesuré
+#: le 2026-11-20 : « HEAD request to http://localhost:30500/v2/galerie/
+#: vignettes/manifests/1.0: 401 Unauthorized »). Le code seul se devine ; le
+#: chemin de la requête ne se lit que dans l'événement.
+REQUETE = re.compile(r"/v2/galerie/vignettes/manifests/1\.0")
 ATTENTE = 90
 PAS = 3
 
@@ -73,6 +81,23 @@ def _json(host, args: str) -> dict | None:
 def _pods(host, app: str) -> list[dict]:
     return [p for p in (_json(host, f"-n {NS} get pods -l app={app}") or {}).get("items", [])
             if not p["metadata"].get("deletionTimestamp")]
+
+
+def _derniere_ecriture(objet: dict) -> float | None:
+    """La date de la dernière écriture d'un objet, lue dans ses managedFields."""
+    dates = [m.get("time") for m in (objet.get("metadata") or {}).get("managedFields") or [] if m.get("time")]
+    if not dates:
+        return None
+    return max(datetime.fromisoformat(d.replace("Z", "+00:00")).timestamp() for d in dates)
+
+
+def _derniere_ecriture_des_identifiants(host) -> float | None:
+    """La dernière écriture du ServiceAccount vignettes et de ses Secrets de pull."""
+    sa = _json(host, f"-n {NS} get serviceaccount vignettes") or {}
+    objets = [sa] + [_json(host, f"-n {NS} get secret {s.get('name')}") or {}
+                     for s in sa.get("imagePullSecrets") or []]
+    dates = [d for d in (_derniere_ecriture(o) for o in objets if o) if d is not None]
+    return max(dates) if dates else None
 
 
 def _disponible(d: dict) -> bool:
@@ -126,25 +151,28 @@ def test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation(host):
     contenu = f.content_string if f.exists else ""
     cause = next((ligne.partition(":")[2] for ligne in contenu.splitlines()
                   if ligne.strip().lower().startswith("cause")), "")
-    assert CAUSE.search(cause), message(
+    assert CAUSE.search(cause) and REQUETE.search(cause), message(
         en="~/galerie/releve.txt does not say on a cause: line why vignettes cannot pull its image, "
-        "as the registry answers it: its status code and the word that goes with it, read in the "
-        "events of the Pod. A general word (secret, credentials) is not enough.",
+        "as the event of the Pod gives it: the request the registry refuses, and its status code with "
+        "the word that goes with it. A general word (secret, credentials) is not enough.",
         fr="~/galerie/releve.txt ne dit pas, sur une ligne cause:, pourquoi vignettes ne tire pas son "
-        "image, comme le registre le répond : son code de statut et le mot qui l'accompagne, lus "
-        "dans les événements du Pod. Un mot général (secret, identifiants) ne suffit pas.",
+        "image, comme l'événement du Pod le donne : la requête que le registre refuse, et son code de "
+        "statut avec le mot qui l'accompagne. Un mot général (secret, identifiants) ne suffit pas.",
     )
-    # La réparation corrige un Secret qui existe, puis recrée les Pods : c'est
-    # la naissance des Pods de vignettes qui la marque.
-    dates = [datetime.fromisoformat(p["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp()
-             for p in _pods(host, "vignettes")]
+    # La réparation se marque par la dernière écriture des identifiants : celle
+    # des Secrets de pull que porte le ServiceAccount, et celle du
+    # ServiceAccount lui-même. La naissance des Pods n'y suffit pas : le
+    # kubelet relit le Secret à chaque nouvelle tentative de pull, et un Pod
+    # existant démarre seul une fois le Secret corrigé sur place.
+    reparation = _derniere_ecriture_des_identifiants(host)
     ecrit = int(host.check_output(f"stat -c %Y {chemin}"))
-    assert not dates or ecrit <= min(dates), message(
+    assert reparation is None or ecrit <= reparation, message(
         en="The cause was written, or rewritten, after the repair: ~/galerie/releve.txt is more recent "
-        "than the Pods of vignettes. The diagnosis comes first, then the file is left untouched.",
+        "than the last change of the pull credentials of vignettes. The diagnosis comes first, then the "
+        "file is left untouched.",
         fr="La cause a été écrite, ou réécrite, après la réparation : ~/galerie/releve.txt est plus "
-        "récent que les Pods de vignettes. Le diagnostic vient d'abord, puis on ne touche plus au "
-        "fichier.",
+        "récent que le dernier changement des identifiants de pull de vignettes. Le diagnostic vient "
+        "d'abord, puis on ne touche plus au fichier.",
     )
 
 
