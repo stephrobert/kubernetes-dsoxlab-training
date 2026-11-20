@@ -85,7 +85,7 @@ helm install vitrail podinfo/podinfo --version 6.16.0 -n essai-values --set repl
 ```text
 namespace/essai-values created
 NAME: vitrail
-LAST DEPLOYED: Fri Nov 20 19:12:39 2026
+LAST DEPLOYED: Fri Nov 20 21:09:47 2026
 NAMESPACE: essai-values
 STATUS: deployed
 REVISION: 1
@@ -175,7 +175,7 @@ kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.templ
 ```
 
 ```text
-2       	Fri Nov 20 19:12:41 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
+2       	Fri Nov 20 21:09:51 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
 [{"name":"PODINFO_UI_MESSAGE","value":"1984"},{"name":"PODINFO_UI_COLOR","value":"#2a9d8f"}]
 ```
 
@@ -214,7 +214,7 @@ USER-SUPPLIED VALUES:
 ui:
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   1/1     1            1           8s
+vitrail-podinfo   1/1     1            1           20s
 ```
 
 Les 2 réplicas et la couleur ont disparu : retour à 1 réplica. Dès qu'un
@@ -228,10 +228,10 @@ helm history vitrail -n essai-values | cut -c1-110
 
 ```text
 REVISION	UPDATED                 	STATUS    	CHART         	APP VERSION	DESCRIPTION     
-1       	Fri Nov 20 19:12:39 2026	superseded	podinfo-6.16.0	6.16.0     	Install complete
-2       	Fri Nov 20 19:12:41 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
-3       	Fri Nov 20 19:12:44 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
-4       	Fri Nov 20 19:12:45 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+1       	Fri Nov 20 21:09:47 2026	superseded	podinfo-6.16.0	6.16.0     	Install complete
+2       	Fri Nov 20 21:09:51 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+3       	Fri Nov 20 21:10:03 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+4       	Fri Nov 20 21:10:03 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 ```
 
 La révision 3 est la dernière qui portait les réglages complets. Enregistrez
@@ -262,7 +262,7 @@ ui:
   color: '#2a9d8f'
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   2/2     2            2           11s
+vitrail-podinfo   2/2     2            2           23s
 ```
 
 Le fichier redonne les 2 réplicas et la couleur. `--set-string`, lu après le
@@ -301,15 +301,26 @@ helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values --reuse-va
 ```
 
 ```text
-7       	Fri Nov 20 19:12:53 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+7       	Fri Nov 20 21:10:13 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 grep : code 1
 ```
 
-La release tourne en 6.17.0, mais `grep` ne trouve rien (code 1) : les deux
-values ajoutées par la 6.17.0 manquent. `--reuse-values` reprend **toutes**
-les values de la révision précédente, défauts de l'ancienne version compris,
-et ignore ceux de la nouvelle. Ici, le chart s'en sort. Un autre chart, dont
-un modèle lit une value nouvelle, peut échouer ou produire un manifeste faux.
+L'historique annonce `podinfo-6.17.0`, mais `grep` ne trouve rien (code 1) :
+les deux values ajoutées par la 6.17.0 manquent. Regardez maintenant l'image
+que font tourner les Pods :
+
+```bash
+kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+```
+
+```text
+ghcr.io/stefanprodan/podinfo:6.16.0
+```
+
+Les Pods tournent toujours en **6.16.0**. `--reuse-values` reprend **toutes**
+les values de la révision précédente, y compris les défauts de l'ancienne
+version du chart, dont `image.tag`, qui valait `6.16.0`. Il ignore ceux de la
+nouvelle version. La release se dit montée, l'application n'a pas changé.
 
 `--reset-then-reuse-values` fait le tri : il repart des défauts de la
 nouvelle version, puis y remet les seules values que la release avait reçues.
@@ -320,7 +331,7 @@ helm rollback vitrail 3 -n essai-values --wait --timeout 180s > /dev/null; helm 
 ```
 
 ```text
-9       	Fri Nov 20 19:13:18 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+9       	Fri Nov 20 21:10:19 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 USER-SUPPLIED VALUES:
 replicaCount: 2
 ui:
@@ -328,15 +339,17 @@ ui:
   message: Reprise
 ```
 
-Les réglages sont repris, et les nouvelles values de la 6.17.0 aussi :
+Les réglages sont repris. Les nouvelles values de la 6.17.0 aussi, et l'image
+suit :
 
 ```bash
-helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'
+helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'; kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 ```
 
 ```text
 171:  backendIDs: []
 172:  backendMTLS: false
+ghcr.io/stefanprodan/podinfo:6.17.0
 ```
 
 L'application tourne en 6.17.0 avec tous ses réglages (le `sleep` laisse le

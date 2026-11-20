@@ -84,7 +84,7 @@ helm install vitrail podinfo/podinfo --version 6.16.0 -n essai-values --set repl
 ```text
 namespace/essai-values created
 NAME: vitrail
-LAST DEPLOYED: Fri Nov 20 19:12:39 2026
+LAST DEPLOYED: Fri Nov 20 21:09:47 2026
 NAMESPACE: essai-values
 STATUS: deployed
 REVISION: 1
@@ -171,7 +171,7 @@ kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.templ
 ```
 
 ```text
-2       	Fri Nov 20 19:12:41 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
+2       	Fri Nov 20 21:09:51 2026	deployed  	podinfo-6.16.0	6.16.0     	Upgrade complete
 [{"name":"PODINFO_UI_MESSAGE","value":"1984"},{"name":"PODINFO_UI_COLOR","value":"#2a9d8f"}]
 ```
 
@@ -209,7 +209,7 @@ USER-SUPPLIED VALUES:
 ui:
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   1/1     1            1           8s
+vitrail-podinfo   1/1     1            1           20s
 ```
 
 The 2 replicas and the colour are gone: back to 1 replica. As soon as an
@@ -223,10 +223,10 @@ helm history vitrail -n essai-values | cut -c1-110
 
 ```text
 REVISION	UPDATED                 	STATUS    	CHART         	APP VERSION	DESCRIPTION     
-1       	Fri Nov 20 19:12:39 2026	superseded	podinfo-6.16.0	6.16.0     	Install complete
-2       	Fri Nov 20 19:12:41 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
-3       	Fri Nov 20 19:12:44 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
-4       	Fri Nov 20 19:12:45 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+1       	Fri Nov 20 21:09:47 2026	superseded	podinfo-6.16.0	6.16.0     	Install complete
+2       	Fri Nov 20 21:09:51 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+3       	Fri Nov 20 21:10:03 2026	superseded	podinfo-6.16.0	6.16.0     	Upgrade complete
+4       	Fri Nov 20 21:10:03 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 ```
 
 Revision 3 is the last one that carried the full settings. Save its values in
@@ -256,7 +256,7 @@ ui:
   color: '#2a9d8f'
   message: Salut
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-vitrail-podinfo   2/2     2            2           11s
+vitrail-podinfo   2/2     2            2           23s
 ```
 
 The file gives back the 2 replicas and the colour. `--set-string`, read after
@@ -295,15 +295,27 @@ helm upgrade vitrail podinfo/podinfo --version 6.17.0 -n essai-values --reuse-va
 ```
 
 ```text
-7       	Fri Nov 20 19:12:53 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+7       	Fri Nov 20 21:10:13 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 grep : code 1
 ```
 
-The release runs 6.17.0, but `grep` finds nothing (code 1): the two values
-added by 6.17.0 are missing. `--reuse-values` takes back **all** the values of
-the previous revision, the old version's defaults included, and ignores
-those of the new version. Here, the chart copes. Another chart, whose
-template reads a new value, may fail or produce a wrong manifest.
+The history announces `podinfo-6.17.0`, but `grep` finds nothing (code 1):
+the two values added by 6.17.0 are missing. Now look at the image the Pods
+run:
+
+```bash
+kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+```
+
+```text
+ghcr.io/stefanprodan/podinfo:6.16.0
+```
+
+The Pods still run **6.16.0**. `--reuse-values` takes back **all** the values
+of the previous revision, including the defaults of the previous version of
+the chart, among them `image.tag`, which was `6.16.0`. It ignores those of the
+new version. The release claims it was upgraded, the application did not
+change.
 
 `--reset-then-reuse-values` sorts this out: it starts again from the new
 version's defaults, then puts back only the values the release had received.
@@ -314,7 +326,7 @@ helm rollback vitrail 3 -n essai-values --wait --timeout 180s > /dev/null; helm 
 ```
 
 ```text
-9       	Fri Nov 20 19:13:18 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
+9       	Fri Nov 20 21:10:19 2026	deployed  	podinfo-6.17.0	6.17.0     	Upgrade complete
 USER-SUPPLIED VALUES:
 replicaCount: 2
 ui:
@@ -322,15 +334,17 @@ ui:
   message: Reprise
 ```
 
-The settings are taken back, and so are the new 6.17.0 values:
+The settings are taken back. So are the new 6.17.0 values, and the image
+follows:
 
 ```bash
-helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'
+helm get values vitrail -n essai-values --all | grep -n -E 'backend(MTLS|IDs)'; kubectl get deployment vitrail-podinfo -n essai-values -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 ```
 
 ```text
 171:  backendIDs: []
 172:  backendMTLS: false
+ghcr.io/stefanprodan/podinfo:6.17.0
 ```
 
 The application runs 6.17.0 with all its settings (the `sleep` gives the old

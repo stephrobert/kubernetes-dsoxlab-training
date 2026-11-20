@@ -17,8 +17,9 @@ files.
 
 1. The values of the release hold **`ui.message`** equal to the **string**
    `"2026"`, not the integer 2026.
-2. The release runs **podinfo 6.17.0**, deployed, and keeps the settings of
-   the operations team: **three replicas** and the colour **`#ff6b00`**.
+2. The release is on **podinfo 6.17.0**, deployed, its Pods run the
+   **6.17.0** image, and it keeps the settings of the operations team:
+   **three replicas** and the colour **`#ff6b00`**.
 3. podinfo **answers** with the message `2026`.
 
 ## 🧭 Useful landmarks
@@ -28,8 +29,9 @@ chart's defaults. `-f` reads a values file, `--set` sets a value on the command
 line. `--set` guesses the type: a number becomes an integer, and `true`,
 `false` and `null` become booleans or nothing. `--set-string` keeps a string.
 As soon as a `helm upgrade` receives values, it starts again from the chart's
-defaults plus those values only. `--reuse-values` takes back those of the
-previous revision.
+defaults plus those values only. `--reuse-values` takes back all those of the
+previous revision, including the default values of the previous version of
+the chart.
 
 ## ✅ How you will know it works
 
