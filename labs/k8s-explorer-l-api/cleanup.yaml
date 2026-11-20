@@ -1,26 +1,31 @@
 ---
-# Joué par `dsoxlab clean` : retire le namespace archives, la CRD Sauvegarde
-# (et avec elle tous ses objets) et le relevé de l'apprenant. Le cluster
-# « lab » reste : c'est le socle partagé des labs kind.
+# Joué par `dsoxlab clean` : retire le namespace entrepot, la CRD Export (et
+# avec elle tous ses objets) et le relevé de l'apprenant. Le cluster « lab »
+# reste : c'est le socle partagé des labs kind. La situation d'avant le
+# 2026-11-20 (namespace archives, CRD Sauvegarde) est retirée aussi.
 - name: Nettoyer le lab k8s-explorer-l-api
   hosts: lab_target
   become: true
   tasks:
-    - name: Supprimer le namespace archives
+    - name: Supprimer les namespaces du lab
       ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace archives
-        --ignore-not-found --wait=true --timeout=180s
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace entrepot
+        archives --ignore-not-found --wait=true --timeout=180s
       changed_when: true
       failed_when: false
 
-    - name: Supprimer la CRD Sauvegarde
+    - name: Supprimer la CRD Export
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kind/lab.kubeconfig delete crd
-        sauvegardes.sauvegarde.formation.k8s --ignore-not-found --wait=true --timeout=120s
+        exports.donnees.formation.k8s sauvegardes.sauvegarde.formation.k8s
+        --ignore-not-found --wait=true --timeout=120s
       changed_when: true
       failed_when: false
 
-    - name: Retirer le répertoire de l'apprenant
+    - name: Retirer les répertoires de l'apprenant
       ansible.builtin.file:
-        path: "/home/{{ ansible_user | default('ansible') }}/archives"
+        path: "/home/{{ ansible_user | default('ansible') }}/{{ item }}"
         state: absent
+      loop:
+        - entrepot
+        - archives
