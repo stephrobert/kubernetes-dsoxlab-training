@@ -4,9 +4,9 @@ Ces tests confrontent le relevé ~/pods-en-panne/releve.txt à l'état réel des
 deux Pods, puis vérifient que chaque Pod a été réparé du geste juste. Un test
 vérifie un seul état demandé par l'énoncé.
 
-L'image d'un Pod se corrige en place : image-fausse doit garder l'uid que le
+L'image d'un Pod se corrige en place : vignettes doit garder l'uid que le
 setup a mémorisé, un Pod recréé ne compte pas. La commande, elle, ne se modifie
-pas sur un Pod existant : plante doit être recréé, et on vérifie qu'il porte le
+pas sur un Pod existant : importeur doit être recréé, et on vérifie qu'il porte le
 même nom, la même image, et qu'il tourne sans redémarrer.
 
 Aucun test n'attend tant que le travail n'est pas commencé : une attente ne
@@ -29,8 +29,8 @@ NS = "pods-en-panne"
 MEMOIRE = "/var/lib/dsoxlab/diagnostiquer-un-pod.json"
 RELEVE = f"~/{NS}/releve.txt"
 IMAGE_CORRIGEE = "nginx:1.30.5"
-IMAGE_PLANTE = "busybox:1.38.0"
-#: Durée minimale pendant laquelle plante doit avoir tourné d'une traite : un
+IMAGE_IMPORTEUR = "busybox:1.38.0"
+#: Durée minimale pendant laquelle importeur doit avoir tourné d'une traite : un
 #: conteneur qui sort en erreur est redémarré en quelques secondes.
 STABLE = 15
 ATTENTE = 60
@@ -107,111 +107,111 @@ def _etat(pod: dict) -> dict:
 
 
 # ----------------------------------------------------------------------
-# 1. La raison d'attente de image-fausse.
+# 1. La raison d'attente de vignettes.
 # ----------------------------------------------------------------------
-def test_la_raison_d_attente_de_image_fausse_est_consignee(releve):
-    valeur = _valeur(releve, "raison-image-fausse")
+def test_la_raison_d_attente_de_vignettes_est_consignee(releve):
+    valeur = _valeur(releve, "raison-vignettes")
     lue = _compact(valeur)
     assert "errimagepull" in lue or "imagepullbackoff" in lue, message(
-        en=f"raison-image-fausse is {valeur!r}. The waiting reason of an image that cannot be "
+        en=f"raison-vignettes is {valeur!r}. The waiting reason of an image that cannot be "
         "pulled alternates between two values, read in the STATUS column or in the Reason of "
         "kubectl describe pod. Reread the section of the lesson on an image that cannot be found.",
-        fr=f"raison-image-fausse vaut {valeur!r}. La raison d'attente d'une image introuvable "
+        fr=f"raison-vignettes vaut {valeur!r}. La raison d'attente d'une image introuvable "
         "alterne entre deux valeurs, lues dans la colonne STATUS ou dans le Reason de "
         "kubectl describe pod. Relisez la section de la leçon sur l'image introuvable.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. Le code de sortie du conteneur de plante.
+# 2. Le code de sortie du conteneur d'importeur.
 # ----------------------------------------------------------------------
-def test_le_code_de_sortie_de_plante_est_consigne(releve):
-    valeur = _valeur(releve, "code-sortie-plante")
+def test_le_code_de_sortie_d_importeur_est_consigne(releve):
+    valeur = _valeur(releve, "code-sortie-importeur")
     nombres = set(re.findall(r"\d+", valeur))
-    assert nombres == {"1"}, message(
-        en=f"code-sortie-plante is {valeur!r}. The exit code of the last stopped container is "
+    assert nombres == {"2"}, message(
+        en=f"code-sortie-importeur is {valeur!r}. The exit code of the last stopped container is "
         "in lastState.terminated.exitCode, or in the Last State of kubectl describe pod. "
         "Reread the section of the lesson on a container that crashes.",
-        fr=f"code-sortie-plante vaut {valeur!r}. Le code de sortie du dernier conteneur arrêté "
+        fr=f"code-sortie-importeur vaut {valeur!r}. Le code de sortie du dernier conteneur arrêté "
         "se lit dans lastState.terminated.exitCode, ou dans le Last State de "
         "kubectl describe pod. Relisez la section de la leçon sur le conteneur qui plante.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. image-fausse réparée en place.
+# 3. vignettes réparée en place.
 # ----------------------------------------------------------------------
-def test_image_fausse_tourne_avec_son_image_corrigee_en_place(host, memoire):
-    pod = _pod(host, "image-fausse")
+def test_vignettes_tourne_avec_son_image_corrigee_en_place(host, memoire):
+    pod = _pod(host, "vignettes")
     assert pod is not None, message(
-        en=f"No Pod image-fausse in {NS}: it was deleted. The image of a Pod is corrected in "
+        en=f"No Pod vignettes in {NS}: it was deleted. The image of a Pod is corrected in "
         "place, without deleting it. Run dsoxlab reset k8s-diagnostiquer-un-pod to start over.",
-        fr=f"Aucun Pod image-fausse dans {NS} : il a été supprimé. L'image d'un Pod se corrige "
+        fr=f"Aucun Pod vignettes dans {NS} : il a été supprimé. L'image d'un Pod se corrige "
         "en place, sans le supprimer. Lancez dsoxlab reset k8s-diagnostiquer-un-pod pour repartir.",
     )
-    assert pod["metadata"]["uid"] == memoire["image-fausse"], message(
-        en="image-fausse is a new Pod, recreated under the same name. A container's image is one "
+    assert pod["metadata"]["uid"] == memoire["vignettes"], message(
+        en="vignettes is a new Pod, recreated under the same name. A container's image is one "
         "of the few fields Kubernetes allows to change on an existing Pod. In this lab, fix it "
         "without deleting the Pod. Run dsoxlab reset k8s-diagnostiquer-un-pod to start over.",
-        fr="image-fausse est un nouveau Pod, recréé sous le même nom. L'image d'un conteneur fait "
+        fr="vignettes est un nouveau Pod, recréé sous le même nom. L'image d'un conteneur fait "
         "partie des rares champs que Kubernetes autorise à modifier sur un Pod existant. Dans ce "
         "lab, corrigez-la sans supprimer le Pod. Lancez dsoxlab reset k8s-diagnostiquer-un-pod "
         "pour repartir.",
     )
     image = _image(pod["spec"]["containers"][0].get("image", ""))
     assert image == IMAGE_CORRIGEE, message(
-        en=f"image-fausse asks for {image!r}, expected {IMAGE_CORRIGEE!r}.",
-        fr=f"image-fausse demande {image!r}, attendu {IMAGE_CORRIGEE!r}.",
+        en=f"vignettes asks for {image!r}, expected {IMAGE_CORRIGEE!r}.",
+        fr=f"vignettes demande {image!r}, attendu {IMAGE_CORRIGEE!r}.",
     )
     # L'image est la bonne : on laisse au kubelet le temps de la télécharger.
     fin = time.monotonic() + ATTENTE
     while not _etat(pod).get("ready") and time.monotonic() < fin:
         time.sleep(PAS)
-        pod = _pod(host, "image-fausse") or pod
+        pod = _pod(host, "vignettes") or pod
     assert _etat(pod).get("ready"), message(
-        en=f"image-fausse asks for the right image but is not ready after {ATTENTE}s: "
-        "kubectl describe pod image-fausse says why, in its Events.",
-        fr=f"image-fausse demande la bonne image mais n'est pas prêt après {ATTENTE}s : "
-        "kubectl describe pod image-fausse dit pourquoi, dans ses Events.",
+        en=f"vignettes asks for the right image but is not ready after {ATTENTE}s: "
+        "kubectl describe pod vignettes says why, in its Events.",
+        fr=f"vignettes demande la bonne image mais n'est pas prêt après {ATTENTE}s : "
+        "kubectl describe pod vignettes dit pourquoi, dans ses Events.",
     )
 
 
 # ----------------------------------------------------------------------
-# 4. plante recréé avec une commande qui ne sort pas.
+# 4. importeur recréé avec une commande qui ne sort pas.
 # ----------------------------------------------------------------------
-def test_plante_tourne_avec_sa_commande_corrigee(host):
-    pod = _pod(host, "plante")
+def test_importeur_tourne_avec_sa_commande_corrigee(host):
+    pod = _pod(host, "importeur")
     assert pod is not None, message(
-        en=f"No Pod plante in {NS}. Its command cannot change on an existing Pod: it is "
+        en=f"No Pod importeur in {NS}. Its command cannot change on an existing Pod: it is "
         "recreated under the SAME name, from its corrected manifest.",
-        fr=f"Aucun Pod plante dans {NS}. Sa commande ne change pas sur un Pod existant : il "
+        fr=f"Aucun Pod importeur dans {NS}. Sa commande ne change pas sur un Pod existant : il "
         "se recrée sous le MÊME nom, depuis son manifeste corrigé.",
     )
     image = _image(pod["spec"]["containers"][0].get("image", ""))
-    assert image == IMAGE_PLANTE, message(
-        en=f"plante runs {image!r}, whereas its image {IMAGE_PLANTE!r} was not the problem: "
+    assert image == IMAGE_IMPORTEUR, message(
+        en=f"importeur runs {image!r}, whereas its image {IMAGE_IMPORTEUR!r} was not the problem: "
         "only its command was. Keep the image, correct the command.",
-        fr=f"plante tourne avec {image!r}, alors que son image {IMAGE_PLANTE!r} n'était pas en "
+        fr=f"importeur tourne avec {image!r}, alors que son image {IMAGE_IMPORTEUR!r} n'était pas en "
         "cause : seule sa commande l'était. Gardez l'image, corrigez la commande.",
     )
     etat = _etat(pod)
     assert etat.get("restartCount", 0) == 0, message(
-        en=f"plante's container has restarted {etat.get('restartCount')} time(s): its command "
+        en=f"importeur's container has restarted {etat.get('restartCount')} time(s): its command "
         "still ends. A Pod is not modified in place for that: recreate it, under the same name, "
         "with a command that keeps running.",
-        fr=f"Le conteneur de plante a redémarré {etat.get('restartCount')} fois : sa commande "
+        fr=f"Le conteneur d'importeur a redémarré {etat.get('restartCount')} fois : sa commande "
         "se termine encore. Un Pod ne se modifie pas en place pour cela : recréez-le, sous le "
         "même nom, avec une commande qui dure.",
     )
     en_marche = (etat.get("state") or {}).get("running")
     assert en_marche, message(
-        en=f"plante's container is not running: {etat.get('state')}.",
-        fr=f"Le conteneur de plante ne tourne pas : {etat.get('state')}.",
+        en=f"importeur's container is not running: {etat.get('state')}.",
+        fr=f"Le conteneur d'importeur ne tourne pas : {etat.get('state')}.",
     )
     # Il tourne et n'a jamais redémarré : on vérifie qu'il TIENT, sans plus.
     fin = time.monotonic() + STABLE + 5
     while time.monotonic() < fin:
-        pod = _pod(host, "plante") or pod
+        pod = _pod(host, "importeur") or pod
         etat = _etat(pod)
         if etat.get("restartCount", 0) or not (etat.get("state") or {}).get("running"):
             break
@@ -221,7 +221,7 @@ def test_plante_tourne_avec_sa_commande_corrigee(host):
             break
         time.sleep(PAS)
     assert etat.get("restartCount", 0) == 0 and (etat.get("state") or {}).get("running"), message(
-        en=f"plante's container stopped again within {STABLE}s: its command still ends.",
-        fr=f"Le conteneur de plante s'est de nouveau arrêté en moins de {STABLE}s : sa commande "
+        en=f"importeur's container stopped again within {STABLE}s: its command still ends.",
+        fr=f"Le conteneur d'importeur s'est de nouveau arrêté en moins de {STABLE}s : sa commande "
         "se termine encore.",
     )

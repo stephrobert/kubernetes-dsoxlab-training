@@ -9,18 +9,18 @@ description: |
 
 criteria:
   - id: la-raison-d-attente-est-consignee
-    label: "La raison d'attente de image-fausse est consignée"
+    label: "La raison d'attente de vignettes est consignée"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: le-code-de-sortie-est-consigne
-    label: "Le code de sortie du conteneur de plante est consigné"
+    label: "Le code de sortie du conteneur d'importeur est consigné"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: l-image-est-corrigee-en-place
-    label: "image-fausse tourne, son image corrigée en place sur le même Pod"
+    label: "vignettes tourne, son image corrigée en place sur le même Pod"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
   - id: la-commande-est-corrigee
-    label: "plante tourne sans redémarrer, même nom et même image, sa commande corrigée"
+    label: "importeur tourne sans redémarrer, même nom et même image, sa commande corrigée"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pods/
