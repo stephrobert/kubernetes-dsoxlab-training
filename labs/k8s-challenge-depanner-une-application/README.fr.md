@@ -5,8 +5,8 @@ dans la section Mettre en pratique de la leçon « Dépanner un nœud » : quatr
 pannes à la fois sur le cluster kubeadm du catalogue, deux côté application (un
 Deployment en `CrashLoopBackOff`, un Pod en `ImagePullBackOff`) et deux côté
 cluster (un API server qui ne démarre plus, un worker dont le kubelet est
-tombé). La cause de chaque panne se consigne avant sa réparation. Dix états,
-seuil 70, deux bloquants.
+tombé). La cause de chaque panne se consigne avant sa réparation. Dix exigences,
+seuil 70, deux bloquantes.
 
 | | |
 |---|---|

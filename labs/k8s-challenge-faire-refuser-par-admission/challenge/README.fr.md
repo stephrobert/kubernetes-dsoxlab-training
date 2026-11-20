@@ -45,8 +45,8 @@ n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Dix états, à poids égal. Le seuil est de **70 sur 100**, et les états **4 et
-10** sont **bloquants** : les deux refus prouvés par de vraies soumissions.
+Dix exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **4 et
+10** sont **bloquantes** : les deux refus prouvés par de vraies soumissions.
 Réussir les autres ne compense pas l'un d'eux manqué.
 
 Les tests lisent les Pods admis, entrent dans le nouveau Pod pour compter ce

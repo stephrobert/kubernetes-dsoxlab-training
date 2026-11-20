@@ -39,7 +39,7 @@ is given: the module taught you what you need.
 
 ## How you will be graded
 
-Seven states, equally weighted. The pass mark is **70 out of 100**, and states
+Seven requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **2 and 6** are **blocking**: the persistence removed for good, and a cap that
 really refuses. Passing the others does not make up for missing one of them.
 

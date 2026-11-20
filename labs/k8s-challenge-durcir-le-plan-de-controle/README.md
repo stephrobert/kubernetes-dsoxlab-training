@@ -4,7 +4,7 @@ Challenge of the **Harden the cluster** module of the Kubernetes course, in the
 Put into practice section of the "Audit Logs" lesson: an API server to harden
 without breaking it, a CIS finding to fix on three control plane components
 and to prove with a second kube-bench audit, and a two-level audit policy
-whose trace must appear in the log. Seven states, threshold 70, two blocking.
+whose trace must appear in the log. Seven requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

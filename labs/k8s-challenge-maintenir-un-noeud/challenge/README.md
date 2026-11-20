@@ -43,13 +43,13 @@ have `sudo`. No procedure is given: the module taught you what you need.
 
 ## How you are graded
 
-Seven states, equal weight. The threshold is **70 out of 100**, and states
+Seven requirements, equal weight. The threshold is **70 out of 100**, and requirements
 **2 and 6** are **blocking**: the emptied worker, and the whole cluster
 upgraded without losing the application. Passing the others does not make up
 for missing one of them.
 
 The tests read the state of the cluster and the git repository, never the
-commands typed. For state 3, the grader starts a short-lived Pod,
+commands typed. For requirement 3, the grader starts a short-lived Pod,
 `sonde-placement`, that the scheduler must place on the worker, then removes
 it. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 

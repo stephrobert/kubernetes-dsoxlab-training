@@ -70,7 +70,7 @@ le temps de redémarrer mongod, puis revient à `Running`.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des six états ci-dessus. Le quatrième lit les
+Chaque test vérifie une des six exigences ci-dessus. Le quatrième lit les
 propriétaires des objets : un StatefulSet monté à la main porterait les mêmes
 noms, sans propriétaire. Le sixième lit les **options de démarrage** de mongod :
 un réglage posé à chaud dans mongod ne les change pas, et disparaîtrait au

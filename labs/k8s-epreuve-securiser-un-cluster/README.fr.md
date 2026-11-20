@@ -5,7 +5,7 @@ faible et d'un cahier des charges qui ne nomme aucun objet Kubernetes,
 sécuriser le cluster qui héberge la boutique. Plan de contrôle, journal
 d'audit, admission, confinement, réseau, détection avec Falco et chaîne
 d'approvisionnement, sans que la boutique cesse de répondre. Notée sur l'état
-final : dix-neuf états à poids égal, seuil 70, sept états critiques, aucun
+final : dix-neuf exigences à poids égal, seuil 70, sept exigences critiques, aucun
 indice.
 
 | | |

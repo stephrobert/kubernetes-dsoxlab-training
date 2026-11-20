@@ -5,7 +5,7 @@ into practice section of the "Image Scanning (Grype/Trivy)" lesson: a
 Deployment to pin to its digest, a Dockerfile to clear of its static analysis
 findings, an image to sign with its public key published, a vulnerable image
 to replace, and a cluster that must refuse unsigned images at creation. Ten
-states, threshold 70, three blocking.
+requirements, threshold 70, three blocking.
 
 | | |
 |---|---|

@@ -5,7 +5,7 @@ dans la page des exercices chronométrés CKNE. Il ne nomme aucun objet : relier
 deux sites pour que la boutique y réponde et survive à la perte de l'un,
 l'annoncer en BGP au routeur de l'équipe réseau, et la servir en HTTPS sous son
 nom public avec un certificat de cert-manager, le HTTP étant redirigé. Trois
-états, tous bloquants, seuil 70.
+exigences, toutes bloquantes, seuil 70.
 
 | | |
 |---|---|

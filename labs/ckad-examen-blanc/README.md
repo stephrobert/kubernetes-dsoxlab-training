@@ -6,8 +6,8 @@ official CKAD v1.37 curriculum, graded on the cluster's final state, no hint.
 The threshold is the real exam's, 66%, read in the Linux Foundation's CKA, CKAD
 and CKS FAQ.
 
-Twenty states at 5 points: dsoxlab grades the share of passed tests, so a 10%
-task carries two states.
+Twenty requirements at 5 points: dsoxlab grades the share of passed tests, so a 10%
+task carries two requirements.
 
 | Domain | Weight | Tasks |
 |---|---|---|

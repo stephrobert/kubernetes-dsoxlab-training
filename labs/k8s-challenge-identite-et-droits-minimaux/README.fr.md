@@ -5,7 +5,7 @@ la section Mettre en pratique de la leçon « ServiceAccounts » : un outil
 d'observation à doter de sa propre identité, le droit de lire le journal des Pods
 d'un autre namespace et rien de plus, un jeton à couper là où il ne sert pas,
 un compte par défaut à dépouiller des droits qu'il a hérités, et un Pod à durcir.
-Six états, seuil 70, deux bloquants.
+Six exigences, seuil 70, deux bloquantes.
 
 | | |
 |---|---|

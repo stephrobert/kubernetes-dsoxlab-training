@@ -42,8 +42,8 @@ n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Sept états, à poids égal. Le seuil est de **70 sur 100**, et les états **4 et
-7** sont **bloquants** : l'audit relancé, et le journal qui trace. Réussir les
+Sept exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **4 et
+7** sont **bloquantes** : l'audit relancé, et le journal qui trace. Réussir les
 autres ne compense pas l'un d'eux manqué.
 
 Les tests lisent les manifestes sur le nœud, relancent eux-mêmes kube-bench et

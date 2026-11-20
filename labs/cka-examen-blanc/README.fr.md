@@ -6,8 +6,8 @@ domaines du programme officiel CKA v1.37, notées sur l'état final du cluster,
 sans indice. Le seuil est celui de l'examen réel, 66 %, lu dans la FAQ CKA, CKAD
 et CKS de la Linux Foundation.
 
-Vingt états à 5 points : dsoxlab note la part de tests réussis, et une tâche de
-10 % porte donc deux états.
+Vingt exigences à 5 points : dsoxlab note la part de tests réussis, et une tâche de
+10 % porte donc deux exigences.
 
 | Domaine | Poids | Tâches |
 |---|---|---|

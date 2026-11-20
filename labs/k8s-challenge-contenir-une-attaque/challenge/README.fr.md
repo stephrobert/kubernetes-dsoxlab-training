@@ -39,8 +39,8 @@ procédure n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Sept états, à poids égal. Le seuil est de **70 sur 100**, et les états **2 et
-6** sont **bloquants** : la persistance retirée pour de bon, et un plafond qui
+Sept exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **2 et
+6** sont **bloquantes** : la persistance retirée pour de bon, et un plafond qui
 refuse vraiment. Réussir les autres ne compense pas l'échec de l'un d'eux.
 
 Les tests comparent le constat à l'objet posé par le setup, attendent un cycle

@@ -5,9 +5,9 @@ Challenge du module **Installer un cluster** de la formation Kubernetes (niveau
 un worker réinitialisé à préparer et à joindre au cluster kubeadm pour qu'il
 survive à un redémarrage, un Pod forcé sur lui, puis un cluster kind à trois
 plans de contrôle derrière son répartiteur, qui doit tenir la perte de l'un
-d'eux. Sept états, seuil 70, deux bloquants.
+d'eux. Sept exigences, seuil 70, deux bloquantes.
 
-Les états de haute disponibilité se jouent sur kind parce que l'infrastructure
+Les exigences de haute disponibilité se jouent sur kind parce que l'infrastructure
 du catalogue ne porte qu'un plan de contrôle kubeadm : kind pose lui-même le
 répartiteur, et ses nœuds sont des machines kubeadm à etcd empilé. Le setup
 supprime les clusters kind des autres labs pour libérer la mémoire ; chacun

@@ -5,7 +5,7 @@ in the Put into practice section of the "ServiceAccounts" lesson: an
 observability tool to give its own identity, the right to read the logs of
 another namespace's Pods and nothing more, a token to cut where it serves no
 purpose, a default account to strip of the rights it inherited, and a Pod to
-harden. Six states, threshold 70, two blocking.
+harden. Six requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

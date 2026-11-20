@@ -30,7 +30,7 @@ You are on the control plane, with `kubectl` configured.
 
 ## Useful bearings
 
-Taking a node out of scheduling and evicting it are two distinct gestures,
+Taking a node out of scheduling and evicting it are two distinct operations,
 and the order matters. Eviction goes through the eviction API, which honours
 disruption budgets: that is what makes the operation safe, and it is also
 what makes it wait when the budget is reached.

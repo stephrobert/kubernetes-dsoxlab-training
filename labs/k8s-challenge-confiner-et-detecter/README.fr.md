@@ -6,7 +6,7 @@ un profil AppArmor à écrire et charger, un profil seccomp qui refuse `chmod`,
 le TLS mutuel à exiger dans un maillage Istio, un namespace à fermer par défaut
 sans couper son flux applicatif ni son DNS, un Pod à faire tourner dans un bac
 à sable gVisor, et une règle Falco qui alerte sur un shell dans le namespace
-protégé, et nulle part ailleurs. Seize états, seuil 70, trois bloquants.
+protégé, et nulle part ailleurs. Seize exigences, seuil 70, trois bloquantes.
 
 | | |
 |---|---|

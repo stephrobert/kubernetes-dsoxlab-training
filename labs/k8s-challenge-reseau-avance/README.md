@@ -5,7 +5,7 @@ Challenge of the **Advanced networking** module of the Kubernetes course
 through an egress gateway": a Service served by Cilium to repair without
 kube-proxy, a single flow to open between two namespaces, a namespace to route
 out through a chosen node, and the flow a policy refuses to name by reading it
-in Hubble. Four states, pass mark 70.
+in Hubble. Four requirements, pass mark 70.
 
 | | |
 |---|---|

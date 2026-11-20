@@ -47,7 +47,7 @@ uninstall nothing.
 
 ## How you will be graded
 
-Four states, equally weighted. The pass mark is **70 out of 100**: three states
+Four requirements, equally weighted. The pass mark is **70 out of 100**: three requirements
 out of four. The feedback is limited to the list of unmet criteria, by their
 label, and the score: no message says why.
 

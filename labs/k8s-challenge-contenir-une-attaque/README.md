@@ -5,7 +5,7 @@ course (level 5, KCSA), in the Put into practice section of the "Denial of
 service" lesson: an attacker's access that something keeps recreating, to
 record and remove for good without harming the legitimate application, then an
 abusive workload to contain in its namespace while another application keeps
-answering. Seven states, threshold 70, two blocking.
+answering. Seven requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

@@ -54,10 +54,10 @@ nommé : choisir les bons fait partie du capstone.
 
 ## Comment vous serez évalué
 
-Trois états, à poids égal, et tous **bloquants** : réussir les deux autres ne
-compense pas l'échec de l'un d'eux. Le seuil est de **70 sur 100**. Le retour se
-limite à la liste des critères non satisfaits, par leur libellé, et à la note :
-aucun message ne dit pourquoi.
+Trois exigences, à poids égal, et toutes **bloquantes** : réussir les deux
+autres ne compense pas l'échec de l'une d'elles. Le seuil est de **70 sur
+100**. Le retour se limite à la liste des critères non satisfaits, par leur
+libellé, et à la note : aucun message ne dit pourquoi.
 
 Les tests lisent les clusters, jamais vos fichiers. Ils appellent la vitrine
 depuis le client, vident eux-mêmes le site 1 de ses réplicas puis les

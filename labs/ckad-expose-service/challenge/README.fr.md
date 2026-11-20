@@ -52,7 +52,7 @@ le port et le port cible.
 
 ## ✅ Comment vous saurez que c'est bon
 
-Onze critères, un par état demandé ci-dessus : le Deployment et ses Pods, le
+Onze critères, un par exigence ci-dessus : le Deployment et ses Pods, le
 Service et ses endpoints, puis dix requêtes depuis `client` et une requête
 directe à chaque Pod.
 

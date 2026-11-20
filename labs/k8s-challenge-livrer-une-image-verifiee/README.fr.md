@@ -5,7 +5,7 @@ dans la section Mettre en pratique de la leçon « Image Scanning (Grype/Trivy) 
 un Deployment à épingler sur son digest, un Dockerfile à débarrasser des
 constats de l'analyse statique, une image à signer avec sa clé publique
 publiée, une image vulnérable à remplacer, et un cluster qui doit refuser les
-images non signées dès la création. Dix états, seuil 70, trois bloquants.
+images non signées dès la création. Dix exigences, seuil 70, trois bloquantes.
 
 | | |
 |---|---|

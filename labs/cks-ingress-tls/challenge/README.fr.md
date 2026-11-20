@@ -59,7 +59,7 @@ quelques secondes avant de conclure.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des quatre états ci-dessus. Le troisième ouvre la
+Chaque test vérifie une des quatre exigences ci-dessus. Le troisième ouvre la
 connexion et lit le certificat servi. Le quatrième appelle le site comme un
 client qui ne fait confiance qu'à votre certificat : « le site répond en
 HTTPS » est déjà vrai avant votre intervention, avec le certificat par défaut,

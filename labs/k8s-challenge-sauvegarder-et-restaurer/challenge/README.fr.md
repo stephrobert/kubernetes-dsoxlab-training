@@ -28,7 +28,7 @@ Vous êtes sur **`k8s-cp.lab`**, le plan de contrôle, avec `kubectl`, `etcdctl`
 
 ## Notation
 
-Chaque état compte pour une part égale ; le seuil de réussite est de 70 %.
+Chaque exigence compte pour une part égale ; le seuil de réussite est de 70 %.
 Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 
 ## Valider votre travail

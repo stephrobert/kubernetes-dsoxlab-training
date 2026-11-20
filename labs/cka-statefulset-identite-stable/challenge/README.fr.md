@@ -49,7 +49,7 @@ survécu.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des six états ci-dessus. Pour les noms stables, le test
+Chaque test vérifie une des six exigences ci-dessus. Pour les noms stables, le test
 résout chaque nom depuis un autre réplica et compare l'adresse obtenue à celle
 du Pod. Pour la donnée, il lit le fichier et les événements du StatefulSet, qui
 disent combien de fois le Pod `annuaire-1` a été créé.

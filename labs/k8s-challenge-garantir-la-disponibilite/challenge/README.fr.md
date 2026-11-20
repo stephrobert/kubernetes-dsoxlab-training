@@ -47,8 +47,8 @@ n'est fournie : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Six états, à poids égal. Le seuil de réussite est de **70 sur 100**, et les
-états **2 et 5** sont **bloquants** : le budget qui garantit le minimum, et le
+Six exigences, à poids égal. Le seuil de réussite est de **70 sur 100**, et les
+exigences **2 et 5** sont **bloquantes** : le budget qui garantit le minimum, et le
 minimum tenu pendant l'évacuation. Réussir les autres ne compense pas l'échec
 de l'un d'eux.
 

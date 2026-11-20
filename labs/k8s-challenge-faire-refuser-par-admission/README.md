@@ -5,7 +5,7 @@ Put into practice section of the "VAP vs Kyverno vs Gatekeeper" lesson: the
 restricted Pod Security Standard on one namespace, a privileged Pod to rebuild
 without any of its flaws on another, and a native admission policy that
 refuses images named by a tag on a third, without touching the rest. Ten
-states, threshold 70, two blocking.
+requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

@@ -5,7 +5,7 @@ Challenge of the **Maintain and upgrade** module of the Kubernetes course
 a disruption budget to set, a worker to empty then bring back, a record of the
 operation, the whole cluster to upgrade from 1.36.4 to 1.37.0 without losing
 the application, and a change made live to carry into the git repository.
-Seven states, threshold 70, two blocking.
+Seven requirements, threshold 70, two blocking.
 
 Like `cka-kubeadm-upgrade`, this challenge rebuilds the cluster one minor
 version back at setup, and gives it back its version at cleanup.

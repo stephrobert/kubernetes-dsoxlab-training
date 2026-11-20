@@ -43,7 +43,7 @@ the module taught you what you need.
 
 ## How you will be graded
 
-Six states, equally weighted. The pass mark is **70 out of 100**, and states
+Six requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **2 and 5** are **blocking**: the budget that guarantees the minimum, and the
 minimum kept during the evacuation. Passing the others does not make up for
 missing one of them.

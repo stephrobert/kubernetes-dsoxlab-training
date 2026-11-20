@@ -5,7 +5,7 @@ la section Mettre en pratique de la leçon « VAP vs Kyverno vs Gatekeeper » : 
 standard restricted sur un namespace, un Pod privilégié à reconstruire sans
 aucun de ses défauts sur un autre, et une politique d'admission native qui
 refuse les images désignées par un tag sur un troisième, sans toucher au
-reste. Dix états, seuil 70, deux bloquants.
+reste. Dix exigences, seuil 70, deux bloquantes.
 
 | | |
 |---|---|

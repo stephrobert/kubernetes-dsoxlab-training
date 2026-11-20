@@ -5,7 +5,7 @@ Put into practice section of the "Troubleshooting a node" lesson: four failures
 at once on the catalogue's kubeadm cluster, two on the application side (a
 Deployment in `CrashLoopBackOff`, a Pod in `ImagePullBackOff`) and two on the
 cluster side (an API server that no longer starts, a worker whose kubelet is
-down). The cause of each failure is recorded before its repair. Ten states,
+down). The cause of each failure is recorded before its repair. Ten requirements,
 threshold 70, two blocking.
 
 | | |

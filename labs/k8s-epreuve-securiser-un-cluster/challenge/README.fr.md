@@ -116,8 +116,8 @@ Kubernetes : les choisir fait partie de l'épreuve.
 
 ## Comment vous serez évalué
 
-Dix-neuf états, à poids égal, numérotés P01 à P19 dans l'ordre de la grille.
-Le seuil est de **70 sur 100**, et sept états sont **critiques** : le
+Dix-neuf exigences, à poids égal, numérotées P01 à P19 dans l'ordre de la grille.
+Le seuil est de **70 sur 100**, et sept exigences sont **critiques** : le
 profileur fermé (P01), le journal d'audit (P04), le standard restricted (P05),
 le refus des tags (P06), le TLS mutuel (P10), l'alerte Falco (P13) et la
 boutique qui répond toujours (P19). Réussir les autres ne compense pas l'échec

@@ -6,7 +6,7 @@ using service accounts".
 
 The catalogue already has two RBAC labs, one CKA and one CKAD, which teach how
 to **grant** a permission. This one teaches how to **take one back** without
-breaking the application, which is the CKS gesture and the harder of the two:
+breaking the application, which is the CKS task and the harder of the two:
 nobody complains about an over-broad permission until something leaks.
 
 The tests do not read manifests, save one and for a precise reason: a

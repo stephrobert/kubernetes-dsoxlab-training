@@ -52,7 +52,7 @@ the port and the target port.
 
 ## ✅ How you will know it is right
 
-Eleven criteria, one per state asked above: the Deployment and its Pods, the
+Eleven criteria, one per requirement asked above: the Deployment and its Pods, the
 Service and its endpoints, then ten requests from `client` and one direct
 request to each Pod.
 

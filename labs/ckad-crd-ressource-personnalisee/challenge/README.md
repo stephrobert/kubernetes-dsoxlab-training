@@ -42,7 +42,7 @@ unblock the resource, but would take all the others with it.
 
 ## How you will know it works
 
-Each test checks one of the five states above. For `hebdomadaire` and for the
+Each test checks one of the five requirements above. For `hebdomadaire` and for the
 CRD, it compares their identifier with the one of the start. For the refusal, it
 reads your file again, then checks that the API still refuses a retention of 400
 days.

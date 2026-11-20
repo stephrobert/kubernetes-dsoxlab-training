@@ -53,7 +53,7 @@ is part of the capstone.
 
 ## How you will be graded
 
-Three states, equally weighted, and all **blocking**: passing the other two
+Three requirements, equally weighted, and all **blocking**: passing the other two
 does not make up for missing one of them. The pass mark is **70 out of 100**.
 The feedback is limited to the list of unmet criteria, by their label, and the
 score: no message says why.

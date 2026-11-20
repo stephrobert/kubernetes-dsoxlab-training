@@ -41,13 +41,13 @@ No procedure is given: the module taught you what you need.
 
 ## How you will be graded
 
-Eight states, equally weighted. The pass mark is **70 out of 100**, and states
+Eight requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **2 and 5** are **blocking**: the reserved application on its node, and the
 ceiling of the namespace. Passing the others does not make up for missing one
 of them.
 
 The tests read where the Pods really run and what their descriptions ask, and
-submit test Pods in server-side dry run, which creates nothing. For state 8,
+submit test Pods in server-side dry run, which creates nothing. For requirement 8,
 **the test generates the load itself**: it runs a CPU loop inside every Pod of
 `accueil` for about two minutes, and waits up to two minutes for the
 Deployment to grow. You have nothing to start for it, and a check can last

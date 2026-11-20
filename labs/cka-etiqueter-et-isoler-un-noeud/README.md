@@ -4,7 +4,7 @@
 "Troubleshoot clusters and nodes", and *Workloads and Scheduling* domain,
 competency "Configure Pod admission and scheduling".
 
-Label, role, annotation, taint: four gestures on a node, and one decision that
+Label, role, annotation, taint: four operations on a node, and one decision that
 matters, the effect of the taint. Picking the wrong effect on a production node
 leaves in place what you wanted gone, or the reverse.
 

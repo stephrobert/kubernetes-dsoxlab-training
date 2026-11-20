@@ -44,12 +44,12 @@ qu'il faut.
 
 ## Comment vous serez noté
 
-Sept états, à poids égal. Le seuil est de **70 sur 100**, et les états **2 et
-6** sont **bloquants** : le worker évacué, et tout le cluster monté sans perdre
+Sept exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **2 et
+6** sont **bloquantes** : le worker évacué, et tout le cluster monté sans perdre
 l'application. Réussir les autres ne compense pas l'un d'eux manqué.
 
 Les tests lisent l'état du cluster et le dépôt git, jamais les commandes
-tapées. Pour l'état 3, le correcteur lance un Pod éphémère,
+tapées. Pour l'exigence 3, le correcteur lance un Pod éphémère,
 `sonde-placement`, que le scheduler doit placer sur le worker, puis le retire.
 Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.
 

@@ -44,7 +44,7 @@ autres avec elle.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des cinq états ci-dessus. Pour `hebdomadaire` et pour la
+Chaque test vérifie une des cinq exigences ci-dessus. Pour `hebdomadaire` et pour la
 CRD, il compare leur identifiant à celui du départ. Pour le refus, il relit votre
 fichier, puis vérifie que l'API refuse toujours une rétention de 400 jours.
 
