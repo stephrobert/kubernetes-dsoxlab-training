@@ -71,4 +71,13 @@ chown -R "$LAB_USER:$LAB_USER" "$D"
 
 kubectl apply -f "$D/facturation.yaml"
 kubectl -n paiements rollout status deployment facturation --timeout=180s
-echo "Situation posée : facturation en version 1, migration non appliquée."
+# Un historique dont la longueur change à chaque préparation : de 1 à 3
+# redémarrages, donc la révision qui portera la version 2 vaut 3, 4 ou 5. Le
+# relevé la demande : elle se lit dans le cluster, pas dans la leçon. Un
+# redémarrage ne touche qu'une annotation que le fichier ne gère pas : comparer
+# le dossier au cluster ne montre toujours aucune différence.
+for _ in $(seq 1 $((RANDOM % 3 + 1))); do
+  kubectl -n paiements rollout restart deployment facturation
+  kubectl -n paiements rollout status deployment facturation --timeout=180s
+done
+echo "Situation posée : facturation en version 1 (révision $(kubectl -n paiements get deployment facturation -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}')), migration non appliquée."

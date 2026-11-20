@@ -4,15 +4,16 @@ description: |
   Passez une application en version 2 et jouez son Job de migration, en
   prévisualisant chaque changement avec kubectl diff et en attendant la vraie
   fin du déploiement, puis écrivez un script de déploiement qui sort proprement
-  quand rien ne diffère et s'arrête avant d'appliquer quand kubectl diff échoue.
+  quand rien ne diffère, s'arrête avant d'appliquer quand kubectl diff échoue,
+  et attend les Jobs du dossier en s'arrêtant au premier qui échoue.
 
 criteria:
   - id: etat-conforme-au-dossier
     label: "Le cluster correspond au dossier ~/deploiement/"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
-  - id: codes-de-diff
-    label: "Le relevé donne les trois codes de sortie de kubectl diff"
+  - id: revision-de-la-version-2
+    label: "Le relevé donne la révision où en est facturation une fois la version 2 déployée"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
   - id: nouvelle-version-en-place
@@ -21,5 +22,9 @@ criteria:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
   - id: script-qui-sait-s-arreter
     label: "deployer.sh sort en 0 sans différence, et s'arrête en erreur avant d'appliquer"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: script-qui-attend-les-jobs
+    label: "deployer.sh attend les Jobs du dossier, sort en 0 s'ils réussissent, et s'arrête en erreur dès que l'un d'eux échoue"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/

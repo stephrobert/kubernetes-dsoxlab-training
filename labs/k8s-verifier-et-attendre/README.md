@@ -1,16 +1,18 @@
 # Preview with diff, wait with wait
 
 Before applying a change, you want to know what it will modify. After applying
-it, you want to know when it is really finished. `kubectl diff` answers the
-first question, `kubectl rollout status` and `kubectl wait` the second. In
-this course, you measure the exit codes of `kubectl diff`, you see the trap
-they set for a script, you tell an available rollout from a finished one, you
-wait for the end of a Job that succeeds then of a Job that fails, and you see
-what `apply` does when an object in the folder is refused.
+it, you want to know when it is really over. `kubectl diff` answers the first
+question, `kubectl rollout status` and `kubectl wait` the second one. The
+lesson presents them and puts together a deployment script. This course starts
+from what goes wrong: a stuck rollout that you undo, a folder that no longer
+says what the cluster runs, a Job that fails without the wait seeing it, Jobs
+to wait for in a folder, and an `apply` that stops halfway.
 
-You work in a scratch namespace, `essai-attente`, with an `accueil` Deployment
-and two trial Jobs. The challenge will ask you for the same thing on another
-application: you will do it on your own, at the end.
+You work in a scratch namespace, `essai-attente`, with an `accueil`
+Deployment and two scratch Jobs. A **Job** starts a Pod that does a task, then
+stops: the lesson on Jobs details them later in the training. The challenge
+will ask you for a complete deployment script, on another application: you
+will write it on your own, at the end.
 
 Related page: [kubectl wait and diff](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-wait-diff/).
 
@@ -22,15 +24,15 @@ Start the lab:
 dsoxlab run k8s-verifier-et-attendre
 ```
 
-You are now connected to the `k8s-kind.lab` machine. The kind cluster `lab` is
-running there, and your kubectl already targets it.
+You are now connected to the `k8s-kind.lab` machine. The kind cluster `lab`
+is running there, and your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
-2026, with Kubernetes 1.37.
+The outputs shown in this course were recorded on this machine on 20 November
+2026, with Kubernetes v1.37.0.
 
-Prepare the scratch namespace and a folder that holds the `accueil`
-Deployment: 3 nginx Pods at version 1.30.5, with a readiness probe. Apply it
-and wait until it is ready:
+Prepare the scratch namespace and a folder holding the `accueil` Deployment: 3
+nginx Pods in version 1.30.5, with a readiness probe. Apply it and wait until
+it is ready:
 
 ```bash
 kubectl create namespace essai-attente; mkdir -p ~/essai-attente
@@ -68,165 +70,120 @@ deployment.apps/accueil created
 deployment "accueil" successfully rolled out
 ```
 
-## 📚 Exercise 1: the three codes of kubectl diff
+## 📚 Exercise 1: reminder, the codes of diff and set -e
 
-`kubectl diff` compares a file or a folder with what runs in the cluster. Its
-**exit code** (which the shell stores in `$?`) tells what it found. Compare the
-folder as it is:
+The lesson details the three exit codes of `kubectl diff`. Go over them in one
+go. Change the image of the file to a version that **does not exist**,
+`nginx:1.30.6-introuvable`, then compare the folder, and finally a missing
+file. `grep` only keeps the changed lines, and `${PIPESTATUS[0]}` gives the
+code of `kubectl diff`, not the one of `grep`:
 
 ```bash
 kubectl diff -f ~/essai-attente/; echo "code $?"
-```
-
-```text
-code 0
-```
-
-No difference: nothing is shown, and the code is 0. Now set the image of the
-file to version 1.30.6, then compare again. `grep` keeps only the changed
-lines, and `${PIPESTATUS[0]}` gives the code of `kubectl diff` (not the one of
-`grep`):
-
-```bash
-sed -i 's/nginx:1.30.5@sha256:[0-9a-f]*/nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703/' ~/essai-attente/accueil.yaml; kubectl diff -f ~/essai-attente/ | grep -E '^[-+] '; echo "code ${PIPESTATUS[0]}"
-```
-
-```text
--  generation: 1
-+  generation: 2
--      - image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-+      - image: nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
-code 1
-```
-
-The `-` shows what runs, the `+` what `apply` would give. The code is 1.
-Finally, ask for an impossible comparison, on a file that does not exist:
-
-```bash
+sed -i 's/image: nginx:1.30.5@sha256:[0-9a-f]*/image: nginx:1.30.6-introuvable/' ~/essai-attente/accueil.yaml; kubectl diff -f ~/essai-attente/ | grep -E '^[-+] '; echo "code ${PIPESTATUS[0]}"
 kubectl diff -f ~/essai-attente/introuvable.yaml; echo "code $?"
 ```
 
 ```text
+code 0
+-  generation: 1
++  generation: 2
+-      - image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
++      - image: nginx:1.30.6-introuvable
+code 1
 error: the path "/home/ansible/essai-attente/introuvable.yaml" does not exist
 code 2
 ```
 
-The three cases:
-
-- **0**: no difference;
-- **1**: differences, which is **not** an error;
-- **2** (or more): kubectl could not compare, this is a real error.
-
-## 📚 Exercise 2: diff under set -e
-
-A script often starts with `set -e`: it stops as soon as a command exits with a
-code other than 0. See what happens with `kubectl diff`, while the folder does
-hold differences ("je continue" means "I carry on"):
+0: no difference. 1: differences, which is not an error. 2: kubectl could not
+compare. Under `set -e`, which stops a script at the first failing command,
+code 1 stops everything at the very moment you should apply. `|| code=$?`
+keeps the code without stopping the script:
 
 ```bash
 bash -c 'set -e; kubectl diff -f ~/essai-attente/ > /dev/null; echo "je continue"'; echo "code $?"
-```
-
-```text
-code 1
-```
-
-The script stops before `je continue`, at the very moment it should apply. For
-`set -e`, the code 1 of `diff` is a failure. The fix: keep the code in a
-variable. `|| code=$?` runs only if `diff` exits with an error, and `set -e`
-does not stop on a command followed by `||` ("diff a rendu" means "diff
-returned"):
-
-```bash
 bash -c 'set -e; code=0; kubectl diff -f ~/essai-attente/ > /dev/null || code=$?; echo "diff a rendu $code"'
 ```
 
 ```text
+code 1
 diff a rendu 1
 ```
 
-The script carries on and knows the code: 0, nothing to do; 1, apply; 2 or
-more, stop.
+## 📚 Exercise 2: a stuck rollout, then undone
 
-## 📚 Exercise 3: available is not finished
-
-Apply the image change, then wait until the Deployment is **Available**, and
-look at its Pods right away. The columns give the name of the Pod, whether it
-is ready (`PRET`), whether it is stopping (`ARRET`), and the beginning of its
-image:
+Apply the file, which now asks for the missing image, and wait for the end of
+the rollout with a 30-second timeout:
 
 ```bash
-kubectl apply -f ~/essai-attente/accueil.yaml && kubectl wait --for=condition=Available deployment/accueil -n essai-attente --timeout=60s && kubectl get pods -n essai-attente -l app=accueil -o custom-columns='POD:.metadata.name,PRET:.status.containerStatuses[0].ready,ARRET:.metadata.deletionTimestamp,IMAGE:.spec.containers[0].image' | cut -c1-82
+kubectl apply -f ~/essai-attente/accueil.yaml; kubectl rollout status deployment/accueil -n essai-attente --timeout=30s; echo "code $?"
+kubectl get pods -n essai-attente -l app=accueil
 ```
 
 ```text
 deployment.apps/accueil configured
-deployment.apps/accueil condition met
-POD                        PRET    ARRET    IMAGE
-accueil-5c6db657b-hjpjh    true    <none>   nginx:1.30.5@sha256:9bf97bd7714f5e24c1
-accueil-5c6db657b-qr7q2    true    <none>   nginx:1.30.5@sha256:9bf97bd7714f5e24c1
-accueil-5c6db657b-vpwpn    true    <none>   nginx:1.30.5@sha256:9bf97bd7714f5e24c1
-accueil-5cbc7d7b69-mnpwg   false   <none>   nginx:1.30.6@sha256:42c68eab6f7e226117
+Waiting for deployment "accueil" rollout to finish: 1 out of 3 new replicas have been updated...
+error: timed out waiting for the condition
+code 1
+NAME                      READY   STATUS             RESTARTS   AGE
+accueil-5c6db657b-2kznd   1/1     Running            0          42s
+accueil-5c6db657b-5ksz9   1/1     Running            0          42s
+accueil-5c6db657b-qjnwb   1/1     Running            0          42s
+accueil-db88c9bcd-6s4vp   0/1     ImagePullBackOff   0          31s
 ```
 
-`wait` returned right away. Yet the three 1.30.5 Pods still serve, and the only
-1.30.6 Pod is not ready. **Available** means "enough ready Pods to serve", not
-"update finished".
-
-`kubectl rollout status`, on the other hand, waits until all the Pods are
-replaced:
+`rollout status` gives control back at the end of the timeout, with code 1:
+the rollout did not finish. The new Pod cannot find its image
+(`ImagePullBackOff`), and the three old ones keep serving. In a script, this
+code 1 is what must stop the rest. Go back to the previous version with
+`rollout undo`:
 
 ```bash
-kubectl rollout status deployment/accueil -n essai-attente --timeout=180s
+kubectl rollout undo deployment/accueil -n essai-attente; kubectl rollout status deployment/accueil -n essai-attente --timeout=120s | tail -1
+kubectl get deployment accueil -n essai-attente -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 ```
 
 ```text
-Waiting for deployment "accueil" rollout to finish: 1 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 1 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 1 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 2 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 2 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 2 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 2 out of 3 new replicas have been updated...
-Waiting for deployment "accueil" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "accueil" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "accueil" rollout to finish: 1 old replicas are pending termination...
+Warning: resource deployments/accueil was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/accueil rolled back
 deployment "accueil" successfully rolled out
+nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-Look at the Pods again:
+The cluster is back on 1.30.5. The warning says it: `undo` does not touch the
+file. Compare the folder with the cluster:
 
 ```bash
-kubectl get pods -n essai-attente -l app=accueil -o custom-columns='POD:.metadata.name,PRET:.status.containerStatuses[0].ready,ARRET:.metadata.deletionTimestamp,IMAGE:.spec.containers[0].image' | cut -c1-82
+kubectl diff -f ~/essai-attente/ | grep -E '^[-+] .*image'; echo "code ${PIPESTATUS[0]}"
 ```
 
 ```text
-POD                        PRET   ARRET                  IMAGE
-accueil-5c6db657b-vpwpn    true   2026-11-19T19:31:01Z   nginx:1.30.5@sha256:9bf97
-accueil-5cbc7d7b69-844tt   true   <none>                 nginx:1.30.6@sha256:42c68
-accueil-5cbc7d7b69-mnpwg   true   <none>                 nginx:1.30.6@sha256:42c68
-accueil-5cbc7d7b69-v8nm9   true   <none>                 nginx:1.30.6@sha256:42c68
+-      - image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
++      - image: nginx:1.30.6-introuvable
+code 1
 ```
 
-The three 1.30.6 Pods are ready. The last 1.30.5 Pod has a date in `ARRET`: it
-is stopping, and is already no longer part of the Deployment. The folder and
-the cluster now say the same thing:
+`diff` returns 1 again: the folder still asks for the missing image, and the
+next `apply` would start the same failure again. After an `undo`, fix the file
+as well:
 
 ```bash
-kubectl diff -f ~/essai-attente/; echo "code $?"
+sed -i 's/image: nginx:1.30.6-introuvable/image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb/' ~/essai-attente/accueil.yaml; kubectl diff -f ~/essai-attente/ > /dev/null; echo "code $?"
 ```
 
 ```text
 code 0
 ```
 
-## 📚 Exercise 4: wait for the end of a Job
+## 📚 Exercise 3: a Job that fails
 
-A **Job** starts a Pod that does a task, then stops. Start a Job that works for
-6 seconds:
+Write two Jobs in a `taches` subfolder: `vider-cache` works for 6 seconds then
+succeeds, `tache-ratee` fails right away (`exit 3`). `backoffLimit: 0` forbids
+restarting a failed Pod:
 
 ```bash
-cat <<'YAML' | kubectl apply -f -
+mkdir -p ~/essai-attente/taches
+cat > ~/essai-attente/taches/vider-cache.yaml <<'YAML'
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -242,40 +199,7 @@ spec:
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command: ["sh", "-c", "echo cache en cours de vidage; sleep 6; echo cache vide"]
 YAML
-```
-
-```text
-job.batch/vider-cache created
-```
-
-`kubectl wait --for=condition=complete` waits until the Job has finished
-successfully. `time` measures how long the command took (`real` line):
-
-```bash
-time kubectl wait --for=condition=complete job/vider-cache -n essai-attente --timeout=60s
-kubectl logs job/vider-cache -n essai-attente
-```
-
-```text
-job.batch/vider-cache condition met
-
-real	0m8.812s
-user	0m0.030s
-sys	0m0.008s
-cache en cours de vidage
-cache vide
-```
-
-`wait` returned after about 9 seconds, when the Job finished. Its logs ("cache
-being emptied", "cache empty") confirm it.
-
-## 📚 Exercise 5: a Job that fails
-
-Start a Job that fails at once (`exit 3`). `backoffLimit: 0` forbids starting
-it again:
-
-```bash
-cat <<'YAML' | kubectl apply -f -
+cat > ~/essai-attente/taches/tache-ratee.yaml <<'YAML'
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -291,50 +215,129 @@ spec:
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           command: ["sh", "-c", "echo echec volontaire; exit 3"]
 YAML
+kubectl apply -f ~/essai-attente/taches/
 ```
 
 ```text
 job.batch/tache-ratee created
+job.batch/vider-cache created
 ```
 
-Wait for it to succeed, as for the previous Job:
+Wait for the success of `tache-ratee`, then for its failure. `time` measures
+how long each command lasts (`real` line):
 
 ```bash
-time kubectl wait --for=condition=complete job/tache-ratee -n essai-attente --timeout=20s
+time kubectl wait --for=condition=Complete job/tache-ratee -n essai-attente --timeout=15s
+time kubectl wait --for=condition=Failed job/tache-ratee -n essai-attente --timeout=15s
 ```
 
 ```text
 error: timed out waiting for the condition on jobs/tache-ratee
 
-real	0m20.037s
+real	0m15.051s
 user	0m0.026s
-sys	0m0.009s
+sys	0m0.017s
+job.batch/tache-ratee condition met
+
+real	0m0.159s
+user	0m0.031s
+sys	0m0.005s
 ```
 
-`wait` waited the 20 seconds of `--timeout` for nothing: a failed Job will
-never be `complete`. Without `--timeout`, it would have waited 30 seconds, the
-default value, and much longer with a bigger `--timeout`. Wait for the
-**failed** condition instead:
+`Complete` waited the 15 seconds for nothing: a failed Job never meets it.
+`Failed` answers right away. With a 300-second timeout in a pipeline, waiting
+for success alone means losing five minutes before you know.
+
+## 📚 Exercise 4: wait for all the Jobs of a folder
+
+A deployment script does not know the objects of a folder in advance:
+`kubectl get -f` lists them. Try with `-o name`, then wait for the first Job
+found that way:
 
 ```bash
-time kubectl wait --for=condition=failed job/tache-ratee -n essai-attente --timeout=20s
-kubectl get job tache-ratee -n essai-attente
+kubectl get -f ~/essai-attente/taches/ -o name
+kubectl wait --for=condition=Complete job/vider-cache --timeout=0
 ```
 
 ```text
-job.batch/tache-ratee condition met
-
-real	0m0.137s
-user	0m0.025s
-sys	0m0.011s
-NAME          STATUS   COMPLETIONS   DURATION   AGE
-tache-ratee   Failed   0/1           20s        20s
+job.batch/tache-ratee
+job.batch/vider-cache
+Error from server (NotFound): jobs.batch "vider-cache" not found
 ```
 
-Immediate answer: the Job has failed. To avoid being stuck, always wait with a
-`--timeout`, and also watch the `failed` condition.
+The Job does exist. `-o name` does not give the namespace, and `wait` looked
+in the one of the context, `default`. Ask for the namespace as well, with
+`custom-columns` and without a line of titles. Try on the folder, then on a
+single file:
 
-## 📚 Exercise 6: a folder where one object is refused
+```bash
+kubectl get -f ~/essai-attente/taches/ -o custom-columns=KIND:.kind,NS:.metadata.namespace,NOM:.metadata.name --no-headers
+kubectl get -f ~/essai-attente/taches/vider-cache.yaml -o custom-columns=KIND:.kind,NS:.metadata.namespace,NOM:.metadata.name --no-headers
+```
+
+```text
+Job   essai-attente   tache-ratee
+Job   essai-attente   vider-cache
+Job   essai-attente   vider-cache
+```
+
+One line per object, in both cases. With a single object, `kubectl get` does
+not return a list: a JSONPath that goes through `.items` would then find
+nothing, while `custom-columns` always works.
+
+Write a script that reads these lines and, for each Job, queries `Complete`
+then `Failed` in turn with `--timeout=0` (a single check, without waiting), in
+a loop bounded to 60 seconds. It exits with an error at the first Job that
+fails:
+
+```bash
+cat > ~/essai-attente/attendre-jobs.sh <<'EOF'
+#!/usr/bin/env bash
+# Usage : ./attendre-jobs.sh <dossier> : attend chaque Job du dossier, et sort
+# en erreur au premier qui échoue.
+set -euo pipefail
+while read -r kind ns nom; do
+  [ "$kind" = Job ] || continue
+  fin=$((SECONDS + 60)); etat=2
+  while [ "$SECONDS" -lt "$fin" ]; do
+    if kubectl wait --for=condition=Complete "job/$nom" -n "$ns" --timeout=0 >/dev/null 2>&1; then etat=0; break; fi
+    if kubectl wait --for=condition=Failed "job/$nom" -n "$ns" --timeout=0 >/dev/null 2>&1; then etat=1; break; fi
+    sleep 2
+  done
+  echo "job/$nom : code $etat"
+  [ "$etat" -eq 0 ] || exit 1
+done < <(kubectl get -f "$1" -o custom-columns=KIND:.kind,NS:.metadata.namespace,NOM:.metadata.name --no-headers)
+echo "Tous les Jobs sont terminés."
+EOF
+chmod +x ~/essai-attente/attendre-jobs.sh
+time ~/essai-attente/attendre-jobs.sh ~/essai-attente/taches/; echo "code $?"
+```
+
+```text
+job/tache-ratee : code 1
+
+real	0m0.118s
+user	0m0.078s
+sys	0m0.029s
+code 1
+```
+
+The script sees the failure of `tache-ratee` on the first round, and exits with
+an error right away. `[ "$kind" = Job ] || continue` skips the objects that
+are not Jobs, and `< <(...)` feeds the loop with the output of `kubectl get`.
+Remove the failed Job from the folder, and run it again:
+
+```bash
+rm ~/essai-attente/taches/tache-ratee.yaml; ~/essai-attente/attendre-jobs.sh ~/essai-attente/taches/; echo "code $?"
+```
+
+```text
+job/vider-cache : code 0
+Tous les Jobs sont terminés.
+code 0
+```
+
+## 📚 Exercise 5: a folder where one object is refused
 
 Prepare a `lot` folder with two files: a correct ConfigMap, and a `casse`
 Deployment whose selector (`app: casse`) does not match the labels of its Pods
@@ -425,18 +428,19 @@ dsoxlab check k8s-verifier-et-attendre
 ```text
 ╭─ Result: k8s-verifier-et-attendre ─╮
 │  0 / 100 pts                       │
-│  ░░░░░░░░░░░░░░░░░░░░  0/4 tests   │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests   │
 ╰────────────────────────────────────╯
 ```
 
-0 out of 4: that is the expected result. The challenge is waiting for you,
+0 out of 5: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge
 
 Your turn, on your own this time: move another application to version 2, wait
-for the real end of the rollout and of a Job, record the codes of `kubectl
-diff`, and write a small deployment script that knows when to stop.
+for the real end of the rollout and of a Job, record the revision reached,
+and write a deployment script that knows when to stop, including when a Job
+fails.
 
 ```bash
 dsoxlab run k8s-verifier-et-attendre
