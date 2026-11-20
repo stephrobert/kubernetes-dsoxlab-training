@@ -1,16 +1,17 @@
-# Organise applications into namespaces
+# Organise applications in namespaces
 
-A cluster often hosts several teams or several applications. **Namespaces** put
-them in separate spaces: each object belongs to a namespace, and two objects
-can have the same name if they are in two different namespaces. But a
+A cluster often hosts several teams or several applications. **Namespaces**
+put them in separate spaces: each object belongs to a namespace, and two
+objects can bear the same name if they are in two different namespaces. But a
 namespace does not cut the network: a Pod can reach a Service of another
-namespace, if it names it properly. In this course, you create two namespaces,
-you put objects with the same name in them, you change the namespace targeted
-by default, then you make two Pods talk across them.
+namespace, if it names it correctly. The lesson shows these rules. This course
+makes you see the cases where people get it wrong: a manifest that lands in
+the namespace of the context, a `-n` that contradicts the manifest, a short
+name that does not resolve, and a namespace that refuses to go away.
 
 You work with two scratch namespaces, `essai-nord` and `essai-sud`. The
-challenge will ask you to organise another application: you will do it on your
-own, at the end.
+challenge will ask you to put another application back in order: you will do
+it on your own, at the end.
 
 Related page: [Kubernetes Namespaces](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/namespaces/).
 
@@ -25,10 +26,10 @@ dsoxlab run k8s-isoler-par-namespace
 You are now connected to the `k8s-kind.lab` machine. The kind cluster
 `boutique` is running there, and your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026.
 
-## 📚 Exercise 1: the namespaces, and the one targeted without saying so
+## 📚 Exercise 1: the namespaces, and the one you target without saying so
 
 List the namespaces of the cluster:
 
@@ -38,22 +39,22 @@ kubectl get namespaces
 
 ```text
 NAME                 STATUS   AGE
-acces                Active   25m
-configuration        Active   14m
-default              Active   25m
-kube-node-lease      Active   25m
-kube-public          Active   25m
-kube-system          Active   25m
-local-path-storage   Active   25m
+caisse               Active   1s
+default              Active   7h14m
+kube-node-lease      Active   7h14m
+kube-public          Active   7h14m
+kube-system          Active   7h14m
+local-path-storage   Active   7h14m
+stock                Active   1s
 ```
 
 `default` is the default namespace. Those starting with `kube-` belong to
-Kubernetes itself. Your list may have others, left by the labs you have already
-played, like `acces` and `configuration` here.
+Kubernetes itself. `caisse` and `stock` belong to the challenge, set up by the
+lab preparation: do not touch them during the course. Your list may hold
+others, left by labs you have already played.
 
 A command without `-n` targets the namespace of your kubectl **context**. Read
-it ("namespace du contexte (vide = default)" means "context namespace (empty =
-default)"):
+it:
 
 ```bash
 kubectl config view --minify -o jsonpath='{..namespace}'; echo "<- namespace du contexte (vide = default)"
@@ -68,13 +69,13 @@ without `-n` target `default`.
 
 ## 📚 Exercise 2: the same name in two namespaces
 
-Create the two scratch namespaces, then a ConfigMap `reglages` in each, with a
-different value:
+Create the two scratch namespaces, then a `reglages` ConfigMap in each, with a
+different value. Then look for it without `-n`:
 
 ```bash
 kubectl create namespace essai-nord; kubectl create namespace essai-sud
 kubectl create configmap reglages --from-literal=region=nord -n essai-nord; kubectl create configmap reglages --from-literal=region=sud -n essai-sud
-kubectl get configmap reglages -n essai-nord -o jsonpath='{.data.region}{"\n"}'; kubectl get configmap reglages -n essai-sud -o jsonpath='{.data.region}{"\n"}'
+kubectl get configmap reglages
 ```
 
 ```text
@@ -82,25 +83,15 @@ namespace/essai-nord created
 namespace/essai-sud created
 configmap/reglages created
 configmap/reglages created
-nord
-sud
-```
-
-Two `reglages` objects, one per namespace, each with its own value: a namespace
-separates **names**. Without `-n`, kubectl looks in `default`, where there is
-nothing:
-
-```bash
-kubectl get configmap reglages
-```
-
-```text
 Error from server (NotFound): configmaps "reglages" not found
 ```
 
+Two `reglages` objects live side by side, one per namespace. Without `-n`,
+kubectl looks in `default`, where there is nothing.
+
 ## 📚 Exercise 3: one namespace, or all of them
 
-`-n` targets a given namespace:
+`-n` targets a precise namespace:
 
 ```bash
 kubectl get configmaps -n essai-nord
@@ -112,7 +103,7 @@ kube-root-ca.crt   1      0s
 reglages           1      0s
 ```
 
-`kube-root-ca.crt` is put by Kubernetes in every namespace. `-A` (for
+`kube-root-ca.crt` is set by Kubernetes in every namespace. `-A` (for
 `--all-namespaces`) looks everywhere, and adds a `NAMESPACE` column. The filter
 only keeps the objects named `reglages`:
 
@@ -126,24 +117,76 @@ essai-nord   reglages   1      0s
 essai-sud    reglages   1      0s
 ```
 
-## 📚 Exercise 4: change the default namespace of the context
+## 📚 Exercise 4: where a manifest lands
 
-Typing `-n essai-nord` on every command quickly gets tiring. You can set the
-default namespace of your context:
+Write two ConfigMap manifests. The first one, `horaires`, gives no namespace.
+The second one, `tarifs`, gives one in `metadata.namespace`: `essai-sud`.
+
+```bash
+cat > ~/horaires.yaml <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: horaires
+data:
+  ouverture: "8h"
+YAML
+cat > ~/tarifs.yaml <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tarifs
+  namespace: essai-sud
+data:
+  ticket: "2 euros"
+YAML
+```
+
+Set the default namespace of the context to `essai-nord`, then apply
+`horaires` without `-n`, and look where it is created:
 
 ```bash
 kubectl config set-context --current --namespace=essai-nord
-kubectl get configmap reglages -o jsonpath='{.data.region}{"\n"}'
+kubectl apply -f ~/horaires.yaml
+kubectl get configmaps -A --field-selector metadata.name=horaires
 ```
 
 ```text
 Context "kind-boutique" modified.
-nord
+configmap/horaires created
+NAMESPACE    NAME       DATA   AGE
+essai-nord   horaires   1      0s
 ```
 
-Without `-n`, the command targeted `essai-nord`. It is handy, but misleading:
-forget this setting, and your next commands will act in the wrong namespace.
-Set `default` back right away:
+A manifest without a namespace lands in the one of the context. The same file,
+applied by a colleague whose context targets `default`, would create the
+object in `default`. Now apply `tarifs`, still without `-n`:
+
+```bash
+kubectl apply -f ~/tarifs.yaml
+kubectl get configmaps -A --field-selector metadata.name=tarifs
+```
+
+```text
+configmap/tarifs created
+NAMESPACE   NAME     DATA   AGE
+essai-sud   tarifs   1      0s
+```
+
+The namespace written in the manifest wins over the one of the context. And
+what if `-n` says something else than the manifest?
+
+```bash
+kubectl apply -f ~/tarifs.yaml -n essai-nord
+```
+
+```text
+error: the namespace from the provided object "essai-sud" does not match the namespace "essai-nord". You must pass '--namespace=essai-sud' to perform this operation.
+```
+
+kubectl refuses and creates nothing: it does not choose between two namespaces
+that contradict each other. Set the context back to `default` right away,
+otherwise your next commands will act in `essai-nord`:
 
 ```bash
 kubectl config set-context --current --namespace=default
@@ -157,8 +200,8 @@ default
 
 ## 📚 Exercise 5: the network crosses namespaces
 
-Create a small `carte` web application in `essai-nord`, with its Service, then a
-`visiteur` Pod in `essai-sud`:
+Create a small `carte` web application in `essai-nord`, with its Service, then
+a `visiteur` Pod in `essai-sud`:
 
 ```bash
 kubectl create deployment carte --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4 -n essai-nord -- sh -c 'echo carte-du-nord > /tmp/index.html && httpd -f -p 8080 -h /tmp'
@@ -190,8 +233,8 @@ carte-du-nord
 ```
 
 The short name fails (`bad address`: the name does not exist). The name
-followed by the namespace answers. The name resolution file of the Pod explains
-why:
+followed by the namespace answers. The name resolution file of the Pod
+explains why:
 
 ```bash
 kubectl exec visiteur -n essai-sud -- cat /etc/resolv.conf
@@ -206,50 +249,89 @@ options ndots:5
 The `search` line lists the suffixes tried for a short name. The first one is
 `essai-sud.svc.cluster.local`: the short name `carte` is therefore only looked
 up in the namespace **of the Pod**. With `carte.essai-nord`, the
-`svc.cluster.local` suffix completes the name, and it is found. The network
-itself was never cut.
+`svc.cluster.local` suffix completes the name, and it is found. The network,
+for its part, was never cut.
 
-## 📚 Exercise 6: deleting a namespace deletes everything in it
+## 📚 Exercise 6: a namespace that refuses to go away
 
-Look at what `essai-nord` contains, then delete it:
+Deleting a namespace deletes everything it contains. But an object can carry a
+**finalizer**: a mark that asks Kubernetes to wait before deleting it, while a
+program does its clean-up work. As long as the mark stays, the object stays,
+and so does its namespace. Set a made-up finalizer on `reglages` of
+`essai-nord`, then delete the namespace without waiting (`--wait=false`):
 
 ```bash
-kubectl get all -n essai-nord
+kubectl patch configmap reglages -n essai-nord --type=merge -p '{"metadata":{"finalizers":["formation.exemple.fr/retenue"]}}'
+kubectl delete namespace essai-nord --wait=false
 ```
 
 ```text
-NAME                        READY   STATUS    RESTARTS   AGE
-pod/carte-5d5c55866-kbgsf   1/1     Running   0          5s
-
-NAME            TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
-service/carte   ClusterIP   10.96.56.18   <none>        80/TCP    5s
-
-NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/carte   1/1     1            1           5s
-
-NAME                              DESIRED   CURRENT   READY   AGE
-replicaset.apps/carte-5d5c55866   1         1         1       5s
-```
-
-```bash
-kubectl delete namespace essai-nord
-kubectl get all -n essai-nord
-```
-
-```text
+configmap/reglages patched
 namespace "essai-nord" deleted
-No resources found in essai-nord namespace.
 ```
 
-The Pod, the Service, the Deployment and the ReplicaSet left with the
-namespace. It is handy for cleaning up, and dangerous for the same reason:
-always check the name before deleting a namespace.
+Kubernetes empties the namespace, then says what blocks it in the conditions
+of the namespace. The loop reads them again every 5 seconds, 2 minutes at
+most, until the `NamespaceFinalizersRemaining` condition turns `True`:
+
+```bash
+debut=$SECONDS; for i in $(seq 1 24); do kubectl get namespace essai-nord -o jsonpath='{.status.conditions[?(@.type=="NamespaceFinalizersRemaining")].status}' | grep -q True && break; sleep 5; done; echo "attente : $((SECONDS - debut)) s"
+kubectl get namespace essai-nord
+kubectl get all,configmaps -n essai-nord
+```
+
+```text
+attente : 45 s
+NAME         STATUS        AGE
+essai-nord   Terminating   51s
+NAME                 DATA   AGE
+configmap/reglages   1      51s
+```
+
+The namespace stays in `Terminating`, and it only holds `reglages` any more.
+The Deployment, the Pod and the Service of `carte` are gone. Read the
+conditions of the namespace:
+
+```bash
+kubectl get namespace essai-nord -o jsonpath='{range .status.conditions[*]}{.type}={.status}: {.message}{"\n"}{end}'
+```
+
+```text
+NamespaceDeletionDiscoveryFailure=False: All resources successfully discovered
+NamespaceDeletionGroupVersionParsingFailure=False: All legacy kube types successfully parsed
+NamespaceDeletionContentFailure=False: All content successfully deleted, may be waiting on finalization
+NamespaceContentRemaining=True: Some resources are remaining: configmaps. has 1 resource instances
+NamespaceFinalizersRemaining=True: Some content in the namespace has finalizers remaining: formation.exemple.fr/retenue in 1 resource instances
+```
+
+The last two lines name the cause: one ConfigMap remains, held by the
+`formation.exemple.fr/retenue` finalizer. Do not read these conditions too
+early: during the first seconds, they still say that everything is deleted,
+while the content is barely leaving.
+
+Here, no program will come and remove this finalizer: you made it up. Remove
+it yourself, and the namespace goes away:
+
+```bash
+kubectl patch configmap reglages -n essai-nord --type=merge -p '{"metadata":{"finalizers":null}}'
+kubectl wait --for=delete namespace/essai-nord --timeout=60s
+```
+
+```text
+configmap/reglages patched
+namespace/essai-nord condition met
+```
+
+On a real cluster, a finalizer belongs to a program, often an operator.
+Removing it by hand skips the clean-up work this program was supposed to do.
+First find out why it did not do it.
 
 ## 🧹 Clean up
 
-Delete the second scratch namespace:
+Delete the work files and the second scratch namespace:
 
 ```bash
+rm -f ~/horaires.yaml ~/tarifs.yaml
 kubectl delete namespace essai-sud
 ```
 
@@ -279,8 +361,8 @@ untouched.
 
 ## 🎯 The challenge
 
-Your turn, on your own this time: put an application and a client in two
-namespaces, then find out which of the two Service names answers.
+Your turn, on your own this time: an application was created in the wrong
+namespace. Move it to the right one, then reach it from another namespace.
 
 ```bash
 dsoxlab run k8s-isoler-par-namespace
