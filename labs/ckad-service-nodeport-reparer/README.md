@@ -1,15 +1,16 @@
 # Open an application outside the cluster with a NodePort Service
 
-A `ClusterIP` Service can only be reached from inside the cluster. For a user,
-outside, to reach the application, the **NodePort** type also opens a port on
-**every node** of the cluster. A request sent to that port, on any node, reaches
-one of the Pods. In this course, you create a NodePort Service, you reach it
-through each node, you choose its port, then you repair a NodePort Service that
-leads nowhere.
+A Service of type `ClusterIP` can only be reached from inside the cluster. For
+a user outside to reach the application, the **NodePort** type also opens a
+port on **every node** of the cluster. A request sent to that port, on any
+node, reaches one of the Pods. The lesson creates a NodePort Service. This
+course makes you reach it through every node, fix its port, and meet two
+limits: a node port already taken, and `externalTrafficPolicy: Local`, which
+closes the nodes that run no Pod.
 
 You work in a scratch namespace, `essai-nodeport`, with a `vitrine`
-application. The challenge will ask you to repair another NodePort Service: you
-will do it on your own, at the end.
+application. The challenge will ask you to repair another NodePort Service:
+you will do it on your own, at the end.
 
 Related page: [Kubernetes Services](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/).
 
@@ -21,30 +22,19 @@ Start the lab:
 dsoxlab run ckad-service-nodeport-reparer
 ```
 
-You are now connected to `k8s-cp.lab`, the node that runs the kubeadm cluster
-(the control plane). Your kubectl already targets it.
+You are now connected to `k8s-cp.lab`, the node that drives the kubeadm
+cluster (the control plane). Your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026, with Kubernetes v1.37.2.
 
-## 📚 Exercise 1: the application, and the node addresses
+## 📚 Exercise 1: the application, and the addresses of the nodes
 
-Create the scratch namespace:
+Create the scratch namespace, then the `vitrine` application, in two Pods that
+serve the text `vitrine` on port 8080:
 
 ```bash
 kubectl create namespace essai-nodeport
-```
-
-```text
-namespace/essai-nodeport created
-```
-
-The `vitrine` application runs in two Pods, which serve the text `vitrine` on
-port 8080. The `terminationGracePeriodSeconds: 5` field shortens the stop of a
-Pod: the small `httpd` server ignores the stop signal, and Kubernetes would
-otherwise wait 30 seconds before cutting it.
-
-```bash
 cat <<'YAML' | kubectl apply -n essai-nodeport -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -64,7 +54,7 @@ spec:
       containers:
         - name: web
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
-          command: ["sh", "-c", "echo vitrine > /tmp/index.html && httpd -f -p 8080 -h /tmp"]
+          command: ["sh", "-c", "mkdir -p /www && echo vitrine > /www/index.html && exec httpd -f -p 8080 -h /www"]
           ports:
             - containerPort: 8080
 YAML
@@ -72,13 +62,21 @@ kubectl rollout status deployment/vitrine -n essai-nodeport --timeout=120s | tai
 ```
 
 ```text
+namespace/essai-nodeport created
 deployment.apps/vitrine created
 deployment "vitrine" successfully rolled out
 ```
 
-A NodePort is reached through the address of a node. These addresses show in
-the `INTERNAL-IP` column of `kubectl get nodes -o wide`. The `awk` command keeps
-only three columns, so that the output fits on screen:
+The `terminationGracePeriodSeconds: 5` field shortens the stop of a Pod. To
+stop a container, Kubernetes sends a stop signal to the main process, the one
+with number 1. A process number 1 that has nothing planned for this signal
+ignores it: here, that is the case of `httpd` as well as `sh`. Kubernetes then
+waits for the set delay, 30 seconds by default, before cutting the container.
+Measured on this cluster: 31 seconds with `exec httpd`, 32 without. The 5
+second delay avoids that wait when a Pod goes away.
+
+A NodePort is reached through the address of a node. These addresses are read
+in the `INTERNAL-IP` column. The `awk` command only keeps three columns:
 
 ```bash
 kubectl get nodes -o wide | awk '{print $1, $2, $6}' | column -t
@@ -98,38 +96,32 @@ NodePort:
 ```bash
 kubectl expose deployment vitrine --type=NodePort --port=80 --target-port=8080 -n essai-nodeport
 kubectl get service vitrine -n essai-nodeport
-```
-
-```text
-service/vitrine exposed
-NAME      TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-vitrine   NodePort   10.104.107.240   <none>        80:32338/TCP   0s
-```
-
-The `PORT(S)` column says `80:32338`. A NodePort Service indeed has **three**
-ports, which the detail shows:
-
-```bash
 kubectl get service vitrine -n essai-nodeport -o jsonpath='{.spec.ports[0]}{"\n"}'
 ```
 
 ```text
-{"nodePort":32338,"port":80,"protocol":"TCP","targetPort":8080}
+service/vitrine exposed
+NAME      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+vitrine   NodePort   10.101.247.28   <none>        80:30275/TCP   0s
+{"nodePort":30275,"port":80,"protocol":"TCP","targetPort":8080}
 ```
 
+The `PORT(S)` column says `80:30275`. A NodePort Service has **three** ports:
+
 - `port` (80): the port of the Service inside the cluster;
-- `targetPort` (8080): the container port, where the requests arrive;
-- `nodePort` (32338): the port opened on **every node**. You did not choose it:
-  Kubernetes picked it at random in its range, from 30000 to 32767.
+- `targetPort` (8080): the port of the container, where requests arrive;
+- `nodePort` (30275): the port opened on **every node**. You did not pick it:
+  Kubernetes drew it at random in its range, from 30000 to 32767.
 
 ## 📚 Exercise 3: reach the application through each node
 
-Query the node port on both nodes. The `NP` variable takes the `nodePort`, since
-it was picked at random. The `sleep 3` gives the cluster time to open that port
-on the nodes:
+Query the node port on both nodes. The `NP` variable takes the `nodePort`,
+since it was drawn at random. The `sleep 3` gives the cluster time to open
+this port on the nodes:
 
 ```bash
-sleep 3; NP=$(kubectl get service vitrine -n essai-nodeport -o jsonpath='{.spec.ports[0].nodePort}'); curl -s "http://10.10.50.11:$NP/"; curl -s "http://10.10.50.12:$NP/"
+sleep 3; NP=$(kubectl get service vitrine -n essai-nodeport -o jsonpath='{.spec.ports[0].nodePort}')
+curl -s "http://10.10.50.11:$NP/"; curl -s "http://10.10.50.12:$NP/"
 ```
 
 ```text
@@ -137,25 +129,26 @@ vitrine
 vitrine
 ```
 
-Both nodes answer. Now scale the application down to a single Pod, then look at
-which node it runs on:
+Both nodes answer. Now scale the application down to a single Pod, then look
+at which node it runs on:
 
 ```bash
-kubectl scale deployment vitrine --replicas=1 -n essai-nodeport && kubectl rollout status deployment/vitrine -n essai-nodeport --timeout=120s | tail -1
-sleep 8; kubectl get pods -n essai-nodeport -o wide | awk '{print $1, $3, $7}' | column -t
+kubectl scale deployment vitrine --replicas=1 -n essai-nodeport
+kubectl rollout status deployment/vitrine -n essai-nodeport --timeout=120s | tail -1
+sleep 10; kubectl get pods -n essai-nodeport -o wide | awk '{print $1, $3, $7}' | column -t
 ```
 
 ```text
 deployment.apps/vitrine scaled
 deployment "vitrine" successfully rolled out
 NAME                      STATUS   NODE
-vitrine-549565bb45-fgxbm  Running  k8s-cp.lab
+vitrine-668ff869cd-68fq5  Running  k8s-cp.lab
 ```
 
 The only Pod runs on `k8s-cp.lab`. Query both nodes again:
 
 ```bash
-NP=$(kubectl get service vitrine -n essai-nodeport -o jsonpath='{.spec.ports[0].nodePort}'); curl -s "http://10.10.50.11:$NP/"; curl -s "http://10.10.50.12:$NP/"
+curl -s "http://10.10.50.11:$NP/"; curl -s "http://10.10.50.12:$NP/"
 ```
 
 ```text
@@ -163,49 +156,34 @@ vitrine
 vitrine
 ```
 
-`k8s-w1.lab` answers too, although it has no `vitrine` Pod. The port is open on
-**all** nodes, and each one passes the request on to the Pod, wherever it runs.
-Scale back to two Pods:
+`k8s-w1.lab` answers too, while it runs no `vitrine` Pod. The port is open on
+**every** node, and each one passes the request on to the Pod, wherever it
+runs.
 
-```bash
-kubectl scale deployment vitrine --replicas=2 -n essai-nodeport && kubectl rollout status deployment/vitrine -n essai-nodeport --timeout=120s | tail -1
-```
+## 📚 Exercise 4: pick the node port
 
-```text
-deployment.apps/vitrine scaled
-deployment "vitrine" successfully rolled out
-```
-
-## 📚 Exercise 4: choose the node port
-
-A random port does not suit users: they need a fixed address. Set the
-`nodePort` to `30095` with `kubectl patch`. The port is identified by its `port`
-(80), so that Kubernetes knows which one to change:
+A port drawn at random does not suit users: they need a fixed address. Set
+the `nodePort` to `30095` with `kubectl patch`. The port is named by its
+`port` (80), so that Kubernetes knows which one to change:
 
 ```bash
 kubectl patch service vitrine -n essai-nodeport -p '{"spec":{"ports":[{"port":80,"nodePort":30095}]}}'
 kubectl get service vitrine -n essai-nodeport
-```
-
-```text
-service/vitrine patched
-NAME      TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-vitrine   NodePort   10.104.107.240   <none>        80:30095/TCP   12s
-```
-
-`80:30095`: the node port is now the one you chose.
-
-```bash
 sleep 3; curl -s http://10.10.50.11:30095/
 ```
 
 ```text
+service/vitrine patched
+NAME      TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+vitrine   NodePort   10.101.247.28   <none>        80:30095/TCP   14s
 vitrine
 ```
 
+`80:30095`: the node port is now the one you picked.
+
 ## 📚 Exercise 5: a port outside the range
 
-Try a node port that is easier to remember, `8080`:
+Try a node port easier to remember, `8080`:
 
 ```bash
 kubectl patch service vitrine -n essai-nodeport -p '{"spec":{"ports":[{"port":80,"nodePort":8080}]}}'
@@ -217,77 +195,102 @@ The Service "vitrine" is invalid: spec.ports[0].nodePort: Invalid value: 8080: p
 30095
 ```
 
-Refused, and the Service keeps `30095`. A node port must be in the range
-reserved for that use, from 30000 to 32767. It prevents a Service from taking
-the port of a program of the node itself, such as SSH (22).
+Refused, and the Service keeps `30095`. A node port must be in the range set
+aside for this use, from 30000 to 32767. It keeps a Service from taking the
+port of a program of the node itself, such as SSH (22).
 
-## 📚 Exercise 6: repair a Service that leads nowhere
+## 📚 Exercise 6: a node port already taken
 
-`kubectl create service nodeport` creates a NodePort Service without starting
-from a Deployment. Create one, `vitrine-cassee`, on node port `30096`, with a
-wrong target port, `9090`:
+A node port is open on every node: two Services therefore cannot have the
+same one. `kubectl create service nodeport` creates a NodePort Service without
+starting from a Deployment. Try to create a second one on `30095`, then on
+`30096`:
 
 ```bash
-kubectl create service nodeport vitrine-cassee --tcp=80:9090 --node-port=30096 -n essai-nodeport
-kubectl get service vitrine-cassee -n essai-nodeport -o jsonpath='{.spec.selector}{"\n"}'
+kubectl create service nodeport vitrine-bis --tcp=80:8080 --node-port=30095 -n essai-nodeport
+kubectl create service nodeport vitrine-bis --tcp=80:8080 --node-port=30096 -n essai-nodeport
+kubectl get services -n essai-nodeport
 ```
 
 ```text
-service/vitrine-cassee created
-{"app":"vitrine-cassee"}
+error: failed to create NodePort service: Service "vitrine-bis" is invalid: spec.ports[0].nodePort: Invalid value: 30095: provided port is already allocated
+service/vitrine-bis created
+NAME          TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+vitrine       NodePort   10.101.247.28   <none>        80:30095/TCP   17s
+vitrine-bis   NodePort   10.103.51.183   <none>        80:30096/TCP   0s
 ```
 
-With no Deployment to copy, the command took a selector from the Service name:
-`app=vitrine-cassee`. No Pod carries that label. Look at the endpoints, then try
-the node port:
+`provided port is already allocated`: `30095` already belongs to the
+`vitrine` Service, across the whole cluster, whatever the namespace. `30096`
+is free.
+
+## 📚 Exercise 7: close the nodes that run no Pod
+
+By default, a node without a Pod passes the request on to a Pod of another
+node, as in exercise 3. This detour hides the client's address. The
+`externalTrafficPolicy: Local` setting removes it: each node only serves its
+own Pods. The single Pod still runs on `k8s-cp.lab`. Switch the Service to
+`Local`, then query both nodes:
 
 ```bash
-kubectl get endpointslices -n essai-nodeport -l kubernetes.io/service-name=vitrine-cassee
-sleep 3; curl -s -m 3 http://10.10.50.11:30096/ || echo "pas de réponse (code $?)"
+kubectl patch service vitrine -n essai-nodeport -p '{"spec":{"externalTrafficPolicy":"Local"}}'
+sleep 3
+curl -s -m 3 http://10.10.50.11:30095/ || echo "pas de réponse (code $?)"
+curl -s -m 3 http://10.10.50.12:30095/ || echo "pas de réponse (code $?)"
 ```
 
 ```text
-NAME                   ADDRESSTYPE   PORTS     ENDPOINTS   AGE
-vitrine-cassee-w6v8m   IPv4          <unset>   <unset>     1s
-pas de réponse (code 7)
+service/vitrine patched
+vitrine
+pas de réponse (code 28)
 ```
 
-No endpoint, and `curl` exits with code 7: the connection is refused ("pas de
-réponse" means "no answer"). First defect, the selector. Fix it so that it
-targets the `vitrine` Pods:
+`k8s-w1.lab`, which runs no `vitrine` Pod, no longer answers: `curl` gives up
+after the 3 seconds of `-m 3` (code 28). A user going through that node no
+longer reaches the application.
+
+Check it from your workstation, outside the cluster. Open a second terminal on
+your machine, the one you run `dsoxlab` from, and run the same two `curl`:
+
+```text
+vitrine
+pas de réponse (code 28)
+```
+
+Same result. Careful: if your Pod runs on `k8s-w1.lab`, it is `k8s-cp.lab`
+that will not answer from your workstation. From `k8s-cp.lab` itself, it will
+answer anyway, because a node always answers the traffic it sends itself:
+always check a `Local` setting from another machine.
+
+Go back to two Pods, one per node:
 
 ```bash
-kubectl set selector service vitrine-cassee app=vitrine -n essai-nodeport
-sleep 3; kubectl get endpointslices -n essai-nodeport -l kubernetes.io/service-name=vitrine-cassee
-curl -s -m 3 http://10.10.50.11:30096/ || echo "pas de réponse (code $?)"
+kubectl scale deployment vitrine --replicas=2 -n essai-nodeport
+kubectl rollout status deployment/vitrine -n essai-nodeport --timeout=120s | tail -1
+sleep 10; kubectl get pods -n essai-nodeport -o wide | awk '{print $1, $3, $7}' | column -t
 ```
 
 ```text
-service/vitrine-cassee selector updated
-NAME                   ADDRESSTYPE   PORTS   ENDPOINTS                     AGE
-vitrine-cassee-w6v8m   IPv4          9090    10.244.38.112,10.244.163.40   7s
-pas de réponse (code 7)
+deployment.apps/vitrine scaled
+deployment "vitrine" successfully rolled out
+NAME                      STATUS   NODE
+vitrine-668ff869cd-68fq5  Running  k8s-cp.lab
+vitrine-668ff869cd-n6zkt  Running  k8s-w1.lab
 ```
 
-Both Pods are now endpoints, but on port `9090`, where nothing listens. Still no
-answer. Second defect, the target port. Fix it:
-
-```bash
-kubectl patch service vitrine-cassee -n essai-nodeport -p '{"spec":{"ports":[{"port":80,"targetPort":8080}]}}'
-sleep 3; curl -s -m 3 http://10.10.50.11:30096/ || echo "pas de réponse (code $?)"
-```
+From your workstation, both nodes answer again:
 
 ```text
-service/vitrine-cassee patched
+vitrine
 vitrine
 ```
 
-The application answers. To repair a Service, go in this order: first the
-endpoints (the selector), then the target port, then the node port.
+With `Local`, a node only answers if it runs a Pod of the application.
 
 ## 🧹 Clean up
 
-Delete the scratch namespace, with everything in it:
+First delete what you created during the exercises: the scratch namespace,
+with its two Services.
 
 ```bash
 kubectl delete namespace essai-nodeport
