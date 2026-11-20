@@ -1,15 +1,17 @@
 # Expose an application with a Service
 
-The Pods of an application change IP address each time they are replaced. The
-other applications of the cluster therefore cannot reach them by address. A
-**Service** gives them a fixed **name** and **address**, and spreads the
-requests over the Pods it selects. In this course, you create a Service with
-`kubectl expose`, you reach it by its different names, you see what happens
-when its target port is wrong, and when one Pod too many enters its selection.
+The Pods of an application change IP address every time they are replaced.
+The other applications of the cluster therefore cannot reach them by their
+address. A **Service** gives them a fixed **name** and **address**, and spreads
+the requests across the Pods it selects. The lesson creates a Service with
+`kubectl expose` and reaches it by its name. This course makes you write a
+Service by hand, tell apart two Services with the same name in two namespaces,
+and recognise two failures: a wrong target port, and one Pod too many in the
+selection.
 
-You work in a scratch namespace, `essai-expose`, with an `annuaire`
-application. The challenge will ask you to expose another application: you will
-do it on your own, at the end.
+You work in two scratch namespaces, `essai-expose` and `essai-voisin`, with an
+`annuaire` application. The challenge will ask you to expose another
+application: you will do it on your own, at the end.
 
 Related page: [Kubernetes Services](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/).
 
@@ -21,29 +23,20 @@ Start the lab:
 dsoxlab run ckad-expose-service
 ```
 
-You are now connected to `k8s-cp.lab`, the node that runs the kubeadm cluster
-(the control plane). Your kubectl already targets it.
+You are now connected to `k8s-cp.lab`, the node that drives the kubeadm
+cluster (the control plane). Your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026, with Kubernetes v1.37.2.
 
 ## 📚 Exercise 1: an application, without a Service
 
-Create the scratch namespace:
+Create the scratch namespace, then the `annuaire` application, in two Pods.
+Their container serves the text `annuaire` on port 8080. This port has a
+**name**, `http`: it will be used in exercise 5.
 
 ```bash
 kubectl create namespace essai-expose
-```
-
-```text
-namespace/essai-expose created
-```
-
-The `annuaire` application runs in two Pods. Their container serves the text
-`annuaire` on port 8080. That port has a **name**, `http`: it will be used in
-exercise 5.
-
-```bash
 cat <<'YAML' | kubectl apply -n essai-expose -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -62,7 +55,7 @@ spec:
       containers:
         - name: web
           image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
-          command: ["sh", "-c", "echo annuaire > /tmp/index.html && httpd -f -p 8080 -h /tmp"]
+          command: ["sh", "-c", "mkdir -p /www && echo annuaire > /www/index.html && exec httpd -f -p 8080 -h /www"]
           ports:
             - name: http
               containerPort: 8080
@@ -70,10 +63,11 @@ YAML
 ```
 
 ```text
+namespace/essai-expose created
 deployment.apps/annuaire created
 ```
 
-Wait until it is ready, then look at its Pods with their address (`-o wide`):
+Wait until it is ready, then look at its Pods with their address:
 
 ```bash
 kubectl rollout status deployment/annuaire -n essai-expose --timeout=120s | tail -1
@@ -83,16 +77,17 @@ kubectl get pods -n essai-expose -o wide
 ```text
 deployment "annuaire" successfully rolled out
 NAME                       READY   STATUS    RESTARTS   AGE   IP              NODE         NOMINATED NODE   READINESS GATES
-annuaire-78f54cb8c-6lddp   1/1     Running   0          1s    10.244.163.38   k8s-cp.lab   <none>           <none>
-annuaire-78f54cb8c-bdsxp   1/1     Running   0          1s    10.244.38.106   k8s-w1.lab   <none>           <none>
+annuaire-59d6c5c5d-t5h74   1/1     Running   0          1s    10.244.38.91    k8s-w1.lab   <none>           <none>
+annuaire-59d6c5c5d-xg58z   1/1     Running   0          1s    10.244.163.12   k8s-cp.lab   <none>           <none>
 ```
 
-Each Pod has its own address, on a different node. These addresses change as
-soon as a Pod is replaced. To query the application from inside the cluster,
-create a `sonde` Pod that only sleeps:
+Each Pod has its own address, on a different node. To query the application
+from inside the cluster, create a `sonde` Pod that only sleeps:
 
 ```bash
-kubectl run sonde --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4 --restart=Never -n essai-expose -- sleep 3600
+kubectl run sonde \
+  --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4 \
+  --restart=Never -n essai-expose -- sleep 3600
 kubectl wait --for=condition=Ready pod/sonde -n essai-expose --timeout=60s
 ```
 
@@ -101,51 +96,44 @@ pod/sonde created
 pod/sonde condition met
 ```
 
-## 📚 Exercise 2: create the Service with kubectl expose
+## 📚 Exercise 2: write the Service by hand
 
-`kubectl expose` creates a Service for a Deployment, reusing its selector. Two
-ports matter:
-
-- `--port`: the port of the **Service**, the one other applications call;
-- `--target-port`: the port of the **containers**, where the Service sends the
-  requests.
+The lesson creates its Service with `kubectl expose`. Write this one in a
+file: you then see the three fields that matter.
 
 ```bash
-kubectl expose deployment annuaire --port=80 --target-port=8080 -n essai-expose
+cat > ~/essai-annuaire-svc.yaml <<'YAML'
+apiVersion: v1
+kind: Service
+metadata:
+  name: annuaire
+  namespace: essai-expose
+spec:
+  selector:
+    app: annuaire
+  ports:
+    - port: 80
+      targetPort: 8080
+YAML
+kubectl apply -f ~/essai-annuaire-svc.yaml
 kubectl get service annuaire -n essai-expose
+kubectl get endpointslices -n essai-expose -l kubernetes.io/service-name=annuaire
 ```
 
 ```text
-service/annuaire exposed
-NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
-annuaire   ClusterIP   10.106.114.47   <none>        80/TCP    0s
+service/annuaire created
+NAME       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+annuaire   ClusterIP   10.110.40.62   <none>        80/TCP    0s
+NAME             ADDRESSTYPE   PORTS   ENDPOINTS                    AGE
+annuaire-lrgrj   IPv4          8080    10.244.163.12,10.244.38.91   0s
 ```
 
-The Service is of type `ClusterIP`: it can only be reached from inside the
-cluster, at address `10.106.114.47`, on port 80. `describe` shows the rest
-(`grep` keeps only the useful lines):
-
-```bash
-kubectl describe service annuaire -n essai-expose | grep -E '^(Selector|Type|IP|Port|TargetPort|Endpoints):'
-```
-
-```text
-Selector:                 app=annuaire
-Type:                     ClusterIP
-IP:                       10.106.114.47
-Port:                     <unset>  80/TCP
-TargetPort:               8080/TCP
-Endpoints:                10.244.38.106:8080,10.244.163.38:8080
-```
-
-`Selector` says which Pods the Service picks: those carrying `app=annuaire`.
-`Endpoints` lists their addresses, with the target port: these are the two Pods
-of exercise 1.
-
-## 📚 Exercise 3: reach the Service by its name
-
-The cluster DNS gives a name to every Service. From a Pod in the **same**
-namespace, the short name is enough:
+`selector` says which Pods the Service picks: those that carry
+`app=annuaire`. `port` is the port of the Service, the one you call.
+`targetPort` is the port of the containers, where it sends the requests.
+Without a `type`, the Service is a `ClusterIP`: reachable only from inside the
+cluster. The two endpoint addresses are those of the Pods of exercise 1. Query
+it by its name:
 
 ```bash
 kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire
@@ -155,67 +143,109 @@ kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire
 annuaire
 ```
 
-From another namespace, you must add the namespace, or give the full name:
+## 📚 Exercise 3: two Services with the same name
+
+A Service name is only unique inside its namespace. Create a second namespace,
+with an `annuaire` application that serves `voisin`, and the same Service:
 
 ```bash
-kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire.essai-expose
-kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire.essai-expose.svc.cluster.local
+kubectl create namespace essai-voisin
+cat <<'YAML' | kubectl apply -n essai-voisin -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: annuaire
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: annuaire
+  template:
+    metadata:
+      labels:
+        app: annuaire
+    spec:
+      containers:
+        - name: web
+          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          command: ["sh", "-c", "mkdir -p /www && echo voisin > /www/index.html && exec httpd -f -p 8080 -h /www"]
+          ports:
+            - name: http
+              containerPort: 8080
+YAML
+sed "s/namespace: essai-expose/namespace: essai-voisin/" ~/essai-annuaire-svc.yaml | kubectl apply -f -
+kubectl rollout status deployment/annuaire -n essai-voisin --timeout=120s | tail -1
+kubectl get services -A --field-selector metadata.name=annuaire
+```
+
+```text title="Excerpt of the output"
+namespace/essai-voisin created
+deployment.apps/annuaire created
+service/annuaire created
+deployment "annuaire" successfully rolled out
+NAMESPACE      NAME       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+essai-expose   annuaire   ClusterIP   10.110.40.62    <none>        80/TCP    7s
+essai-voisin   annuaire   ClusterIP   10.100.94.251   <none>        80/TCP    4s
+```
+
+Two `annuaire` Services, two addresses. From the probe, query the short name,
+then the name followed by the namespace:
+
+```bash
+kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire
+kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire.essai-voisin
 ```
 
 ```text
 annuaire
-annuaire
+voisin
 ```
 
-Port 80 does not show in the address: it is the default HTTP port, and it is
-the Service port. `nslookup` shows which address the name points to:
+The short name leads to the Service of the probe's namespace. To reach the
+other one, you must add its namespace. The reason is in the Pod's DNS
+configuration:
 
 ```bash
-kubectl exec sonde -n essai-expose -- nslookup annuaire.essai-expose.svc.cluster.local
+kubectl exec sonde -n essai-expose -- cat /etc/resolv.conf
 ```
 
 ```text
-Server:		10.96.0.10
-Address:	10.96.0.10:53
-
-
-Name:	annuaire.essai-expose.svc.cluster.local
-Address: 10.106.114.47
+search essai-expose.svc.cluster.local svc.cluster.local cluster.local lab
+nameserver 10.96.0.10
+options ndots:5
 ```
 
-The name points to the fixed address of the Service (`10.106.114.47`), never to
-the address of a Pod.
+The `search` line lists the suffixes tried in order. `annuaire` first becomes
+`annuaire.essai-expose.svc.cluster.local`: the Pod's namespace comes first.
+`annuaire.essai-voisin` becomes `annuaire.essai-voisin.svc.cluster.local`
+with the second suffix.
 
 ## 📚 Exercise 4: a target port that leads nowhere
 
-Create a second Service, with a wrong target port, `9090`, while the containers
-listen on 8080:
+Create a third Service, with a wrong target port, `9090`, while the containers
+listen on 8080. Wait a few seconds for the Service to be in place, then query
+it:
 
 ```bash
 kubectl expose deployment annuaire --name=annuaire-faux --port=80 --target-port=9090 -n essai-expose
 kubectl get endpointslices -n essai-expose -l kubernetes.io/service-name=annuaire-faux
-```
-
-```text
-service/annuaire-faux exposed
-NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                     AGE
-annuaire-faux-bfnzx   IPv4          9090    10.244.163.38,10.244.38.106   0s
-```
-
-The endpoints are there, but on port `9090`. The selector is right, so
-Kubernetes did find the Pods. Yet nothing checks that they listen on that port:
-
-```bash
+sleep 3
 kubectl exec sonde -n essai-expose -- wget -qO- -T 3 http://annuaire-faux
 ```
 
 ```text
-wget: download timed out
+service/annuaire-faux exposed
+NAME                  ADDRESSTYPE   PORTS   ENDPOINTS                    AGE
+annuaire-faux-jffnm   IPv4          9090    10.244.163.12,10.244.38.91   0s
+wget: can't connect to remote host (10.98.214.179): Connection refused
 command terminated with exit code 1
 ```
 
-The request goes nowhere. Remember the difference: **no endpoint** means the
-selector is wrong. **Endpoints but no answer** is often the target port. Delete
+The endpoints are there, on port `9090`: the selector is right, Kubernetes
+found the Pods. Yet nothing checks that they listen on that port.
+`Connection refused` means the request reached the Pod, and nothing listens on
+that port there. Keep the difference in mind: **no endpoint**, the selector is
+wrong; **endpoints, and a refused connection**, it is the target port. Delete
 this Service:
 
 ```bash
@@ -228,7 +258,7 @@ service "annuaire-faux" deleted from essai-expose namespace
 
 ## 📚 Exercise 5: target a port by its name
 
-The container port is called `http`:
+The container's port is called `http`:
 
 ```bash
 kubectl get deployment annuaire -n essai-expose -o jsonpath='{.spec.template.spec.containers[0].ports[0]}{"\n"}'
@@ -238,12 +268,12 @@ kubectl get deployment annuaire -n essai-expose -o jsonpath='{.spec.template.spe
 {"containerPort":8080,"name":"http","protocol":"TCP"}
 ```
 
-The target port of a Service can give that name instead of the number:
+The target port of a Service can give this name instead of the number:
 
 ```bash
 kubectl expose deployment annuaire --name=annuaire-nomme --port=80 --target-port=http -n essai-expose
 kubectl get service annuaire-nomme -n essai-expose -o jsonpath='{.spec.ports[0].targetPort}{"\n"}'
-sleep 2; kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire-nomme
+sleep 3; kubectl exec sonde -n essai-expose -- wget -qO- -T 2 http://annuaire-nomme
 ```
 
 ```text
@@ -252,8 +282,8 @@ http
 annuaire
 ```
 
-The benefit: if the application ever changes port, only the Deployment needs
-changing. The Service, which targets `http`, follows with no edit.
+The benefit: if the application changes port one day, only the Deployment
+needs changing. The Service, which targets `http`, follows without any edit.
 
 ## 📚 Exercise 6: one Pod too many in the Service
 
@@ -264,12 +294,13 @@ kubectl get endpointslices -n essai-expose -l kubernetes.io/service-name=annuair
 ```
 
 ```text
-NAME             ADDRESSTYPE   PORTS   ENDPOINTS                     AGE
-annuaire-lr9v8   IPv4          8080    10.244.38.106,10.244.163.38   7s
+NAME             ADDRESSTYPE   PORTS   ENDPOINTS                    AGE
+annuaire-lrgrj   IPv4          8080    10.244.163.12,10.244.38.91   19s
 ```
 
-The Service picks **every** Pod of the namespace carrying `app=annuaire`, even
-those that are not part of the application. Give that label to the probe:
+The Service picks **every** Pod of the namespace that carries `app=annuaire`,
+even those that are not part of the application. Give this label to the
+probe:
 
 ```bash
 kubectl label pod sonde app=annuaire -n essai-expose
@@ -278,35 +309,39 @@ sleep 3; kubectl get endpointslices -n essai-expose -l kubernetes.io/service-nam
 
 ```text
 pod/sonde labeled
-NAME             ADDRESSTYPE   PORTS   ENDPOINTS                                   AGE
-annuaire-lr9v8   IPv4          8080    10.244.38.106,10.244.163.38,10.244.38.107   10s
+NAME             ADDRESSTYPE   PORTS   ENDPOINTS                                 AGE
+annuaire-lrgrj   IPv4          8080    10.244.163.12,10.244.38.91,10.244.38.74   22s
 ```
 
-The probe became a third endpoint. Yet it serves nothing on port 8080. Send six
-requests (`|| echo ECHEC` flags each failed request):
+The probe became a third endpoint. Yet it serves nothing on port 8080. Send
+six requests (`|| echo ECHEC` reports each failed request):
 
 ```bash
-for i in 1 2 3 4 5 6; do kubectl exec sonde -n essai-expose -- wget -qO- -T 2 'http://annuaire' || echo ECHEC; done
+for i in 1 2 3 4 5 6; do kubectl exec sonde -n essai-expose -- wget -qO- -T 2 "http://annuaire" || echo ECHEC; done
 ```
 
 ```text
-annuaire
-wget: can't connect to remote host (10.106.114.47): Connection refused
+wget: can't connect to remote host (10.110.40.62): Connection refused
+command terminated with exit code 1
+ECHEC
+wget: can't connect to remote host (10.110.40.62): Connection refused
 command terminated with exit code 1
 ECHEC
 annuaire
 annuaire
 annuaire
-annuaire
+wget: can't connect to remote host (10.110.40.62): Connection refused
+command terminated with exit code 1
+ECHEC
 ```
 
-One request failed: the one the Service sent to the probe. The spreading is
+Three requests failed: those the Service sent to the probe. The split is
 random, so you may see more or fewer. Remove the label (the dash after the key
-deletes it), then try again:
+erases it), then start again:
 
 ```bash
 kubectl label pod sonde app- -n essai-expose
-sleep 3; for i in 1 2 3 4 5 6; do kubectl exec sonde -n essai-expose -- wget -qO- -T 2 'http://annuaire' || echo ECHEC; done
+sleep 3; for i in 1 2 3 4 5 6; do kubectl exec sonde -n essai-expose -- wget -qO- -T 2 "http://annuaire" || echo ECHEC; done
 ```
 
 ```text
@@ -324,14 +359,17 @@ endpoints: there must be as many as the application has Pods.
 
 ## 🧹 Clean up
 
-Delete the scratch namespace, with everything in it:
+First delete what you created during the exercises: both scratch namespaces
+and the Service file.
 
 ```bash
-kubectl delete namespace essai-expose
+kubectl delete namespace essai-expose essai-voisin
+rm ~/essai-annuaire-svc.yaml
 ```
 
 ```text
 namespace "essai-expose" deleted
+namespace "essai-voisin" deleted
 ```
 
 Then leave the machine and reset the lab. `dsoxlab reset` replays the lab's
@@ -356,9 +394,9 @@ untouched.
 
 ## 🎯 The challenge
 
-Your turn, on your own this time: a web server in three copies, each one
+Your turn, on your own this time: a service in four copies, each one
 answering its own name, reachable by the other applications under a stable
-name.
+name and port.
 
 ```bash
 dsoxlab run ckad-expose-service

@@ -16,8 +16,8 @@ if [[ "$(kubectl get namespace lab -o jsonpath='{.status.phase}' 2>/dev/null)" =
 fi
 kubectl get namespace lab >/dev/null 2>&1 || kubectl create namespace lab
 
-kubectl -n lab delete service web-svc --ignore-not-found
-kubectl -n lab delete deployment web --ignore-not-found --wait=true
+kubectl -n lab delete service contacts-svc web-svc --ignore-not-found
+kubectl -n lab delete deployment contacts web --ignore-not-found --wait=true
 
 cat <<'EOF' | kubectl apply -f -
 apiVersion: v1
@@ -33,4 +33,4 @@ spec:
 EOF
 kubectl -n lab wait --for=condition=Ready pod/client --timeout=180s
 
-echo "Situation posée : client attend web-svc."
+echo "Situation posée : client attend contacts-svc."

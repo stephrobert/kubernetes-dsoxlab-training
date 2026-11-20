@@ -15,9 +15,9 @@ Deux points de méthode qui tiennent la mesure honnête :
   LISTE RÉELLE des Pods, puis interroge chaque Pod sur sa propre boucle locale
   et exige qu'il serve SON nom. Un conteneur qui écrirait un identifiant
   inventé dans son index.html donnerait des réponses distinctes préfixées
-  `web-` sans jamais servir son nom d'hôte : c'est refusé ici ;
-- les boucles d'attente ne vivent que dans deux tests, « les trois replicas
-  sont disponibles » et « trois endpoints prêts ». Les autres lisent un état
+  `contacts-` sans jamais servir son nom d'hôte : c'est refusé ici ;
+- les boucles d'attente ne vivent que dans deux tests, « les quatre replicas
+  sont disponibles » et « quatre endpoints prêts ». Les autres lisent un état
   déjà stabilisé par ces deux-là, et un `check` ne paie donc l'attente qu'une
   fois. Les dix requêtes HTTP sont faites une seule fois, par une fixture de
   portée module, et les trois derniers tests les relisent.
@@ -33,14 +33,14 @@ import pytest
 from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
-DEPLOYMENT = "web"
-SERVICE = "web-svc"
+DEPLOYMENT = "contacts"
+SERVICE = "contacts-svc"
 CLIENT = "client"
 IMAGE = "busybox:1.38.0"
-LABEL = "app=web"
-REPLICAS = 3
-PORT_SERVICE = 80
-PORT_CIBLE = 8080
+LABEL = "app=contacts"
+REPLICAS = 4
+PORT_SERVICE = 8081
+PORT_CIBLE = 9090
 REQUETES = 10
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
@@ -71,7 +71,7 @@ def _json(host, args: str, absent: str) -> dict:
 
 
 def _deployment(host) -> dict:
-    """Le Deployment web, lu dans le cluster. Sans boucle d'attente : les tests
+    """Le Deployment contacts, lu dans le cluster. Sans boucle d'attente : les tests
     qui attendent sont nommés, et ce sont les seuls à payer ce prix."""
     return _json(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT}", message(
         en=f"No Deployment {DEPLOYMENT} in namespace {NAMESPACE}. "
@@ -82,7 +82,7 @@ def _deployment(host) -> dict:
 
 
 def _service(host) -> dict:
-    """Le Service web-svc, lu dans le cluster."""
+    """Le Service contacts-svc, lu dans le cluster."""
     return _json(host, f"-n {NAMESPACE} get service {SERVICE}", message(
         en=f"No Service {SERVICE} in namespace {NAMESPACE}. "
         f"Check with: kubectl -n {NAMESPACE} get services",
@@ -91,8 +91,8 @@ def _service(host) -> dict:
     ))
 
 
-def _pods_web(host) -> list[dict]:
-    """Les Pods RÉELLEMENT présents qui portent le label app=web.
+def _pods_contacts(host) -> list[dict]:
+    """Les Pods RÉELLEMENT présents qui portent le label app=contacts.
 
     Rend une liste vide si la lecture échoue : chaque test donne alors son
     propre message, plutôt que de recevoir celui d'un helper partagé.
@@ -123,10 +123,10 @@ def _pods_vivants(pods: list[dict]) -> list[dict]:
 
 
 def _pods_etrangers(pods: list[dict]) -> list[str]:
-    """Les Pods étiquetés app=web que le Deployment web ne gère pas.
+    """Les Pods étiquetés app=contacts que le Deployment contacts ne gère pas.
 
     Un Pod posé à la main avec ce label entre dans le Service et fait passer
-    les endpoints prêts à plus de trois. Le nommer, c'est dire quoi retirer.
+    les endpoints prêts à plus de quatre. Le nommer, c'est dire quoi retirer.
     """
     etrangers = []
     for pod in pods:
@@ -142,10 +142,10 @@ def _pods_etrangers(pods: list[dict]) -> list[str]:
 
 
 def _ports_cibles_nommes(pods: list[dict]) -> set[str]:
-    """Les noms de containerPort qui désignent le port 8080 dans les Pods.
+    """Les noms de containerPort qui désignent le port 9090 dans les Pods.
 
-    L'énoncé demande que le Service vise le port 8080 des Pods. Le viser par
-    son numéro ou par le nom d'un containerPort qui vaut 8080 décrit le même
+    L'énoncé demande que le Service vise le port 9090 des Pods. Le viser par
+    son numéro ou par le nom d'un containerPort qui vaut 9090 décrit le même
     état : les deux écritures sont acceptées.
     """
     noms = set()
@@ -174,7 +174,7 @@ def sondage(host) -> dict:
         for _ in range(REQUETES):
             res = _kubectl(
                 host,
-                f"-n {NAMESPACE} exec {CLIENT} -- wget -qO- -T 5 http://{SERVICE}/",
+                f"-n {NAMESPACE} exec {CLIENT} -- wget -qO- -T 5 http://{SERVICE}:{PORT_SERVICE}/",
             )
             if res.rc == 0:
                 reponses.append(res.stdout.strip())
@@ -186,7 +186,7 @@ def sondage(host) -> dict:
 # ----------------------------------------------------------------------
 # 1 à 4. Le Deployment, et les Pods qu'il a réellement produits.
 # ----------------------------------------------------------------------
-def test_le_deployment_demande_trois_replicas(host):
+def test_le_deployment_demande_quatre_replicas(host):
     demande = _deployment(host)["spec"].get("replicas")
     assert demande == REPLICAS, message(
         en=f"Deployment {DEPLOYMENT} asks for {demande} replica(s), expected {REPLICAS}. "
@@ -196,7 +196,7 @@ def test_le_deployment_demande_trois_replicas(host):
     )
 
 
-def test_les_trois_replicas_sont_disponibles(host):
+def test_les_quatre_replicas_sont_disponibles(host):
     """Le seul test qui attend que le Deployment converge, avec celui des
     endpoints. Les suivants lisent l'état qu'il a stabilisé."""
     deployment: dict = {}
@@ -219,9 +219,9 @@ def test_les_trois_replicas_sont_disponibles(host):
     )
 
 
-def test_les_pods_portent_le_label_app_web(host):
+def test_les_pods_portent_le_label_app_contacts(host):
     labels = _deployment(host)["spec"]["template"]["metadata"].get("labels") or {}
-    assert labels.get("app") == "web", message(
+    assert labels.get("app") == "contacts", message(
         en=f"The Pod template of {DEPLOYMENT} carries the labels {labels}, which do not "
         f"include {LABEL}. That is the label the Service selects: without it, the Service "
         "finds nothing, whatever its own definition says.",
@@ -229,7 +229,7 @@ def test_les_pods_portent_le_label_app_web(host):
         f"contiennent pas {LABEL}. C'est ce label que le Service sélectionne : sans lui, "
         "le Service ne trouve rien, quelle que soit sa propre définition.",
     )
-    pods = _pods_web(host)
+    pods = _pods_contacts(host)
     assert len(pods) >= REPLICAS, message(
         en=f"{len(pods)} Pod(s) carry {LABEL} in {NAMESPACE}, expected at least {REPLICAS}. "
         "The template declares the label, but the Pods in place do not carry it: they are "
@@ -241,7 +241,7 @@ def test_les_pods_portent_le_label_app_web(host):
 
 
 def test_les_pods_tournent_avec_l_image_demandee(host):
-    pods = _pods_vivants(_pods_web(host))
+    pods = _pods_vivants(_pods_contacts(host))
     assert pods, message(
         en=f"No running Pod carries {LABEL} in {NAMESPACE}: the image cannot be read. "
         "Start with the Deployment and its label.",
@@ -279,7 +279,7 @@ def test_le_service_est_de_type_clusterip(host):
     )
 
 
-def test_le_service_ecoute_sur_80_vers_8080(host):
+def test_le_service_ecoute_sur_8081_vers_9090(host):
     ports = _service(host)["spec"].get("ports") or []
     sur_80 = [p for p in ports if p.get("port") == PORT_SERVICE]
     assert sur_80, message(
@@ -290,7 +290,7 @@ def test_le_service_ecoute_sur_80_vers_8080(host):
         "Le port que les clients appellent et le port que le conteneur sert sont deux "
         "champs différents.",
     )
-    nommes = _ports_cibles_nommes(_pods_vivants(_pods_web(host)))
+    nommes = _ports_cibles_nommes(_pods_vivants(_pods_contacts(host)))
     cibles = [p.get("targetPort") for p in sur_80]
     accepte = any(
         str(cible) == str(PORT_CIBLE) or (isinstance(cible, str) and cible in nommes)
@@ -307,9 +307,9 @@ def test_le_service_ecoute_sur_80_vers_8080(host):
     )
 
 
-def test_le_service_selectionne_app_web(host):
+def test_le_service_selectionne_app_contacts(host):
     selector = _service(host)["spec"].get("selector") or {}
-    assert selector.get("app") == "web", message(
+    assert selector.get("app") == "contacts", message(
         en=f"The selector of {SERVICE} is {selector}, expected {LABEL}. A Service finds its "
         "Pods by their labels, never by the name of the Deployment.",
         fr=f"Le selector de {SERVICE} vaut {selector}, attendu {LABEL}. Un Service trouve "
@@ -317,7 +317,7 @@ def test_le_service_selectionne_app_web(host):
     )
 
 
-def test_le_service_a_trois_endpoints_prets(host):
+def test_le_service_a_quatre_endpoints_prets(host):
     """Le second et dernier test qui attend. Les endpoints apparaissent après
     les Pods, et c'est cette attente que les tests de requêtes n'ont plus à
     payer."""
@@ -342,7 +342,7 @@ def test_le_service_a_trois_endpoints_prets(host):
             break
         time.sleep(5)
     if len(prets) > REPLICAS:
-        etrangers = _pods_etrangers(_pods_vivants(_pods_web(host)))
+        etrangers = _pods_etrangers(_pods_vivants(_pods_contacts(host)))
         assert not etrangers, message(
             en=f"{SERVICE} has {len(prets)} ready endpoints, expected exactly {REPLICAS}. "
             f"These Pods carry {LABEL} without being managed by Deployment {DEPLOYMENT}, "
@@ -380,18 +380,18 @@ def test_le_service_repond_sous_son_nom_depuis_le_client(sondage):
     )
     assert not sondage["echecs"], message(
         en=f"{len(sondage['echecs'])} request(s) out of {REQUETES} failed from {CLIENT} "
-        f"towards http://{SERVICE}/ : {sorted(set(sondage['echecs']))}. The name resolves "
+        f"towards http://{SERVICE}:{PORT_SERVICE}/ : {sorted(set(sondage['echecs']))}. The name resolves "
         "through the cluster DNS inside the namespace; a Service with no ready endpoint "
-        "resolves and then refuses the connection.",
+        "resolves and then never answers (download timed out).",
         fr=f"{len(sondage['echecs'])} requête(s) sur {REQUETES} ont échoué depuis {CLIENT} "
-        f"vers http://{SERVICE}/ : {sorted(set(sondage['echecs']))}. Le nom se résout par "
+        f"vers http://{SERVICE}:{PORT_SERVICE}/ : {sorted(set(sondage['echecs']))}. Le nom se résout par "
         "le DNS du cluster dans le namespace ; un Service sans endpoint prêt se résout "
-        "puis refuse la connexion.",
+        "puis ne répond jamais (download timed out).",
     )
 
 
 def test_chaque_pod_repond_son_propre_nom(host, sondage):
-    pods = _pods_web(host)
+    pods = _pods_contacts(host)
     noms = _noms_de_pods(pods)
     assert noms, message(
         en=f"No Pod carries {LABEL} in {NAMESPACE}: there is no real name to compare the "

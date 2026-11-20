@@ -4,9 +4,9 @@ level: services-networking
 section: ckad
 difficulty: beginner
 description: |
-  Deploy three replicas of a server and expose them through an internal
-  Service. Prove from a client that the Service answers under its name, and
-  that it really spreads the requests across the three Pods.
+  Deploy four replicas of a server and expose them through an internal
+  Service. Check from a client that the Service answers under its name and
+  port, and that it really spreads the requests across the Pods.
 skills:
   - service
   - deployment
@@ -36,57 +36,57 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: le-deployment-demande-trois-replicas
-    label: "The Deployment web asks for three replicas"
+  - id: le-deployment-demande-quatre-replicas
+    label: "The Deployment contacts asks for four replicas"
     tests:
-      - test_le_deployment_demande_trois_replicas
+      - test_le_deployment_demande_quatre_replicas
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: les-trois-replicas-sont-disponibles
-    label: "The three replicas of web are available"
+  - id: les-quatre-replicas-sont-disponibles
+    label: "The four replicas of contacts are available"
     tests:
-      - test_les_trois_replicas_sont_disponibles
+      - test_les_quatre_replicas_sont_disponibles
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: les-pods-portent-le-label-app-web
-    label: "The Pods of web carry the label app=web"
+  - id: les-pods-portent-le-label-app-contacts
+    label: "The Pods of contacts carry the label app=contacts"
     tests:
-      - test_les_pods_portent_le_label_app_web
+      - test_les_pods_portent_le_label_app_contacts
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-pods-tournent-avec-l-image-demandee
-    label: "The Pods of web run busybox:1.38.0"
+    label: "The Pods of contacts run busybox:1.38.0"
     tests:
       - test_les_pods_tournent_avec_l_image_demandee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-service-est-de-type-clusterip
-    label: "The Service web-svc is of type ClusterIP"
+    label: "The Service contacts-svc is of type ClusterIP"
     tests:
       - test_le_service_est_de_type_clusterip
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-ecoute-sur-80-vers-8080
-    label: "The Service web-svc listens on 80 and targets port 8080 of the Pods"
+  - id: le-service-ecoute-sur-8081-vers-9090
+    label: "The Service contacts-svc listens on 8081 and targets port 9090 of the Pods"
     tests:
-      - test_le_service_ecoute_sur_80_vers_8080
+      - test_le_service_ecoute_sur_8081_vers_9090
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-selectionne-app-web
-    label: "The selector of web-svc is app=web"
+  - id: le-service-selectionne-app-contacts
+    label: "The selector of contacts-svc is app=contacts"
     tests:
-      - test_le_service_selectionne_app_web
+      - test_le_service_selectionne_app_contacts
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-a-trois-endpoints-prets
-    label: "The Service web-svc has exactly three ready endpoints"
+  - id: le-service-a-quatre-endpoints-prets
+    label: "The Service contacts-svc has exactly four ready endpoints"
     tests:
-      - test_le_service_a_trois_endpoints_prets
+      - test_le_service_a_quatre_endpoints_prets
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repond-sous-son-nom-depuis-le-client
-    label: "http://web-svc/ answers from the client Pod"
+    label: "http://contacts-svc:8081/ answers from the client Pod"
     tests:
       - test_le_service_repond_sous_son_nom_depuis_le_client
     lessons:
