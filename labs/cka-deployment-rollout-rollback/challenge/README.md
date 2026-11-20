@@ -3,30 +3,30 @@
 ## 📍 The situation
 
 You are on the control plane of the kubeadm cluster, and your kubectl is
-configured. In the **`lab`** namespace, the **`webapp`** Deployment runs three
-Pods, on `nginx:1.30.5`.
+configured. In the **`lab`** namespace, the **`catalogue`** Deployment runs three
+Pods, on `nginx:1.30.5-alpine`.
 
-This morning, a colleague updated it to the new image, but made a typo in its
-name. Since then, the update is stuck:
+This morning, a colleague wanted to update it, but picked the wrong image: he
+shipped `busybox:1.38.0` instead of nginx. Since then, the update is stuck:
 
-- a new Pod cannot download its image;
+- a new Pod starts, then stops, again and again;
 - the three old Pods still serve the traffic;
 - `kubectl rollout status` does not give the prompt back.
 
-The expected image is **`nginx:1.30.6`**. Its tag is what counts: you may add
+The expected image is **`nginx:1.30.6-alpine`**. Its tag is what counts: you may add
 a digest to this tag, but not pick another tag.
 
 ## 🎯 What you must obtain
 
-1. **First**, put the version that worked, `nginx:1.30.5`, back in service. It
-   must become **revision 3** of the Deployment. Leave the stuck update before
+1. **First**, put the version that worked, `nginx:1.30.5-alpine`, back in
+   service. It must become **revision 3** of the Deployment. Leave the stuck update before
    shipping anything else.
 
-2. **Then**, ship the right image: `webapp` on `nginx:1.30.6`, as
+2. **Then**, ship the right image: `catalogue` on `nginx:1.30.6-alpine`, as
    **revision 4**, with three Pods requested, three Pods available and up to
-   date, and no Pod left in image error.
+   date, and no Pod left failing.
 
-3. The `webapp` Deployment carries a **change cause**: the
+3. The `catalogue` Deployment carries a **change cause**: the
    `kubernetes.io/change-cause` annotation, set on the Deployment itself, with
    a text that says what was shipped.
 
@@ -50,7 +50,7 @@ comes back into service and gets a new number.
 Three commands are enough: `kubectl rollout history`, `kubectl rollout undo`
 and `kubectl set image`. The Deployment's container is called `nginx`.
 `kubectl describe deployment` says why the update is stuck, and
-`kubectl get pods` shows the Pod that has no image.
+`kubectl get pods` shows the Pod that stops in a loop.
 
 The change cause stays on the Deployment, and each new revision copies it. A
 rollback, on the other hand, brings back the cause of the chosen revision. So
