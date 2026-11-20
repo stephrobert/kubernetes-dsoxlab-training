@@ -224,7 +224,9 @@ pod/boucle-5f64888d87-w47sh   0/1     Pending             0          0s
 Two things happen at once. The three old Pods are `Terminating`: they go away
 with their ReplicaSet. But a ReplicaSet already exists again (age `0s`), with
 three new Pods. It has the same name, because this name is computed from the
-description of the Pods, which did not change. Fifteen seconds later,
+description of the Pods, which did not change. Yet it is not the same object:
+Kubernetes gave it a new **UID**, the unique identifier it assigns to every
+object when it is created, read in `metadata.uid`. Fifteen seconds later,
 everything is back:
 
 ```bash
@@ -296,7 +298,7 @@ untouched.
 ## 🎯 The challenge
 
 Your turn, on your own this time: delete a Pod then the ReplicaSet of the
-challenge's application, and record which controller recreated each.
+challenge's application, and record what replaced them.
 
 ```bash
 dsoxlab run k8s-observer-la-reconciliation

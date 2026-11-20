@@ -14,11 +14,11 @@ criteria:
     label: "Le ReplicaSet supprimé a été remplacé et vitrine est revenu à trois réplicas disponibles"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
-  - id: le-controleur-du-pod-est-consigne
-    label: "Le contrôleur qui a recréé le Pod est consigné"
+  - id: le-pod-recree-est-consigne
+    label: "Le Pod créé pour remplacer le Pod supprimé est consigné"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/
-  - id: le-controleur-du-replicaset-est-consigne
-    label: "Le contrôleur qui a recréé le ReplicaSet est consigné"
+  - id: l-uid-du-nouveau-replicaset-est-consigne
+    label: "L'UID du ReplicaSet de remplacement est consigné"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/control-plan/

@@ -55,8 +55,7 @@ def memoire(host) -> dict:
     return json.loads(res.stdout)
 
 
-@pytest.fixture(scope="module")
-def releve(host) -> dict[str, str]:
+def _releve(host) -> dict[str, str]:
     fichier = host.file(f"{_maison(host)}/reconciliation/releve.txt")
     if not fichier.exists:
         return {}
@@ -76,36 +75,6 @@ def _valeur(releve: dict[str, str], cle: str) -> str:
         fr=f"La clé {cle!r} de ~/reconciliation/releve.txt n'a pas de valeur.",
     )
     return valeur
-
-
-def _forme(texte: str) -> str:
-    """Le texte sans accents ni casse, espaces et soulignés changés en tirets :
-    « Replica Set », « replica_set » et « ReplicaSet » se comparent pareil."""
-    import unicodedata
-    decompose = unicodedata.normalize("NFKD", texte.lower())
-    sans = "".join(c for c in decompose if not unicodedata.combining(c))
-    return "-".join(sans.replace("_", " ").split())
-
-
-#: L'objet de ce lab est la DISTINCTION entre deux contrôleurs : chaque champ doit
-#: nommer le sien. « replicaset » couvre replicaset-controller, ReplicaSet et
-#: « contrôleur des ReplicaSets » ; « deployment » couvre deployment-controller,
-#: Deployment et « contrôleur des Deployments ». Le kube-controller-manager seul
-#: est refusé : il héberge les deux contrôleurs, le nommer ne distingue rien.
-CONTROLEUR_DU_POD = ("replicaset", "replica-set")
-CONTROLEUR_DU_REPLICASET = ("deployment",)
-HOTE_DES_CONTROLEURS = ("controller-manager",)
-
-
-def _juge_controleur(valeur: str, attendu: tuple[str, ...], rival: tuple[str, ...]) -> str | None:
-    """Rend None si la valeur nomme le bon contrôleur, sinon la raison du refus."""
-    forme = _forme(valeur)
-    nomme = any(nom in forme for nom in attendu)
-    if not nomme and any(nom in forme for nom in HOTE_DES_CONTROLEURS):
-        return "hote"
-    if not nomme or any(nom in forme for nom in (*rival, "scheduler", "kubelet")):
-        return "faux"
-    return None
 
 
 # ----------------------------------------------------------------------
@@ -160,48 +129,56 @@ def test_le_replicaset_supprime_est_remplace_et_vitrine_revient_a_l_etat_demande
 
 
 # ----------------------------------------------------------------------
-# 3. Le contrôleur qui a recréé le Pod.
+# 3. Le Pod que le ReplicaSet a créé pour remplacer le Pod supprimé.
 # ----------------------------------------------------------------------
-def test_le_controleur_qui_recree_le_pod_est_consigne(releve):
-    valeur = _valeur(releve, "pod-recree-par")
-    refus = _juge_controleur(valeur, CONTROLEUR_DU_POD, CONTROLEUR_DU_REPLICASET)
-    assert refus != "hote", message(
-        en=f"pod-recree-par is {valeur!r}: the kube-controller-manager hosts every controller. "
-           "Name the controller itself, as shown in the From column of kubectl describe.",
-        fr=f"pod-recree-par vaut {valeur!r} : le kube-controller-manager héberge tous les "
-           "contrôleurs. Nommez le contrôleur lui-même, tel que l'affiche la colonne From de "
-           "kubectl describe.",
+def test_le_pod_recree_est_consigne(host, memoire):
+    evenements = _json(
+        host,
+        f"-n {NS} get events --field-selector "
+        f"involvedObject.uid={memoire['replicaset']},reason=SuccessfulCreate",
+        message(en="Cannot read the events of the initial ReplicaSet.",
+                fr="Impossible de lire les événements du ReplicaSet de départ."),
+    ).get("items") or []
+    crees = {e.get("message", "").rpartition(" ")[2] for e in evenements}
+    recrees = crees - set(memoire.get("pods") or [])
+    assert recrees, message(
+        en="The initial ReplicaSet recreated no Pod: delete one Pod of vitrine first.",
+        fr="Le ReplicaSet de départ n'a recréé aucun Pod : supprimez d'abord un Pod de vitrine.",
     )
-    assert refus is None, message(
-        en=f"pod-recree-par is {valeur!r}; it must name the controller that wrote the "
-           "SuccessfulCreate event of the new Pod, and only that one.",
-        fr=f"pod-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "
-           "l'événement SuccessfulCreate du nouveau Pod, et lui seul.",
+    valeur = _valeur(_releve(host), "pod-recree")
+    assert valeur in recrees, message(
+        en=f"pod-recree is {valeur!r}, which is not the Pod created to replace the deleted one "
+           f"({', '.join(sorted(recrees))}). The initial ReplicaSet wrote its name in a "
+           "SuccessfulCreate event.",
+        fr=f"pod-recree vaut {valeur!r}, qui n'est pas le Pod créé pour remplacer le Pod supprimé "
+           f"({', '.join(sorted(recrees))}). Le ReplicaSet de départ a écrit son nom dans un "
+           "événement SuccessfulCreate.",
     )
 
 
 # ----------------------------------------------------------------------
-# 4. Le contrôleur qui a recréé le ReplicaSet.
+# 4. L'UID du ReplicaSet de remplacement.
 # ----------------------------------------------------------------------
-def test_le_controleur_qui_recree_le_replicaset_est_consigne(releve):
-    valeur = _valeur(releve, "replicaset-recree-par")
-    refus = _juge_controleur(valeur, CONTROLEUR_DU_REPLICASET, CONTROLEUR_DU_POD)
-    assert refus != "hote", message(
-        en=f"replicaset-recree-par is {valeur!r}: the kube-controller-manager hosts every "
-           "controller. Name the controller itself, as shown in the From column of kubectl describe.",
-        fr=f"replicaset-recree-par vaut {valeur!r} : le kube-controller-manager héberge tous les "
-           "contrôleurs. Nommez le contrôleur lui-même, tel que l'affiche la colonne From de "
-           "kubectl describe.",
+def test_l_uid_du_nouveau_replicaset_est_consigne(host, memoire):
+    jeux = _json(host, f"-n {NS} get replicasets -l app=vitrine", message(
+        en="Cannot list the ReplicaSets of vitrine.",
+        fr="Impossible de lister les ReplicaSets de vitrine.",
+    )).get("items") or []
+    uids = {rs["metadata"]["uid"] for rs in jeux} - {memoire["replicaset"]}
+    assert uids, message(
+        en="vitrine has no replacement ReplicaSet yet: delete its ReplicaSet first.",
+        fr="vitrine n'a pas encore de ReplicaSet de remplacement : supprimez d'abord son ReplicaSet.",
     )
-    assert refus is None, message(
-        en=f"replicaset-recree-par is {valeur!r}; it must name the controller that wrote the "
-           "ScalingReplicaSet event of the Deployment, and only that one.",
-        fr=f"replicaset-recree-par vaut {valeur!r} ; il doit nommer le contrôleur qui a écrit "
-           "l'événement ScalingReplicaSet du Deployment, et lui seul.",
+    valeur = _valeur(_releve(host), "uid-du-nouveau-replicaset")
+    assert valeur != memoire["replicaset"], message(
+        en="uid-du-nouveau-replicaset is the UID of the deleted ReplicaSet. The replacement "
+           "has the same name, but Kubernetes gave it a new UID.",
+        fr="uid-du-nouveau-replicaset est l'UID du ReplicaSet supprimé. Le remplaçant porte le "
+           "même nom, mais Kubernetes lui a donné un nouvel UID.",
     )
-    assert _forme(valeur) != _forme(releve.get("pod-recree-par", "")), message(
-        en="replicaset-recree-par and pod-recree-par carry the same value: two different "
-           "controllers recreated the Pod and the ReplicaSet.",
-        fr="replicaset-recree-par et pod-recree-par portent la même valeur : ce sont deux "
-           "contrôleurs différents qui ont recréé le Pod et le ReplicaSet.",
+    assert valeur in uids, message(
+        en=f"uid-du-nouveau-replicaset is {valeur!r}, which is not the UID of the current "
+           "ReplicaSet of vitrine (kubectl get replicaset -o jsonpath='{.items[0].metadata.uid}').",
+        fr=f"uid-du-nouveau-replicaset vaut {valeur!r}, qui n'est pas l'UID du ReplicaSet actuel "
+           "de vitrine (kubectl get replicaset -o jsonpath='{.items[0].metadata.uid}').",
     )
