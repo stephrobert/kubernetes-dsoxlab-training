@@ -45,26 +45,26 @@ validation:
 
 criteria:
   - id: le-replicaset-actif-est-consigne
-    label: "The active ReplicaSet of api is recorded"
+    label: "The active ReplicaSet of paiement is recorded"
     tests:
-      - test_le_replicaset_actif_de_api_est_consigne
+      - test_le_replicaset_actif_de_paiement_est_consigne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: l-ancien-replicaset-est-consigne
-    label: "The previous ReplicaSet of api, kept at zero, is recorded"
+    label: "The previous ReplicaSet of paiement, kept at zero, is recorded"
     tests:
-      - test_l_ancien_replicaset_de_api_est_consigne
+      - test_l_ancien_replicaset_de_paiement_est_consigne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: la-cause-du-failedcreate-est-consignee
-    label: "The cause of the FailedCreate of compte-absent is recorded"
+    label: "The cause of the FailedCreate of rapports is recorded"
     tests:
       - test_la_cause_du_failedcreate_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/replicasets/
   - id: le-deployment-bloque-est-repare
-    label: "compte-absent, repaired without being recreated, has its two replicas available"
+    label: "rapports, repaired without being recreated, has its two replicas available"
     tests:
-      - test_compte_absent_repare_a_ses_deux_replicas_disponibles
+      - test_rapports_repare_a_ses_deux_replicas_disponibles
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/replicasets/

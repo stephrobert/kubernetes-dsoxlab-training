@@ -1,4 +1,4 @@
-# Challenge : Placer des Pods, plafonner un namespace et dimensionner, sans guidage
+# Challenge : Placer des Pods, plafonner un namespace et dimensionner, seul et sans indice
 
 ## La situation
 
@@ -41,14 +41,14 @@ Aucune procédure n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Huit états, à poids égal. Le seuil est de **70 sur 100**, et les états **2
-et 5** sont **bloquants** : l'application réservée sur son nœud, et le
+Huit exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **2
+et 5** sont **bloquantes** : l'application réservée sur son nœud, et le
 plafond du namespace. Réussir les autres ne compense pas l'échec de l'un
 d'eux.
 
 Les tests lisent où les Pods tournent vraiment et ce que demandent leurs
 descriptions, et soumettent des Pods d'essai en dry-run côté serveur, qui ne
-crée rien. Pour l'état 8, **le test génère lui-même la charge** : il fait
+crée rien. Pour l'exigence 8, **le test génère lui-même la charge** : il fait
 tourner une boucle de calcul dans chaque Pod d'`accueil` pendant environ deux
 minutes, et attend au plus deux minutes que le Deployment grossisse. Vous
 n'avez rien à lancer pour cela, et une vérification peut durer ce temps-là.

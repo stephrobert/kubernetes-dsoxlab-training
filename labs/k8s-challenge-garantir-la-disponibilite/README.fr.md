@@ -5,8 +5,8 @@ Challenge du module **Fiabiliser et exploiter** de la formation Kubernetes
 d'exploitation » : une application à faire tourner en trois exemplaires
 répartis sur les nœuds, avec un budget de perturbation et des sondes, qui doit
 garder son minimum pendant que le check évacue lui-même le worker, puis un
-rapport de routine confronté à l'état réel du cluster. Six états, seuil 70,
-deux bloquants.
+rapport de routine confronté à l'état réel du cluster. Six exigences, seuil 70,
+deux bloquantes.
 
 | | |
 |---|---|

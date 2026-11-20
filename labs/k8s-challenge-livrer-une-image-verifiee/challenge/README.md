@@ -1,4 +1,4 @@
-# Challenge: Let only verified images in, without guidance
+# Challenge: Let only verified images in, on your own and without hints
 
 ## The situation
 
@@ -45,7 +45,7 @@ given: the module taught you what you need.
 
 ## How you will be graded
 
-Ten states, equally weighted. The pass mark is **70 out of 100**, and states
+Ten requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **3, 9 and 10** are **blocking**: an image that is really pinned, an image
 that is really less exposed, and a cluster that only admits what is signed.
 Passing the others does not make up for missing one of them.

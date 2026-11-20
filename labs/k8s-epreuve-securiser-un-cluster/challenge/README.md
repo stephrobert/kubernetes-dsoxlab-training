@@ -111,8 +111,8 @@ choosing them is part of the test.
 
 ## How you will be graded
 
-Nineteen states, equally weighted, numbered P01 to P19 in the order of the
-grading grid. The pass mark is **70 out of 100**, and seven states are
+Nineteen requirements, equally weighted, numbered P01 to P19 in the order of the
+grading grid. The pass mark is **70 out of 100**, and seven requirements are
 **critical**: the closed profiler (P01), the audit log (P04), the restricted
 standard (P05), the refusal of tags (P06), mutual TLS (P10), the Falco alert
 (P13) and the shop that still answers (P19). Passing the others does not make

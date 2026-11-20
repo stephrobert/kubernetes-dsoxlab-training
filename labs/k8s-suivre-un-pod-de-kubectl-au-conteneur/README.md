@@ -189,6 +189,12 @@ The new Pod follows the same path: `Scheduled`, then `Created` and `Started`.
 The image was already on the node (`already present on machine`): no download
 this time. `Killing` is the stop of the deleted Pod's container.
 
+Two lines need a careful reading. The `Created` line of `5rx62` is about the
+old Pod, the one you deleted, not the new one. And the list is sorted to the
+second: when several events fall in the same second, their display order is not
+reliable. Here, the `Started` of `mqvjk` shows up before its `Created`. To
+know the real order for a Pod, read its events with `kubectl describe pod`.
+
 ## 📚 Exercise 7: reach a Pod by its address
 
 Each Pod has its own address, and any Pod can reach any other Pod directly.

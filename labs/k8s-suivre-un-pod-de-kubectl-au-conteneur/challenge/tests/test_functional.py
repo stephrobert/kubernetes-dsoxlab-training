@@ -3,10 +3,10 @@
 Ces tests confrontent le relevé ~/suivre-un-pod/etapes.txt à l'état réel du
 cluster. Un test vérifie un seul état demandé par l'énoncé.
 
-L'attribution d'une étape est jugée sur le nom du composant, sans exiger une
-forme au mot près : « default-scheduler » ou « kube-scheduler » valent pour le
-placement, « kubelet » pour les étapes du conteneur. Une valeur qui nomme les
-deux composants à la fois n'attribue rien et est refusée.
+Les trois valeurs du relevé dépendent du cluster de l'apprenant : le nom du
+Pod (suffixe tiré au hasard), le Node choisi par le Scheduler, l'identifiant
+que containerd a donné au conteneur. Aucune ne se recopie depuis la leçon,
+qui imprime les siens.
 """
 
 from __future__ import annotations
@@ -85,30 +85,43 @@ def test_le_deployment_suivi_a_un_replica_disponible(host):
 
 
 # ----------------------------------------------------------------------
-# 2. Le placement, attribué au scheduler.
+# 2. Le Pod relevé est celui que le Deployment fait tourner.
 # ----------------------------------------------------------------------
-def test_l_etape_scheduled_est_attribuee_au_scheduler(releve):
-    valeur = _valeur(releve, "scheduled").lower()
-    assert "scheduler" in valeur and "kubelet" not in valeur, message(
-        en=f"scheduled is {valeur!r}; the Scheduled step is performed by the scheduler.",
-        fr=f"scheduled vaut {valeur!r} ; l'étape Scheduled n'est pas attribuée au bon composant.",
+def test_le_pod_releve_est_celui_de_suivi(host, releve):
+    noms = {p["metadata"]["name"] for p in _pods_de_suivi(host)}
+    assert noms, message(
+        en="No Pod of suivi exists yet.",
+        fr="Aucun Pod de suivi n'existe encore.",
+    )
+    valeur = _valeur(releve, "pod")
+    assert valeur in noms, message(
+        en=f"pod is {valeur!r}, which is not the Pod of suivi ({', '.join(sorted(noms))}). "
+           "The end of the name is drawn at random when the Pod is created.",
+        fr=f"pod vaut {valeur!r}, qui n'est pas le Pod de suivi ({', '.join(sorted(noms))}). "
+           "La fin du nom est tirée au hasard à la création du Pod.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. Les étapes du conteneur, attribuées au kubelet.
+# 3. L'identifiant du conteneur, donné par containerd.
 # ----------------------------------------------------------------------
-def test_les_etapes_du_conteneur_sont_attribuees_au_kubelet(releve):
-    fautives = [
-        cle for cle in ("pulled", "created", "started")
-        if "kubelet" not in _valeur(releve, cle).lower()
-        or "scheduler" in _valeur(releve, cle).lower()
-    ]
-    assert not fautives, message(
-        en=f"{', '.join(fautives)}: these steps are not attributed to the component "
-           "that performed them, read the From column of the events.",
-        fr=f"{', '.join(fautives)} : ces étapes ne sont pas attribuées au composant "
-           "qui les a faites, lisez la colonne From des événements.",
+def test_le_conteneur_releve_est_celui_du_pod(host, releve):
+    ids = set()
+    for pod in _pods_de_suivi(host):
+        for statut in (pod.get("status") or {}).get("containerStatuses") or []:
+            brut = statut.get("containerID") or ""
+            if brut:
+                ids.add(brut.split("://", 1)[-1])
+    assert ids, message(
+        en="The container of suivi has no identifier yet: it has not been created.",
+        fr="Le conteneur de suivi n'a pas encore d'identifiant : il n'a pas été créé.",
+    )
+    valeur = _valeur(releve, "conteneur").split("://", 1)[-1].strip()
+    assert len(valeur) >= 12 and any(i.startswith(valeur) for i in ids), message(
+        en=f"conteneur is {valeur!r}, which is not the identifier of the container of suivi. "
+           "Copy the Container ID line of kubectl describe pod (at least its first 12 characters).",
+        fr=f"conteneur vaut {valeur!r}, qui n'est pas l'identifiant du conteneur de suivi. "
+           "Recopiez la ligne Container ID de kubectl describe pod (au moins ses 12 premiers caractères).",
     )
 
 

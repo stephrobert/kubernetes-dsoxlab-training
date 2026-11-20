@@ -38,7 +38,7 @@ The address of each node shows in the `INTERNAL-IP` column of
 
 ## ✅ How you will know it is right
 
-Each test checks one of the four states above. The last two send a real
+Each test checks one of the four requirements above. The last two send a real
 request, one to the control plane, the other to the worker: a NodePort opens on
 every node, wherever the Pods run.
 

@@ -1,4 +1,4 @@
-# Challenge : Confiner un Pod et détecter une activité anormale, sans guidage
+# Challenge : Confiner un Pod et détecter une activité anormale, seul et sans indice
 
 ## La situation
 
@@ -73,8 +73,8 @@ restent en marche) :
 
 ## Comment vous serez évalué
 
-Seize états, à poids égal. Le seuil est de **70 sur 100**, et trois états
-sont **bloquants** : l'écriture dans `/tmp` refusée (3), le client sans sidecar
+Seize exigences, à poids égal. Le seuil est de **70 sur 100**, et trois exigences
+sont **bloquantes** : l'écriture dans `/tmp` refusée (3), le client sans sidecar
 bloqué pendant que le client maillé passe (8), et l'alerte Falco pour un shell
 dans `coffre` (14). Réussir les autres ne compense pas l'échec de l'un d'eux.
 

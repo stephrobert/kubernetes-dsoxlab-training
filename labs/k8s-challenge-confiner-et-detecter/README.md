@@ -1,4 +1,4 @@
-# Confine a Pod and detect abnormal activity, without guidance
+# Confine a Pod and detect abnormal activity, on your own and without hints
 
 Challenge of the **Confine and detect** module of the Kubernetes course, in
 the Put into practice section of the "Runtime Sandboxes (gVisor, Kata)"
@@ -6,7 +6,7 @@ lesson: an AppArmor profile to write and load, a seccomp profile that refuses
 `chmod`, mutual TLS to require in an Istio mesh, a namespace to close by
 default without cutting its application flow or its DNS, a Pod to run in a
 gVisor sandbox, and a Falco rule that raises an alert for a shell in the
-protected namespace, and nowhere else. Sixteen states, threshold 70, three
+protected namespace, and nowhere else. Sixteen requirements, threshold 70, three
 blocking.
 
 | | |

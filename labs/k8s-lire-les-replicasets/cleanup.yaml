@@ -13,6 +13,13 @@
       changed_when: true
       failed_when: false
 
+    - name: Retirer le ServiceAccount leurre du namespace default
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/boutique.kubeconfig -n default delete
+        serviceaccount lecteur --ignore-not-found
+      changed_when: true
+      failed_when: false
+
     - name: Retirer le relevé et la mémoire de l'état initial
       ansible.builtin.file:
         path: "{{ item }}"

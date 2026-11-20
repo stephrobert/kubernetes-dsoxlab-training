@@ -1,4 +1,4 @@
-title: "Interdire un appel système à un conteneur, et le prouver de l'intérieur"
+title: "Interdire un appel système à un conteneur, et le vérifier de l'intérieur"
 description: |
   Un conteneur qui peut appeler tout ce que le noyau propose. Écrivez un
   profil seccomp qui refuse une famille d'appels système, appliquez-le, et

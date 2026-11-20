@@ -1,4 +1,4 @@
-# Challenge : Ne laisser entrer que des images vérifiées, sans guidage
+# Challenge : Ne laisser entrer que des images vérifiées, seul et sans indice
 
 ## La situation
 
@@ -48,8 +48,8 @@ n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Dix états, à poids égal. Le seuil est de **70 sur 100**, et les états **3, 9
-et 10** sont **bloquants** : une image vraiment épinglée, une image vraiment
+Dix exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **3, 9
+et 10** sont **bloquantes** : une image vraiment épinglée, une image vraiment
 moins exposée, et un cluster qui n'admet que du signé. Réussir les autres ne
 compense pas l'un d'eux manqué.
 

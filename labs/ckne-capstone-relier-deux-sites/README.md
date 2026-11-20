@@ -4,7 +4,7 @@ Capstone of the **CKNE** certification in the Kubernetes course (level 6), in
 the CKNE timed exercises page. It names no object: link two sites so the shop
 answers from both and survives the loss of one, announce it over BGP to the
 network team's router, and serve it over HTTPS under its public name with a
-cert-manager certificate, plain HTTP being redirected. Three states, all
+cert-manager certificate, plain HTTP being redirected. Three requirements, all
 blocking, pass mark 70.
 
 | | |

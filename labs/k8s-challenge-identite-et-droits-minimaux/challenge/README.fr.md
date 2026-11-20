@@ -39,8 +39,8 @@ n'est donnée : le module vous a appris ce qu'il faut.
 
 ## Comment vous serez noté
 
-Six états, à poids égal. Le seuil est de **70 sur 100**, et les états **2 et
-3** sont **bloquants** : la lecture du journal de `production`, et rien de plus.
+Six exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **2 et
+3** sont **bloquantes** : la lecture du journal de `production`, et rien de plus.
 Réussir les autres ne compense pas l'un d'eux manqué.
 
 Les tests entrent dans le Pod de `collecte` et interrogent l'API avec son

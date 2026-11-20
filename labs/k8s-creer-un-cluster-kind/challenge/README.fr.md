@@ -26,9 +26,10 @@ vous le lancez. Le répertoire **`~/atelier/`** est vide.
 Un cluster de plusieurs nœuds se décrit dans un fichier. La leçon en donne la
 forme : une liste `nodes`, avec un `role` pour chaque nœud.
 
-L'image du nœud ne va pas dans le fichier. Donnez-la à `kind create cluster`,
-avec le nom du cluster et le chemin du fichier. Attention : sans nom, kind
-appelle le cluster `kind`.
+L'image du nœud se donne à `kind create cluster` avec `--image`, ou dans le
+fichier, nœud par nœud, avec `image:`. Si vous donnez les deux, `--image`
+l'emporte. La commande reçoit aussi le nom du cluster et le chemin du fichier.
+Attention : sans nom, kind appelle le cluster `kind`.
 
 Un cluster qui répond n'est pas forcément prêt. Comptez les nœuds et lisez les
 colonnes `STATUS` et `VERSION` de `kubectl get nodes`. Attendez que les trois

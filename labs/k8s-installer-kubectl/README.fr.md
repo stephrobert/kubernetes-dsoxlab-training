@@ -1,9 +1,10 @@
 # Installer et configurer kubectl
 
 kubectl est la commande qui sert à parler à un cluster Kubernetes. Dans ce
-cours, vous refaites un par un les gestes de la leçon : choisir une version,
-télécharger le programme, vérifier qu'il n'a pas été abîmé, l'installer, lui
-ajouter un raccourci, puis vérifier qu'il joint le cluster.
+cours, vous pratiquez les gestes de la leçon, et vous rencontrez des pannes
+qu'elle ne montre pas : une version qui n'existe pas, un fichier abîmé, un
+programme que le shell ne trouve pas, et une complétion qui ne se charge pas
+dans un nouveau terminal.
 
 Pour vous entraîner, vous installez une **autre version** de kubectl, sous un
 **autre nom**. Le challenge, lui, vous demandera la vraie installation : vous
@@ -25,7 +26,7 @@ contient de quoi s'y connecter. Il ne manque qu'une chose : kubectl, que le lab
 a retiré.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine (Debian
-13.7) le 19 novembre 2026.
+13.7) les 19 et 20 novembre 2026.
 
 ## 📚 Exercice 1 : choisir une version de kubectl
 
@@ -226,7 +227,7 @@ Le shell ne trouve aucune commande `kubectl`, et `/usr/local/bin` ne contient
 que `kind`. Ce que vous avez installé ne sert qu'à vous, sous un autre nom.
 Le challenge vous demandera une commande `kubectl` utilisable par tous.
 
-## 📚 Exercice 6 : créer un raccourci et une complétion, puis voir qu'ils disparaissent
+## 📚 Exercice 6 : garder un alias et sa complétion dans `~/.bashrc`
 
 Deux aides rendent kubectl plus agréable :
 
@@ -246,40 +247,124 @@ type _init_completion
 bash: type: _init_completion: not found
 ```
 
-Il ne l'est pas : la touche Tab ne complétera pas vraiment les commandes. Le
-challenge vous demandera de l'installer. Ici, vous apprenez seulement à créer
-l'alias et à déclarer la complétion.
-
-Chargez la complétion de kubectl, créez l'alias `kc`, puis dites au shell que
-`kc` se complète comme kubectl :
+La fonction `_init_completion` vient de ce paquet. Elle manque : le paquet
+n'est pas installé. Installez-le :
 
 ```bash
+sudo apt-get install -y bash-completion
+dpkg -s bash-completion | grep -E "^(Status|Version)"
+```
+
+```text
+Status: install ok installed
+Version: 1:2.16.0-7
+```
+
+Une commande tapée dans le terminal est oubliée quand il se ferme. Pour garder
+l'alias et la complétion, écrivez-les dans `~/.bashrc`, le fichier que bash lit
+à chaque ouverture d'un terminal. Ajoutez trois lignes à la fin :
+
+```bash
+cat >> ~/.bashrc <<'EOF'
 source <(kubectl136 completion bash)
 alias kc=kubectl136
 complete -o default -F __start_kubectl kc
+EOF
+tail -3 ~/.bashrc
+```
+
+```text
+source <(kubectl136 completion bash)
+alias kc=kubectl136
+complete -o default -F __start_kubectl kc
+```
+
+La première ligne charge la complétion de kubectl. Elle crée une fonction,
+`__start_kubectl`, qui calcule les propositions. La deuxième crée l'alias. La
+troisième dit à bash : pour compléter `kc`, appelle `__start_kubectl`. Un alias
+n'hérite pas tout seul de la complétion de la commande qu'il remplace.
+
+Vérifiez maintenant comme le fera le challenge : dans un **nouveau** terminal.
+`bash -l` ouvre un shell de connexion, celui qu'une nouvelle connexion SSH vous
+donnerait :
+
+```bash
+bash -l
+```
+
+```text
+bash: kubectl136: command not found
+```
+
+Dès l'ouverture, une erreur. Regardez si la fonction de complétion existe :
+
+```bash
+alias kc
+type -t __start_kubectl || echo "pas de fonction __start_kubectl"
+```
+
+```text
+alias kc='kubectl136'
+pas de fonction __start_kubectl
+```
+
+L'alias est là, mais pas la complétion. Tapez `kc ver` puis Tab : rien n'est
+complété. Pour comprendre, regardez dans quel ordre `~/.profile` fait les
+choses :
+
+```bash
+grep -n -E "bashrc|local/bin" ~/.profile
+```
+
+```text
+13:    # include .bashrc if it exists
+14:    if [ -f "$HOME/.bashrc" ]; then
+15:	. "$HOME/.bashrc"
+25:if [ -d "$HOME/.local/bin" ] ; then
+26:    PATH="$HOME/.local/bin:$PATH"
+```
+
+`~/.profile` lit `~/.bashrc` à la ligne 15, puis ajoute `~/.local/bin` au PATH
+à la ligne 26. Quand votre ligne `source <(kubectl136 completion bash)` est lue,
+le shell ne sait pas encore où trouver `kubectl136`. L'alias, lui, n'est
+utilisé que plus tard, quand vous tapez `kc` : à ce moment, le PATH est
+complet.
+
+Quittez ce shell. Corrigez la ligne pour qu'elle donne le chemin complet du
+programme, sans dépendre du PATH :
+
+```bash
+exit
+sed -i 's|^source <(kubectl136 completion bash)|source <("$HOME/.local/bin/kubectl136" completion bash)|' ~/.bashrc
+tail -3 ~/.bashrc
+```
+
+```text
+source <("$HOME/.local/bin/kubectl136" completion bash)
+alias kc=kubectl136
+complete -o default -F __start_kubectl kc
+```
+
+Ouvrez à nouveau un nouveau terminal et refaites la vérification :
+
+```bash
+bash -l
 complete -p kc
+type -t __start_kubectl
 ```
 
 ```text
 complete -o default -F __start_kubectl kc
+function
 ```
 
-La dernière ligne confirme que `kc` utilise la complétion de kubectl.
-Ouvrez maintenant un **nouveau** shell et posez la même question :
+Plus d'erreur à l'ouverture, et la fonction existe. Tapez `kc ver` puis Tab :
+la ligne devient `kc version`. Quittez ce shell avec `exit`.
 
-```bash
-bash -i -c 'complete -p kc; alias kc'
-```
-
-```text
-bash: complete: kc: no completion specification
-bash: alias: kc: not found
-```
-
-Le nouveau shell ne connaît ni l'alias ni la complétion. Tout ce que vous tapez
-dans un terminal est oublié quand il se ferme. Pour les garder, il faut les
-écrire dans le fichier `~/.bashrc`, que bash lit à chaque ouverture. C'est ce
-que le challenge vérifiera, dans un nouveau shell.
+Dans le challenge, kubectl sera dans `/usr/local/bin`, qui est toujours dans
+le PATH : ce piège ne s'y pose pas. Mais retenez la méthode : on vérifie
+toujours dans un nouveau terminal, et un message à l'ouverture veut dire qu'une
+ligne de `~/.bashrc` a échoué.
 
 ## 📚 Exercice 7 : vérifier que kubectl joint le cluster
 
@@ -308,12 +393,17 @@ change à chaque création de cluster : le vôtre sera différent.
 
 ## 🧹 Nettoyage
 
-Supprimez d'abord ce que vous avez créé pendant les exercices : le programme `kubectl136`.
+Supprimez d'abord ce que vous avez créé pendant les exercices : les trois
+lignes de `kc` dans `~/.bashrc`, puis le programme `kubectl136`.
 
 ```bash
+sed -i -e '/kubectl136/d' -e '/__start_kubectl kc/d' ~/.bashrc
 rm ~/.local/bin/kubectl136
 rmdir ~/.local/bin
 ```
+
+Le paquet `bash-completion`, lui, sera retiré par `dsoxlab reset` : le
+challenge vous demandera de l'installer vous-même.
 
 Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
 le nettoyage puis la préparation du lab : vous retrouvez exactement l'état de

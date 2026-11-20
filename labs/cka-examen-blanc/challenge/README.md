@@ -192,9 +192,9 @@ Then go back to the base: `exit`.
 
 ## How you will be graded
 
-Twenty states, 5 points each; the 10% tasks carry two. The weights follow those
+Twenty requirements, 5 points each; the 10% tasks carry two. The weights follow those
 of the domains of the official CKA curriculum. The threshold is **66 out of
-100**, as in the real exam: 14 states out of 20 are needed. No hint is offered,
+100**, as in the real exam: 14 requirements out of 20 are needed. No hint is offered,
 and the feedback is the verdict only, as on exam night.
 
 ## What this mock exam does not reproduce

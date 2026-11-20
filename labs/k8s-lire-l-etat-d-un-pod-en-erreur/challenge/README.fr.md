@@ -2,30 +2,31 @@
 
 ## 📍 La situation
 
-Dans le namespace **`diagnostic`** du cluster kind `lab`, trois applications
-ont été lancées. **`web`** marche. **`api`** et **`batch`** ne démarrent pas.
+Dans le namespace **`incident`** du cluster kind `lab`, trois applications
+ont été lancées. **`vitrine`** marche. **`catalogue`** et **`export`** ne
+démarrent pas.
 
 Avant de corriger quoi que ce soit, l'équipe veut savoir **pourquoi**, avec
 des preuves lues dans le cluster. Une correction faite à l'aveugle effacerait
 la panne qu'il fallait comprendre.
 
-Votre kubectl vise déjà ce cluster. Le répertoire **`~/diagnostic`** existe et
+Votre kubectl vise déjà ce cluster. Le répertoire **`~/incident`** existe et
 il est vide.
 
 ## 🎯 Ce que vous devez obtenir
 
-1. Un fichier **`~/diagnostic/api.txt`** qui donne la **raison** pour laquelle
-   le conteneur de `api` attend, et l'**image** en cause.
+1. Un fichier **`~/incident/catalogue.txt`** qui donne la **raison** pour
+   laquelle le conteneur de `catalogue` attend, et l'**image** en cause.
 
-2. Un fichier **`~/diagnostic/batch.txt`** qui recopie le **message d'erreur**
-   écrit par `batch` avant de s'arrêter, et le **code de sortie** de son
+2. Un fichier **`~/incident/export.txt`** qui recopie le **message d'erreur**
+   écrit par `export` avant de s'arrêter, et le **code de sortie** de son
    dernier arrêt, écrit sous la forme `code de sortie : N`.
 
-3. Un fichier **`~/diagnostic/top.txt`** qui donne le nom du **Pod** du
+3. Un fichier **`~/incident/top.txt`** qui donne le nom du **Pod** du
    namespace qui utilise le plus de **mémoire**.
 
-4. **Rien n'est réparé** : `api` et `batch` gardent leur image et leur commande
-   de départ.
+4. **Rien n'est réparé** : `catalogue` et `export` gardent leur image et leur
+   commande de départ.
 
 ## 🧭 Les repères utiles
 

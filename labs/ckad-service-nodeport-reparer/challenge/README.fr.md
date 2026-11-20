@@ -38,7 +38,7 @@ L'adresse de chaque nœud se lit dans la colonne `INTERNAL-IP` de
 
 ## ✅ Comment vous saurez que c'est bon
 
-Chaque test vérifie un des quatre états ci-dessus. Les deux derniers envoient
+Chaque test vérifie une des quatre exigences ci-dessus. Les deux derniers envoient
 une vraie requête, l'un au control plane, l'autre au worker : un NodePort
 s'ouvre sur tous les nœuds, où que tournent les Pods.
 

@@ -10,7 +10,7 @@ description: |
 
 criteria:
   - id: le-deploiement-demande-la-bonne-image
-    label: "Le Deployment webapp demande l'image nginx:1.30.6"
+    label: "Le Deployment catalogue demande l'image nginx:1.30.6-alpine"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: les-trois-replicas-sont-disponibles-et-a-jour
@@ -18,7 +18,7 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: aucun-pod-n-est-en-erreur-d-image
-    label: "Aucun Pod de webapp n'est resté en erreur d'image"
+    label: "Aucun Pod de catalogue n'est resté en panne"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: l-historique-du-deploiement-est-intact
@@ -34,10 +34,10 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-revision-finale-est-celle-de-la-bonne-image
-    label: "La révision finale 4 est celle de nginx:1.30.6, avec les trois replicas conservés"
+    label: "La révision finale 4 est celle de nginx:1.30.6-alpine, avec les trois replicas conservés"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-deploiement-porte-la-cause-de-changement
-    label: "Le Deployment webapp porte l'annotation kubernetes.io/change-cause"
+    label: "Le Deployment catalogue porte l'annotation kubernetes.io/change-cause"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/

@@ -2,30 +2,30 @@
 
 ## 📍 The situation
 
-In the **`diagnostic`** namespace of the kind cluster `lab`, three
-applications were started. **`web`** works. **`api`** and **`batch`** do not
-start.
+In the **`incident`** namespace of the kind cluster `lab`, three
+applications were started. **`vitrine`** works. **`catalogue`** and
+**`export`** do not start.
 
 Before fixing anything, the team wants to know **why**, with evidence read in
 the cluster. A blind fix would erase the failure you needed to understand.
 
-Your kubectl already targets this cluster. The **`~/diagnostic`** directory
+Your kubectl already targets this cluster. The **`~/incident`** directory
 exists and is empty.
 
 ## 🎯 What you must obtain
 
-1. A **`~/diagnostic/api.txt`** file that gives the **reason** why the `api`
-   container is waiting, and the **image** at fault.
+1. A **`~/incident/catalogue.txt`** file that gives the **reason** why the
+   `catalogue` container is waiting, and the **image** at fault.
 
-2. A **`~/diagnostic/batch.txt`** file that copies the **error message**
-   written by `batch` before it stopped, and the **exit code** of its last
+2. A **`~/incident/export.txt`** file that copies the **error message**
+   written by `export` before it stopped, and the **exit code** of its last
    stop, written as `exit code: N`.
 
-3. A **`~/diagnostic/top.txt`** file that gives the name of the namespace's
+3. A **`~/incident/top.txt`** file that gives the name of the namespace's
    **Pod** that uses the most **memory**.
 
-4. **Nothing is fixed**: `api` and `batch` keep their starting image and
-   command.
+4. **Nothing is fixed**: `catalogue` and `export` keep their starting image
+   and command.
 
 ## 🧭 Useful landmarks
 

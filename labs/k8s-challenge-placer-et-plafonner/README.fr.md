@@ -1,12 +1,12 @@
-# Placer des Pods, plafonner un namespace et dimensionner, sans guidage
+# Placer des Pods, plafonner un namespace et dimensionner, seul et sans indice
 
 Challenge du module **Scheduling et capacité** de la formation Kubernetes,
 dans la section Mettre en pratique de la leçon « Ajuster les ressources d'un
 Pod » : un nœud à réserver à une application, une application à placer par
 affinité de nœud obligatoire et préférée, des réplicas à répartir sur
 plusieurs nœuds, un namespace à plafonner et à doter de valeurs par défaut, et
-une application à mettre à l'échelle sur sa charge CPU. Huit états, seuil 70,
-deux bloquants.
+une application à mettre à l'échelle sur sa charge CPU. Huit exigences, seuil 70,
+deux bloquantes.
 
 | | |
 |---|---|

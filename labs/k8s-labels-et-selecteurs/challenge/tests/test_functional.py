@@ -3,13 +3,14 @@
 Ces tests lisent l'état du cluster et le relevé ~/etiquettes/releve.txt. Un
 test vérifie un seul état demandé par l'énoncé.
 
-Le label est jugé dans le MODÈLE de Pod du Deployment web : c'est ce qui le
-fait survivre au remplacement des Pods. Un label posé à la main sur les Pods
-ne compte pas. L'annotation est cherchée parmi les annotations du Deployment,
-pas parmi ses labels. Le sélecteur consigné est rejoué tel quel par
-kubectl get pods -l, et doit rendre exactement les Pods de api, avec une
-négation (!= ou !clé) : `app=api` les rend aussi, mais n'est pas le geste
-demandé.
+Le label est jugé dans le MODÈLE de Pod du Deployment vitrine : c'est ce qui
+le fait survivre au remplacement des Pods. Un label posé à la main sur les
+Pods ne compte pas. L'annotation contact est cherchée parmi les annotations du
+Deployment, pas parmi ses labels. Le sélecteur consigné est rejoué tel quel
+par kubectl get pods -l, et doit rendre exactement les Pods de facturation,
+avec une négation (!= ou !clé) : `app=facturation` les rend aussi, mais n'est
+pas ce qui est demandé. Le Deployment outils porte palier=interne : il fait
+échouer palier!=front, qui le rend avec facturation.
 """
 
 from __future__ import annotations
@@ -61,11 +62,11 @@ def _json(host, args: str) -> dict | None:
     return json.loads(res.stdout) if res.rc == 0 else None
 
 
-def _web(host) -> dict:
-    dep = _json(host, "get deployment web")
+def _vitrine(host) -> dict:
+    dep = _json(host, "get deployment vitrine")
     assert dep is not None, message(
-        en=f"No Deployment web in {NS}: run dsoxlab reset k8s-labels-et-selecteurs.",
-        fr=f"Aucun Deployment web dans {NS} : lancez dsoxlab reset k8s-labels-et-selecteurs.",
+        en=f"No Deployment vitrine in {NS}: run dsoxlab reset k8s-labels-et-selecteurs.",
+        fr=f"Aucun Deployment vitrine dans {NS} : lancez dsoxlab reset k8s-labels-et-selecteurs.",
     )
     return dep
 
@@ -78,17 +79,17 @@ def _pods_vivants(host, selecteur: str) -> set[str]:
 
 
 # ----------------------------------------------------------------------
-# 1. env=prod dans le modèle de Pod de web.
+# 1. palier=front dans le modèle de Pod de vitrine.
 # ----------------------------------------------------------------------
-def test_env_prod_est_dans_le_modele_de_pod_de_web(host):
-    dep = _web(host)
+def test_palier_front_est_dans_le_modele_de_pod_de_vitrine(host):
+    dep = _vitrine(host)
     modele = (dep["spec"]["template"]["metadata"].get("labels") or {})
-    assert modele.get("env") == "prod", message(
-        en=f"The Pod template of web carries the labels {modele}, without env=prod. A label "
+    assert modele.get("palier") == "front", message(
+        en=f"The Pod template of vitrine carries the labels {modele}, without palier=front. A label "
         "put on the Pods by hand disappears with them when they are replaced: a lasting label "
         "is written in spec.template.metadata.labels. Reread the section of the lesson on a "
         "manual label that does not last.",
-        fr=f"Le modèle de Pod de web porte les labels {modele}, sans env=prod. Un label posé à "
+        fr=f"Le modèle de Pod de vitrine porte les labels {modele}, sans palier=front. Un label posé à "
         "la main sur les Pods disparaît avec eux quand ils sont remplacés : un label durable "
         "s'écrit dans spec.template.metadata.labels. Relisez la section de la leçon sur le "
         "label manuel qui ne dure pas.",
@@ -99,39 +100,39 @@ def test_env_prod_est_dans_le_modele_de_pod_de_web(host):
     fin = time.monotonic() + ATTENTE
     while True:
         tous = _pods_vivants(host, selecteur)
-        sans = tous - _pods_vivants(host, f"{selecteur},env=prod")
-        dep = _web(host)
+        sans = tous - _pods_vivants(host, f"{selecteur},palier=front")
+        dep = _vitrine(host)
         fini = (dep.get("status") or {}).get("updatedReplicas") == dep["spec"].get("replicas")
         if (fini and not sans) or time.monotonic() >= fin:
             break
         time.sleep(PAS)
     assert tous and not sans, message(
-        en=f"After {ATTENTE}s, Pods of web still lack env=prod: {sorted(sans)}.",
-        fr=f"Après {ATTENTE}s, des Pods de web n'ont toujours pas env=prod : {sorted(sans)}.",
+        en=f"After {ATTENTE}s, Pods of vitrine still lack palier=front: {sorted(sans)}.",
+        fr=f"Après {ATTENTE}s, des Pods de vitrine n'ont toujours pas palier=front : {sorted(sans)}.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. Une annotation description sur web.
+# 2. Une annotation contact sur vitrine.
 # ----------------------------------------------------------------------
-def test_une_annotation_description_est_posee_sur_web(host):
-    dep = _web(host)
+def test_une_annotation_contact_est_posee_sur_vitrine(host):
+    dep = _vitrine(host)
     annotations = dep["metadata"].get("annotations") or {}
-    description = annotations.get("description", "").strip()
-    assert description, message(
-        en="The Deployment web has no annotation description. A description is not used to "
+    contact = annotations.get("contact", "").strip()
+    assert contact, message(
+        en="The Deployment vitrine has no annotation contact. A contact sentence is not used to "
         "select: it is an annotation, not a label, put on the Deployment itself. Reread the "
         "section of the lesson on annotations.",
-        fr="Le Deployment web n'a pas d'annotation description. Une description ne sert pas à "
+        fr="Le Deployment vitrine n'a pas d'annotation contact. Une phrase de contact ne sert pas à "
         "sélectionner : c'est une annotation, pas un label, posée sur le Deployment lui-même. "
         "Relisez la section de la leçon sur les annotations.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. Un sélecteur à négation qui rend exactement les Pods de api.
+# 3. Un sélecteur à négation qui rend exactement les Pods de facturation.
 # ----------------------------------------------------------------------
-def test_le_selecteur_consigne_rend_exactement_les_pods_de_api(host, releve):
+def test_le_selecteur_consigne_rend_exactement_les_pods_de_facturation(host, releve):
     brut = releve.get("selecteur", "").strip().strip("'\"")
     assert brut, message(
         en=f"The key 'selecteur' of {RELEVE} has no value.",
@@ -149,12 +150,12 @@ def test_le_selecteur_consigne_rend_exactement_les_pods_de_api(host, releve):
         "sélecteurs.",
     )
     rendus = _pods_vivants(host, brut)
-    attendus = _pods_vivants(host, "app=api")
+    attendus = _pods_vivants(host, "app=facturation")
     assert attendus and rendus == attendus, message(
         en=f"kubectl get pods -l '{brut}' returns {sorted(rendus)}, expected exactly the Pods "
-        f"of api {sorted(attendus)}. A != also keeps the objects that do not have the key at "
+        f"of facturation {sorted(attendus)}. A != also keeps the objects that do not have the key at "
         "all: check what your selector returns before writing it down.",
         fr=f"kubectl get pods -l '{brut}' rend {sorted(rendus)}, attendu exactement les Pods "
-        f"de api {sorted(attendus)}. Un != retient aussi les objets qui n'ont pas du tout la "
+        f"de facturation {sorted(attendus)}. Un != retient aussi les objets qui n'ont pas du tout la "
         "clé : vérifiez ce que rend votre sélecteur avant de le consigner.",
     )

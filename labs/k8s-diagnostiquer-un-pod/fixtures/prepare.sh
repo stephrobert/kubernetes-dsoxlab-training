@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Pose la situation du lab sur le cluster kind « boutique » :
 #
-#   - le namespace pods-en-panne, neuf, avec deux Pods nus en panne, ceux de la
-#     démonstration de la leçon : image-fausse, sur un tag qui n'existe pas, et
-#     plante, dont le conteneur sort en code 1 ;
+#   - le namespace pods-en-panne, neuf, avec deux Pods nus en panne, autres que
+#     ceux de la démonstration de la leçon (image-fausse, code 1) : vignettes,
+#     sur un tag mal écrit, et importeur, dont le conteneur sort en code 2 ;
 #   - la mémoire de l'état initial, lisible par root seul : l'uid de
-#     image-fausse, pour constater que son image a été corrigée EN PLACE ;
+#     vignettes, pour constater que son image a été corrigée EN PLACE ;
 #   - le relevé à compléter, ~/pods-en-panne/releve.txt.
 #
 # Ne touche ni aux Nodes, ni à kube-system, ni aux namespaces des autres labs.
@@ -24,21 +24,22 @@ MEMOIRE=/var/lib/dsoxlab/diagnostiquer-un-pod.json
 # Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
 kubectl delete namespace "$NS" --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace "$NS"
-kubectl -n "$NS" run image-fausse --image=nginx:1.30.999
-kubectl -n "$NS" run plante --image="$BUSYBOX" \
-  -- sh -c 'echo "je démarre puis je plante"; exit 1'
+# Tag mal écrit (alpne pour alpine) : la leçon, elle, montre nginx:1.30.999.
+kubectl -n "$NS" run vignettes --image=nginx:1.30.5-alpne
+kubectl -n "$NS" run importeur --image="$BUSYBOX" \
+  -- sh -c 'echo "importeur: fichier des tarifs introuvable" >&2; exit 2'
 
 # Le code de sortie ne se lit qu'une fois le conteneur arrêté au moins une fois.
 for _ in $(seq 1 60); do
-  code="$(kubectl -n "$NS" get pod plante \
+  code="$(kubectl -n "$NS" get pod importeur \
     -o jsonpath='{.status.containerStatuses[0].lastState.terminated.exitCode}{.status.containerStatuses[0].state.terminated.exitCode}')"
   [ -n "$code" ] && break
   sleep 2
 done
 
 install -d -m 0700 /var/lib/dsoxlab
-uid="$(kubectl -n "$NS" get pod image-fausse -o jsonpath='{.metadata.uid}')"
-printf '{"image-fausse": "%s"}\n' "$uid" > "$MEMOIRE"
+uid="$(kubectl -n "$NS" get pod vignettes -o jsonpath='{.metadata.uid}')"
+printf '{"vignettes": "%s"}\n' "$uid" > "$MEMOIRE"
 chmod 0600 "$MEMOIRE"
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/${NS}"
@@ -47,8 +48,8 @@ cat > "${LAB_HOME}/${NS}/releve.txt" <<'RELEVE'
 # What you read in the cluster, one value per key.
 # Les lignes qui commencent par # sont ignorées. Lines starting with # are ignored.
 
-raison-image-fausse:
-code-sortie-plante:
+raison-vignettes:
+code-sortie-importeur:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/${NS}/releve.txt"
-echo "Situation posée : image-fausse et plante en panne, image-fausse ${uid}."
+echo "Situation posée : vignettes et importeur en panne, vignettes ${uid}."

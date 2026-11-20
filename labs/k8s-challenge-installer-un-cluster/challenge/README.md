@@ -41,12 +41,12 @@ have `sudo`. No procedure is given: the module taught you what you need.
 
 ## How you are graded
 
-Seven states, equal weight. The threshold is **70 out of 100**, and states
+Seven requirements, equal weight. The threshold is **70 out of 100**, and requirements
 **1 and 7** are **blocking**: the joined worker, and the API that survives the
 loss of a control plane. Passing the others does not make up for missing one
 of them.
 
-For state 7, the grader **stops a control plane of `ha` itself** (it freezes
+For requirement 7, the grader **stops a control plane of `ha` itself** (it freezes
 its container), queries `/readyz` through the load balancer, then **starts it
 again**. Every check therefore acts on cluster `ha` for a good minute. The feedback is limited to the list of unmet criteria, by their label, and the score: no message says why.
 

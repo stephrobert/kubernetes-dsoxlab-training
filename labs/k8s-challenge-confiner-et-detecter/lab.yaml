@@ -19,7 +19,7 @@
 # famille du module : le confinement qui agit vraiment (écriture refusée), le
 # chiffrement qui coupe le client hors maillage, et la détection du shell.
 id: k8s-challenge-confiner-et-detecter
-title: "Confine a Pod and detect abnormal activity, without guidance"
+title: "Confine a Pod and detect abnormal activity, on your own and without hints"
 level: monitoring-logging
 section: cks
 difficulty: advanced

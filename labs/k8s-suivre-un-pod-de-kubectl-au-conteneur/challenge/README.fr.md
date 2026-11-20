@@ -16,12 +16,13 @@ valeur après chaque deux-points.
    nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
    ```
 
-2. Après **`scheduled`** : le composant qui a placé le Pod sur un nœud.
+2. Après **`pod`** : le nom complet du Pod que le Deployment a créé.
 
-3. Après **`pulled`**, **`created`** et **`started`** : le composant qui a
-   téléchargé l'image, créé le conteneur et l'a démarré.
+3. Après **`noeud-du-kubelet`** : le nœud choisi par le Scheduler, dont le
+   kubelet a démarré le conteneur.
 
-4. Après **`noeud-du-kubelet`** : le nœud dont le kubelet a fait ce travail.
+4. Après **`conteneur`** : l'identifiant que containerd a donné au conteneur
+   du Pod.
 
 ## 🧭 Les repères utiles
 
@@ -31,7 +32,9 @@ l'ordre, avec une colonne `From`. `kubectl get events -o wide` montre les mêmes
 événements pour tout le namespace, avec une colonne `SOURCE`.
 
 La raison de l'événement donne l'étape (`Scheduled`, `Pulled`, `Created`,
-`Started`). Le message de l'événement `Scheduled` donne le nœud choisi.
+`Started`). Le message de l'événement `Scheduled` donne le nœud choisi. Le
+kubelet de ce nœud demande ensuite le conteneur à containerd :
+`kubectl describe pod` affiche l'identifiant reçu sur la ligne `Container ID`.
 
 Sur ce cluster, les événements sont gardés **24 heures** (une heure par défaut
 dans Kubernetes). Après une longue pause, ceux du lab ont disparu : relancez
@@ -40,7 +43,7 @@ alors `dsoxlab reset k8s-suivre-un-pod-de-kubectl-au-conteneur`.
 ## ✅ Comment vous saurez que c'est bon
 
 Les tests lisent votre Deployment et votre fichier. Ils comparent vos réponses
-au nœud qui fait vraiment tourner le Pod.
+au Pod, au nœud et au conteneur qui tournent vraiment.
 
 ```bash
 dsoxlab check k8s-suivre-un-pod-de-kubectl-au-conteneur

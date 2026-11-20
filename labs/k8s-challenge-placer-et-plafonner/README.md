@@ -1,11 +1,11 @@
-# Place Pods, cap a namespace and scale, without guidance
+# Place Pods, cap a namespace and scale, on your own and without hints
 
 Challenge of the **Scheduling and capacity** module of the Kubernetes course,
 in the Put into practice section of the "Adjusting a Pod's resources" lesson:
 a node to reserve for one application, an application to place by required and
 preferred node affinity, replicas to spread across nodes, a namespace to cap
 and to give default values, and an application to scale on its CPU load. Eight
-states, threshold 70, two blocking.
+requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

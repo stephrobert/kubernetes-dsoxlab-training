@@ -3,30 +3,32 @@
 ## 📍 La situation
 
 Vous êtes sur le control plane du cluster kubeadm, et votre kubectl est
-configuré. Dans le namespace **`lab`**, le Deployment **`webapp`** tourne avec
-trois Pods, en `nginx:1.30.5`.
+configuré. Dans le namespace **`lab`**, le Deployment **`catalogue`** tourne avec
+trois Pods, en `nginx:1.30.5-alpine`.
 
-Ce matin, un collègue l'a mis à jour vers la nouvelle image, mais il a fait
-une faute de frappe dans son nom. Depuis, la mise à jour est bloquée :
+Ce matin, un collègue a voulu le mettre à jour, mais il s'est trompé d'image :
+il a livré `busybox:1.38.0` à la place de nginx. Depuis, la mise à jour est
+bloquée :
 
-- un Pod neuf n'arrive pas à télécharger son image ;
+- un Pod neuf démarre, puis s'arrête, encore et encore ;
 - les trois anciens Pods tiennent toujours le service ;
 - `kubectl rollout status` ne rend pas la main.
 
-L'image attendue est **`nginx:1.30.6`**. C'est son tag qui compte : vous
+L'image attendue est **`nginx:1.30.6-alpine`**. C'est son tag qui compte : vous
 pouvez ajouter un digest à ce tag, mais pas choisir un autre tag.
 
 ## 🎯 Ce que vous devez obtenir
 
-1. **D'abord**, remettez en service la version qui marchait, `nginx:1.30.5`.
+1. **D'abord**, remettez en service la version qui marchait,
+   `nginx:1.30.5-alpine`.
    Elle doit devenir la **révision 3** du Deployment. Quittez la mise à jour
    bloquée avant de livrer quoi que ce soit d'autre.
 
-2. **Ensuite**, livrez la bonne image : `webapp` en `nginx:1.30.6`, en
+2. **Ensuite**, livrez la bonne image : `catalogue` en `nginx:1.30.6-alpine`, en
    **révision 4**, avec trois Pods demandés, trois Pods disponibles et à jour,
-   et plus aucun Pod en erreur d'image.
+   et plus aucun Pod en panne.
 
-3. Le Deployment `webapp` porte une **cause de changement** : l'annotation
+3. Le Deployment `catalogue` porte une **cause de changement** : l'annotation
    `kubernetes.io/change-cause`, posée sur le Deployment lui-même, avec un
    texte qui dit ce qui a été livré.
 
@@ -50,7 +52,7 @@ ReplicaSet reprend du service et reçoit un nouveau numéro.
 Trois commandes suffisent : `kubectl rollout history`, `kubectl rollout undo`
 et `kubectl set image`. Le conteneur du Deployment s'appelle `nginx`.
 `kubectl describe deployment` dit pourquoi la mise à jour est bloquée, et
-`kubectl get pods` montre le Pod qui n'a pas d'image.
+`kubectl get pods` montre le Pod qui s'arrête en boucle.
 
 La cause de changement reste sur le Deployment, et chaque nouvelle révision
 la recopie. Un retour en arrière, lui, remet la cause de la révision choisie.

@@ -6,7 +6,7 @@ exam), competency "Use appropriate pod security standards", remediation side.
 The catalogue already has `ckad-security-context-hardened`, which teaches how
 to **build** a hardened Pod. This one starts from an **existing** privileged
 Pod, running, that nobody has flagged. Taking back what exists is the CKS
-gesture, and it is the harder one: you must find what is wrong before fixing
+task, and it is the harder one: you must find what is wrong before fixing
 it, and the scenario does not say how many defects there are.
 
 The last test does not read `hostPID: false` from a spec, which would only be

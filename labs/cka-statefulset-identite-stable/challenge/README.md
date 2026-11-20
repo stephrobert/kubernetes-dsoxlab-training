@@ -48,7 +48,7 @@ writes it at every start, nothing proves any more that it survived.
 
 ## How you will know it works
 
-Each test checks one of the six states above. For stable names, the test
+Each test checks one of the six requirements above. For stable names, the test
 resolves each name from another replica and compares the address it gets with
 that of the Pod. For the data, it reads the file and the events of the
 StatefulSet, which say how many times the Pod `annuaire-1` was created.

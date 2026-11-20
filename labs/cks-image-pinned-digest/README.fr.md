@@ -1,4 +1,4 @@
-# Épingler une image par son digest, et prouver que le tag ne suffit pas
+# Épingler une image par son digest, et vérifier que le tag ne suffit pas
 
 Lab **CKS**, domaine *Supply Chain Security* (20 % de l'épreuve). Ce domaine
 pèse un cinquième de l'examen et n'avait aucun lab dans le catalogue.

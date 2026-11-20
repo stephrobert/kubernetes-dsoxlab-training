@@ -1,4 +1,4 @@
-# Challenge : Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+# Challenge : Faire baisser le compte d'un audit CIS, et le vérifier par un second audit
 
 ## La situation
 

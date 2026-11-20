@@ -1,4 +1,4 @@
-# Interdire un appel système à un conteneur, et le prouver de l'intérieur
+# Interdire un appel système à un conteneur, et le vérifier de l'intérieur
 
 Lab **CKS**, domaine *System Hardening* (10 % de l'épreuve), compétence
 « Minimize host OS footprint (reduce attack surface) ».

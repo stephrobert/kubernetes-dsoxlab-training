@@ -5,8 +5,8 @@ d'exercices CKS. Seize tâches au format de l'examen, réparties comme les six
 domaines du programme officiel CKS v1.37, notées sur l'état final du cluster,
 sans indice. Le seuil est celui de l'examen réel, 67 %.
 
-Vingt états à 5 points : dsoxlab note la part de tests réussis, et une tâche à
-10 % porte donc deux états.
+Vingt exigences à 5 points : dsoxlab note la part de tests réussis, et une tâche à
+10 % porte donc deux exigences.
 
 | Domaine | Poids | Tâches |
 |---|---|---|

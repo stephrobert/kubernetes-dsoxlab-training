@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # Pose la situation du lab sur le cluster kind « boutique » :
 #
-#   - le namespace replicasets, neuf, avec les deux Deployments de la
-#     démonstration de la leçon : api, mis à jour une fois de nginx 1.30.5 en
-#     1.30.6, donc deux ReplicaSets ; compte-absent, dont le modèle de Pod
-#     demande un ServiceAccount qui n'existe pas, donc un ReplicaSet en
-#     FailedCreate et aucun Pod ;
+#   - le namespace replicasets, neuf, avec deux Deployments qui ne sont pas
+#     ceux de la leçon (api et compte-absent, dont la leçon imprime les noms
+#     de ReplicaSets) : paiement, mis à jour une fois de nginx 1.30.5-alpine en
+#     1.30.6-alpine, donc deux ReplicaSets ; rapports, dont le modèle de Pod
+#     demande le ServiceAccount lecteur, absent du namespace, donc un
+#     ReplicaSet en FailedCreate et aucun Pod ;
+#   - un ServiceAccount lecteur dans le namespace default, en leurre : il
+#     existe bien, mais pas là où les Pods le cherchent ;
 #   - la mémoire de l'état initial, lisible par root seul : l'uid de
-#     compte-absent, pour constater qu'il a été réparé et non recréé ;
+#     rapports, pour constater qu'il a été réparé et non recréé ;
 #   - le relevé à compléter, ~/replicasets/releve.txt.
 #
 # Ne touche ni aux Nodes, ni à kube-system, ni aux namespaces des autres labs.
@@ -19,54 +22,56 @@ set -x
 LAB_USER="${LAB_USER:-ansible}"
 LAB_HOME="$(getent passwd "$LAB_USER" | cut -d: -f6)"
 NS=replicasets
-V1="nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"
-V2="nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703"
+V1="nginx:1.30.5-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94"
+V2="nginx:1.30.6-alpine@sha256:901e593c95dc85f5a729f5765516321366ef4ac401821431d408897e95287d0a"
 MEMOIRE=/var/lib/dsoxlab/lire-les-replicasets.json
 
 # --ignore-not-found plutôt qu'un get préalable : un namespace encore en
 # Terminating au moment du get disparaîtrait avant le delete (NotFound, set -e).
 kubectl delete namespace "$NS" --ignore-not-found --wait=true --timeout=180s
 kubectl create namespace "$NS"
+# Le leurre : un lecteur existe, mais dans default.
+kubectl -n default create serviceaccount lecteur --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl -n "$NS" apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: paiement
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: api
+      app: paiement
   template:
     metadata:
       labels:
-        app: api
+        app: paiement
     spec:
       containers:
         - name: nginx
           image: ${V1}
 EOF
-kubectl -n "$NS" rollout status deployment/api --timeout=180s
-kubectl -n "$NS" set image deployment/api nginx="$V2"
-kubectl -n "$NS" rollout status deployment/api --timeout=180s
+kubectl -n "$NS" rollout status deployment/paiement --timeout=180s
+kubectl -n "$NS" set image deployment/paiement nginx="$V2"
+kubectl -n "$NS" rollout status deployment/paiement --timeout=180s
 
 kubectl -n "$NS" apply -f - <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: compte-absent
+  name: rapports
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: compte-absent
+      app: rapports
   template:
     metadata:
       labels:
-        app: compte-absent
+        app: rapports
     spec:
-      serviceAccountName: compte-absent
+      serviceAccountName: lecteur
       containers:
         - name: nginx
           image: ${V1}
@@ -80,8 +85,8 @@ for _ in $(seq 1 30); do
 done
 
 install -d -m 0700 /var/lib/dsoxlab
-uid="$(kubectl -n "$NS" get deployment compte-absent -o jsonpath='{.metadata.uid}')"
-printf '{"compte-absent": "%s"}\n' "$uid" > "$MEMOIRE"
+uid="$(kubectl -n "$NS" get deployment rapports -o jsonpath='{.metadata.uid}')"
+printf '{"rapports": "%s"}\n' "$uid" > "$MEMOIRE"
 chmod 0600 "$MEMOIRE"
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/${NS}"
@@ -95,4 +100,4 @@ replicaset-ancien:
 cause-failedcreate:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/${NS}/releve.txt"
-echo "Situation posée : api en deux ReplicaSets, compte-absent ${uid} en FailedCreate."
+echo "Situation posée : paiement en deux ReplicaSets, rapports ${uid} en FailedCreate."

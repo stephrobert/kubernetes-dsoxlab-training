@@ -18,23 +18,23 @@ to the requested state.
    `vitrine` is back to **three available Pods**, without the Deployment being
    changed.
 
-3. After **`pod-recree-par`**: the name of the controller that recreated the
-   Pod.
+3. After **`pod-recree`**: the name of the Pod the ReplicaSet created to
+   replace the one you deleted.
 
-4. After **`replicaset-recree-par`**: the name of the controller that
-   recreated the ReplicaSet.
+4. After **`uid-du-nouveau-replicaset`**: the UID of the ReplicaSet that
+   replaced the one you deleted.
 
 ## 🧭 Useful pointers
 
 You have nothing to restart by hand: the controllers fix the gap on their own.
-To watch it happen, run `kubectl get pods -w` in a second terminal while you
-delete.
+To see it, run `kubectl get pods` again right after each deletion, and compare
+the names and the ages.
 
-Each controller signs what it does. When a ReplicaSet creates a Pod, it writes
-a `SuccessfulCreate` event on itself. When a Deployment creates a ReplicaSet,
-it writes a `ScalingReplicaSet` event on itself. The name to copy is in the
-`From` column of `kubectl describe`, or in the `SOURCE` column of
-`kubectl get events -o wide`.
+Each controller records what it does. When a ReplicaSet creates a Pod, it
+writes a `SuccessfulCreate` event on itself, with the name of the Pod. Note
+that name before deleting the ReplicaSet: its Pods go with it. Two objects can
+carry the same name one after the other. The **UID** is the unique identifier
+Kubernetes gives an object when it is created: it is read in `metadata.uid`.
 
 Delete only the Pod, then only the ReplicaSet. Do not use
 `kubectl rollout restart`: it also creates a new ReplicaSet, but by changing

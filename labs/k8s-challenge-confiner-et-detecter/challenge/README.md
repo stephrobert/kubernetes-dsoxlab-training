@@ -1,4 +1,4 @@
-# Challenge: Confine a Pod and detect abnormal activity, without guidance
+# Challenge: Confine a Pod and detect abnormal activity, on your own and without hints
 
 ## The situation
 
@@ -67,8 +67,8 @@ stay running):
 
 ## How you will be graded
 
-Sixteen states, equally weighted. The pass mark is **70 out of 100**, and
-three states are **blocking**: the write into `/tmp` denied (3), the client
+Sixteen requirements, equally weighted. The pass mark is **70 out of 100**, and
+three requirements are **blocking**: the write into `/tmp` denied (3), the client
 without a sidecar blocked while the meshed client gets through (8), and the
 Falco alert for a shell in `coffre` (14). Passing the others does not make up
 for missing one of them.

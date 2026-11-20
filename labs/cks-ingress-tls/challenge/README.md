@@ -58,7 +58,7 @@ seconds before concluding.
 
 ## How you will know it works
 
-Each test checks one of the four states above. The third opens the connection
+Each test checks one of the four requirements above. The third opens the connection
 and reads the certificate served. The fourth calls the site as a client that
 trusts only your certificate: "the site answers over HTTPS" is already true
 before you intervene, with the default certificate, and proves nothing on its

@@ -1,16 +1,16 @@
 # Revenir en arrière sur un déploiement bloqué
 
 Un Deployment garde l'historique de ses versions. Chaque changement du modèle
-de ses Pods (une nouvelle image, par exemple) crée une **révision** numérotée,
-et l'ancienne version reste en réserve, à zéro Pod. Quand une mise à jour se
-passe mal, on peut donc **revenir en arrière** en une commande, sans rien
-reconstruire. Dans ce cours, vous livrez une nouvelle image, vous écrivez la
-raison du changement, vous provoquez une livraison qui bloque, puis vous
-revenez à une version qui marche.
+de ses Pods crée une **révision** numérotée, et l'ancienne version reste en
+réserve, à zéro Pod. La leçon livre une image fausse, revient en arrière, puis
+livre la bonne image. Ce cours prend une autre panne : une livraison bloquée
+alors que l'image est bonne. Vous la diagnostiquez par les conditions du
+Deployment, vous revenez en arrière, puis vous voyez pourquoi changer l'image
+ne répare pas une panne qui n'est pas dans l'image.
 
-Vous travaillez dans un namespace d'essai, `essai-rollout`, avec un Deployment
-`vitrine`. Le challenge vous demandera le même travail sur un autre Deployment,
-déjà bloqué : vous le ferez seul, à la fin.
+Vous travaillez dans un namespace d'essai, `essai-livraison`, avec un
+Deployment `affiche`. Le challenge vous demandera de réparer un autre
+Deployment, déjà bloqué : vous le ferez seul, à la fin.
 
 Page associée : [Deployments Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/).
 
@@ -26,185 +26,99 @@ Vous êtes maintenant connecté à `k8s-cp.lab`, le nœud qui pilote le cluster
 kubeadm (le control plane). Votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026, avec Kubernetes v1.37.2.
+20 novembre 2026, avec Kubernetes v1.37.2.
 
-## 📚 Exercice 1 : créer un Deployment et lire son historique
+## 📚 Exercice 1 : livrer une première version
 
-Créez le namespace d'essai et un Deployment `vitrine` à deux Pods, en
-nginx 1.30.5 :
-
-```bash
-kubectl create namespace essai-rollout
-kubectl create deployment vitrine --replicas=2 \
-  --image=nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
-  -n essai-rollout
-kubectl rollout status deployment/vitrine -n essai-rollout --timeout=180s
-```
-
-```text
-namespace/essai-rollout created
-deployment.apps/vitrine created
-Waiting for deployment "vitrine" rollout to finish: 0 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 0 of 2 updated replicas are available...
-Waiting for deployment "vitrine" rollout to finish: 1 of 2 updated replicas are available...
-deployment "vitrine" successfully rolled out
-```
-
-`kubectl rollout status` suit le déploiement et rend la main quand tous les
-Pods sont prêts. Lisez maintenant l'historique :
+Écrivez le Deployment `affiche` dans un fichier. Il porte une **sonde de
+disponibilité** (readinessProbe) : le kubelet interroge le port 80 toutes les
+deux secondes, et le Pod ne reçoit du trafic que si nginx répond.
+`progressDeadlineSeconds: 30` dit au Deployment de signaler une livraison
+qui n'avance plus au bout de 30 secondes.
 
 ```bash
-kubectl rollout history deployment/vitrine -n essai-rollout
+kubectl create namespace essai-livraison
+cat > ~/essai-affiche.yaml <<'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: affiche
+  namespace: essai-livraison
+spec:
+  replicas: 3
+  progressDeadlineSeconds: 30
+  selector:
+    matchLabels:
+      app: affiche
+  template:
+    metadata:
+      labels:
+        app: affiche
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 2
+EOF
+kubectl apply -f ~/essai-affiche.yaml
+kubectl rollout status deployment/affiche -n essai-livraison --timeout=120s
+kubectl rollout history deployment/affiche -n essai-livraison
 ```
 
-```text
-deployment.apps/vitrine
+```text title="Extrait de la sortie"
+namespace/essai-livraison created
+deployment.apps/affiche created
+deployment "affiche" successfully rolled out
+deployment.apps/affiche
 REVISION  CHANGE-CAUSE
 1         <none>
 ```
 
-Une seule révision, la 1. La colonne `CHANGE-CAUSE` dit pourquoi une révision
-existe. Elle est vide (`<none>`) : personne ne l'a encore remplie.
+Une révision, la 1.
 
-## 📚 Exercice 2 : livrer une nouvelle image
+## 📚 Exercice 2 : diagnostiquer une livraison qui bloque
 
-`kubectl set image` change l'image d'un conteneur du Deployment. Ici, le
-conteneur s'appelle `nginx`, comme l'image de départ :
+Un collègue modifie la sonde et vise le port 8080, où nginx n'écoute pas.
+Faites la même erreur, puis appliquez :
 
 ```bash
-kubectl set image deployment/vitrine \
-  nginx=nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703 \
-  -n essai-rollout
-kubectl rollout status deployment/vitrine -n essai-rollout --timeout=180s
+sed -i 's/port: 80/port: 8080/' ~/essai-affiche.yaml
+kubectl apply -f ~/essai-affiche.yaml
+kubectl rollout status deployment/affiche -n essai-livraison --timeout=45s
 ```
 
 ```text
-deployment.apps/vitrine image updated
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-deployment "vitrine" successfully rolled out
+deployment.apps/affiche configured
+Waiting for deployment "affiche" rollout to finish: 1 out of 3 new replicas have been updated...
+error: deployment "affiche" exceeded its progress deadline
 ```
 
-Les Pods sont remplacés un par un. Regardez l'historique, puis les
-ReplicaSets du namespace. Un ReplicaSet est l'objet qui fait tourner les Pods
-d'une version. La commande affiche pour chacun son numéro de révision, son
-image et son nombre de Pods prêts :
+`rollout status` abandonne et sort en erreur. Regardez les Pods :
 
 ```bash
-kubectl rollout history deployment/vitrine -n essai-rollout
-kubectl get rs -n essai-rollout -o custom-columns='NOM:.metadata.name,REVISION:.metadata.annotations.deployment\.kubernetes\.io/revision,IMAGE:.spec.template.spec.containers[0].image,PODS:.status.readyReplicas'
+kubectl get pods -n essai-livraison
 ```
 
 ```text
-deployment.apps/vitrine
-REVISION  CHANGE-CAUSE
-1         <none>
-2         <none>
-
-NOM                  REVISION   IMAGE                                                                                  PODS
-vitrine-56d8956678   2          nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703   2
-vitrine-8469487455   1          nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb   <none>
+NAME                       READY   STATUS    RESTARTS   AGE
+affiche-576cfff896-wszxz   0/1     Running   0          31s
+affiche-5b56f6c8d-9rnfc    1/1     Running   0          33s
+affiche-5b56f6c8d-qjzp6    1/1     Running   0          33s
+affiche-5b56f6c8d-vt674    1/1     Running   0          33s
 ```
 
-Deux révisions, et un ReplicaSet pour chacune. Celui de la révision 1 n'a plus
-de Pod (`<none>` veut dire zéro), mais il est toujours là : c'est lui qui
-servira pour revenir en arrière.
-
-## 📚 Exercice 3 : écrire la cause du changement
-
-La cause d'une révision vient de l'annotation `kubernetes.io/change-cause`,
-posée sur le Deployment. Écrivez-la :
+Le nouveau Pod tourne (`Running`) sans aucun redémarrage, mais il n'est pas
+prêt (`0/1`). Rien ne plante, et pourtant la livraison est arrêtée : le
+Deployment attend qu'un nouveau Pod soit prêt avant de retirer un ancien. Les
+trois anciens Pods tiennent toujours le service. Les **conditions** du
+Deployment le résument :
 
 ```bash
-kubectl annotate deployment vitrine kubernetes.io/change-cause='passage en nginx 1.30.6' -n essai-rollout
-kubectl rollout history deployment/vitrine -n essai-rollout
-```
-
-```text
-deployment.apps/vitrine annotated
-deployment.apps/vitrine
-REVISION  CHANGE-CAUSE
-1         <none>
-2         passage en nginx 1.30.6
-```
-
-La révision en cours, la 2, a maintenant sa raison. Gardez en tête que cette
-annotation reste sur le Deployment : vous allez voir ce que cela donne au
-changement suivant.
-
-## 📚 Exercice 4 : une livraison qui bloque
-
-Par défaut, un Deployment attend 10 minutes avant de déclarer qu'une livraison
-n'avance plus. Pour ne pas attendre aussi longtemps, ramenez ce délai à
-30 secondes avec le champ `progressDeadlineSeconds` :
-
-```bash
-kubectl patch deployment vitrine -n essai-rollout -p '{"spec":{"progressDeadlineSeconds":30}}'
-kubectl rollout history deployment/vitrine -n essai-rollout
-```
-
-```text
-deployment.apps/vitrine patched
-deployment.apps/vitrine
-REVISION  CHANGE-CAUSE
-1         <none>
-2         passage en nginx 1.30.6
-```
-
-Pas de nouvelle révision : ce champ ne touche pas au modèle des Pods. Livrez
-maintenant une image qui n'existe pas, `nginx:1.30.99`, comme si vous aviez
-fait une faute de frappe :
-
-```bash
-kubectl set image deployment/vitrine nginx=nginx:1.30.99 -n essai-rollout
-kubectl rollout status deployment/vitrine -n essai-rollout --timeout=60s
-```
-
-```text
-deployment.apps/vitrine image updated
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-error: deployment "vitrine" exceeded its progress deadline
-```
-
-La livraison est bloquée. Regardez les Pods :
-
-```bash
-kubectl get pods -n essai-rollout
-```
-
-```text
-NAME                       READY   STATUS         RESTARTS   AGE
-vitrine-56d8956678-hbc6x   1/1     Running        0          40s
-vitrine-56d8956678-w8rqc   1/1     Running        0          48s
-vitrine-75b7b686f9-9mz6h   0/1     ErrImagePull   0          31s
-```
-
-Le nouveau Pod n'arrive pas à télécharger son image (`ErrImagePull`). Les deux
-anciens Pods tournent toujours : Kubernetes ne retire un ancien Pod qu'une fois
-le nouveau prêt. Le service n'est donc pas coupé, mais la livraison n'avance
-plus. Les ReplicaSets le montrent aussi :
-
-```bash
-kubectl get rs -n essai-rollout -o custom-columns='NOM:.metadata.name,REVISION:.metadata.annotations.deployment\.kubernetes\.io/revision,IMAGE:.spec.template.spec.containers[0].image,PODS:.status.readyReplicas'
-```
-
-```text
-NOM                  REVISION   IMAGE                                                                                  PODS
-vitrine-56d8956678   2          nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703   2
-vitrine-75b7b686f9   3          nginx:1.30.99                                                                          <none>
-vitrine-8469487455   1          nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb   <none>
-```
-
-La révision 3 existe, avec zéro Pod prêt. Pour savoir pourquoi le Deployment
-n'avance plus, lisez ses conditions (`sed` coupe la sortie de `describe` pour
-n'en garder que ce bloc) :
-
-```bash
-kubectl describe deployment vitrine -n essai-rollout | sed -n '/^Conditions:/,/^OldReplicaSets/p'
+kubectl describe deployment affiche -n essai-livraison | sed -n '/^Conditions:/,/^OldReplicaSets/p'
 ```
 
 ```text
@@ -213,171 +127,191 @@ Conditions:
   ----           ------  ------
   Available      True    MinimumReplicasAvailable
   Progressing    False   ProgressDeadlineExceeded
-OldReplicaSets:  vitrine-8469487455 (0/0 replicas created), vitrine-56d8956678 (2/2 replicas created)
+OldReplicaSets:  affiche-5b56f6c8d (3/3 replicas created)
 ```
 
-`Available True` : assez de Pods répondent. `Progressing False` avec
-`ProgressDeadlineExceeded` : la livraison a dépassé son délai.
-
-## 📚 Exercice 5 : lire une révision avant d'y revenir
-
-Avant de revenir en arrière, regardez l'historique :
+`Available True` : le service tourne. `Progressing False` avec
+`ProgressDeadlineExceeded` : la livraison n'a pas avancé en 30 secondes. La
+raison se lit dans les événements du Pod qui n'est pas prêt :
 
 ```bash
-kubectl rollout history deployment/vitrine -n essai-rollout
+POD=$(kubectl get pods -n essai-livraison -o jsonpath='{range .items[?(@.status.containerStatuses[0].ready==false)]}{.metadata.name}{end}')
+kubectl describe pod $POD -n essai-livraison | grep -E 'Readiness|Unhealthy'
 ```
 
 ```text
-deployment.apps/vitrine
+    Readiness:      http-get http://:8080/ delay=0s timeout=1s period=2s successThreshold=1 failureThreshold=3
+  Warning  Unhealthy  2s (x16 over 31s)  kubelet            spec.containers{nginx}: Readiness probe failed: Get "http://10.244.38.81:8080/": dial tcp 10.244.38.81:8080: connect: connection refused
+```
+
+La sonde vise le port 8080, et rien n'y répond.
+
+## 📚 Exercice 3 : revenir en arrière, et voir ce qui tourne
+
+Avant de revenir en arrière, notez les deux ReplicaSets :
+
+```bash
+kubectl get rs -n essai-livraison
+```
+
+```text
+NAME                 DESIRED   CURRENT   READY   AGE
+affiche-576cfff896   1         1         0       31s
+affiche-5b56f6c8d    3         3         3       33s
+```
+
+Revenez à la révision précédente, et attendez la fin :
+
+```bash
+kubectl rollout undo deployment/affiche -n essai-livraison
+kubectl rollout status deployment/affiche -n essai-livraison --timeout=120s
+```
+
+```text
+Warning: resource deployments/affiche was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/affiche rolled back
+Waiting for deployment "affiche" rollout to finish: 1 old replicas are pending termination...
+deployment "affiche" successfully rolled out
+```
+
+Gardez cet avertissement en tête : vous en verrez l'effet à l'exercice 5.
+Regardez maintenant les ReplicaSets et l'historique :
+
+```bash
+kubectl get rs -n essai-livraison
+kubectl rollout history deployment/affiche -n essai-livraison
+```
+
+```text
+NAME                 DESIRED   CURRENT   READY   AGE
+affiche-576cfff896   0         0         0       31s
+affiche-5b56f6c8d    3         3         3       33s
+deployment.apps/affiche
 REVISION  CHANGE-CAUSE
-1         <none>
-2         passage en nginx 1.30.6
-3         passage en nginx 1.30.6
+2         <none>
+3         <none>
 ```
 
-La révision 3, celle de l'image fautive, affiche « passage en nginx 1.30.6 ».
-C'est faux, mais c'est normal : l'annotation était restée sur le Deployment,
-et chaque nouvelle révision la recopie. **Après chaque changement, réécrivez la
-cause**, sinon l'historique ment.
-
-Pour voir ce que contient une révision avant d'y revenir, ajoutez
-`--revision` :
+Aucun ReplicaSet neuf : `affiche-5b56f6c8d`, celui de la révision 1, a repris
+le service et porte maintenant le numéro 3. Vérifiez ce que les Pods font
+tourner :
 
 ```bash
-kubectl rollout history deployment/vitrine -n essai-rollout --revision=2
+kubectl get pods -n essai-livraison -o jsonpath='{range .items[*]}{.metadata.name}{"  "}{.spec.containers[0].image}{"\n"}{end}'
 ```
 
 ```text
-deployment.apps/vitrine with revision #2
-Pod Template:
-  Labels:	app=vitrine
-	pod-template-hash=56d8956678
-  Annotations:	kubernetes.io/change-cause: passage en nginx 1.30.6
-  Containers:
-   nginx:
-    Image:	nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
-    Port:	<none>
-    Host Port:	<none>
-    Environment:	<none>
-    Mounts:	<none>
-  Volumes:	<none>
-  Node-Selectors:	<none>
-  Tolerations:	<none>
+affiche-576cfff896-wszxz  nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+affiche-5b56f6c8d-9rnfc  nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+affiche-5b56f6c8d-qjzp6  nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+affiche-5b56f6c8d-vt674  nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-La révision 2 est bien celle de nginx 1.30.6, celle qui marchait.
+Les deux révisions avaient la même image : seule la sonde différait. Le Pod
+`wszxz` de la révision fautive est encore listé : il est en cours d'arrêt.
 
-## 📚 Exercice 6 : revenir à la révision précédente
+## 📚 Exercice 4 : livrer l'image suivante et écrire sa cause
 
-`kubectl rollout undo` revient à la révision juste avant celle en cours :
+Livrez `nginx:1.30.6`, puis écrivez la raison du changement dans
+l'annotation `kubernetes.io/change-cause`. Corrigez ensuite ce texte :
 
 ```bash
-kubectl rollout undo deployment/vitrine -n essai-rollout
-kubectl rollout status deployment/vitrine -n essai-rollout --timeout=180s
+kubectl set image deployment/affiche nginx=nginx:1.30.6 -n essai-livraison
+kubectl rollout status deployment/affiche -n essai-livraison --timeout=120s
+kubectl annotate deployment/affiche -n essai-livraison kubernetes.io/change-cause='passage à nginx 1.30.6'
+kubectl annotate deployment/affiche -n essai-livraison kubernetes.io/change-cause='nginx 1.30.6, sonde sur le port 80'
+kubectl rollout history deployment/affiche -n essai-livraison
 ```
 
-```text
-deployment.apps/vitrine rolled back
-deployment "vitrine" successfully rolled out
-```
-
-Le retour est immédiat : les Pods de la révision 2 tournaient encore. Lisez
-l'historique et les ReplicaSets :
-
-```bash
-kubectl rollout history deployment/vitrine -n essai-rollout
-kubectl get rs -n essai-rollout -o custom-columns='NOM:.metadata.name,REVISION:.metadata.annotations.deployment\.kubernetes\.io/revision,IMAGE:.spec.template.spec.containers[0].image,PODS:.status.readyReplicas'
-```
-
-```text
-deployment.apps/vitrine
+```text title="Extrait de la sortie"
+deployment.apps/affiche image updated
+deployment "affiche" successfully rolled out
+deployment.apps/affiche annotated
+deployment.apps/affiche annotated
+deployment.apps/affiche
 REVISION  CHANGE-CAUSE
-1         <none>
-3         passage en nginx 1.30.6
-4         passage en nginx 1.30.6
-
-NOM                  REVISION   IMAGE                                                                                  PODS
-vitrine-56d8956678   4          nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703   2
-vitrine-75b7b686f9   3          nginx:1.30.99                                                                          <none>
-vitrine-8469487455   1          nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb   <none>
+2         <none>
+3         <none>
+4         nginx 1.30.6, sonde sur le port 80
 ```
 
-La révision 2 a disparu de la liste, et une révision 4 est apparue. C'est le
-même ReplicaSet (`vitrine-56d8956678`), qui a reçu un **nouveau numéro**. Un
-retour en arrière ne détruit rien : il réactive l'ancien ReplicaSet et le
-renumérote. Le ReplicaSet fautif, lui, reste là, à zéro Pod. Son Pod en
-erreur est en cours de suppression :
+Le second `annotate` a remplacé le premier texte sans erreur. Pour cette clé,
+`kubernetes.io/change-cause`, kubectl v1.37.2 remplace l'ancienne valeur
+directement. Pour toute autre annotation, il refuse sans l'option
+`--overwrite`, avec le message
+`--overwrite is false but found the following declared annotation(s)`. Ajouter
+`--overwrite` marche dans les deux cas.
+
+## 📚 Exercice 5 : changer l'image ne répare pas une sonde fausse
+
+Votre fichier `~/essai-affiche.yaml` contient toujours la sonde sur le port
+8080 : le retour en arrière a changé le cluster, pas le fichier. Appliquez-le
+de nouveau, comme le ferait un collègue qui reprend son travail, puis
+regardez les Pods une trentaine de secondes plus tard :
 
 ```bash
-kubectl get pods -n essai-rollout
+kubectl apply -f ~/essai-affiche.yaml
+kubectl get pods -n essai-livraison
 ```
 
 ```text
-NAME                       READY   STATUS        RESTARTS   AGE
-vitrine-56d8956678-hbc6x   1/1     Running       0          40s
-vitrine-56d8956678-w8rqc   1/1     Running       0          48s
-vitrine-75b7b686f9-9mz6h   0/1     Terminating   0          31s
+deployment.apps/affiche configured
+NAME                       READY   STATUS    RESTARTS   AGE
+affiche-576cfff896-6tc58   0/1     Running   0          35s
+affiche-5fd8fdd64b-4d94t   1/1     Running   0          39s
+affiche-5fd8fdd64b-csgw6   1/1     Running   0          37s
+affiche-5fd8fdd64b-lwnss   1/1     Running   0          41s
 ```
 
-## 📚 Exercice 7 : revenir à une révision précise
-
-`--to-revision` revient à n'importe quelle révision de l'historique, pas
-seulement à la précédente. Revenez à la toute première, nginx 1.30.5 :
+La panne est revenue. Le ReplicaSet `affiche-576cfff896` reprend même du
+service : le fichier décrit exactement la révision fautive. Essayez de réparer
+en changeant l'image :
 
 ```bash
-kubectl rollout undo deployment/vitrine --to-revision=1 -n essai-rollout
-kubectl rollout status deployment/vitrine -n essai-rollout --timeout=180s
+kubectl set image deployment/affiche nginx=nginx:1.30.5 -n essai-livraison
+kubectl rollout status deployment/affiche -n essai-livraison --timeout=45s
+kubectl get deployment affiche -n essai-livraison -o jsonpath='{.spec.template.spec.containers[0].image} {.spec.template.spec.containers[0].readinessProbe.httpGet.port}{"\n"}'
+```
+
+```text title="Extrait de la sortie"
+deployment.apps/affiche image updated
+error: deployment "affiche" exceeded its progress deadline
+nginx:1.30.5 8080
+```
+
+Nouvelle image, même blocage : `set image` ne change que l'image, et la sonde
+vise toujours le port 8080. Regardez ce qu'est devenu l'historique :
+
+```bash
+kubectl rollout history deployment/affiche -n essai-livraison
 ```
 
 ```text
-deployment.apps/vitrine rolled back
-Waiting for deployment "vitrine" rollout to finish: 0 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 out of 2 new replicas have been updated...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-Waiting for deployment "vitrine" rollout to finish: 1 old replicas are pending termination...
-deployment "vitrine" successfully rolled out
-```
-
-Cette fois, les Pods sont remplacés un par un, comme pour une livraison
-normale. Regardez le résultat :
-
-```bash
-kubectl rollout history deployment/vitrine -n essai-rollout
-kubectl get rs -n essai-rollout -o custom-columns='NOM:.metadata.name,REVISION:.metadata.annotations.deployment\.kubernetes\.io/revision,IMAGE:.spec.template.spec.containers[0].image,PODS:.status.readyReplicas'
-```
-
-```text
-deployment.apps/vitrine
+deployment.apps/affiche
 REVISION  CHANGE-CAUSE
-3         passage en nginx 1.30.6
-4         passage en nginx 1.30.6
-5         <none>
-
-NOM                  REVISION   IMAGE                                                                                  PODS
-vitrine-56d8956678   4          nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703   <none>
-vitrine-75b7b686f9   3          nginx:1.30.99                                                                          <none>
-vitrine-8469487455   5          nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb   2
+3         <none>
+4         nginx 1.30.6, sonde sur le port 80
+5         nginx 1.30.6, sonde sur le port 80
+6         nginx 1.30.6, sonde sur le port 80
 ```
 
-Le ReplicaSet de la révision 1 est devenu la révision 5, et porte les deux
-Pods. Sa cause est vide : un retour en arrière remet aussi la cause de la
-révision choisie, et la révision 1 n'en avait pas. Là encore, il faudrait
-réécrire la cause.
+Deux révisions de plus, et la cause de la révision 4 recopiée sur la 5 et la
+6, où elle est fausse : l'annotation reste sur le Deployment, et chaque
+nouvelle révision la reprend. Avant de livrer, cherchez donc ce qui bloque :
+ici `Unhealthy` dans les événements du Pod, pas l'image.
 
 ## 🧹 Nettoyage
 
-Supprimez le namespace d'essai :
+Supprimez d'abord ce que vous avez créé pendant les exercices : le namespace
+d'essai et le fichier du Deployment.
 
 ```bash
-kubectl delete namespace essai-rollout
+kubectl delete namespace essai-livraison
+rm ~/essai-affiche.yaml
 ```
 
 ```text
-namespace "essai-rollout" deleted
+namespace "essai-livraison" deleted
 ```
 
 Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
@@ -401,8 +335,8 @@ dsoxlab check cka-deployment-rollout-rollback
 
 ## 🎯 Le challenge
 
-À vous, seul cette fois : un Deployment est bloqué sur une image qui n'existe
-pas. Revenez à la version qui marchait, puis livrez la bonne image, avec sa
+À vous, seul cette fois : un Deployment est bloqué sur une image qui s'arrête
+en boucle. Revenez à la version qui marchait, puis livrez la bonne image, avec sa
 cause.
 
 ```bash

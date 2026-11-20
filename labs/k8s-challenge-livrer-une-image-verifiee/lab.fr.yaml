@@ -1,4 +1,4 @@
-title: "Ne laisser entrer que des images vérifiées, sans guidage"
+title: "Ne laisser entrer que des images vérifiées, seul et sans indice"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
 description: |
   Sans procédure, épingler un Deployment sur son digest, débarrasser un

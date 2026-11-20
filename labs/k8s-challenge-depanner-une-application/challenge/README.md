@@ -47,9 +47,9 @@ another node repair nothing.
 
 ## How you will be graded
 
-Ten states, equally weighted. The pass mark is **70 out of 100**, and two
-states are **blocking**: the causes recorded before the repairs (state 5) and
-the API server back in service (state 6). Passing the others does not make up
+Ten requirements, equally weighted. The pass mark is **70 out of 100**, and two
+requirements are **blocking**: the causes recorded before the repairs (requirement 5) and
+the API server back in service (requirement 6). Passing the others does not make up
 for missing one of them.
 
 The tests read the cluster through its API, the state of the services and the

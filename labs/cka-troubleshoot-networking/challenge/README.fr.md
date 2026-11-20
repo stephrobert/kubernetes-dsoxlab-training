@@ -53,7 +53,7 @@ suffit à les distinguer.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des six états ci-dessus. Le quatrième exige `cible` sur
+Chaque test vérifie une des six exigences ci-dessus. Le quatrième exige `cible` sur
 le worker : le déplacer sur le control plane contournerait la panne sans la
 réparer. Le sixième compare à un tirage au sort fait par la préparation : le bon
 verdict ne se devine pas.

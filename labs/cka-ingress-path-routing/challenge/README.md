@@ -1,4 +1,4 @@
-# Challenge: Route two applications on a single host, and prove each gets its own
+# Challenge: Route two applications on a single host, and check each gets its own
 
 ## The situation
 

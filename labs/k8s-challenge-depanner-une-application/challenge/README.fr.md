@@ -49,9 +49,9 @@ un autre nœud ne réparent rien.
 
 ## Comment vous serez noté
 
-Dix états, à poids égal. Le seuil de réussite est de **70 sur 100**, et deux
-états sont **bloquants** : les causes consignées avant les réparations (état
-5) et l'API server remis en service (état 6). Réussir les autres ne compense
+Dix exigences, à poids égal. Le seuil de réussite est de **70 sur 100**, et deux
+exigences sont **bloquantes** : les causes consignées avant les réparations (exigence
+5) et l'API server remis en service (exigence 6). Réussir les autres ne compense
 pas l'échec de l'un d'eux.
 
 Les tests lisent le cluster par son API, l'état des services et les fichiers

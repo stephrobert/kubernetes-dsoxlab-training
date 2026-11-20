@@ -2,17 +2,19 @@
 
 Ces tests confrontent la fiche ~/lire-un-node/fiche.txt à ce que le Node
 architecture-worker2 déclare au moment du test. Aucune valeur attendue n'est
-écrite ici : runtime, versions et capacité viennent du cluster, ce qui laisse
-le lab juste quand kind change de version ou quand l'hôte change de taille.
+écrite ici : elles viennent du cluster.
 
-Un test vérifie un seul état demandé. Les formes équivalentes sont acceptées :
-une version avec ou sans le « v », une mémoire en Ki, Mi ou Gi à 5 % près.
+Les quatre valeurs demandées sont propres au nœud : son adresse interne, la
+plage d'adresses de ses Pods et son Machine ID diffèrent de ceux des autres
+nœuds, et toutes changent quand le cluster est recréé. Le runtime, le kubelet
+et la capacité, eux, sont les mêmes sur les quatre nœuds kind et dans la
+leçon : ils se recopiaient. Une valeur qui contient aussi celle d'un autre
+nœud est refusée, pour qu'une liste recopiée en bloc ne passe pas.
 """
 
 from __future__ import annotations
 
 import json
-import re
 
 import pytest
 
@@ -20,9 +22,6 @@ from conftest import lab_host, lab_target_host, message
 
 ADMIN = "sudo kubectl --kubeconfig /etc/kind/architecture.kubeconfig"
 NOEUD = "architecture-worker2"
-UNITES = {"": 1, "k": 1000, "m": 1000**2, "g": 1000**3,
-          "ki": 1024, "mi": 1024**2, "gi": 1024**3}
-OUI = {"true", "ready", "oui", "yes", "vrai"}
 
 
 @pytest.fixture(scope="module")
@@ -68,70 +67,89 @@ def _valeur(fiche: dict[str, str], cle: str) -> str:
     return valeur
 
 
-def _octets(texte: str) -> float | None:
-    """Une quantité mémoire Kubernetes ou humaine (« 4011484Ki », « 3.8 Gi »)."""
-    m = re.fullmatch(r"\s*([0-9]+(?:[.,][0-9]+)?)\s*([kmg]i?)?b?\s*", texte.lower())
-    if not m:
-        return None
-    return float(m.group(1).replace(",", ".")) * UNITES[m.group(2) or ""]
+@pytest.fixture(scope="module")
+def autres(host) -> list[dict]:
+    """Les autres Nodes du cluster, pour refuser une valeur recopiée en bloc."""
+    res = host.run(f"{ADMIN} get nodes -o json")
+    assert res.rc == 0, message(
+        en="Cannot list the Nodes of the cluster.",
+        fr="Impossible de lister les Nodes du cluster.",
+    )
+    return [n for n in json.loads(res.stdout)["items"] if n["metadata"]["name"] != NOEUD]
+
+
+def _adresse_interne(n: dict) -> str:
+    for adresse in (n.get("status") or {}).get("addresses") or []:
+        if adresse.get("type") == "InternalIP":
+            return adresse.get("address", "")
+    return ""
+
+
+def _propre(valeur: str, attendue: str, autres_valeurs: list[str]) -> bool:
+    """La valeur contient celle du nœud, et aucune de celles des autres nœuds."""
+    mots = set(valeur.replace(",", " ").split())
+    return attendue in mots and not any(a and a in mots for a in autres_valeurs)
 
 
 # ----------------------------------------------------------------------
-# 1. Le runtime et sa version.
+# 1. L'adresse interne du nœud.
 # ----------------------------------------------------------------------
-def test_le_runtime_du_worker_est_consigne(noeud, fiche):
-    runtime = noeud["status"]["nodeInfo"]["containerRuntimeVersion"]
-    moteur, _, version = runtime.partition("://")
-    valeur = _valeur(fiche, "runtime")
-    assert moteur.lower() in valeur.lower() and version in valeur, message(
-        en=f"runtime is {valeur!r}; it must name the runtime of {NOEUD} and its version.",
-        fr=f"runtime vaut {valeur!r} ; il doit nommer le runtime d'{NOEUD} et sa version.",
+def test_l_adresse_interne_est_consignee(noeud, autres, fiche):
+    attendue = _adresse_interne(noeud)
+    valeur = _valeur(fiche, "adresse-interne")
+    assert _propre(valeur, attendue, [_adresse_interne(n) for n in autres]), message(
+        en=f"adresse-interne is {valeur!r}; expected the InternalIP of {NOEUD} alone "
+           "(Addresses section of kubectl describe node).",
+        fr=f"adresse-interne vaut {valeur!r} ; attendu l'InternalIP d'{NOEUD}, et elle seule "
+           "(section Addresses de kubectl describe node).",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. La version du kubelet.
+# 2. La plage d'adresses des Pods du nœud.
 # ----------------------------------------------------------------------
-def test_la_version_du_kubelet_est_consignee(noeud, fiche):
-    attendue = noeud["status"]["nodeInfo"]["kubeletVersion"].lstrip("v")
-    valeur = _valeur(fiche, "version-kubelet").strip().lstrip("vV")
-    assert valeur == attendue, message(
-        en=f"version-kubelet is {valeur!r}, which is not the kubelet version of {NOEUD}.",
-        fr=f"version-kubelet vaut {valeur!r}, qui n'est pas la version du kubelet d'{NOEUD}.",
+def test_la_plage_des_pods_est_consignee(noeud, autres, fiche):
+    attendue = (noeud.get("spec") or {}).get("podCIDR", "")
+    valeur = _valeur(fiche, "plage-des-pods")
+    assert _propre(valeur, attendue, [(n.get("spec") or {}).get("podCIDR", "") for n in autres]), message(
+        en=f"plage-des-pods is {valeur!r}; expected the PodCIDR of {NOEUD} alone, "
+           "written as kubectl describe node shows it.",
+        fr=f"plage-des-pods vaut {valeur!r} ; attendu le PodCIDR d'{NOEUD}, et lui seul, "
+           "écrit comme kubectl describe node l'affiche.",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. La capacité en CPU et en mémoire.
+# 3. Le Machine ID du nœud.
 # ----------------------------------------------------------------------
-def test_la_capacite_en_cpu_et_en_memoire_est_consignee(noeud, fiche):
-    capacite = noeud["status"]["capacity"]
-    cpu = _valeur(fiche, "cpu").strip()
-    assert cpu == str(capacite["cpu"]), message(
-        en=f"cpu is {cpu!r}, which is not the CPU capacity of {NOEUD}.",
-        fr=f"cpu vaut {cpu!r}, qui n'est pas la capacité en CPU d'{NOEUD}.",
-    )
-    reelle = _octets(capacite["memory"])
-    lue = _octets(_valeur(fiche, "memoire"))
-    assert reelle and lue and abs(lue - reelle) <= 0.05 * reelle, message(
-        en=f"memoire is {fiche.get('memoire')!r}, which is not the memory capacity of {NOEUD}, "
-           "as shown under Capacity.",
-        fr=f"memoire vaut {fiche.get('memoire')!r}, qui n'est pas la capacité mémoire d'{NOEUD}, "
-           "telle qu'affichée sous Capacity.",
+def test_le_machine_id_est_consigne(noeud, autres, fiche):
+    attendue = noeud["status"]["nodeInfo"].get("machineID", "")
+    valeur = _valeur(fiche, "machine-id")
+    assert _propre(valeur, attendue, [n["status"]["nodeInfo"].get("machineID", "") for n in autres]), message(
+        en=f"machine-id is {valeur!r}; expected the Machine ID of {NOEUD} alone "
+           "(System Info section of kubectl describe node).",
+        fr=f"machine-id vaut {valeur!r} ; attendu le Machine ID d'{NOEUD}, et lui seul "
+           "(section System Info de kubectl describe node).",
     )
 
 
 # ----------------------------------------------------------------------
-# 4. La condition Ready.
+# 4. L'heure à laquelle le nœud est devenu Ready.
 # ----------------------------------------------------------------------
-def test_la_condition_ready_est_consignee(noeud, fiche):
-    etat = next(
-        (c["status"] for c in noeud["status"].get("conditions") or [] if c["type"] == "Ready"),
-        "Unknown",
-    )
-    valeur = _valeur(fiche, "condition-ready").strip().lower()
-    declare_pret = valeur in OUI
-    assert declare_pret == (etat == "True") and (declare_pret or valeur in {"false", "unknown"}), message(
-        en=f"condition-ready is {valeur!r}, which is not the status of the Ready condition of {NOEUD}.",
-        fr=f"condition-ready vaut {valeur!r}, qui n'est pas le statut de la condition Ready d'{NOEUD}.",
+MOIS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+def test_l_heure_du_passage_a_ready_est_consignee(noeud, fiche):
+    ready = next(c for c in noeud["status"]["conditions"] if c["type"] == "Ready")
+    horodatage = ready["lastTransitionTime"]          # 2026-11-20T07:28:14Z
+    jour, heure = horodatage.rstrip("Z").split("T")
+    annee, mois, quantieme = jour.split("-")
+    formes_du_jour = (jour, f"{int(quantieme)} {MOIS[int(mois) - 1]} {annee}",
+                      f"{quantieme} {MOIS[int(mois) - 1]} {annee}")
+    valeur = _valeur(fiche, "ready-depuis")
+    assert heure in valeur and any(f in valeur for f in formes_du_jour), message(
+        en=f"ready-depuis is {valeur!r}; expected the LastTransitionTime of the Ready "
+           f"condition of {NOEUD}, date and time (Conditions section of kubectl describe node).",
+        fr=f"ready-depuis vaut {valeur!r} ; attendu le LastTransitionTime de la condition "
+           f"Ready d'{NOEUD}, date et heure (section Conditions de kubectl describe node).",
     )

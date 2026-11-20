@@ -26,9 +26,10 @@ You broke nothing: each lab recreates its cluster when you start it. The
 A cluster of several nodes is described in a file. The lesson gives its shape:
 a `nodes` list, with a `role` for each node.
 
-The node image does not go in the file. Give it to `kind create cluster`, with
-the cluster name and the path of the file. Careful: without a name, kind calls
-the cluster `kind`.
+The node image is given to `kind create cluster` with `--image`, or in the
+file, node by node, with `image:`. If you give both, `--image` wins. The
+command also takes the cluster name and the path of the file.
+Careful: without a name, kind calls the cluster `kind`.
 
 A cluster that answers is not necessarily ready. Count the nodes and read the
 `STATUS` and `VERSION` columns of `kubectl get nodes`. Wait until all three are

@@ -1,4 +1,4 @@
-# Faire baisser le compte d'un audit CIS, et le prouver par un second audit
+# Faire baisser le compte d'un audit CIS, et le vérifier par un second audit
 
 Lab **CKS**, domaine *Cluster Setup* (15 % de l'épreuve), compétence « Use CIS
 benchmark to review the security configuration of Kubernetes components ».

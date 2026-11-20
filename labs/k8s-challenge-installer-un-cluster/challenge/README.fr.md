@@ -41,11 +41,11 @@ qu'il faut.
 
 ## Comment vous serez noté
 
-Sept états, à poids égal. Le seuil est de **70 sur 100**, et les états **1 et
-7** sont **bloquants** : le worker joint, et l'API qui survit à la perte d'un
+Sept exigences, à poids égal. Le seuil est de **70 sur 100**, et les exigences **1 et
+7** sont **bloquantes** : le worker joint, et l'API qui survit à la perte d'un
 plan de contrôle. Réussir les autres ne compense pas l'un d'eux manqué.
 
-Pour l'état 7, le correcteur **arrête lui-même** un plan de contrôle de `ha`
+Pour l'exigence 7, le correcteur **arrête lui-même** un plan de contrôle de `ha`
 (il gèle son conteneur), interroge `/readyz` par le répartiteur, puis le
 **remet en marche**. Chaque check agit donc sur le cluster `ha` pendant une
 bonne minute. Le retour se limite à la liste des critères non satisfaits, par leur libellé, et à la note : aucun message ne dit pourquoi.

@@ -11,7 +11,7 @@ package with the modern eBPF probe. It only has its **shipped rules**, in
 In the namespace **`paiements`**, the Pod **`caisse`** processes payments. The
 security team wants to know **at once** if someone opens a shell in it. The
 namespace **`accueil`** holds the Pod **`vitrine`**, which is not concerned: a
-shell there is an ordinary gesture. Both Pods run on `k8s-cp.lab`, where Falco
+shell there is an ordinary task. Both Pods run on `k8s-cp.lab`, where Falco
 watches.
 
 You are on the control plane, with `kubectl` configured, and `sudo`.

@@ -1,46 +1,46 @@
 title: "Exposer un Deployment par un Service ClusterIP"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/#mettre-en-pratique
 description: |
-  Déployer trois replicas d'un serveur et les exposer par un Service
-  interne. Prouver depuis un client que le Service répond par son nom, et
-  qu'il répartit réellement les requêtes entre les trois Pods.
+  Déployer quatre replicas d'un serveur et les exposer par un Service
+  interne. Vérifier depuis un client que le Service répond par son nom et son
+  port, et qu'il répartit réellement les requêtes entre les Pods.
 
 criteria:
-  - id: le-deployment-demande-trois-replicas
-    label: "Le Deployment web demande trois replicas"
+  - id: le-deployment-demande-quatre-replicas
+    label: "Le Deployment contacts demande quatre replicas"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: les-trois-replicas-sont-disponibles
-    label: "Les trois replicas de web sont disponibles"
+  - id: les-quatre-replicas-sont-disponibles
+    label: "Les quatre replicas de contacts sont disponibles"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
-  - id: les-pods-portent-le-label-app-web
-    label: "Les Pods de web portent le label app=web"
+  - id: les-pods-portent-le-label-app-contacts
+    label: "Les Pods de contacts portent le label app=contacts"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: les-pods-tournent-avec-l-image-demandee
-    label: "Les Pods de web tournent avec l'image busybox:1.38.0"
+    label: "Les Pods de contacts tournent avec l'image busybox:1.38.0"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-service-est-de-type-clusterip
-    label: "Le Service web-svc est de type ClusterIP"
+    label: "Le Service contacts-svc est de type ClusterIP"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-ecoute-sur-80-vers-8080
-    label: "Le Service web-svc écoute sur 80 et vise le port 8080 des Pods"
+  - id: le-service-ecoute-sur-8081-vers-9090
+    label: "Le Service contacts-svc écoute sur 8081 et vise le port 9090 des Pods"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-selectionne-app-web
-    label: "Le selector de web-svc vaut app=web"
+  - id: le-service-selectionne-app-contacts
+    label: "Le selector de contacts-svc vaut app=contacts"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
-  - id: le-service-a-trois-endpoints-prets
-    label: "Le Service web-svc a exactement trois endpoints prêts"
+  - id: le-service-a-quatre-endpoints-prets
+    label: "Le Service contacts-svc a exactement quatre endpoints prêts"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-service-repond-sous-son-nom-depuis-le-client
-    label: "http://web-svc/ répond depuis le Pod client"
+    label: "http://contacts-svc:8081/ répond depuis le Pod client"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/coredns/

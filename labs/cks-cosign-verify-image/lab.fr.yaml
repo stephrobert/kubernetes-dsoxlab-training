@@ -1,4 +1,4 @@
-title: "Signer une image, et prouver la signature en faisant refuser une autre"
+title: "Signer une image, et vérifier la signature en faisant refuser une autre"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
 description: |
   Un registre local porte deux images, aucune signée. Signez-en une avec

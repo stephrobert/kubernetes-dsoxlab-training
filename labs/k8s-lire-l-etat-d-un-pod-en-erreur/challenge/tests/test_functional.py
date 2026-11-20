@@ -5,7 +5,7 @@ commandes tapées.
 
 Un test vérifie un seul état demandé par l'énoncé. Les trois fichiers sont
 confrontés à ce que le cluster dit lui-même : la raison d'attente du conteneur
-de api, le code de sortie réel de batch, la mémoire mesurée par l'API de
+de catalogue, le code de sortie réel d'export, la mémoire mesurée par l'API de
 métriques au moment du contrôle. Le dernier test garde la consigne « sans rien
 réparer » : un diagnostic qui commence par corriger l'image a détruit la panne
 qu'il devait lire.
@@ -20,13 +20,13 @@ import pytest
 
 from conftest import lab_host, lab_target_host, message
 
-NAMESPACE = "diagnostic"
+NAMESPACE = "incident"
 KUBECTL = "kubectl --kubeconfig /etc/kind/lab.kubeconfig"
-IMAGE_API = "nginx:1.280"
-IMAGE_BATCH = (
+IMAGE_CATALOGUE = "nginx:1.30-bookwrom"
+IMAGE_EXPORT = (
     "busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e"
 )
-RAISONS_API = ("ImagePullBackOff", "ErrImagePull")
+RAISONS_CATALOGUE = ("ImagePullBackOff", "ErrImagePull")
 CODE_DE_SORTIE = re.compile(
     r"(?i)(exit\s*code|code\s+de\s+sortie|exitcode|code\s+retour)\D{0,12}(\d+)"
 )
@@ -56,7 +56,7 @@ def _maison(host) -> str:
 
 
 def _livrable(host, nom: str) -> str:
-    chemin = f"{_maison(host)}/diagnostic/{nom}"
+    chemin = f"{_maison(host)}/incident/{nom}"
     fichier = host.file(chemin)
     assert fichier.exists and fichier.size > 0, message(
         en=f"{chemin} is missing or empty.",
@@ -81,56 +81,56 @@ def _deployment(host, nom: str) -> dict:
 
 
 # ----------------------------------------------------------------------
-# 1. api : pourquoi l'image ne se télécharge pas.
+# 1. catalogue : pourquoi l'image ne se télécharge pas.
 # ----------------------------------------------------------------------
-def test_la_cause_de_api_est_consignee(host):
-    texte = _livrable(host, "api.txt")
-    assert any(r.lower() in texte.lower() for r in RAISONS_API), message(
-        en="api.txt does not name the reason the container is waiting "
+def test_la_cause_de_catalogue_est_consignee(host):
+    texte = _livrable(host, "catalogue.txt")
+    assert any(r.lower() in texte.lower() for r in RAISONS_CATALOGUE), message(
+        en="catalogue.txt does not name the reason the container is waiting "
            "(read the State and Reason lines of kubectl describe pod).",
-        fr="api.txt ne nomme pas la raison pour laquelle le conteneur attend "
+        fr="catalogue.txt ne nomme pas la raison pour laquelle le conteneur attend "
            "(lisez les lignes State et Reason de kubectl describe pod).",
     )
-    assert IMAGE_API in texte, message(
-        en=f"api.txt does not name the faulty image {IMAGE_API}.",
-        fr=f"api.txt ne nomme pas l'image fautive {IMAGE_API}.",
+    assert IMAGE_CATALOGUE in texte, message(
+        en=f"catalogue.txt does not name the faulty image {IMAGE_CATALOGUE}.",
+        fr=f"catalogue.txt ne nomme pas l'image fautive {IMAGE_CATALOGUE}.",
     )
 
 
 # ----------------------------------------------------------------------
-# 2. batch : l'erreur écrite par l'exécution qui a planté.
+# 2. export : l'erreur écrite par l'exécution qui a planté.
 # ----------------------------------------------------------------------
-def test_l_erreur_de_batch_est_consignee(host):
-    texte = _livrable(host, "batch.txt")
-    assert "DB_HOST" in texte, message(
-        en="batch.txt does not quote the error batch wrote before stopping "
+def test_l_erreur_d_export_est_consignee(host):
+    texte = _livrable(host, "export.txt")
+    assert "5432" in texte, message(
+        en="export.txt does not quote the error export wrote before stopping "
            "(kubectl logs, with --previous once the container runs again).",
-        fr="batch.txt ne cite pas l'erreur que batch a écrite avant de s'arrêter "
+        fr="export.txt ne cite pas l'erreur qu'export a écrite avant de s'arrêter "
            "(kubectl logs, avec --previous une fois le conteneur relancé).",
     )
 
 
 # ----------------------------------------------------------------------
-# 3. batch : le code de sortie du dernier conteneur terminé.
+# 3. export : le code de sortie du dernier conteneur terminé.
 # ----------------------------------------------------------------------
-def test_le_code_de_sortie_de_batch_est_consigne(host):
-    texte = _livrable(host, "batch.txt")
+def test_le_code_de_sortie_d_export_est_consigne(host):
+    texte = _livrable(host, "export.txt")
     codes = set()
-    for pod in _pods(host, "batch"):
+    for pod in _pods(host, "export"):
         for statut in (pod.get("status") or {}).get("containerStatuses") or []:
             termine = (statut.get("lastState") or {}).get("terminated") or \
                 (statut.get("state") or {}).get("terminated")
             if termine:
                 codes.add(str(termine.get("exitCode")))
     assert codes, message(
-        en="No terminated batch container found: let the Pod crash at least once before checking.",
-        fr="Aucun conteneur terminé de batch : laissez le Pod planter au moins une fois avant de contrôler.",
+        en="No terminated export container found: let the Pod crash at least once before checking.",
+        fr="Aucun conteneur terminé d'export : laissez le Pod planter au moins une fois avant de contrôler.",
     )
     ecrits = {m.group(2) for m in CODE_DE_SORTIE.finditer(texte)}
     assert ecrits & codes, message(
-        en=f"batch.txt does not give the exit code of the last terminated container "
+        en=f"export.txt does not give the exit code of the last terminated container "
            f"(cluster says {sorted(codes)}); write it as « exit code: N », as kubectl describe shows it.",
-        fr=f"batch.txt ne donne pas le code de sortie du dernier conteneur terminé "
+        fr=f"export.txt ne donne pas le code de sortie du dernier conteneur terminé "
            f"(le cluster dit {sorted(codes)}) ; écrivez-le « code de sortie : N », comme kubectl describe l'affiche.",
     )
 
@@ -177,22 +177,22 @@ def test_le_pod_le_plus_gourmand_est_consigne(host):
 def test_rien_n_a_ete_repare(host):
     # Un contrôle qui passerait sans rien faire ne mesurerait rien : le
     # diagnostic doit exister, et les pannes doivent être restées en l'état.
-    for nom in ("api.txt", "batch.txt", "top.txt"):
+    for nom in ("catalogue.txt", "export.txt", "top.txt"):
         _livrable(host, nom)
-    api = _deployment(host, "api")
-    batch = _deployment(host, "batch")
-    image_api = api["spec"]["template"]["spec"]["containers"][0]["image"]
-    conteneur_batch = batch["spec"]["template"]["spec"]["containers"][0]
+    catalogue = _deployment(host, "catalogue")
+    export = _deployment(host, "export")
+    image_catalogue = catalogue["spec"]["template"]["spec"]["containers"][0]["image"]
+    conteneur_export = export["spec"]["template"]["spec"]["containers"][0]
     intacts = (
-        image_api == IMAGE_API
-        and conteneur_batch["image"] == IMAGE_BATCH
-        and "DB_HOST" in " ".join(conteneur_batch.get("command") or conteneur_batch.get("args") or [])
-        and api["metadata"].get("generation") == 1
-        and batch["metadata"].get("generation") == 1
+        image_catalogue == IMAGE_CATALOGUE
+        and conteneur_export["image"] == IMAGE_EXPORT
+        and "5432" in " ".join(conteneur_export.get("command") or conteneur_export.get("args") or [])
+        and catalogue["metadata"].get("generation") == 1
+        and export["metadata"].get("generation") == 1
     )
     assert intacts, message(
-        en="api or batch was modified: the lab asks for a diagnosis only. "
+        en="catalogue or export was modified: the lab asks for a diagnosis only. "
            "Run « dsoxlab reset » to get the original failures back.",
-        fr="api ou batch a été modifié : le lab ne demande qu'un diagnostic. "
+        fr="catalogue ou export a été modifié : le lab ne demande qu'un diagnostic. "
            "Lancez « dsoxlab reset » pour retrouver les pannes d'origine.",
     )

@@ -2,16 +2,13 @@
 
 Un **nœud** (Node) est une machine du cluster. Sur chaque nœud, un programme,
 le **kubelet**, fait tourner les Pods et écrit sans arrêt dans le cluster ce
-que la machine offre et comment elle va. Dans ce cours, vous apprenez à lire
-ces informations, comme dans la leçon :
+que la machine offre et comment elle va. La leçon montre comment lire ces
+informations. Dans ce cours, vous provoquez des changements sur un nœud, puis
+vous relisez ce qu'il déclare : un kubelet arrêté, un nœud qui revient, un Pod
+système supprimé.
 
-- le **battement de cœur** du kubelet, qui dit que le nœud est vivant ;
-- la **vue d'ensemble** de tous les nœuds, puis la **fiche** d'un seul ;
-- **kube-proxy**, présent sur chaque nœud ;
-- ce qui se passe quand un nœud **ne répond plus**.
-
-Vous lisez surtout le nœud `architecture-worker3`. Le challenge vous demandera
-la fiche d'un autre nœud : vous la remplirez seul, à la fin.
+Vous travaillez sur le nœud `architecture-worker3`. Le challenge vous
+demandera la fiche d'un autre nœud : vous la remplirez seul, à la fin.
 
 Page associée : [Fonctionnement des Worker Nodes Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/).
 
@@ -28,260 +25,257 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+20 novembre 2026.
 
-## 📚 Exercice 1 : voir le battement de cœur du kubelet
+## 📚 Exercice 1 : voir ce qui distingue deux nœuds
 
-Toutes les dix secondes, le kubelet renouvelle un petit objet, un **bail**
-(Lease), qui porte le nom de son nœud. Listez les baux :
+Sur ce cluster, les nœuds sont des conteneurs de la même machine : beaucoup de
+leurs valeurs sont identiques. Comparez deux workers sur trois lignes de leur
+fiche :
 
 ```bash
-kubectl get lease -n kube-node-lease
+kubectl describe node architecture-worker | grep -E 'InternalIP|PodCIDR:|Machine ID'
+kubectl describe node architecture-worker3 | grep -E 'InternalIP|PodCIDR:|Machine ID'
 ```
 
 ```text
-NAME                         HOLDER                       AGE
-architecture-control-plane   architecture-control-plane   10m
-architecture-worker          architecture-worker          10m
-architecture-worker2         architecture-worker2         10m
-architecture-worker3         architecture-worker3         10m
+  InternalIP:  172.18.0.7
+  Machine ID:                 f524842260574d1fbf3b8ff528d7412d
+PodCIDR:                      10.244.1.0/24
+  InternalIP:  172.18.0.4
+  Machine ID:                 6313db26e58b44398528deda41404384
+PodCIDR:                      10.244.4.0/24
 ```
 
-Un bail par nœud. Lisez l'heure de renouvellement de celui
-d'`architecture-worker3`, deux fois, à dix secondes d'écart :
+Ces trois valeurs sont propres à chaque nœud :
+
+- `InternalIP` est l'adresse du nœud sur le réseau des machines ;
+- `PodCIDR` est la plage d'adresses où les Pods de ce nœud reçoivent la leur :
+  un Pod d'`architecture-worker3` aura une adresse en `10.244.4.x` ;
+- `Machine ID` est l'identifiant de la machine, tiré au hasard à sa création.
+
+Elles changent aussi quand le cluster est recréé : chez vous, elles seront
+différentes. D'autres lignes, au contraire, sont les mêmes partout :
 
 ```bash
-kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
-sleep 10
-kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+kubectl describe node architecture-worker3 | grep -E 'Kubelet Version|Container Runtime Version|^  memory'
 ```
 
 ```text
-2026-11-19T11:12:13.857703Z
-2026-11-19T11:12:23.871343Z
-```
-
-L'heure a avancé de dix secondes : le kubelet a renouvelé son bail. Tant qu'il
-le fait, le cluster sait que le nœud est vivant.
-
-## 📚 Exercice 2 : voir tous les nœuds d'un coup
-
-```bash
-kubectl get nodes -o wide
-```
-
-```text
-NAME                         STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                 CONTAINER-RUNTIME
-architecture-control-plane   Ready    control-plane   10m   v1.37.0   172.18.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker          Ready    <none>          10m   v1.37.0   172.18.0.5    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker2         Ready    <none>          10m   v1.37.0   172.18.0.7    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker3         Ready    <none>          10m   v1.37.0   172.18.0.6    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-```
-
-Trois colonnes répondent aux questions de la leçon :
-
-- `STATUS` : `Ready` veut dire que le kubelet signale un nœud prêt ;
-- `VERSION` : la version du kubelet, ici `v1.37.0` ;
-- `CONTAINER-RUNTIME` : le programme qui lance vraiment les conteneurs, et sa
-  version, ici `containerd://2.3.4`.
-
-## 📚 Exercice 3 : n'afficher que les colonnes utiles
-
-L'option `-o custom-columns` affiche seulement les champs que vous choisissez,
-sous la forme `TITRE:chemin.du.champ`. Affichez la **capacité** de chaque
-nœud :
-
-```bash
-kubectl get nodes -o custom-columns=NOM:.metadata.name,CPU:.status.capacity.cpu,MEMOIRE:.status.capacity.memory,PODS:.status.capacity.pods
-```
-
-```text
-NOM                          CPU   MEMOIRE     PODS
-architecture-control-plane   2     4009780Ki   110
-architecture-worker          2     4009780Ki   110
-architecture-worker2         2     4009780Ki   110
-architecture-worker3         2     4009780Ki   110
-```
-
-Les quatre nœuds ont la même capacité : ce sont des conteneurs qui partagent
-la même machine. Sur un vrai cluster, chaque nœud a la sienne. `PODS` vaut
-110, le nombre maximal de Pods par nœud.
-
-## 📚 Exercice 4 : lire la fiche d'un nœud
-
-`kubectl describe node` affiche tout ce que le cluster sait d'un nœud. La
-sortie est longue : `sed` n'en garde qu'une partie à la fois. Commencez par
-les **conditions** :
-
-```bash
-kubectl describe node architecture-worker3 | sed -n '/^Conditions:/,/^Addresses:/p'
-```
-
-```text
-Conditions:
-  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
-  ----             ------  -----------------                 ------------------                ------                       -------
-  MemoryPressure   False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasSufficientMemory   kubelet has sufficient memory available
-  DiskPressure     False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasNoDiskPressure     kubelet has no disk pressure
-  PIDPressure      False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasSufficientPID      kubelet has sufficient PID available
-  Ready            True    Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:16 +0000   KubeletReady                 kubelet is posting ready status
-Addresses:
-```
-
-Les trois premières conditions signalent un problème quand elles valent
-`True` : manque de mémoire, de disque ou de processus. `Ready`, elle, doit
-valoir `True`. Un nœud en bonne santé affiche donc `False`, `False`,
-`False`, `True`.
-
-Lisez ensuite ce que la machine possède et ce qui reste pour les Pods :
-
-```bash
-kubectl describe node architecture-worker3 | sed -n '/^Capacity:/,/^System Info:/p'
-```
-
-```text
-Capacity:
-  cpu:                2
-  ephemeral-storage:  31491104768
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             4009780Ki
-  pods:               110
-Allocatable:
-  cpu:                2
-  ephemeral-storage:  31491104768
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             4009780Ki
-  pods:               110
-System Info:
-```
-
-`Capacity` est ce que la machine possède. `Allocatable` est ce qui reste aux
-Pods, une fois la part du système retirée. Ici les deux sont égaux, parce que
-kind ne réserve rien pour le système.
-
-Enfin, les versions :
-
-```bash
-kubectl describe node architecture-worker3 | grep -E 'Container Runtime Version|Kubelet Version'
-```
-
-```text
+  memory:             4009788Ki
+  memory:             4009788Ki
   Container Runtime Version:  containerd://2.3.4
   Kubelet Version:            v1.37.0
+  memory             50Mi (1%)  0 (0%)
 ```
 
-Ce sont les mêmes valeurs que les colonnes de l'exercice 2, lues cette fois
-dans la fiche du nœud.
+Les deux premières lignes `memory` viennent de `Capacity` et `Allocatable`, la
+dernière de `Allocated resources` : la mémoire déjà réservée par les Pods du
+nœud. Version du kubelet, runtime et mémoire sont les mêmes sur les quatre
+nœuds de ce cluster.
 
-## 📚 Exercice 5 : voir kube-proxy sur chaque nœud
+## 📚 Exercice 2 : placer un Pod témoin et lire ses tolérances
 
-**kube-proxy** prépare, sur chaque nœud, les règles réseau qui font marcher
-les Services. Son mode de fonctionnement se lit dans sa configuration :
+Créez un namespace d'essai et un Deployment de quatre Pods, pour en avoir au
+moins un sur `architecture-worker3` :
 
 ```bash
-kubectl -n kube-system get configmap kube-proxy -o yaml | grep 'mode:'
+kubectl create namespace essai-noeud
+kubectl create deployment temoin \
+  --image=nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
+  --replicas=4 -n essai-noeud
+kubectl wait --for=condition=Available deployment/temoin -n essai-noeud --timeout=180s
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
 ```
 
 ```text
-    mode: iptables
+namespace/essai-noeud created
+deployment.apps/temoin created
+deployment.apps/temoin condition met
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          1s    10.244.4.12   architecture-worker3   <none>           <none>
 ```
 
-Il tourne sous la forme d'un **DaemonSet**, un objet qui place un Pod sur
-chaque nœud :
+L'option `--field-selector spec.nodeName=...` ne garde que les Pods de ce
+nœud. Son adresse, `10.244.4.12`, est bien dans le `PodCIDR` du nœud.
+Kubernetes a ajouté à ce Pod deux **tolérances**, des règles qui disent combien
+de temps il reste sur un nœud en difficulté :
 
 ```bash
-kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide
+POD=$(kubectl get pods -n essai-noeud --field-selector spec.nodeName=architecture-worker3 -o jsonpath='{.items[0].metadata.name}')
+kubectl describe pod $POD -n essai-noeud | sed -n '/^Tolerations:/,/^Events:/p'
 ```
 
 ```text
-NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                         NOMINATED NODE   READINESS GATES
-kube-proxy-6zbcq   1/1     Running   0          10m   172.18.0.7   architecture-worker2         <none>           <none>
-kube-proxy-gsm7l   1/1     Running   0          10m   172.18.0.6   architecture-worker3         <none>           <none>
-kube-proxy-hskwd   1/1     Running   0          10m   172.18.0.2   architecture-control-plane   <none>           <none>
-kube-proxy-mscg7   1/1     Running   0          10m   172.18.0.5   architecture-worker          <none>           <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
 ```
 
-Regardez la colonne `NODE` : exactement un Pod `kube-proxy` par nœud, control
-plane compris.
+Si le nœud n'est plus prêt (`not-ready`) ou plus joignable (`unreachable`), ce
+Pod y reste encore 300 secondes, puis il en est retiré. Gardez ce chiffre pour
+l'exercice suivant.
 
-## 📚 Exercice 6 : arrêter un nœud, puis le relancer
+## 📚 Exercice 3 : arrêter le kubelet d'un nœud
 
-Sur kind, un nœud est un conteneur Docker. Arrêtez celui
-d'`architecture-worker3` (rien n'est détruit), puis regardez les nœuds tout
-de suite :
+Toutes les dix secondes environ, le kubelet renouvelle un **bail** (Lease) au
+nom de son nœud : c'est son battement de cœur. Lisez l'heure du dernier
+renouvellement, puis arrêtez le kubelet d'`architecture-worker3`. Sur kind, le
+nœud est un conteneur Docker : `docker exec` lance une commande dedans.
 
 ```bash
-docker stop architecture-worker3
-kubectl get nodes
+kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+docker exec architecture-worker3 systemctl stop kubelet
+docker exec architecture-worker3 systemctl is-active kubelet
 ```
 
 ```text
-architecture-worker3
-NAME                         STATUS   ROLES           AGE   VERSION
-architecture-control-plane   Ready    control-plane   10m   v1.37.0
-architecture-worker          Ready    <none>          10m   v1.37.0
-architecture-worker2         Ready    <none>          10m   v1.37.0
-architecture-worker3         Ready    <none>          10m   v1.37.0
+2026-11-20T07:41:39.949102Z
+inactive
 ```
 
-Le nœud est encore `Ready` : le cluster ne sait pas encore qu'il est arrêté.
-Attendez une minute, puis regardez de nouveau :
+Attendez une quinzaine de secondes, puis relisez le bail :
+
+```bash
+kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+date -u +%H:%M:%S
+```
+
+```text
+2026-11-20T07:41:39.949102Z
+07:41:56
+```
+
+L'heure du bail n'a pas bougé, alors que l'horloge a avancé de 17 secondes :
+plus personne ne le renouvelle. Attendez encore une minute, puis regardez les
+nœuds et la fiche d'`architecture-worker3` :
 
 ```bash
 sleep 60
 kubectl get nodes
-```
-
-```text
-NAME                         STATUS     ROLES           AGE   VERSION
-architecture-control-plane   Ready      control-plane   11m   v1.37.0
-architecture-worker          Ready      <none>          11m   v1.37.0
-architecture-worker2         Ready      <none>          11m   v1.37.0
-architecture-worker3         NotReady   <none>          11m   v1.37.0
-```
-
-`NotReady` : le kubelet ne renouvelle plus son bail, et au bout d'environ
-50 secondes le cluster le considère perdu. Sa fiche le dit :
-
-```bash
 kubectl describe node architecture-worker3 | grep -E '^Taints|unreachable|^  Ready'
 ```
 
 ```text
+NAME                         STATUS     ROLES           AGE   VERSION
+architecture-control-plane   Ready      control-plane   14m   v1.37.0
+architecture-worker          Ready      <none>          14m   v1.37.0
+architecture-worker2         Ready      <none>          14m   v1.37.0
+architecture-worker3         NotReady   <none>          14m   v1.37.0
 Taints:             node.kubernetes.io/unreachable:NoExecute
                     node.kubernetes.io/unreachable:NoSchedule
-  Ready            Unknown   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:13:14 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+  Ready            Unknown   Fri, 20 Nov 2026 07:41:09 +0000   Fri, 20 Nov 2026 07:42:33 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
 ```
 
-La condition `Ready` vaut `Unknown`, avec le message `Kubelet stopped posting
-node status`. Le cluster a aussi posé deux **marques** (taints)
-`unreachable` : plus aucun nouveau Pod n'ira sur ce nœud. Relancez-le et
-attendez qu'il revienne :
+Sur cette machine, le nœud est passé `NotReady` au bout d'une minute environ.
+La condition `Ready` vaut `Unknown` : le cluster ne sait pas si le nœud est en
+panne, il sait seulement que le kubelet ne donne plus de nouvelles. Il a posé
+deux **marques** (taints) `unreachable` :
+
+- `NoSchedule` : aucun nouveau Pod ne sera placé sur ce nœud ;
+- `NoExecute` : les Pods déjà présents en seront retirés, après le délai de
+  leur tolérance, soit 300 secondes pour votre Pod témoin.
+
+Regardez ce Pod :
 
 ```bash
-docker start architecture-worker3
-kubectl wait --for=condition=Ready node/architecture-worker3 --timeout=120s
-kubectl get nodes
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
 ```
 
 ```text
-architecture-worker3
-node/architecture-worker3 condition met
-NAME                         STATUS   ROLES           AGE   VERSION
-architecture-control-plane   Ready    control-plane   11m   v1.37.0
-architecture-worker          Ready    <none>          11m   v1.37.0
-architecture-worker2         Ready    <none>          11m   v1.37.0
-architecture-worker3         Ready    <none>          11m   v1.37.0
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          57s   10.244.4.12   architecture-worker3   <none>           <none>
 ```
 
-Le nœud est de nouveau `Ready`.
+Il affiche encore `Running`. C'est la dernière chose que le kubelet a dite au
+cluster, avant de s'arrêter : le cluster n'en sait pas plus. Les 300 secondes
+de sa tolérance ne sont pas écoulées.
+
+## 📚 Exercice 4 : relancer le kubelet
+
+Relancez le kubelet, attendez que le nœud soit prêt, puis relisez ses marques
+deux fois, à dix secondes d'écart :
+
+```bash
+docker exec architecture-worker3 systemctl start kubelet
+kubectl wait --for=condition=Ready node/architecture-worker3 --timeout=120s
+kubectl describe node architecture-worker3 | grep -E '^Taints'
+sleep 10
+kubectl describe node architecture-worker3 | grep -E '^Taints'
+```
+
+```text
+node/architecture-worker3 condition met
+Taints:             node.kubernetes.io/unreachable:NoExecute
+Taints:             <none>
+```
+
+Le nœud est `Ready` avant que la marque `NoExecute` soit retirée : quelques
+secondes séparent les deux. Votre Pod témoin, lui, n'a pas bougé :
+
+```bash
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
+```
+
+```text
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          67s   10.244.4.12   architecture-worker3   <none>           <none>
+```
+
+Même nom, aucun redémarrage : le nœud est revenu avant la fin des 300
+secondes, le Pod n'a pas été retiré.
+
+## 📚 Exercice 5 : supprimer le kube-proxy d'un nœud
+
+**kube-proxy** prépare, sur chaque nœud, les règles réseau qui font marcher
+les Services. Il tourne sous la forme d'un **DaemonSet**, un objet qui place
+un Pod sur chaque nœud. Supprimez celui d'`architecture-worker3` :
+
+```bash
+kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide --field-selector spec.nodeName=architecture-worker3
+PROXY=$(kubectl get pods -n kube-system -l k8s-app=kube-proxy --field-selector spec.nodeName=architecture-worker3 -o jsonpath='{.items[0].metadata.name}')
+kubectl delete pod $PROXY -n kube-system
+```
+
+```text
+NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                   NOMINATED NODE   READINESS GATES
+kube-proxy-p9gxx   1/1     Running   0          88s   172.18.0.4   architecture-worker3   <none>           <none>
+pod "kube-proxy-p9gxx" deleted from kube-system namespace
+```
+
+Attendez cinq secondes et regardez de nouveau :
+
+```bash
+kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide --field-selector spec.nodeName=architecture-worker3
+kubectl get daemonset kube-proxy -n kube-system
+```
+
+```text
+NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                   NOMINATED NODE   READINESS GATES
+kube-proxy-jhhlg   1/1     Running   0          6s    172.18.0.4   architecture-worker3   <none>           <none>
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-proxy   4         4         4       4            4           kubernetes.io/os=linux   15m
+```
+
+Un Pod neuf, `kube-proxy-jhhlg`, tourne déjà sur le même nœud. Le DaemonSet
+veut un Pod par nœud : `DESIRED` vaut `4`, comme le nombre de nœuds. L'adresse
+du Pod, `172.18.0.4`, est celle du nœud lui-même : kube-proxy utilise le
+réseau de la machine, pas une adresse du `PodCIDR`.
 
 ## 🧹 Nettoyage
 
-Les exercices n'ont rien créé : vous avez seulement lu, puis arrêté et relancé
-un nœud. Quittez la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
+Supprimez d'abord ce que vous avez créé pendant les exercices : le namespace
+d'essai, et le Pod témoin avec lui.
+
+```bash
+kubectl delete namespace essai-noeud
+```
+
+```text
+namespace "essai-noeud" deleted
+```
+
+Quittez ensuite la machine et remettez le lab à zéro. `dsoxlab reset` rejoue
 le nettoyage puis la préparation du lab : vous retrouvez exactement l'état de
 départ du challenge. Il vous demande de confirmer : répondez `y`.
 

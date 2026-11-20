@@ -1,5 +1,5 @@
 id: cks-cosign-verify-image
-title: "Sign an image, and prove the signature by having another one refused"
+title: "Sign an image, and check the signature by having another one refused"
 level: supply-chain-security
 section: cks
 difficulty: advanced

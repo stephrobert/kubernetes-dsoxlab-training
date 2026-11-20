@@ -5,7 +5,7 @@ Challenge of the **Make reliable and operate** module of the Kubernetes course
 lesson: an application to run as three copies spread across the nodes, with a
 disruption budget and probes, that must keep its minimum while the check
 itself evacuates the worker, then a routine report checked against the real
-state of the cluster. Six states, threshold 70, two blocking.
+state of the cluster. Six requirements, threshold 70, two blocking.
 
 | | |
 |---|---|

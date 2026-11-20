@@ -1,4 +1,4 @@
-# Sign an image, and prove the signature by having another one refused
+# Sign an image, and check the signature by having another one refused
 
 **CKS** lab, *Supply Chain Security* domain (20 % of the exam), competency
 "Verify platform binaries before deploying" applied to images.

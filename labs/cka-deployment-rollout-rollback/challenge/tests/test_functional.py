@@ -5,7 +5,7 @@ fichier YAML du poste.
 
 Un test vérifie un seul état demandé par l'énoncé. Les trois premiers lisent
 le Deployment lui-même : l'image qu'il demande, les replicas réellement
-disponibles et à jour, et l'absence de Pod resté sans image. Les quatre
+disponibles et à jour, et l'absence de Pod en panne. Les quatre
 suivants lisent les ReplicaSets du Deployment et leurs numéros de révision :
 l'historique conservé, la révision de la version d'avant, la version fautive
 gardée à zéro, et la révision finale. Le dernier lit la cause de changement
@@ -14,8 +14,8 @@ LÀ OÙ L'ÉNONCÉ LA DEMANDE, sur le Deployment.
 Trois choix de mesure, qui valent d'être dits.
 
 1. Les ReplicaSets sont sélectionnés par leur PROPRIÉTAIRE
-   (``ownerReferences`` qui nomme le Deployment webapp), pas par le label
-   ``app=webapp``. Un second Deployment qui porterait le même label
+   (``ownerReferences`` qui nomme le Deployment catalogue), pas par le label
+   ``app=catalogue``. Un second Deployment qui porterait le même label
    injecterait sinon ses propres ReplicaSets dans la mesure. Les Pods sont
    filtrés de la même façon, par le ReplicaSet qui les possède.
 
@@ -51,11 +51,11 @@ import pytest
 from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "lab"
-DEPLOYMENT = "webapp"
+DEPLOYMENT = "catalogue"
 CONTENEUR = "nginx"
-IMAGE_AVANT = "nginx:1.30.5"
-IMAGE_FAUTIVE = "nginx:1.30.66"
-IMAGE = "nginx:1.30.6"
+IMAGE_AVANT = "nginx:1.30.5-alpine"
+IMAGE_FAUTIVE = "busybox:1.38.0"
+IMAGE = "nginx:1.30.6-alpine"
 REPLICAS = 3
 
 #: Les révisions attendues à la fin, telles que l'énoncé les demande.
@@ -121,10 +121,10 @@ def _possede_par_le_deploiement(objet: dict, noms: set[str], kind: str) -> bool:
 
 
 def _replicasets_bruts(host) -> list[dict]:
-    """Les ReplicaSets dont le propriétaire est LE Deployment webapp.
+    """Les ReplicaSets dont le propriétaire est LE Deployment catalogue.
 
     Le label ne suffit pas : il se pose sur n'importe quel objet, donc un
-    Deployment voisin qui porterait ``app: webapp`` fournirait des
+    Deployment voisin qui porterait ``app: catalogue`` fournirait des
     ReplicaSets à la mesure. La propriété, elle, est posée par le
     contrôleur.
     """
@@ -135,7 +135,7 @@ def _replicasets_bruts(host) -> list[dict]:
 
 
 def _replicasets(host) -> dict[str, dict]:
-    """Les ReplicaSets de webapp, par image de leur template."""
+    """Les ReplicaSets de catalogue, par image de leur template."""
     par_image: dict[str, dict] = {}
     for rs in _replicasets_bruts(host):
         image = _image(rs["spec"]["template"]["spec"]["containers"][0].get("image", ""))
@@ -151,7 +151,7 @@ def _replicasets(host) -> dict[str, dict]:
 
 
 def _pods(host) -> list[dict]:
-    """Les Pods possédés par les ReplicaSets de webapp, et eux seuls."""
+    """Les Pods possédés par les ReplicaSets de catalogue, et eux seuls."""
     noms = {rs["metadata"]["name"] for rs in _replicasets_bruts(host)}
     if not noms:
         return []
@@ -163,12 +163,12 @@ def _pods(host) -> list[dict]:
 
 def _absent(image: str, role_en: str, role_fr: str) -> str:
     return message(
-        en=f"No ReplicaSet of webapp carries the image {image!r} ({role_en}). "
+        en=f"No ReplicaSet of catalogue carries the image {image!r} ({role_en}). "
         "kubectl get rs -n lab shows the ReplicaSets that remain, and "
-        "kubectl rollout history deployment/webapp -n lab their revisions.",
-        fr=f"Aucun ReplicaSet de webapp ne porte l'image {image!r} ({role_fr}). "
+        "kubectl rollout history deployment/catalogue -n lab their revisions.",
+        fr=f"Aucun ReplicaSet de catalogue ne porte l'image {image!r} ({role_fr}). "
         "kubectl get rs -n lab montre les ReplicaSets qui restent, et "
-        "kubectl rollout history deployment/webapp -n lab leurs révisions.",
+        "kubectl rollout history deployment/catalogue -n lab leurs révisions.",
     )
 
 
@@ -212,10 +212,10 @@ def test_le_deploiement_demande_la_bonne_image(host):
         "quitté cette révision." if image == IMAGE_FAUTIVE else ""
     )
     assert image == IMAGE, message(
-        en=f"webapp asks for image {image!r} instead of {IMAGE!r}.{detail_en} "
+        en=f"catalogue asks for image {image!r} instead of {IMAGE!r}.{detail_en} "
         f"The container of the template is named {CONTENEUR!r}; a digest "
         "appended to the expected tag is accepted.",
-        fr=f"webapp demande l'image {image!r} au lieu de {IMAGE!r}.{detail_fr} "
+        fr=f"catalogue demande l'image {image!r} au lieu de {IMAGE!r}.{detail_fr} "
         f"Le conteneur du template s'appelle {CONTENEUR!r} ; un digest "
         "ajouté au tag attendu est accepté.",
     )
@@ -228,30 +228,33 @@ def test_les_trois_replicas_sont_disponibles_et_a_jour(deploiement_stabilise):
     assert disponibles == REPLICAS and a_jour == REPLICAS, message(
         en=f"{disponibles} replica(s) available and {a_jour} up to date, out of "
         f"{REPLICAS}: the rollout is not finished. kubectl rollout status "
-        "deployment/webapp -n lab waits for it, and kubectl describe "
-        "deployment webapp -n lab says what blocks it.",
+        "deployment/catalogue -n lab waits for it, and kubectl describe "
+        "deployment catalogue -n lab says what blocks it.",
         fr=f"{disponibles} replica(s) disponible(s) et {a_jour} à jour, sur "
         f"{REPLICAS} : le déploiement n'est pas terminé. kubectl rollout status "
-        "deployment/webapp -n lab l'attend, et kubectl describe deployment "
-        "webapp -n lab dit ce qui le bloque.",
+        "deployment/catalogue -n lab l'attend, et kubectl describe deployment "
+        "catalogue -n lab dit ce qui le bloque.",
     )
 
 
-def test_aucun_pod_n_est_en_erreur_d_image(host):
-    en_erreur = [
+def test_aucun_pod_n_est_en_panne(host):
+    """Ni erreur d'image, ni conteneur qui s'arrête en boucle : la panne posée
+    par le setup est un conteneur qui démarre puis s'arrête, mais un tag mal
+    recopié pendant la réparation en ferait une erreur d'image."""
+    en_panne = [
         pod["metadata"]["name"] for pod in _pods(host)
         for etat in pod["status"].get("containerStatuses") or []
-        if (etat.get("state", {}).get("waiting") or {})
-        .get("reason", "")
-        .startswith(("ImagePull", "ErrImage", "InvalidImageName"))
+        if (etat.get("state", {}).get("waiting") or {}).get("reason", "").startswith(
+            ("ImagePull", "ErrImage", "InvalidImageName", "CrashLoopBackOff"))
+        or etat.get("state", {}).get("terminated")
     ]
-    assert not en_erreur, message(
-        en=f"These Pods of webapp still have no image: {en_erreur}. A Pod that "
-        "cannot pull its image belongs to a revision that asks for an image "
-        "that does not exist; kubectl describe pod names it.",
-        fr=f"Ces Pods de webapp n'ont toujours pas d'image : {en_erreur}. Un Pod "
-        "qui n'arrive pas à tirer son image appartient à une révision qui "
-        "demande une image inexistante ; kubectl describe pod la nomme.",
+    assert not en_panne, message(
+        en=f"These Pods of catalogue are failing: {en_panne}. They belong to a revision "
+        "whose container cannot start or does not stay up; kubectl describe pod "
+        "says which image they run and why they stop.",
+        fr=f"Ces Pods de catalogue sont en panne : {en_panne}. Ils appartiennent à une "
+        "révision dont le conteneur ne démarre pas ou ne tient pas ; kubectl "
+        "describe pod dit quelle image ils lancent et pourquoi ils s'arrêtent.",
     )
 
 
@@ -273,27 +276,27 @@ def test_l_historique_du_deploiement_est_intact(host):
     """
     rs = _replicasets(host)
     assert IMAGE in rs, message(
-        en=f"No ReplicaSet of webapp carries {IMAGE!r}, the image to ship: the "
+        en=f"No ReplicaSet of catalogue carries {IMAGE!r}, the image to ship: the "
         "final delivery has not happened yet. A kept history is judged on "
         "what the rollback and the delivery LEFT behind, so there is nothing "
         "to judge before they are done.",
-        fr=f"Aucun ReplicaSet de webapp ne porte {IMAGE!r}, l'image à livrer : la "
+        fr=f"Aucun ReplicaSet de catalogue ne porte {IMAGE!r}, l'image à livrer : la "
         "livraison finale n'a pas encore eu lieu. Un historique conservé se "
         "juge sur ce que le retour arrière et la livraison ont LAISSÉ "
         "derrière eux, il n'y a donc rien à juger avant qu'ils soient faits.",
     )
     assert IMAGE_AVANT in rs, message(
-        en=f"No ReplicaSet of webapp carries {IMAGE_AVANT!r}, the version that "
+        en=f"No ReplicaSet of catalogue carries {IMAGE_AVANT!r}, the version that "
         "worked. A Deployment deleted and recreated starts a new history, "
         "and that history no longer holds a previous revision.",
-        fr=f"Aucun ReplicaSet de webapp ne porte {IMAGE_AVANT!r}, la version qui "
+        fr=f"Aucun ReplicaSet de catalogue ne porte {IMAGE_AVANT!r}, la version qui "
         "marchait. Un Deployment supprimé puis recréé repart sur un nouvel "
         "historique, et cet historique ne porte plus de révision précédente.",
     )
     assert IMAGE_FAUTIVE in rs, message(
-        en=f"No ReplicaSet of webapp carries {IMAGE_FAUTIVE!r}, the faulty "
+        en=f"No ReplicaSet of catalogue carries {IMAGE_FAUTIVE!r}, the faulty "
         "update. A history is kept: a revision is scaled down, never deleted.",
-        fr=f"Aucun ReplicaSet de webapp ne porte {IMAGE_FAUTIVE!r}, la mise à "
+        fr=f"Aucun ReplicaSet de catalogue ne porte {IMAGE_FAUTIVE!r}, la mise à "
         "jour fautive. Un historique se garde : une révision se réduit, elle "
         "ne se supprime pas.",
     )
@@ -306,20 +309,20 @@ def test_le_retour_arriere_a_ete_fait_avant_la_livraison(host):
     fautive = rs.get(IMAGE_FAUTIVE)
     assert fautive is not None, _absent(IMAGE_FAUTIVE, "the faulty update", "la mise à jour fautive")
     assert fautive["revision"] == REV_FAUTIVE, message(
-        en=f"The faulty update should be revision {REV_FAUTIVE} of webapp, it is "
+        en=f"The faulty update should be revision {REV_FAUTIVE} of catalogue, it is "
         f"revision {fautive['revision']}. That revision is the one of this "
         "morning: it is not meant to move again.",
-        fr=f"La mise à jour fautive doit être la révision {REV_FAUTIVE} de webapp, "
+        fr=f"La mise à jour fautive doit être la révision {REV_FAUTIVE} de catalogue, "
         f"elle est la révision {fautive['revision']}. Cette révision est celle "
         "de ce matin : elle n'a pas à bouger de nouveau.",
     )
     assert avant["revision"] == REV_AVANT, message(
-        en=f"The version that worked is at revision {avant['revision']} of webapp, "
+        en=f"The version that worked is at revision {avant['revision']} of catalogue, "
         f"expected {REV_AVANT}: it was not put back in service between the "
         "faulty update and the final delivery. Going back to the previous "
         "revision reuses its ReplicaSet and gives it a new number.",
         fr=f"La version qui marchait est à la révision {avant['revision']} de "
-        f"webapp, attendu {REV_AVANT} : elle n'a pas été remise en service "
+        f"catalogue, attendu {REV_AVANT} : elle n'a pas été remise en service "
         "entre la mise à jour fautive et la livraison finale. Revenir à la "
         "révision précédente réutilise son ReplicaSet et lui donne un "
         "nouveau numéro.",
@@ -358,11 +361,11 @@ def test_la_revision_finale_est_celle_de_la_bonne_image(host):
     finale = _replicasets(host).get(IMAGE)
     assert finale is not None, _absent(IMAGE, "the image to ship", "l'image à livrer")
     assert finale["revision"] == REV_FINALE, message(
-        en=f"The ReplicaSet of {IMAGE!r} is revision {finale['revision']} of webapp, "
+        en=f"The ReplicaSet of {IMAGE!r} is revision {finale['revision']} of catalogue, "
         f"expected {REV_FINALE}: the right image was not shipped last. Four "
         "revisions are expected in the end, and this one closes them.",
         fr=f"Le ReplicaSet de {IMAGE!r} est la révision {finale['revision']} de "
-        f"webapp, attendu {REV_FINALE} : la bonne image n'a pas été livrée en "
+        f"catalogue, attendu {REV_FINALE} : la bonne image n'a pas été livrée en "
         "dernier. Quatre révisions sont attendues à la fin, et celle-ci les "
         "ferme.",
     )
@@ -376,11 +379,11 @@ def test_la_revision_finale_est_celle_de_la_bonne_image(host):
     )
     voulus = _deploiement(host)["spec"].get("replicas")
     assert voulus == REPLICAS, message(
-        en=f"webapp asks for {voulus} replica(s) instead of {REPLICAS}. "
+        en=f"catalogue asks for {voulus} replica(s) instead of {REPLICAS}. "
         "The number of replicas is not changed by an image update nor by a "
         "rollback: it is the one the Deployment carried before, and it must "
         "stay after the delivery.",
-        fr=f"webapp demande {voulus} replica(s) au lieu de {REPLICAS}. "
+        fr=f"catalogue demande {voulus} replica(s) au lieu de {REPLICAS}. "
         "Le nombre de replicas ne change ni lors d'une mise à jour d'image ni "
         "lors d'un retour arrière : c'est celui que le Deployment portait "
         "avant, et il doit le rester après la livraison.",
@@ -394,11 +397,11 @@ def test_le_deploiement_porte_la_cause_de_changement(host):
     annotations = _deploiement(host)["metadata"].get("annotations") or {}
     cause = annotations.get(CAUSE, "")
     assert cause.strip(), message(
-        en=f"The Deployment webapp carries no {CAUSE} annotation, or it is empty. "
+        en=f"The Deployment catalogue carries no {CAUSE} annotation, or it is empty. "
         "The annotation is read on the Deployment, which is where it is asked "
         "for; kubectl annotate sets it, and kubectl rollout history shows it "
         "under CHANGE-CAUSE.",
-        fr=f"Le Deployment webapp ne porte pas d'annotation {CAUSE}, ou elle est "
+        fr=f"Le Deployment catalogue ne porte pas d'annotation {CAUSE}, ou elle est "
         "vide. L'annotation est lue sur le Deployment, là où elle est "
         "demandée ; kubectl annotate la pose, et kubectl rollout history "
         "l'affiche dans la colonne CHANGE-CAUSE.",

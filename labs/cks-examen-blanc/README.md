@@ -5,8 +5,8 @@ page. Sixteen tasks in the exam format, spread like the six domains of the
 official CKS v1.37 curriculum, graded on the cluster's final state, no hint.
 The threshold is the real exam's, 67%.
 
-Twenty states at 5 points: dsoxlab grades the share of passed tests, so a 10%
-task carries two states.
+Twenty requirements at 5 points: dsoxlab grades the share of passed tests, so a 10%
+task carries two requirements.
 
 | Domain | Weight | Tasks |
 |---|---|---|

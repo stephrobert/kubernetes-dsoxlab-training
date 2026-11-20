@@ -16,11 +16,10 @@ cat > "${LAB_HOME}/lire-un-node/fiche.txt" <<'FICHE'
 # Card of the Node architecture-worker2, as the Node declares it.
 # Les lignes qui commencent par # sont ignorées. Lines starting with # are ignored.
 
-runtime:
-version-kubelet:
-cpu:
-memoire:
-condition-ready:
+adresse-interne:
+plage-des-pods:
+machine-id:
+ready-depuis:
 FICHE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/lire-un-node/fiche.txt"
 echo "Situation posée : fiche d'architecture-worker2 à compléter."

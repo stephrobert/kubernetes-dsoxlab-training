@@ -1,4 +1,4 @@
-# Challenge : Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, sans guidage
+# Challenge : Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, seul et sans indice
 
 ## La situation
 
@@ -47,7 +47,7 @@ ce qu'il faut. N'installez et ne désinstallez rien.
 
 ## Comment vous serez évalué
 
-Quatre états, à poids égal. Le seuil est de **70 sur 100** : trois états sur
+Quatre exigences, à poids égal. Le seuil est de **70 sur 100** : trois exigences sur
 quatre. Le retour se limite à la liste des critères non satisfaits, par leur
 libellé, et à la note : aucun message ne dit pourquoi.
 

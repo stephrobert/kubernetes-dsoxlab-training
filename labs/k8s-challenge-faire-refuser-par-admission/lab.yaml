@@ -17,7 +17,7 @@
 # Dix états, à poids égal. Les états 4 et 10 bloquent : ce sont les deux
 # refus prouvés par de vraies soumissions, la raison d'être du module.
 id: k8s-challenge-faire-refuser-par-admission
-title: "Enforce an admission rule and prove the refusal, without guidance"
+title: "Enforce an admission rule and check the refusal, on your own and without hints"
 level: minimize-vulnerabilities
 section: cks
 difficulty: advanced

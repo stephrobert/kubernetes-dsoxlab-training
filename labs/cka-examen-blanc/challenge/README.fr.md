@@ -194,9 +194,9 @@ Revenez ensuite à la base : `exit`.
 
 ## Comment vous serez noté
 
-Vingt états, à 5 points chacun ; les tâches à 10 % en portent deux. Les poids
+Vingt exigences, à 5 points chacune ; les tâches à 10 % en portent deux. Les poids
 suivent ceux des domaines du programme officiel de la CKA. Le seuil est de **66
-sur 100**, comme à l'examen réel : il faut 14 états sur 20. Aucun indice n'est
+sur 100**, comme à l'examen réel : il faut 14 exigences sur 20. Aucun indice n'est
 proposé, et le retour se limite au verdict, comme le soir de l'examen.
 
 ## Ce que cet examen blanc ne reproduit pas

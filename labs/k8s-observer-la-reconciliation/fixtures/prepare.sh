@@ -29,17 +29,21 @@ kubectl -n reconciliation rollout status deployment vitrine --timeout=180s
 install -d -m 0700 /var/lib/dsoxlab
 rs_uid="$(kubectl -n reconciliation get replicaset -l app=vitrine -o jsonpath='{.items[0].metadata.uid}')"
 generation="$(kubectl -n reconciliation get deployment vitrine -o jsonpath='{.metadata.generation}')"
-printf '{"replicaset": "%s", "generation": %s}\n' "$rs_uid" "$generation" > "$MEMOIRE"
+# Les noms des trois Pods de départ : le test reconnaît le Pod recréé à ce
+# qu'il n'en fait pas partie.
+pods="$(kubectl -n reconciliation get pods -l app=vitrine -o jsonpath='{range .items[*]}"{.metadata.name}",{end}')"
+printf '{"replicaset": "%s", "generation": %s, "pods": [%s]}\n' \
+  "$rs_uid" "$generation" "${pods%,}" > "$MEMOIRE"
 chmod 0600 "$MEMOIRE"
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/reconciliation"
 cat > "${LAB_HOME}/reconciliation/releve.txt" <<'RELEVE'
-# Le contrôleur qui a recréé chaque objet, lu dans les événements.
-# The controller that recreated each object, read in the events.
+# Le Pod recréé et l'UID du ReplicaSet de remplacement, lus dans le cluster.
+# The recreated Pod and the UID of the replacement ReplicaSet, read in the cluster.
 # Les lignes qui commencent par # sont ignorées. Lines starting with # are ignored.
 
-pod-recree-par:
-replicaset-recree-par:
+pod-recree:
+uid-du-nouveau-replicaset:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/reconciliation/releve.txt"
 echo "Situation posée : vitrine à 3 réplicas, ReplicaSet ${rs_uid}."

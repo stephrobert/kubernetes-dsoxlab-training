@@ -48,7 +48,7 @@ Do not be surprised it stays Pending right after your fix: a class in
 
 ## How you will know it works
 
-Each test checks one of the six states above. The first also checks that
+Each test checks one of the six requirements above. The first also checks that
 `local-path` still exists: renaming the existing class is not creating one. The
 third does not settle for seeing the claim Bound: it checks that the provisioner
 created the volume for this claim. Creating a volume by hand, even with the

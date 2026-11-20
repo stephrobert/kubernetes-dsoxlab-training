@@ -1,4 +1,4 @@
-# Challenge: Enforce an admission rule and prove the refusal, without guidance
+# Challenge: Enforce an admission rule and check the refusal, on your own and without hints
 
 ## The situation
 
@@ -42,7 +42,7 @@ given: the module taught you what you need.
 
 ## How you will be graded
 
-Ten states, equally weighted. The pass mark is **70 out of 100**, and states
+Ten requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **4 and 10** are **blocking**: the two refusals proven by real submissions.
 Passing the others does not make up for missing one of them.
 

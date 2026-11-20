@@ -1,11 +1,11 @@
-# Corriger les écarts CIS d'un cluster, sans guidage
+# Corriger les écarts CIS d'un cluster, seul et sans indice
 
 Challenge du module **Durcir le cluster** de la formation Kubernetes, dans la
 section Mettre en pratique de la leçon « Audit Logs » : un API server à durcir
 sans le casser, un écart CIS à corriger sur trois composants du plan de
 contrôle et à prouver par un second audit kube-bench, et une politique d'audit
-à deux niveaux dont la trace doit apparaître dans le journal. Sept états,
-seuil 70, deux bloquants.
+à deux niveaux dont la trace doit apparaître dans le journal. Sept exigences,
+seuil 70, deux bloquantes.
 
 | | |
 |---|---|

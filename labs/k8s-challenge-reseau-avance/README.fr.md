@@ -1,11 +1,11 @@
-# Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, sans guidage
+# Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, seul et sans indice
 
 Challenge du module **Réseau avancé** de la formation Kubernetes (niveau 6,
 CKNE), dans la section Mettre en pratique de la leçon « Faire sortir le trafic
 par une passerelle d'egress » : un Service servi par Cilium à réparer sans
 kube-proxy, un seul flux à ouvrir entre deux namespaces, un namespace à faire
 sortir par un nœud choisi, et le flux qu'une politique refuse à désigner en le
-lisant dans Hubble. Quatre états, seuil 70.
+lisant dans Hubble. Quatre exigences, seuil 70.
 
 | | |
 |---|---|

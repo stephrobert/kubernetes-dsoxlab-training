@@ -227,7 +227,9 @@ Deux choses se passent en même temps. Les trois anciens Pods sont en
 `Terminating` : ils disparaissent avec leur ReplicaSet. Mais un ReplicaSet
 existe déjà de nouveau (âge `0s`), avec trois Pods neufs. Il porte le même nom,
 parce que ce nom est calculé à partir de la description des Pods, qui n'a pas
-changé. Quinze secondes plus tard, tout est revenu :
+changé. Ce n'est pourtant pas le même objet : Kubernetes lui a donné un nouvel
+**UID**, l'identifiant unique qu'il attribue à chaque objet à sa création, et
+qui se lit dans `metadata.uid`. Quinze secondes plus tard, tout est revenu :
 
 ```bash
 sleep 15
@@ -297,7 +299,7 @@ dsoxlab check k8s-observer-la-reconciliation
 ## 🎯 Le challenge
 
 À vous, seul cette fois : supprimer un Pod puis le ReplicaSet de l'application
-du challenge, et relever quel contrôleur a recréé chacun.
+du challenge, et relever ce qui les a remplacés.
 
 ```bash
 dsoxlab run k8s-observer-la-reconciliation

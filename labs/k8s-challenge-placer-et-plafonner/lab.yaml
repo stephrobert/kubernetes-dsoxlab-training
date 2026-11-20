@@ -21,7 +21,7 @@
 # Il tourne sur le cluster kind « capacite » (un control plane, trois workers),
 # partagé avec l'épreuve du niveau 3.
 id: k8s-challenge-placer-et-plafonner
-title: "Place Pods, cap a namespace and scale, without guidance"
+title: "Place Pods, cap a namespace and scale, on your own and without hints"
 level: workloads-scheduling
 section: cka
 difficulty: advanced

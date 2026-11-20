@@ -5,7 +5,7 @@ Challenge du module **Modèle de menaces et cadres** de la formation Kubernetes
 service » : l'accès d'un attaquant que quelque chose recrée sans cesse, à
 consigner et à retirer pour de bon sans abîmer l'application légitime, puis une
 charge abusive à contenir dans son namespace pendant qu'une autre application
-continue de répondre. Sept états, seuil 70, deux bloquants.
+continue de répondre. Sept exigences, seuil 70, deux bloquantes.
 
 | | |
 |---|---|

@@ -71,7 +71,7 @@ while it restarts mongod, then returns to `Running`.
 
 ## How you will know it works
 
-Each test checks one of the six states above. The fourth reads the objects'
+Each test checks one of the six requirements above. The fourth reads the objects'
 owners: a StatefulSet built by hand would carry the same names, without an
 owner. The sixth reads mongod's **startup options**: a setting changed live in
 mongod does not alter them, and would disappear at the first restart.

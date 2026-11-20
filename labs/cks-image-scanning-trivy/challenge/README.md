@@ -1,4 +1,4 @@
-# Challenge: Replace an image riddled with flaws, and prove it with a second scan
+# Challenge: Replace an image riddled with flaws, and check it with a second scan
 
 ## The situation
 

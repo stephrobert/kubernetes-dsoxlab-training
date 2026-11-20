@@ -3,8 +3,9 @@
 Un **Deployment** ne crée pas ses Pods lui-même. Il crée un **ReplicaSet**, un
 objet dont le seul travail est de garder le bon nombre de Pods, et c'est lui
 qui crée les Pods. Chaque objet garde la trace de celui qui l'a créé, son
-**propriétaire**. Dans ce cours, vous suivez cette chaîne, vous voyez ce que
-devient un ReplicaSet après une mise à jour, et vous diagnostiquez un
+**propriétaire**. La leçon suit cette chaîne sur un Deployment qu'elle crée.
+Ce cours part d'un nom de Pod seul, montre des Pods qui ne viennent pas d'un
+ReplicaSet, retire un Pod de son ReplicaSet, puis diagnostique un
 ReplicaSet qui n'arrive pas à créer ses Pods.
 
 Vous travaillez dans deux namespaces d'essai, `essai-rs` et `essai-quota`. Le
@@ -24,215 +25,190 @@ dsoxlab run k8s-lire-les-replicasets
 Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `boutique` y tourne, et votre kubectl le vise déjà.
 
-Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+Les sorties montrées dans ce cours ont été relevées sur cette machine les
+19 et 20 novembre 2026.
 
-## 📚 Exercice 1 : créer un Deployment et voir son ReplicaSet
+## 📚 Exercice 1 : remonter d'un Pod jusqu'à son Deployment
 
-Créez le namespace d'essai, puis écrivez le fichier d'un Deployment
-`catalogue` de trois Pods :
+Vous ne connaissez souvent qu'un nom de Pod, lu dans une alerte ou un
+journal. Partez d'un Pod `coredns`, le service de noms du cluster, et
+remontez la chaîne des propriétaires. Le champ `ownerReferences` nomme le
+propriétaire d'un objet ; la variable `OWN` garde le chemin à afficher :
+
+```bash
+OWN='{.metadata.ownerReferences[0].kind}/{.metadata.ownerReferences[0].name}{"\n"}'
+P=$(kubectl get pods -n kube-system -l k8s-app=kube-dns -o jsonpath='{.items[0].metadata.name}')
+echo $P
+kubectl get pod $P -n kube-system -o jsonpath="$OWN"
+```
+
+```text
+coredns-559f6c778d-jwhr5
+ReplicaSet/coredns-559f6c778d
+```
+
+Le Pod appartient à un ReplicaSet. Remontez d'un étage, puis encore d'un :
+
+```bash
+kubectl get replicaset coredns-559f6c778d -n kube-system -o jsonpath="$OWN"
+kubectl get deployment coredns -n kube-system -o jsonpath='{.metadata.ownerReferences}{"\n"}'
+```
+
+```text
+Deployment/coredns
+```
+
+Le ReplicaSet appartient au Deployment `coredns`. La dernière commande
+n'affiche qu'une ligne vide : le Deployment n'a pas de propriétaire, c'est le
+haut de la chaîne. Le nom du Pod la résumait déjà :
+`coredns-559f6c778d-jwhr5`, c'est le Deployment, puis l'empreinte du
+ReplicaSet, puis un suffixe tiré au hasard.
+
+## 📚 Exercice 2 : voir un Pod qui n'a pas de ReplicaSet
+
+Tous les Pods ne viennent pas d'un ReplicaSet. Faites la même lecture sur un
+Pod `kube-proxy` et sur le Pod `etcd` :
+
+```bash
+K=$(kubectl get pods -n kube-system -l k8s-app=kube-proxy -o jsonpath='{.items[0].metadata.name}')
+kubectl get pod $K -n kube-system -o jsonpath="$OWN"
+E=$(kubectl get pods -n kube-system -l component=etcd -o jsonpath='{.items[0].metadata.name}')
+kubectl get pod $E -n kube-system -o jsonpath="$OWN"
+kubectl get replicaset -n kube-system
+```
+
+```text
+DaemonSet/kube-proxy
+Node/boutique-control-plane
+NAME                 DESIRED   CURRENT   READY   AGE
+coredns-559f6c778d   2         2         2       77m
+```
+
+`kube-proxy` appartient à un **DaemonSet**, un objet qui place un Pod sur
+chaque nœud, sans ReplicaSet. `etcd` est rattaché au nœud lui-même : c'est un
+Pod que le kubelet lance à partir d'un fichier posé sur le nœud. Le namespace
+`kube-system` ne compte donc qu'un ReplicaSet, celui de `coredns`. Remonter
+d'un Pod ne mène pas toujours à un Deployment.
+
+## 📚 Exercice 3 : retirer un Pod de son ReplicaSet
+
+Un ReplicaSet reconnaît ses Pods à leurs **étiquettes** (labels), pas à leur
+nom. Créez un Deployment de trois Pods, et affichez leurs étiquettes :
 
 ```bash
 kubectl create namespace essai-rs
-cat > ~/catalogue.yaml <<'EOF'
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: catalogue
-  namespace: essai-rs
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: catalogue
-  template:
-    metadata:
-      labels:
-        app: catalogue
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-EOF
-```
-
-Créez-le, attendez qu'il soit prêt, puis regardez les ReplicaSets :
-
-```bash
-kubectl apply -f ~/catalogue.yaml
-kubectl rollout status deployment/catalogue -n essai-rs --timeout=120s
-kubectl get replicaset -n essai-rs -l app=catalogue
-```
-
-```text
-deployment.apps/catalogue created
-Waiting for deployment "catalogue" rollout to finish: 0 out of 3 new replicas have been updated...
-Waiting for deployment "catalogue" rollout to finish: 0 of 3 updated replicas are available...
-Waiting for deployment "catalogue" rollout to finish: 1 of 3 updated replicas are available...
-Waiting for deployment "catalogue" rollout to finish: 2 of 3 updated replicas are available...
-deployment "catalogue" successfully rolled out
-NAME                  DESIRED   CURRENT   READY   AGE
-catalogue-75867bdb5   3         3         3       1s
-```
-
-Un ReplicaSet est apparu. Son nom est celui du Deployment, suivi d'une
-**empreinte** (`75867bdb5`) calculée à partir de la description des Pods.
-`DESIRED`, `CURRENT` et `READY` disent combien de Pods il veut, en a, et en a
-de prêts.
-
-## 📚 Exercice 2 : remonter de propriétaire en propriétaire
-
-Le champ `ownerReferences` d'un objet dit qui l'a créé. Lisez-le sur le
-ReplicaSet, puis sur un Pod :
-
-```bash
-kubectl get replicaset -n essai-rs -l app=catalogue \
-  -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}/{.items[0].metadata.ownerReferences[0].name}{"\n"}'
-kubectl get pods -n essai-rs -l app=catalogue \
-  -o jsonpath='{.items[0].metadata.ownerReferences[0].kind}/{.items[0].metadata.ownerReferences[0].name}{"\n"}'
-```
-
-```text
-Deployment/catalogue
-ReplicaSet/catalogue-75867bdb5
-```
-
-La chaîne est complète : le Deployment possède le ReplicaSet, qui possède les
-Pods. Kubernetes s'en sert pour supprimer les enfants quand on supprime le
-parent.
-
-## 📚 Exercice 3 : mettre à jour et voir un second ReplicaSet
-
-Changez l'image du Deployment pour la version suivante de nginx :
-
-```bash
-kubectl set image deployment/catalogue \
-  nginx=nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703 \
-  -n essai-rs
-kubectl rollout status deployment/catalogue -n essai-rs --timeout=120s | tail -1
-```
-
-```text
-deployment.apps/catalogue image updated
-deployment "catalogue" successfully rolled out
-```
-
-Regardez maintenant les ReplicaSets, avec les colonnes utiles :
-
-```bash
-kubectl get replicaset -n essai-rs -l app=catalogue \
-  -o custom-columns=NOM:.metadata.name,VOULUS:.spec.replicas,PRETS:.status.readyReplicas,IMAGE:.spec.template.spec.containers[0].image
-```
-
-```text
-NOM                    VOULUS   PRETS    IMAGE
-catalogue-5f44879b68   3        3        nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
-catalogue-75867bdb5    0        <none>   nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-```
-
-Il y en a maintenant deux. Le nouveau porte les trois Pods, avec la nouvelle
-image. L'ancien est gardé, mais à **zéro** Pod : il sert à revenir en arrière
-sans rien recréer. Pour savoir lequel porte les Pods aujourd'hui, regardez la
-colonne `VOULUS`.
-
-Chaque ReplicaSet reconnaît ses Pods grâce à une étiquette qui contient son
-empreinte :
-
-```bash
-kubectl get replicaset -n essai-rs -l app=catalogue \
-  -o custom-columns=NOM:.metadata.name,SELECTEUR:.spec.selector.matchLabels
-```
-
-```text
-NOM                    SELECTEUR
-catalogue-5f44879b68   map[app:catalogue pod-template-hash:5f44879b68]
-catalogue-75867bdb5    map[app:catalogue pod-template-hash:75867bdb5]
-```
-
-L'étiquette `pod-template-hash` est différente pour chacun : c'est elle qui
-sépare les Pods des deux versions.
-
-## 📚 Exercice 4 : voir un ReplicaSet adopter un Pod
-
-Un ReplicaSet ne garde pas de liste de ses Pods. Il compte les Pods qui
-portent ses étiquettes et qui n'ont pas déjà de propriétaire. Créez d'abord un
-Pod seul, avec l'étiquette `app=isole` :
-
-```bash
-kubectl run isole --labels=app=isole \
+kubectl create deployment catalogue \
   --image=nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
-  -n essai-rs
-kubectl wait --for=condition=Ready pod/isole -n essai-rs --timeout=90s
+  --replicas=3 -n essai-rs
+kubectl rollout status deployment/catalogue -n essai-rs --timeout=120s
+kubectl get pods -n essai-rs --show-labels
 ```
 
-```text
-pod/isole created
-pod/isole condition met
+```text title="Extrait de la sortie"
+namespace/essai-rs created
+deployment.apps/catalogue created
+deployment "catalogue" successfully rolled out
+NAME                        READY   STATUS    RESTARTS   AGE   LABELS
+catalogue-75867bdb5-5gv8j   1/1     Running   0          1s    app=catalogue,pod-template-hash=75867bdb5
+catalogue-75867bdb5-jd9c8   1/1     Running   0          1s    app=catalogue,pod-template-hash=75867bdb5
+catalogue-75867bdb5-xp9nv   1/1     Running   0          1s    app=catalogue,pod-template-hash=75867bdb5
 ```
 
-Créez ensuite un ReplicaSet qui demande trois Pods avec cette même étiquette :
+Retirez l'étiquette `app` d'un des Pods. `kubectl label` pose ou retire une
+étiquette, et le `-` final veut dire « retirer » ; la leçon sur les labels la
+détaille plus loin :
 
 ```bash
-cat > ~/isole-rs.yaml <<'EOF'
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: isole-rs
-  namespace: essai-rs
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: isole
-  template:
-    metadata:
-      labels:
-        app: isole
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
-EOF
-kubectl apply -f ~/isole-rs.yaml
-kubectl wait --for=jsonpath='{.status.readyReplicas}'=3 replicaset/isole-rs -n essai-rs --timeout=90s
-kubectl get pods -n essai-rs -l app=isole
+X=$(kubectl get pods -n essai-rs -l app=catalogue -o jsonpath='{.items[0].metadata.name}')
+kubectl label pod $X -n essai-rs app-
+kubectl get pods -n essai-rs --show-labels
 ```
 
 ```text
-replicaset.apps/isole-rs created
-replicaset.apps/isole-rs condition met
-NAME             READY   STATUS    RESTARTS   AGE
-isole            1/1     Running   0          1s
-isole-rs-49gdz   1/1     Running   0          0s
-isole-rs-4rhvs   1/1     Running   0          0s
+pod/catalogue-75867bdb5-5gv8j unlabeled
+NAME                        READY   STATUS    RESTARTS   AGE   LABELS
+catalogue-75867bdb5-5gv8j   1/1     Running   0          6s    pod-template-hash=75867bdb5
+catalogue-75867bdb5-jd9c8   1/1     Running   0          6s    app=catalogue,pod-template-hash=75867bdb5
+catalogue-75867bdb5-kxt5g   1/1     Running   0          5s    app=catalogue,pod-template-hash=75867bdb5
+catalogue-75867bdb5-xp9nv   1/1     Running   0          6s    app=catalogue,pod-template-hash=75867bdb5
 ```
 
-Trois Pods, mais le ReplicaSet n'en a créé que deux. Ses événements et le
-propriétaire du Pod `isole` le confirment :
+Quatre Pods tournent maintenant. Le ReplicaSet ne compte plus `5gv8j` parmi
+les siens : il n'en voyait que deux, et il en a créé un troisième, `kxt5g`.
+Le Pod `5gv8j`, lui, continue de tourner. Lisez son propriétaire :
 
 ```bash
-kubectl describe replicaset isole-rs -n essai-rs | sed -n '/^Events:/,$p'
-kubectl get pod isole -n essai-rs \
-  -o jsonpath='{.metadata.ownerReferences[0].kind}/{.metadata.ownerReferences[0].name}{"\n"}'
+kubectl get pod $X -n essai-rs -o jsonpath='{.metadata.ownerReferences}{"\n"}'
+kubectl get replicaset -n essai-rs
 ```
 
 ```text
-Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  0s    replicaset-controller  Created pod: isole-rs-49gdz
-  Normal  SuccessfulCreate  0s    replicaset-controller  Created pod: isole-rs-4rhvs
-ReplicaSet/isole-rs
+
+NAME                  DESIRED   CURRENT   READY   AGE
+catalogue-75867bdb5   3         3         3       6s
 ```
 
-Le Pod `isole` existait déjà et portait la bonne étiquette : le ReplicaSet l'a
-pris en charge, et il est maintenant son propriétaire. À retenir : deux
-contrôleurs ne doivent jamais chercher les mêmes étiquettes.
+Ligne vide : le Pod n'a plus de propriétaire. Plus aucun contrôleur ne le
+recréera s'il tombe, ni ne le supprimera. Le ReplicaSet compte toujours trois
+Pods, sans lui.
+
+## 📚 Exercice 4 : remplacer les Pods sans changer l'image
+
+`kubectl rollout restart` fait remplacer tous les Pods d'un Deployment, sans
+rien changer d'autre. Lancez-le, puis regardez les ReplicaSets :
+
+```bash
+kubectl rollout restart deployment/catalogue -n essai-rs
+kubectl rollout status deployment/catalogue -n essai-rs --timeout=120s
+kubectl get replicaset -n essai-rs -o custom-columns='NOM:.metadata.name,VOULUS:.spec.replicas,REVISION:.metadata.annotations.deployment\.kubernetes\.io/revision'
+```
+
+```text title="Extrait de la sortie"
+deployment.apps/catalogue restarted
+deployment "catalogue" successfully rolled out
+NOM                   VOULUS   REVISION
+catalogue-75867bdb5   0        1
+catalogue-c4bb56c49   3        2
+```
+
+Un second ReplicaSet est apparu, comme pour une nouvelle image, et le premier
+est gardé à zéro. Pourtant l'image n'a pas changé. Regardez ce que `restart`
+a modifié dans le modèle de Pod :
+
+```bash
+kubectl get deployment catalogue -n essai-rs -o jsonpath='{.spec.template.metadata.annotations}{"\n"}'
+kubectl get pods -n essai-rs
+```
+
+```text
+{"kubectl.kubernetes.io/restartedAt":"2026-11-20T08:19:47Z"}
+NAME                        READY   STATUS        RESTARTS   AGE
+catalogue-75867bdb5-5gv8j   1/1     Running       0          8s
+catalogue-75867bdb5-jd9c8   1/1     Terminating   0          8s
+catalogue-c4bb56c49-bztv4   1/1     Running       0          1s
+catalogue-c4bb56c49-cxmcq   1/1     Running       0          2s
+catalogue-c4bb56c49-jq6hd   1/1     Running       0          1s
+```
+
+`restart` pose une annotation datée dans le modèle de Pod. Le modèle change,
+donc son empreinte change, donc le Deployment crée un ReplicaSet. Le Pod
+`5gv8j` de l'exercice 3 tourne toujours : sans propriétaire, il n'appartient à
+aucun ReplicaSet, et le redémarrage ne l'a pas touché. Supprimez ce
+namespace, vous n'en avez plus besoin :
+
+```bash
+kubectl delete namespace essai-rs
+```
+
+```text
+namespace "essai-rs" deleted
+```
 
 ## 📚 Exercice 5 : diagnostiquer un ReplicaSet bloqué
 
-Un **quota** limite ce qu'un namespace a le droit de contenir. Créez un
-namespace limité à un seul Pod, puis un Deployment qui en demande deux :
+Un **quota** limite ce qu'un namespace a le droit de contenir ; la leçon sur
+les quotas, bien plus loin dans le parcours, le détaille. Créez un namespace
+limité à un seul Pod, puis un Deployment qui en demande deux :
 
 ```bash
 kubectl create namespace essai-quota
@@ -273,9 +249,9 @@ Events:
   Warning  FailedCreate      10s   replicaset-controller  Error creating: pods "borne-6f65f67d68-ngtpf" is forbidden: exceeded quota: plafond, requested: pods=1, used: pods=1, limited: pods=1
 ```
 
-`FailedCreate` donne la cause : le quota `plafond` est atteint (`used: pods=1,
-limited: pods=1`). Le ReplicaSet a réessayé plusieurs fois, et la liste
-complète compte une dizaine de lignes identiques.
+`FailedCreate` donne la cause : le quota `plafond` est atteint
+(`used: pods=1, limited: pods=1`). Le ReplicaSet a réessayé plusieurs fois, et
+la liste complète compte une dizaine de lignes identiques.
 
 ## 📚 Exercice 6 : lever la cause et voir le ReplicaSet réessayer
 
@@ -305,15 +281,14 @@ plus.
 
 ## 🧹 Nettoyage
 
-Supprimez les deux namespaces d'essai et les deux fichiers :
+Supprimez d'abord ce qui reste des exercices : le namespace `essai-quota`.
+Le namespace `essai-rs` est déjà supprimé.
 
 ```bash
-kubectl delete namespace essai-rs essai-quota
-rm ~/catalogue.yaml ~/isole-rs.yaml
+kubectl delete namespace essai-quota
 ```
 
 ```text
-namespace "essai-rs" deleted
 namespace "essai-quota" deleted
 ```
 

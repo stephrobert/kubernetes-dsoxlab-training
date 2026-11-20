@@ -1,4 +1,4 @@
-# Replace an image riddled with flaws, and prove it with a second scan
+# Replace an image riddled with flaws, and check it with a second scan
 
 **CKS** lab, *Supply Chain Security* domain (20 % of the exam), competency
 "Scan images for known vulnerabilities".

@@ -1,4 +1,4 @@
-# Challenge : Remplacer une image criblée de failles, et le prouver par un second scan
+# Challenge : Remplacer une image criblée de failles, et le vérifier par un second scan
 
 ## La situation
 

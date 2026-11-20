@@ -1,7 +1,7 @@
 # Repair a node's Pod network and read what the network says
 
 **CKA** lab, *Troubleshooting* domain (30 % of the exam). Guided lab of the
-"Pod Networking" lesson of the Kubernetes course, whose gestures it practises:
+"Pod Networking" lesson of the Kubernetes course, whose tasks it practises:
 read the address ranges, reach a Pod on another node, repair a node whose Pod
 network went down, tell an immediate refusal from a timeout.
 

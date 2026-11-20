@@ -5,9 +5,9 @@ Challenge of the **Install a cluster** module of the Kubernetes course (level
 worker to prepare and join to the kubeadm cluster so that it survives a
 reboot, a Pod forced onto it, then a kind cluster with three control planes
 behind its load balancer, which must survive the loss of one of them. Seven
-states, threshold 70, two blocking.
+requirements, threshold 70, two blocking.
 
-The high availability states run on kind because the catalogue's
+The high availability requirements run on kind because the catalogue's
 infrastructure carries a single kubeadm control plane: kind sets up the load
 balancer itself, and its nodes are kubeadm machines with stacked etcd. The
 setup deletes the other labs' kind clusters to free memory; each one recreates

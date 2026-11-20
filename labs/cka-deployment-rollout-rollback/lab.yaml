@@ -41,7 +41,7 @@ validation:
 
 criteria:
   - id: le-deploiement-demande-la-bonne-image
-    label: "The Deployment webapp asks for the image nginx:1.30.6"
+    label: "The Deployment catalogue asks for the image nginx:1.30.6-alpine"
     tests:
       - test_le_deploiement_demande_la_bonne_image
     lessons:
@@ -53,9 +53,9 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: aucun-pod-n-est-en-erreur-d-image
-    label: "No Pod of webapp is left in image error"
+    label: "No Pod of catalogue is left failing"
     tests:
-      - test_aucun_pod_n_est_en_erreur_d_image
+      - test_aucun_pod_n_est_en_panne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: l-historique-du-deploiement-est-intact
@@ -77,13 +77,13 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: la-revision-finale-est-celle-de-la-bonne-image
-    label: "The final revision 4 is the one of nginx:1.30.6, with the three replicas kept"
+    label: "The final revision 4 is the one of nginx:1.30.6-alpine, with the three replicas kept"
     tests:
       - test_la_revision_finale_est_celle_de_la_bonne_image
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/deployments/
   - id: le-deploiement-porte-la-cause-de-changement
-    label: "The Deployment webapp carries the kubernetes.io/change-cause annotation"
+    label: "The Deployment catalogue carries the kubernetes.io/change-cause annotation"
     tests:
       - test_le_deploiement_porte_la_cause_de_changement
     lessons:

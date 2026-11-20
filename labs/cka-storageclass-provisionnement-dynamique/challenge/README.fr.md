@@ -51,7 +51,7 @@ utilise** la revendication.
 
 ## Comment vous saurez que c'est bon
 
-Chaque test vérifie un des six états ci-dessus. Le premier vérifie aussi que
+Chaque test vérifie une des six exigences ci-dessus. Le premier vérifie aussi que
 `local-path` existe toujours : renommer la classe existante n'est pas en créer
 une. Le troisième ne se contente pas de voir la revendication liée : il vérifie
 que le provisionneur a créé le volume pour cette revendication. Créer un volume

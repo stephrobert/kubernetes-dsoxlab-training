@@ -1,4 +1,4 @@
-# Challenge : Interdire un appel système à un conteneur, et le prouver de l'intérieur
+# Challenge : Interdire un appel système à un conteneur, et le vérifier de l'intérieur
 
 ## La situation
 

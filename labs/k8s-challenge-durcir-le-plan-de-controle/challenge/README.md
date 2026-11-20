@@ -1,4 +1,4 @@
-# Challenge: Fix a cluster's CIS findings, without guidance
+# Challenge: Fix a cluster's CIS findings, on your own and without hints
 
 ## The situation
 
@@ -41,7 +41,7 @@ given: the module taught you what you need.
 
 ## How you will be graded
 
-Seven states, equally weighted. The pass mark is **70 out of 100**, and states
+Seven requirements, equally weighted. The pass mark is **70 out of 100**, and requirements
 **4 and 7** are **blocking**: the audit run again, and the log that traces.
 Passing the others does not make up for missing one of them.
 

@@ -1,4 +1,4 @@
-# Challenge: Isolate a Pod from the host kernel, and prove it by reading its version
+# Challenge: Isolate a Pod from the host kernel, and check it by reading its kernel version
 
 ## The situation
 

@@ -17,16 +17,13 @@ kubectl create namespace suivre-un-pod
 
 install -d -o "$LAB_USER" -g "$LAB_USER" -m 0755 "${LAB_HOME}/suivre-un-pod"
 cat > "${LAB_HOME}/suivre-un-pod/etapes.txt" <<'RELEVE'
-# Pour chaque étape, le composant qui a agi, lu dans les événements du Pod.
-# For each step, the component that acted, read in the events of the Pod.
+# Le Pod, son Node et l'identifiant de son conteneur, lus dans le cluster.
+# The Pod, its Node and the identifier of its container, read in the cluster.
 # Les lignes qui commencent par # sont ignorées. Lines starting with # are ignored.
 
-scheduled:
-pulled:
-created:
-started:
-
+pod:
 noeud-du-kubelet:
+conteneur:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/suivre-un-pod/etapes.txt"
 echo "Situation posée : namespace suivre-un-pod vide, relevé à compléter."

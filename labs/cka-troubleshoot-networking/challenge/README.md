@@ -52,7 +52,7 @@ them apart.
 
 ## How you will know it works
 
-Each test checks one of the six states above. The fourth requires `cible` on
+Each test checks one of the six requirements above. The fourth requires `cible` on
 the worker: moving it to the control plane would work around the failure
 without repairing it. The sixth compares with a draw made by the preparation:
 the right verdict cannot be guessed.

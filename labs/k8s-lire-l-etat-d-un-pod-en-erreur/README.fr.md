@@ -13,7 +13,7 @@ Dans ce cours, vous créez vous-même trois petites applications dans un
 namespace d'essai, `essai-panne` : une qui marche, une dont l'image n'existe
 pas, et une qui s'arrête en erreur. Puis vous les diagnostiquez. Le challenge
 vous demandera de diagnostiquer d'autres pannes, dans le namespace
-`diagnostic` : vous le ferez seul, à la fin.
+`incident` : vous le ferez seul, à la fin.
 
 Page associée : [Lire l'état du cluster : kubectl get, describe, logs et top](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-get-describe-logs-top/).
 
@@ -55,8 +55,8 @@ nginx, qui n'existe pas. `tache` écrit un message d'erreur, puis s'arrête avec
 le code `3`. Attendez une minute avant de continuer, le temps que Kubernetes
 essaie de les lancer.
 
-Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+Les sorties montrées dans ce cours ont été relevées sur cette machine les
+19 et 20 novembre 2026.
 
 ## 📚 Exercice 1 : repérer le Pod qui va mal
 
@@ -214,10 +214,75 @@ tache: lancement
 ```
 
 Voilà la cause : un fichier de configuration manque. Les deux lignes ne sont
-pas dans l'ordre où elles ont été écrites : le message normal et le message
-d'erreur passent par deux canaux différents, que kubectl mélange.
+pas dans l'ordre où elles ont été écrites. Le programme écrit sur deux canaux,
+la sortie normale et la sortie d'erreur. containerd, le moteur qui enregistre
+les journaux sur le nœud, lit ces deux canaux séparément : deux lignes écrites
+au même instant peuvent donc s'inverser.
 
-Essayez maintenant les journaux de `cache` :
+`tache` a déjà planté plusieurs fois. L'option `--previous` lit l'exécution
+d'avant. Essayez-la :
+
+```bash
+kubectl logs deployment/tache -n essai-panne --previous
+echo "code : $?"
+```
+
+```text
+unable to retrieve container logs for containerd://3e4e5d03ad17114b5855d4320021e844031b8ffa737f8270aa1d22b33d71f59ccode : 0
+```
+
+Pas de journal, et pourtant le code de sortie vaut `0`. Le message ne finit pas
+par un retour à la ligne : `code : 0` s'affiche juste derrière. `tache`
+s'arrête dès son lancement : son conteneur est presque toujours à l'arrêt, et
+c'est sa dernière exécution, celle qui vient d'échouer, que `kubectl logs`
+affiche sans option. `--previous` vise l'exécution d'avant celle-là, et le nœud
+n'en garde plus le journal. Ici, `kubectl logs` sans option suffisait.
+
+`--previous` sert quand le conteneur tourne de nouveau après un plantage.
+Lancez `lente`, qui démarre, travaille 25 secondes, puis s'arrête en erreur :
+
+```bash
+kubectl create deployment lente \
+  --image=busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e \
+  -n essai-panne \
+  -- sh -c 'echo "lente: démarrage"; sleep 25; echo "erreur: délai dépassé pour joindre le stockage" >&2; exit 4'
+```
+
+Attendez une trentaine de secondes, jusqu'à ce que la colonne `RESTARTS` de
+`kubectl get pods -n essai-panne` affiche `1` et la colonne `STATUS`
+`Running`. Lisez alors les deux journaux :
+
+```bash
+kubectl get pods -n essai-panne -l app=lente
+kubectl logs deployment/lente -n essai-panne
+kubectl logs deployment/lente -n essai-panne --previous
+```
+
+```text
+NAME                    READY   STATUS    RESTARTS     AGE
+lente-b567f8667-djmw8   1/1     Running   1 (2s ago)   27s
+lente: démarrage
+lente: démarrage
+erreur: délai dépassé pour joindre le stockage
+```
+
+Sans option, vous lisez l'exécution en cours : elle vient de démarrer et n'a
+encore rien dit d'utile. Avec `--previous`, vous lisez celle qui a planté, et
+son message d'erreur. Le code de sortie de ce plantage se lit dans
+`Last State` :
+
+```bash
+kubectl describe pod -n essai-panne -l app=lente | grep -A3 "Last State"
+```
+
+```text
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    4
+      Started:      Fri, 20 Nov 2026 07:21:49 +0000
+```
+
+Essayez enfin les journaux de `cache` :
 
 ```bash
 kubectl logs deployment/cache -n essai-panne
@@ -229,20 +294,6 @@ Error from server (BadRequest): container "nginx" in pod "cache-6bcb8d84c5-4hhx5
 
 Il n'y a pas de journal : un conteneur qui n'a jamais démarré n'a rien écrit.
 Pour lui, c'est `describe` qui donnait la réponse.
-
-L'option `--previous` lit les journaux de l'exécution d'avant, celle qui a
-planté. Sur `front`, qui n'a jamais redémarré, elle ne trouve rien :
-
-```bash
-kubectl logs deployment/front -n essai-panne --previous
-```
-
-```text
-Error from server (BadRequest): previous terminated container "nginx" in pod "front-545fdfbcf8-8v4ph" not found
-```
-
-Ce message veut dire « pas de redémarrage », et donc pas de plantage à
-expliquer.
 
 ## 📚 Exercice 7 : mesurer la consommation
 
@@ -279,7 +330,7 @@ Le premier de la liste est celui qui consomme le plus de mémoire.
 
 ## 🧹 Nettoyage
 
-Supprimez le namespace d'essai. Ses trois applications disparaissent avec
+Supprimez le namespace d'essai. Ses quatre applications disparaissent avec
 lui :
 
 ```bash
@@ -312,7 +363,7 @@ dsoxlab check k8s-lire-l-etat-d-un-pod-en-erreur
 ## 🎯 Le challenge
 
 À vous, seul cette fois : diagnostiquer les deux applications en panne du
-namespace `diagnostic`, et trouver celle qui consomme le plus de mémoire, sans
+namespace `incident`, et trouver celle qui consomme le plus de mémoire, sans
 rien réparer.
 
 ```bash

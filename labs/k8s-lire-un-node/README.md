@@ -1,16 +1,12 @@
 # Read what a worker Node declares
 
-A **node** is a machine of the cluster. On each node, a program, the
-**kubelet**, runs the Pods and keeps writing into the cluster what the machine
-offers and how it is doing. In this course, you learn to read this
-information, as in the lesson:
+A **node** (Node) is a machine of the cluster. On each node, a program, the
+**kubelet**, runs the Pods and keeps writing to the cluster what the machine
+offers and how it is doing. The lesson shows how to read this information. In
+this course, you cause changes on a node, then you read again what it
+declares: a stopped kubelet, a node that comes back, a deleted system Pod.
 
-- the kubelet's **heartbeat**, which says the node is alive;
-- the **overview** of all the nodes, then the **sheet** of a single one;
-- **kube-proxy**, present on every node;
-- what happens when a node **stops answering**.
-
-You mostly read the `architecture-worker3` node. The challenge will ask you for
+You work on the `architecture-worker3` node. The challenge will ask you for
 the sheet of another node: you will fill it on your own, at the end.
 
 Related page: [How Kubernetes worker nodes work](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/).
@@ -24,259 +20,261 @@ dsoxlab run k8s-lire-un-node
 ```
 
 You are now connected to the `k8s-kind.lab` machine. The kind cluster
-`architecture` is running there, with one control plane and three workers, and
-your kubectl already targets it.
+`architecture` runs there, with one control plane and three workers, and your
+kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026.
 
-## 📚 Exercise 1: see the kubelet's heartbeat
+## 📚 Exercise 1: see what sets two nodes apart
 
-Every ten seconds, the kubelet renews a small object, a **lease**, named after
-its node. List the leases:
+On this cluster, the nodes are containers of the same machine: many of their
+values are identical. Compare two workers on three lines of their sheet:
 
 ```bash
-kubectl get lease -n kube-node-lease
+kubectl describe node architecture-worker | grep -E 'InternalIP|PodCIDR:|Machine ID'
+kubectl describe node architecture-worker3 | grep -E 'InternalIP|PodCIDR:|Machine ID'
 ```
 
 ```text
-NAME                         HOLDER                       AGE
-architecture-control-plane   architecture-control-plane   10m
-architecture-worker          architecture-worker          10m
-architecture-worker2         architecture-worker2         10m
-architecture-worker3         architecture-worker3         10m
+  InternalIP:  172.18.0.7
+  Machine ID:                 f524842260574d1fbf3b8ff528d7412d
+PodCIDR:                      10.244.1.0/24
+  InternalIP:  172.18.0.4
+  Machine ID:                 6313db26e58b44398528deda41404384
+PodCIDR:                      10.244.4.0/24
 ```
 
-One lease per node. Read the renewal time of `architecture-worker3`'s, twice,
-ten seconds apart:
+These three values belong to each node:
+
+- `InternalIP` is the address of the node on the machines' network;
+- `PodCIDR` is the address range where the Pods of this node get theirs: a Pod
+  of `architecture-worker3` will get an address in `10.244.4.x`;
+- `Machine ID` is the identifier of the machine, drawn at random when it is
+  created.
+
+They also change when the cluster is recreated: on your side, they will be
+different. Other lines, on the contrary, are the same everywhere:
 
 ```bash
-kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
-sleep 10
-kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+kubectl describe node architecture-worker3 | grep -E 'Kubelet Version|Container Runtime Version|^  memory'
 ```
 
 ```text
-2026-11-19T11:12:13.857703Z
-2026-11-19T11:12:23.871343Z
-```
-
-The time moved forward by ten seconds: the kubelet renewed its lease. As long
-as it does, the cluster knows the node is alive.
-
-## 📚 Exercise 2: see all the nodes at once
-
-```bash
-kubectl get nodes -o wide
-```
-
-```text
-NAME                         STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION                 CONTAINER-RUNTIME
-architecture-control-plane   Ready    control-plane   10m   v1.37.0   172.18.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker          Ready    <none>          10m   v1.37.0   172.18.0.5    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker2         Ready    <none>          10m   v1.37.0   172.18.0.7    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-architecture-worker3         Ready    <none>          10m   v1.37.0   172.18.0.6    <none>        Debian GNU/Linux 13 (trixie)   6.12.117+deb13-amd64 (amd64)   containerd://2.3.4
-```
-
-Three columns answer the lesson's questions:
-
-- `STATUS`: `Ready` means the kubelet reports a ready node;
-- `VERSION`: the kubelet's version, here `v1.37.0`;
-- `CONTAINER-RUNTIME`: the program that really starts the containers, and its
-  version, here `containerd://2.3.4`.
-
-## 📚 Exercise 3: show only the useful columns
-
-The `-o custom-columns` option shows only the fields you choose, as
-`TITLE:path.of.the.field`. Show the **capacity** of each node:
-
-```bash
-kubectl get nodes -o custom-columns=NOM:.metadata.name,CPU:.status.capacity.cpu,MEMOIRE:.status.capacity.memory,PODS:.status.capacity.pods
-```
-
-```text
-NOM                          CPU   MEMOIRE     PODS
-architecture-control-plane   2     4009780Ki   110
-architecture-worker          2     4009780Ki   110
-architecture-worker2         2     4009780Ki   110
-architecture-worker3         2     4009780Ki   110
-```
-
-The four nodes have the same capacity: they are containers sharing the same
-machine. On a real cluster, each node has its own. `PODS` is 110, the maximum
-number of Pods per node.
-
-## 📚 Exercise 4: read a node's sheet
-
-`kubectl describe node` shows everything the cluster knows about a node. The
-output is long: `sed` keeps one part of it at a time. Start with the
-**conditions**:
-
-```bash
-kubectl describe node architecture-worker3 | sed -n '/^Conditions:/,/^Addresses:/p'
-```
-
-```text
-Conditions:
-  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
-  ----             ------  -----------------                 ------------------                ------                       -------
-  MemoryPressure   False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasSufficientMemory   kubelet has sufficient memory available
-  DiskPressure     False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasNoDiskPressure     kubelet has no disk pressure
-  PIDPressure      False   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:01 +0000   KubeletHasSufficientPID      kubelet has sufficient PID available
-  Ready            True    Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:02:16 +0000   KubeletReady                 kubelet is posting ready status
-Addresses:
-```
-
-The first three conditions signal a problem when they are `True`: lack of
-memory, disk or processes. `Ready`, on the other hand, must be `True`. A
-healthy node therefore shows `False`, `False`, `False`, `True`.
-
-Then read what the machine has and what is left for the Pods:
-
-```bash
-kubectl describe node architecture-worker3 | sed -n '/^Capacity:/,/^System Info:/p'
-```
-
-```text
-Capacity:
-  cpu:                2
-  ephemeral-storage:  31491104768
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             4009780Ki
-  pods:               110
-Allocatable:
-  cpu:                2
-  ephemeral-storage:  31491104768
-  hugepages-1Gi:      0
-  hugepages-2Mi:      0
-  memory:             4009780Ki
-  pods:               110
-System Info:
-```
-
-`Capacity` is what the machine has. `Allocatable` is what is left for the Pods,
-once the system's share is removed. Here both are equal, because kind reserves
-nothing for the system.
-
-Finally, the versions:
-
-```bash
-kubectl describe node architecture-worker3 | grep -E 'Container Runtime Version|Kubelet Version'
-```
-
-```text
+  memory:             4009788Ki
+  memory:             4009788Ki
   Container Runtime Version:  containerd://2.3.4
   Kubelet Version:            v1.37.0
+  memory             50Mi (1%)  0 (0%)
 ```
 
-These are the same values as the columns of exercise 2, read this time in the
-node's sheet.
+The first two `memory` lines come from `Capacity` and `Allocatable`, the last
+one from `Allocated resources`: the memory already reserved by the Pods of the
+node. Kubelet version, runtime and memory are the same on the four nodes of
+this cluster.
 
-## 📚 Exercise 5: see kube-proxy on every node
+## 📚 Exercise 2: place a witness Pod and read its tolerations
 
-**kube-proxy** sets up, on each node, the network rules that make Services
-work. Its mode is read in its configuration:
+Create a scratch namespace and a Deployment of four Pods, to get at least one
+on `architecture-worker3`:
 
 ```bash
-kubectl -n kube-system get configmap kube-proxy -o yaml | grep 'mode:'
+kubectl create namespace essai-noeud
+kubectl create deployment temoin \
+  --image=nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb \
+  --replicas=4 -n essai-noeud
+kubectl wait --for=condition=Available deployment/temoin -n essai-noeud --timeout=180s
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
 ```
 
 ```text
-    mode: iptables
+namespace/essai-noeud created
+deployment.apps/temoin created
+deployment.apps/temoin condition met
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          1s    10.244.4.12   architecture-worker3   <none>           <none>
 ```
 
-It runs as a **DaemonSet**, an object that places one Pod on every node:
+The `--field-selector spec.nodeName=...` option keeps only the Pods of that
+node. Its address, `10.244.4.12`, is indeed in the node's `PodCIDR`.
+Kubernetes added two **tolerations** to this Pod, rules that say how long it
+stays on a node in trouble:
 
 ```bash
-kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide
+POD=$(kubectl get pods -n essai-noeud --field-selector spec.nodeName=architecture-worker3 -o jsonpath='{.items[0].metadata.name}')
+kubectl describe pod $POD -n essai-noeud | sed -n '/^Tolerations:/,/^Events:/p'
 ```
 
 ```text
-NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                         NOMINATED NODE   READINESS GATES
-kube-proxy-6zbcq   1/1     Running   0          10m   172.18.0.7   architecture-worker2         <none>           <none>
-kube-proxy-gsm7l   1/1     Running   0          10m   172.18.0.6   architecture-worker3         <none>           <none>
-kube-proxy-hskwd   1/1     Running   0          10m   172.18.0.2   architecture-control-plane   <none>           <none>
-kube-proxy-mscg7   1/1     Running   0          10m   172.18.0.5   architecture-worker          <none>           <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
 ```
 
-Look at the `NODE` column: exactly one `kube-proxy` Pod per node, control plane
-included.
+If the node is no longer ready (`not-ready`) or no longer reachable
+(`unreachable`), this Pod stays there for 300 more seconds, then it is removed
+from it. Keep this number for the next exercise.
 
-## 📚 Exercise 6: stop a node, then restart it
+## 📚 Exercise 3: stop the kubelet of a node
 
-On kind, a node is a Docker container. Stop `architecture-worker3`'s (nothing
-is destroyed), then look at the nodes right away:
+About every ten seconds, the kubelet renews a **lease** (Lease) named after its
+node: it is its heartbeat. Read the time of the last renewal, then stop the
+kubelet of `architecture-worker3`. On kind, the node is a Docker container:
+`docker exec` runs a command inside it.
 
 ```bash
-docker stop architecture-worker3
-kubectl get nodes
+kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+docker exec architecture-worker3 systemctl stop kubelet
+docker exec architecture-worker3 systemctl is-active kubelet
 ```
 
 ```text
-architecture-worker3
-NAME                         STATUS   ROLES           AGE   VERSION
-architecture-control-plane   Ready    control-plane   10m   v1.37.0
-architecture-worker          Ready    <none>          10m   v1.37.0
-architecture-worker2         Ready    <none>          10m   v1.37.0
-architecture-worker3         Ready    <none>          10m   v1.37.0
+2026-11-20T07:41:39.949102Z
+inactive
 ```
 
-The node is still `Ready`: the cluster does not know yet that it stopped. Wait
-a minute, then look again:
+Wait about fifteen seconds, then read the lease again:
+
+```bash
+kubectl get lease -n kube-node-lease architecture-worker3 -o jsonpath='{.spec.renewTime}'; echo
+date -u +%H:%M:%S
+```
+
+```text
+2026-11-20T07:41:39.949102Z
+07:41:56
+```
+
+The time of the lease did not move, while the clock moved on by 17 seconds:
+nobody renews it any more. Wait one more minute, then look at the nodes and at
+the sheet of `architecture-worker3`:
 
 ```bash
 sleep 60
 kubectl get nodes
-```
-
-```text
-NAME                         STATUS     ROLES           AGE   VERSION
-architecture-control-plane   Ready      control-plane   11m   v1.37.0
-architecture-worker          Ready      <none>          11m   v1.37.0
-architecture-worker2         Ready      <none>          11m   v1.37.0
-architecture-worker3         NotReady   <none>          11m   v1.37.0
-```
-
-`NotReady`: the kubelet no longer renews its lease, and after about 50 seconds
-the cluster considers it lost. Its sheet says so:
-
-```bash
 kubectl describe node architecture-worker3 | grep -E '^Taints|unreachable|^  Ready'
 ```
 
 ```text
+NAME                         STATUS     ROLES           AGE   VERSION
+architecture-control-plane   Ready      control-plane   14m   v1.37.0
+architecture-worker          Ready      <none>          14m   v1.37.0
+architecture-worker2         Ready      <none>          14m   v1.37.0
+architecture-worker3         NotReady   <none>          14m   v1.37.0
 Taints:             node.kubernetes.io/unreachable:NoExecute
                     node.kubernetes.io/unreachable:NoSchedule
-  Ready            Unknown   Thu, 19 Nov 2026 11:10:52 +0000   Thu, 19 Nov 2026 11:13:14 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
+  Ready            Unknown   Fri, 20 Nov 2026 07:41:09 +0000   Fri, 20 Nov 2026 07:42:33 +0000   NodeStatusUnknown   Kubelet stopped posting node status.
 ```
 
-The `Ready` condition is `Unknown`, with the message `Kubelet stopped posting
-node status`. The cluster also set two `unreachable` **marks** (taints): no
-new Pod will go to this node anymore. Restart it and wait for it to come back:
+On this machine, the node became `NotReady` after about one minute. The
+`Ready` condition is `Unknown`: the cluster does not know whether the node is
+broken, it only knows the kubelet no longer reports. It set two `unreachable`
+**taints**:
+
+- `NoSchedule`: no new Pod will be placed on this node;
+- `NoExecute`: the Pods already there will be removed from it, after the delay
+  of their toleration, that is 300 seconds for your witness Pod.
+
+Look at this Pod:
 
 ```bash
-docker start architecture-worker3
-kubectl wait --for=condition=Ready node/architecture-worker3 --timeout=120s
-kubectl get nodes
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
 ```
 
 ```text
-architecture-worker3
-node/architecture-worker3 condition met
-NAME                         STATUS   ROLES           AGE   VERSION
-architecture-control-plane   Ready    control-plane   11m   v1.37.0
-architecture-worker          Ready    <none>          11m   v1.37.0
-architecture-worker2         Ready    <none>          11m   v1.37.0
-architecture-worker3         Ready    <none>          11m   v1.37.0
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          57s   10.244.4.12   architecture-worker3   <none>           <none>
 ```
 
-The node is `Ready` again.
+It still shows `Running`. It is the last thing the kubelet told the cluster,
+before it stopped: the cluster knows nothing more. The 300 seconds of its
+toleration have not run out.
+
+## 📚 Exercise 4: start the kubelet again
+
+Start the kubelet again, wait until the node is ready, then read its taints
+twice, ten seconds apart:
+
+```bash
+docker exec architecture-worker3 systemctl start kubelet
+kubectl wait --for=condition=Ready node/architecture-worker3 --timeout=120s
+kubectl describe node architecture-worker3 | grep -E '^Taints'
+sleep 10
+kubectl describe node architecture-worker3 | grep -E '^Taints'
+```
+
+```text
+node/architecture-worker3 condition met
+Taints:             node.kubernetes.io/unreachable:NoExecute
+Taints:             <none>
+```
+
+The node is `Ready` before the `NoExecute` taint is removed: a few seconds
+separate the two. Your witness Pod did not move:
+
+```bash
+kubectl get pods -n essai-noeud -o wide --field-selector spec.nodeName=architecture-worker3
+```
+
+```text
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                   NOMINATED NODE   READINESS GATES
+temoin-556cf4ff8c-8w9th   1/1     Running   0          67s   10.244.4.12   architecture-worker3   <none>           <none>
+```
+
+Same name, no restart: the node came back before the end of the 300 seconds,
+the Pod was not removed.
+
+## 📚 Exercise 5: delete the kube-proxy of a node
+
+**kube-proxy** prepares, on each node, the network rules that make Services
+work. It runs as a **DaemonSet**, an object that places one Pod on each node.
+Delete the one of `architecture-worker3`:
+
+```bash
+kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide --field-selector spec.nodeName=architecture-worker3
+PROXY=$(kubectl get pods -n kube-system -l k8s-app=kube-proxy --field-selector spec.nodeName=architecture-worker3 -o jsonpath='{.items[0].metadata.name}')
+kubectl delete pod $PROXY -n kube-system
+```
+
+```text
+NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                   NOMINATED NODE   READINESS GATES
+kube-proxy-p9gxx   1/1     Running   0          88s   172.18.0.4   architecture-worker3   <none>           <none>
+pod "kube-proxy-p9gxx" deleted from kube-system namespace
+```
+
+Wait five seconds and look again:
+
+```bash
+kubectl get pods -n kube-system -l k8s-app=kube-proxy -o wide --field-selector spec.nodeName=architecture-worker3
+kubectl get daemonset kube-proxy -n kube-system
+```
+
+```text
+NAME               READY   STATUS    RESTARTS   AGE   IP           NODE                   NOMINATED NODE   READINESS GATES
+kube-proxy-jhhlg   1/1     Running   0          6s    172.18.0.4   architecture-worker3   <none>           <none>
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-proxy   4         4         4       4            4           kubernetes.io/os=linux   15m
+```
+
+A new Pod, `kube-proxy-jhhlg`, already runs on the same node. The DaemonSet
+wants one Pod per node: `DESIRED` is `4`, like the number of nodes. The Pod's
+address, `172.18.0.4`, is the address of the node itself: kube-proxy uses the
+machine's network, not an address from the `PodCIDR`.
 
 ## 🧹 Clean up
 
-The exercises created nothing: you only read, then stopped and restarted a
-node. Leave the machine and reset the lab. `dsoxlab reset` replays the lab's
+First delete what you created during the exercises: the scratch namespace,
+and the witness Pod with it.
+
+```bash
+kubectl delete namespace essai-noeud
+```
+
+```text
+namespace "essai-noeud" deleted
+```
+
+Then leave the machine and reset the lab. `dsoxlab reset` replays the lab's
 clean-up then its preparation: you get back exactly the starting state of the
 challenge. It asks you to confirm: answer `y`.
 
