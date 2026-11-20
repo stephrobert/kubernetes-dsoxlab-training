@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Pose la situation : un namespace vide, aucune release, et le chart de
-# l'équipe dans ~/charts/web de l'apprenant, généré par helm create et
-# aligné sur une image nginx à jour.
+# l'équipe dans ~/charts/web de l'apprenant, généré par helm create (version
+# 0.1.0) et aligné sur l'image nginx 1.30.5 de la formation, épinglée par
+# digest.
 #
 # Rejouable : le namespace est attendu s'il se termine, la release d'un
 # passage précédent est désinstallée, le chart est régénéré.
@@ -25,7 +26,14 @@ helm uninstall web -n lab --ignore-not-found --wait
 rm -rf "${MAISON}/charts/web"
 mkdir -p "${MAISON}/charts"
 (cd "${MAISON}/charts" && helm create web >/dev/null)
-sed -i 's/^appVersion: .*/appVersion: "1.27-alpine"/' "${MAISON}/charts/web/Chart.yaml"
+# L'image de la formation, épinglée par digest dans values.yaml (le template
+# de helm create écrit repository:tag). Avant le 2026-11-20, l'appVersion
+# posait nginx:1.27-alpine, une version périmée et sans digest.
+sed -i 's/^appVersion: .*/appVersion: "1.30.5"/' "${MAISON}/charts/web/Chart.yaml"
+sed -i 's/^  tag: ""/  tag: "1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb"/' \
+  "${MAISON}/charts/web/values.yaml"
+grep -q '^  tag: "1.30.5@sha256:' "${MAISON}/charts/web/values.yaml"
+grep -E '^(version|appVersion):' "${MAISON}/charts/web/Chart.yaml"
 chown -R "${UTILISATEUR}:${UTILISATEUR}" "${MAISON}/charts"
 helm version --short
 

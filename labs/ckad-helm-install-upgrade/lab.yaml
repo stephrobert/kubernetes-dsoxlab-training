@@ -4,9 +4,9 @@ level: application-deployment
 section: ckad
 difficulty: intermediate
 description: |
-  Deploy a chart with Helm, upgrade it with new values, then go back to the
-  first revision. Prove through the release history and the state of the
-  Deployment that the three operations took place, in that order.
+  Install the team's chart in version 0.1.0, upgrade the release with the
+  chart in version 0.2.0 and new values, then go back to the first revision.
+  The release history shows the chart version of each revision.
 skills:
   - helm
   - release
@@ -14,7 +14,7 @@ skills:
   - rollback
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/
 lab_type: lab
 estimated_time: 15m
 
@@ -37,25 +37,23 @@ validation:
   functional: true
   persistence_after_reboot: false
 
-# Critères ajoutés le 2026-11-16 pour la couverture stricte de la CKAD. La
-# leçon n'a pas encore de jumelle anglaise (404 relevé ce jour) : les liens
-# visent la page française.
+# Critères ajoutés le 2026-11-16 pour la couverture stricte de la CKAD.
 criteria:
   - id: trois-revisions
-    label: "The release history shows install, upgrade, then a rollback, the last revision deployed"
+    label: "The history shows web-0.1.0, then web-0.2.0, then a deployed rollback to revision 1"
     tests:
-      - test_l_historique_montre_les_trois_revisions
+      - test_l_historique_montre_les_deux_versions_du_chart_puis_le_retour
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/
   - id: montee-annulee
-    label: "Revision 2 carried two replicas, the current values bring back one"
+    label: "Revision 2 carried 3 replicas and the tier=front label, the current values carry neither"
     tests:
-      - test_la_montee_en_charge_a_eu_lieu_puis_a_ete_annulee
+      - test_la_revision_2_portait_ses_valeurs_et_le_retour_les_retire
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/
   - id: application-repond
     label: "The application runs with one replica, the chart's image, and answers through its Service"
     tests:
       - test_l_application_tourne_et_repond
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/install-releases/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/

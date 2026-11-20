@@ -1,14 +1,15 @@
 # Install, upgrade and roll back with Helm 4
 
 A Helm **chart** is a directory: manifest templates, and a **values** file that
-fills them. In this course, you create a chart, you read its values, you check
-it before installing it, you install it, you change a value, you see what an
-`upgrade` does with the values passed before, then you go back to a given
-revision.
+fills them. In this course, you create a chart, check it, install it and
+change its values. Then you go back in three ways: to a given revision,
+without a number, and after an uninstall. You will also see `upgrade
+--install`, which installs or upgrades depending on whether the release
+exists.
 
-You work with a trial chart and release, `bonjour`, in a scratch namespace,
-`essai-chart`. The challenge is about another chart, already prepared: you will
-do it on your own, at the end.
+You work with a trial chart, `bonjour`, in a scratch namespace,
+`essai-chart`. The challenge is about another chart, already prepared: you
+will do it on your own, at the end.
 
 Related page: [Install and manage Helm releases](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/).
 
@@ -24,7 +25,7 @@ You are now connected to `k8s-cp.lab`, the node that runs the kubeadm cluster
 (the control plane). Your kubectl already targets it, and the lab installed
 Helm.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026, with Kubernetes v1.37.2 and Helm 4.3.2.
 
 ## 📚 Exercise 1: create a chart
@@ -167,13 +168,13 @@ kubectl get deployment -n essai-chart
 ```text
 namespace/essai-chart created
 NAME: bonjour
-LAST DEPLOYED: Thu Nov 19 19:52:13 2026
+LAST DEPLOYED: Fri Nov 20 19:02:52 2026
 NAMESPACE: essai-chart
 STATUS: deployed
 REVISION: 1
 DESCRIPTION: Install complete
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   1/1     1            1           2s
+bonjour   1/1     1            1           1s
 ```
 
 Revision 1, with 1 replica, the default value.
@@ -190,7 +191,7 @@ helm upgrade bonjour ~/essai-charts/bonjour -n essai-chart --set replicaCount=3 
 ```text
 Release "bonjour" has been upgraded. Happy Helming!
 NAME: bonjour
-LAST DEPLOYED: Thu Nov 19 19:52:15 2026
+LAST DEPLOYED: Fri Nov 20 19:02:53 2026
 NAMESPACE: essai-chart
 STATUS: deployed
 REVISION: 2
@@ -206,7 +207,7 @@ helm get values bonjour -n essai-chart; kubectl get deployment -n essai-chart
 USER-SUPPLIED VALUES:
 replicaCount: 3
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   3/3     3            3           4s
+bonjour   3/3     3            3           12s
 ```
 
 ## 📚 Exercise 6: an upgrade with another value
@@ -222,7 +223,7 @@ helm upgrade bonjour ~/essai-charts/bonjour -n essai-chart --wait --timeout 180s
 USER-SUPPLIED VALUES:
 replicaCount: 3
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   3/3     3            3           4s
+bonjour   3/3     3            3           13s
 ```
 
 With no value at all, Helm takes those of the previous revision: still 3
@@ -237,7 +238,7 @@ USER-SUPPLIED VALUES:
 podLabels:
   equipe: accueil
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   1/1     1            1           6s
+bonjour   1/1     1            1           15s
 ```
 
 Back to 1 replica. As soon as you pass a value, Helm starts again from the
@@ -254,7 +255,7 @@ podLabels:
   equipe: accueil
 replicaCount: 3
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   3/3     3            3           8s
+bonjour   3/3     3            3           16s
 ```
 
 Both values are there. Each `upgrade` created a revision:
@@ -265,15 +266,17 @@ helm history bonjour -n essai-chart
 
 ```text
 REVISION	UPDATED                 	STATUS    	CHART        	APP VERSION	DESCRIPTION     
-1       	Thu Nov 19 19:52:13 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
-2       	Thu Nov 19 19:52:15 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-3       	Thu Nov 19 19:52:17 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-4       	Thu Nov 19 19:52:17 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-5       	Thu Nov 19 19:52:19 2026	deployed  	bonjour-0.1.0	1.16.0     	Upgrade complete
+1       	Fri Nov 20 19:02:52 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
+2       	Fri Nov 20 19:02:53 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+3       	Fri Nov 20 19:03:04 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+4       	Fri Nov 20 19:03:05 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+5       	Fri Nov 20 19:03:07 2026	deployed  	bonjour-0.1.0	1.16.0     	Upgrade complete
 ```
 
-The `APP VERSION` column shows `1.16.0`, the chart's `appVersion`, while the
-image runs 1.30.5: this column copies `Chart.yaml`, it does not read the image.
+The `CHART` column gives the name and version of the chart each revision
+used: here always `bonjour-0.1.0`, since `Chart.yaml` did not change. The
+`APP VERSION` column shows `1.16.0`, the chart's `appVersion`, while the image
+runs 1.30.5: this column copies `Chart.yaml`, it does not read the image.
 
 ## 📚 Exercise 7: go back to a revision
 
@@ -293,20 +296,20 @@ helm history bonjour -n essai-chart; helm get values bonjour -n essai-chart; kub
 
 ```text
 REVISION	UPDATED                 	STATUS    	CHART        	APP VERSION	DESCRIPTION     
-1       	Thu Nov 19 19:52:13 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
-2       	Thu Nov 19 19:52:15 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-3       	Thu Nov 19 19:52:17 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-4       	Thu Nov 19 19:52:17 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-5       	Thu Nov 19 19:52:19 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
-6       	Thu Nov 19 19:52:21 2026	deployed  	bonjour-0.1.0	1.16.0     	Rollback to 2   
+1       	Fri Nov 20 19:02:52 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
+2       	Fri Nov 20 19:02:53 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+3       	Fri Nov 20 19:03:04 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+4       	Fri Nov 20 19:03:05 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+5       	Fri Nov 20 19:03:07 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+6       	Fri Nov 20 19:03:09 2026	deployed  	bonjour-0.1.0	1.16.0     	Rollback to 2   
 USER-SUPPLIED VALUES:
 replicaCount: 3
 NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-bonjour   3/3     3            3           12s
+bonjour   3/3     3            3           20s
 ```
 
 A revision 6 appeared (`Rollback to 2`), with the values of revision 2:
-3 replicas, no more label. Finally, check that the application answers, on the
+3 replicas, no more label. Check that the application answers, on the
 internal address of its Service (`grep -o` keeps only the page title):
 
 ```bash
@@ -317,16 +320,207 @@ IP=$(kubectl get service bonjour -n essai-chart -o jsonpath='{.spec.clusterIP}')
 <title>Welcome to nginx!</title>
 ```
 
-## 🧹 Clean up
+## 📚 Exercise 8: a rollback without a number
 
-Uninstall the release, delete its namespace and the trial chart:
+Do one more upgrade, to 2 replicas:
 
 ```bash
-helm uninstall bonjour -n essai-chart --wait; kubectl delete namespace essai-chart; rm -rf ~/essai-charts
+helm upgrade bonjour ~/essai-charts/bonjour -n essai-chart --reuse-values --set replicaCount=2 --wait --timeout 180s > /dev/null; helm history bonjour -n essai-chart
+```
+
+```text
+REVISION	UPDATED                 	STATUS    	CHART        	APP VERSION	DESCRIPTION     
+1       	Fri Nov 20 19:02:52 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
+2       	Fri Nov 20 19:02:53 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+3       	Fri Nov 20 19:03:04 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+4       	Fri Nov 20 19:03:05 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+5       	Fri Nov 20 19:03:07 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+6       	Fri Nov 20 19:03:09 2026	superseded	bonjour-0.1.0	1.16.0     	Rollback to 2   
+7       	Fri Nov 20 19:03:12 2026	deployed  	bonjour-0.1.0	1.16.0     	Upgrade complete
+```
+
+Without a number, `helm rollback` goes back to the revision before the
+current one:
+
+```bash
+helm rollback bonjour -n essai-chart --wait --timeout 180s
+```
+
+```text
+Rollback was a success! Happy Helming!
+```
+
+```bash
+helm history bonjour -n essai-chart; helm get values bonjour -n essai-chart
+```
+
+```text
+REVISION	UPDATED                 	STATUS    	CHART        	APP VERSION	DESCRIPTION     
+1       	Fri Nov 20 19:02:52 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
+2       	Fri Nov 20 19:02:53 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+3       	Fri Nov 20 19:03:04 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+4       	Fri Nov 20 19:03:05 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+5       	Fri Nov 20 19:03:07 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+6       	Fri Nov 20 19:03:09 2026	superseded	bonjour-0.1.0	1.16.0     	Rollback to 2   
+7       	Fri Nov 20 19:03:12 2026	superseded	bonjour-0.1.0	1.16.0     	Upgrade complete
+8       	Fri Nov 20 19:03:12 2026	deployed  	bonjour-0.1.0	1.16.0     	Rollback to 6   
+USER-SUPPLIED VALUES:
+replicaCount: 3
+```
+
+Revision 8 says `Rollback to 6`: the previous revision was the rollback of
+exercise 7, not revision 1 or 2. Without a number, Helm goes back one step
+only, whatever that step holds. To target a given revision, give its number.
+
+## 📚 Exercise 9: upgrade --install, twice
+
+`helm install` fails if the release already exists (`cannot reuse a name that
+is still in use`), and `helm upgrade` fails if it does not exist (`has no
+deployed releases`). `helm upgrade --install` does one or the other: it is the
+command you can run again without thinking, in a script or a pipeline. First
+look at the releases of the namespace:
+
+```bash
+helm list -n essai-chart
+```
+
+```text
+NAME   	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART        	APP VERSION
+bonjour	essai-chart	8       	2026-11-20 19:03:12.748038061 +0000 UTC	deployed	bonjour-0.1.0	1.16.0     
+```
+
+Run `upgrade --install` for a release `salut` that does not exist:
+
+```bash
+helm upgrade --install salut ~/essai-charts/bonjour -n essai-chart --wait --timeout 180s | head -6
+```
+
+```text
+Release "salut" does not exist. Installing it now.
+NAME: salut
+LAST DEPLOYED: Fri Nov 20 19:03:14 2026
+NAMESPACE: essai-chart
+STATUS: deployed
+REVISION: 1
+```
+
+Helm installed it. Run exactly the same command again:
+
+```bash
+helm upgrade --install salut ~/essai-charts/bonjour -n essai-chart --wait --timeout 180s | head -6
+```
+
+```text
+Release "salut" has been upgraded. Happy Helming!
+NAME: salut
+LAST DEPLOYED: Fri Nov 20 19:03:15 2026
+NAMESPACE: essai-chart
+STATUS: deployed
+REVISION: 2
+```
+
+This time it is an upgrade. The history shows both:
+
+```bash
+helm history salut -n essai-chart
+```
+
+```text
+REVISION	UPDATED                 	STATUS    	CHART        	APP VERSION	DESCRIPTION     
+1       	Fri Nov 20 19:03:14 2026	superseded	bonjour-0.1.0	1.16.0     	Install complete
+2       	Fri Nov 20 19:03:15 2026	deployed  	bonjour-0.1.0	1.16.0     	Upgrade complete
+```
+
+## 📚 Exercise 10: uninstall and keep the history
+
+`helm uninstall` deletes the objects of the release and, by default, its
+history. With `--keep-history`, the history stays:
+
+```bash
+helm uninstall salut -n essai-chart --keep-history --wait
+```
+
+```text
+release "salut" uninstalled
+```
+
+```bash
+helm list -n essai-chart; helm list -n essai-chart --uninstalled
+```
+
+```text
+NAME   	NAMESPACE  	REVISION	UPDATED                                	STATUS     	CHART        	APP VERSION
+bonjour	essai-chart	8       	2026-11-20 19:03:12.748038061 +0000 UTC	deployed   	bonjour-0.1.0	1.16.0     
+salut  	essai-chart	2       	2026-11-20 19:03:15.885798202 +0000 UTC	uninstalled	bonjour-0.1.0	1.16.0     
+NAME 	NAMESPACE  	REVISION	UPDATED                                	STATUS     	CHART        	APP VERSION
+salut	essai-chart	2       	2026-11-20 19:03:15.885798202 +0000 UTC	uninstalled	bonjour-0.1.0	1.16.0     
+```
+
+With Helm 4.3.2, `helm list` without an option also shows the uninstalled
+release, with the `uninstalled` status. `--uninstalled` keeps only those. The
+objects, though, are gone:
+
+```bash
+helm history salut -n essai-chart; kubectl get deployment -n essai-chart
+```
+
+```text
+REVISION	UPDATED                 	STATUS     	CHART        	APP VERSION	DESCRIPTION            
+1       	Fri Nov 20 19:03:14 2026	superseded 	bonjour-0.1.0	1.16.0     	Install complete       
+2       	Fri Nov 20 19:03:15 2026	uninstalled	bonjour-0.1.0	1.16.0     	Uninstallation complete
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+bonjour   3/3     3            3           24s
+```
+
+No more `salut-bonjour` Deployment. The name stays taken as long as the
+history exists, even for a `helm install`:
+
+```bash
+helm install salut ~/essai-charts/bonjour -n essai-chart 2>&1 | tail -1
+```
+
+```text
+Error: INSTALLATION FAILED: release name check failed: cannot reuse a name that is still in use
+```
+
+A rollback, though, works: it recreates the objects from a kept revision.
+
+```bash
+helm rollback salut 1 -n essai-chart --wait --timeout 180s
+```
+
+```text
+Rollback was a success! Happy Helming!
+```
+
+```bash
+helm history salut -n essai-chart; kubectl get deployment -n essai-chart
+```
+
+```text
+REVISION	UPDATED                 	STATUS     	CHART        	APP VERSION	DESCRIPTION            
+1       	Fri Nov 20 19:03:14 2026	superseded 	bonjour-0.1.0	1.16.0     	Install complete       
+2       	Fri Nov 20 19:03:15 2026	uninstalled	bonjour-0.1.0	1.16.0     	Uninstallation complete
+3       	Fri Nov 20 19:03:16 2026	deployed   	bonjour-0.1.0	1.16.0     	Rollback to 1          
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+bonjour         3/3     3            3           25s
+salut-bonjour   1/1     1            1           1s
+```
+
+Revision 3 takes back revision 1, and `salut-bonjour` is back. Without
+`--keep-history`, there would be nothing left to take back.
+
+## 🧹 Clean up
+
+Uninstall both releases, delete the namespace and the trial chart:
+
+```bash
+helm uninstall bonjour salut -n essai-chart --wait; kubectl delete namespace essai-chart; rm -rf ~/essai-charts
 ```
 
 ```text
 release "bonjour" uninstalled
+release "salut" uninstalled
 namespace "essai-chart" deleted
 ```
 
@@ -353,7 +547,8 @@ untouched.
 ## 🎯 The challenge
 
 Your turn, on your own this time: another chart, already prepared. Install it,
-move it to two replicas, then go back to its first revision.
+raise its version, upgrade the release with new values, then go back to its
+first revision.
 
 ```bash
 dsoxlab run ckad-helm-install-upgrade
