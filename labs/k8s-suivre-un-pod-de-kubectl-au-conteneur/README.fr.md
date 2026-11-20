@@ -192,6 +192,13 @@ L'image était déjà sur le nœud (`already present on machine`) : pas de
 téléchargement cette fois. `Killing` est l'arrêt du conteneur du Pod
 supprimé.
 
+Deux lignes demandent une lecture attentive. La ligne `Created` de `5rx62`
+concerne l'ancien Pod, celui que vous avez supprimé, et non le nouveau. Et la
+liste est triée à la seconde près : quand plusieurs événements tombent dans la
+même seconde, leur ordre d'affichage n'est pas fiable. Ici, le `Started` de
+`mqvjk` apparaît avant son `Created`. Pour connaître le vrai ordre d'un Pod,
+lisez ses événements avec `kubectl describe pod`.
+
 ## 📚 Exercice 7 : joindre un Pod par son adresse
 
 Chaque Pod a sa propre adresse, et tout Pod peut joindre tout autre Pod
@@ -225,9 +232,10 @@ pod "test" deleted from essai-trajet namespace
 
 La page de nginx s'affiche : le Pod `test` a joint un Pod du cluster par son
 adresse, sans rien configurer. Il arrive que la page s'affiche **deux fois**,
-avec la ligne `warning: couldn't attach to pod/test, falling back to streaming
-logs` : le Pod a fini avant que kubectl s'y branche, et kubectl relit sa
-sortie. Ce n'est pas une erreur.
+avec la ligne
+`warning: couldn't attach to pod/test, falling back to streaming logs` : le Pod
+a fini avant que kubectl s'y branche, et kubectl relit sa sortie. Ce n'est pas
+une erreur.
 
 ## 🧹 Nettoyage
 

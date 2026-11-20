@@ -50,16 +50,16 @@ criteria:
       - test_le_deployment_suivi_a_un_replica_disponible
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
-  - id: le-placement-est-attribue-au-scheduler
-    label: "The Scheduled step is attributed to the scheduler"
+  - id: le-pod-releve-est-celui-de-suivi
+    label: "The recorded Pod is the Pod that suivi runs"
     tests:
-      - test_l_etape_scheduled_est_attribuee_au_scheduler
+      - test_le_pod_releve_est_celui_de_suivi
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
-  - id: les-etapes-du-conteneur-sont-attribuees-au-kubelet
-    label: "The Pulled, Created and Started steps are attributed to the kubelet"
+  - id: le-conteneur-releve-est-celui-du-pod
+    label: "The recorded container identifier is the one containerd gave the container of suivi"
     tests:
-      - test_les_etapes_du_conteneur_sont_attribuees_au_kubelet
+      - test_le_conteneur_releve_est_celui_du_pod
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-kubelet-est-celui-du-node-du-pod

@@ -16,12 +16,13 @@ value after each colon.
    nginx:1.30@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
    ```
 
-2. After **`scheduled`**: the component that placed the Pod on a node.
+2. After **`pod`**: the full name of the Pod the Deployment created.
 
-3. After **`pulled`**, **`created`** and **`started`**: the component that
-   downloaded the image, created the container and started it.
+3. After **`noeud-du-kubelet`**: the node chosen by the Scheduler, whose
+   kubelet started the container.
 
-4. After **`noeud-du-kubelet`**: the node whose kubelet did that work.
+4. After **`conteneur`**: the identifier containerd gave the container of the
+   Pod.
 
 ## 🧭 Useful pointers
 
@@ -31,7 +32,10 @@ with a `From` column. `kubectl get events -o wide` shows the same events for
 the whole namespace, with a `SOURCE` column.
 
 The event's reason gives the step (`Scheduled`, `Pulled`, `Created`,
-`Started`). The message of the `Scheduled` event gives the chosen node.
+`Started`). The message of the `Scheduled` event gives the chosen node. The
+kubelet of that node then asks containerd for the container:
+`kubectl describe pod` shows the identifier it received on the `Container ID`
+line.
 
 On this cluster, events are kept for **24 hours** (one hour by default in
 Kubernetes). After a long break, those of the lab are gone: then run

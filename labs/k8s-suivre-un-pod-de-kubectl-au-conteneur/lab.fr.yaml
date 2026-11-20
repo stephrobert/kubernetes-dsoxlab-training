@@ -11,12 +11,12 @@ criteria:
     label: "Le Deployment suivi a un réplica disponible sur l'image demandée"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
-  - id: le-placement-est-attribue-au-scheduler
-    label: "L'étape Scheduled est attribuée au scheduler"
+  - id: le-pod-releve-est-celui-de-suivi
+    label: "Le Pod relevé est celui que suivi fait tourner"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
-  - id: les-etapes-du-conteneur-sont-attribuees-au-kubelet
-    label: "Les étapes Pulled, Created et Started sont attribuées au kubelet"
+  - id: le-conteneur-releve-est-celui-du-pod
+    label: "L'identifiant relevé est celui que containerd a donné au conteneur de suivi"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/architecture/
   - id: le-kubelet-est-celui-du-node-du-pod

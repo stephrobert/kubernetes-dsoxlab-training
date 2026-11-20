@@ -21,12 +21,9 @@ cat > "${LAB_HOME}/suivre-un-pod/etapes.txt" <<'RELEVE'
 # For each step, the component that acted, read in the events of the Pod.
 # Les lignes qui commencent par # sont ignorées. Lines starting with # are ignored.
 
-scheduled:
-pulled:
-created:
-started:
-
+pod:
 noeud-du-kubelet:
+conteneur:
 RELEVE
 chown "$LAB_USER:$LAB_USER" "${LAB_HOME}/suivre-un-pod/etapes.txt"
 echo "Situation posée : namespace suivre-un-pod vide, relevé à compléter."
