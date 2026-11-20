@@ -1,9 +1,9 @@
 # Install and configure kubectl
 
 kubectl is the command you use to talk to a Kubernetes cluster. In this
-course, you redo the moves of the lesson one by one: pick a version, download
-the program, check that it was not damaged, install it, give it a shortcut,
-then check that it reaches the cluster.
+course, you practise the moves of the lesson, and you meet failures it does
+not show: a version that does not exist, a damaged file, a program the shell
+cannot find, and a completion that does not load in a new terminal.
 
 To practise, you install **another version** of kubectl, under **another
 name**. The challenge will ask you for the real installation: you will do it on
@@ -25,7 +25,7 @@ holds what it takes to connect to it. Only one thing is missing: kubectl,
 which the lab removed.
 
 The outputs shown in this course were recorded on this machine (Debian 13.7)
-on 19 November 2026.
+on 19 and 20 November 2026.
 
 ## 📚 Exercise 1: pick a kubectl version
 
@@ -224,7 +224,7 @@ The shell finds no `kubectl` command, and `/usr/local/bin` only holds `kind`.
 What you installed only serves you, under another name. The challenge will ask
 you for a `kubectl` command everyone can use.
 
-## 📚 Exercise 6: create a shortcut and a completion, then see them disappear
+## 📚 Exercise 6: keep an alias and its completion in `~/.bashrc`
 
 Two helpers make kubectl nicer to use:
 
@@ -244,40 +244,121 @@ type _init_completion
 bash: type: _init_completion: not found
 ```
 
-It is not: the Tab key will not really complete commands. The challenge will
-ask you to install it. Here, you only learn to create the alias and to declare
-the completion.
-
-Load kubectl's completion, create the `kc` alias, then tell the shell that
-`kc` completes like kubectl:
+The `_init_completion` function comes from that package. It is missing: the
+package is not installed. Install it:
 
 ```bash
+sudo apt-get install -y bash-completion
+dpkg -s bash-completion | grep -E "^(Status|Version)"
+```
+
+```text
+Status: install ok installed
+Version: 1:2.16.0-7
+```
+
+A command typed in the terminal is forgotten when the terminal closes. To keep
+the alias and the completion, write them in `~/.bashrc`, the file bash reads
+every time a terminal opens. Add three lines at the end:
+
+```bash
+cat >> ~/.bashrc <<'EOF'
 source <(kubectl136 completion bash)
 alias kc=kubectl136
 complete -o default -F __start_kubectl kc
+EOF
+tail -3 ~/.bashrc
+```
+
+```text
+source <(kubectl136 completion bash)
+alias kc=kubectl136
+complete -o default -F __start_kubectl kc
+```
+
+The first line loads kubectl's completion. It creates a function,
+`__start_kubectl`, which computes the suggestions. The second line creates the
+alias. The third tells bash: to complete `kc`, call `__start_kubectl`. An alias
+does not inherit on its own the completion of the command it stands for.
+
+Now check the way the challenge will: in a **new** terminal. `bash -l` opens a
+login shell, the one a new SSH connection would give you:
+
+```bash
+bash -l
+```
+
+```text
+bash: kubectl136: command not found
+```
+
+An error, right at startup. Check whether the completion function exists:
+
+```bash
+alias kc
+type -t __start_kubectl || echo "no __start_kubectl function"
+```
+
+```text
+alias kc='kubectl136'
+no __start_kubectl function
+```
+
+The alias is there, but not the completion. Type `kc ver` then Tab: nothing is
+completed. To understand why, look at the order in which `~/.profile` does
+things:
+
+```bash
+grep -n -E "bashrc|local/bin" ~/.profile
+```
+
+```text
+13:    # include .bashrc if it exists
+14:    if [ -f "$HOME/.bashrc" ]; then
+15:	. "$HOME/.bashrc"
+25:if [ -d "$HOME/.local/bin" ] ; then
+26:    PATH="$HOME/.local/bin:$PATH"
+```
+
+`~/.profile` reads `~/.bashrc` on line 15, then adds `~/.local/bin` to the PATH
+on line 26. When your `source <(kubectl136 completion bash)` line is read, the
+shell does not know yet where to find `kubectl136`. The alias is only used
+later, when you type `kc`: by then, the PATH is complete.
+
+Leave this shell. Fix the line so that it gives the full path of the program,
+without relying on the PATH:
+
+```bash
+exit
+sed -i 's|^source <(kubectl136 completion bash)|source <("$HOME/.local/bin/kubectl136" completion bash)|' ~/.bashrc
+tail -3 ~/.bashrc
+```
+
+```text
+source <("$HOME/.local/bin/kubectl136" completion bash)
+alias kc=kubectl136
+complete -o default -F __start_kubectl kc
+```
+
+Open a new terminal again and check once more:
+
+```bash
+bash -l
 complete -p kc
+type -t __start_kubectl
 ```
 
 ```text
 complete -o default -F __start_kubectl kc
+function
 ```
 
-The last line confirms that `kc` uses kubectl's completion. Now open a **new**
-shell and ask the same question:
+No more error at startup, and the function exists. Type `kc ver` then Tab: the
+line becomes `kc version`. Leave this shell with `exit`.
 
-```bash
-bash -i -c 'complete -p kc; alias kc'
-```
-
-```text
-bash: complete: kc: no completion specification
-bash: alias: kc: not found
-```
-
-The new shell knows neither the alias nor the completion. Everything you type
-in a terminal is forgotten when it closes. To keep them, you must write them in
-the `~/.bashrc` file, which bash reads every time it opens. That is what the
-challenge will check, in a new shell.
+In the challenge, kubectl will live in `/usr/local/bin`, which is always in the
+PATH: this trap does not arise there. But keep the method: always check in a
+new terminal, and a message at startup means a line of `~/.bashrc` failed.
 
 ## 📚 Exercise 7: check that kubectl reaches the cluster
 
@@ -306,12 +387,17 @@ time a cluster is created: yours will be different.
 
 ## 🧹 Clean up
 
-First delete what you created during the exercises: the `kubectl136` program.
+First delete what you created during the exercises: the three `kc` lines in
+`~/.bashrc`, then the `kubectl136` program.
 
 ```bash
+sed -i -e '/kubectl136/d' -e '/__start_kubectl kc/d' ~/.bashrc
 rm ~/.local/bin/kubectl136
 rmdir ~/.local/bin
 ```
+
+The `bash-completion` package will be removed by `dsoxlab reset`: the
+challenge will ask you to install it yourself.
 
 Then leave the machine and reset the lab. `dsoxlab reset` replays the lab's
 clean-up then its preparation: you get back exactly the starting state of the
