@@ -3,6 +3,15 @@
 Ces tests lisent l'état réel du CLUSTER et l'intérieur du conteneur, jamais un
 fichier YAML du poste ni les commandes tapées.
 
+Depuis le 2026-11-20, le challenge est une ROTATION : l'ancien mot de passe
+(ANCIEN) a fuité, et le nouveau est tiré au hasard par fixtures/prepare.sh,
+qui le pose dans ~/paiement/nouveau-mot-de-passe.txt. La fixture `host` le lit
+là. Les tests exigent le nouveau dans le Secret et dans le conteneur, et
+refusent l'ancien comme le nouveau en clair dans le manifeste, annotation
+last-applied-configuration comprise : le Deployment est posé par `kubectl
+apply`, et `kubectl set env` ne met pas cette annotation à jour (mesuré en
+v1.37.2).
+
 Un test par état demandé par l'énoncé, et neuf états. Le découpage n'est pas
 cosmétique : regroupés, le premier échec masquait les suivants, et chaque moitié
 pesait la moitié de la note au lieu de sa part.
@@ -29,9 +38,9 @@ regardaient un fait vrai au départ au lieu de l'état que le travail produit.
 - le septième voyait « un Pod tourne », ce qui est vrai dès le setup. Il lit
   maintenant le `spec` du Pod QUI TOURNE et y exige la projection du Secret :
   seul un Pod né du gabarit modifié la porte ;
-- le huitième voyait `DB_PASSWORD` porter la bonne valeur, ce qui est vrai dès
-  le setup, puisque c'est le défaut même que le lab fait corriger. Il exige
-  maintenant la valeur ET son origine, lue dans le Pod réel.
+- le huitième voyait la variable porter la bonne valeur, ce qui était vrai
+  dès le setup avant la rotation. Il exige la valeur ET son origine, lue dans
+  le Pod réel.
 
 Le gabarit de Pod et le Pod réel ne se confondent pas : le premier dit ce que
 le Deployment demande, le second dit ce qui tourne. Les tests 2 et 3 lisent le
@@ -57,8 +66,11 @@ from conftest import lab_host, lab_target_host, message
 NAMESPACE = "paiement"
 DEPLOYMENT = "passerelle"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
-VALEUR = "Tr3s0r-2026"
-VARIABLE = "DB_PASSWORD"
+#: Le mot de passe d'avant, celui qui a fuité : il ne doit plus être nulle part.
+ANCIEN = "Tr3s0r-2026"
+#: Le nouveau, tiré au hasard par fixtures/prepare.sh à chaque préparation.
+FICHIER_NOUVEAU = "paiement/nouveau-mot-de-passe.txt"
+VARIABLE = "DATABASE_PASSWORD"
 CHEMIN_MONTE = "/etc/passerelle"
 
 #: Attente du rollout : 18 tours de 5 s, soit 90 s, comme les autres labs du
@@ -69,7 +81,25 @@ DELAI = 5
 
 @pytest.fixture(scope="module")
 def host():
-    return lab_host(lab_target_host("k8s-cp.lab"))
+    h = lab_host(lab_target_host("k8s-cp.lab"))
+    maison = h.check_output('getent passwd "${SUDO_USER:-ansible}" | cut -d: -f6').strip()
+    fichier = h.file(f"{maison}/{FICHIER_NOUVEAU}")
+    assert fichier.exists, message(
+        en=f"~/{FICHIER_NOUVEAU} is missing: the lab was not prepared. Run "
+        "`dsoxlab run ckad-secret-injection-protection` again.",
+        fr=f"~/{FICHIER_NOUVEAU} est absent : le lab n'a pas été préparé. Relancez "
+        "`dsoxlab run ckad-secret-injection-protection`.",
+    )
+    _VALEURS["nouveau"] = fichier.content_string.strip()
+    return h
+
+
+_VALEURS: dict[str, str] = {}
+
+
+def _nouveau() -> str:
+    """Le nouveau mot de passe, lu une fois par la fixture host."""
+    return _VALEURS["nouveau"]
 
 
 def _kubectl(host, args: str):
@@ -155,7 +185,7 @@ def _porteurs(inventaire: dict[str, dict[str, str | None]]) -> list[tuple[str, s
         (nom, cle)
         for nom, contenu in inventaire.items()
         for cle, valeur in contenu.items()
-        if valeur is not None and valeur.strip() == VALEUR
+        if valeur is not None and valeur.strip() == _nouveau()
     ]
 
 
@@ -189,7 +219,7 @@ def _variables_declarees(spec: dict) -> list[str | None]:
 
 
 def _entrees_de_la_variable(spec: dict) -> list[dict]:
-    """Les déclarations de DB_PASSWORD trouvées dans ce `spec`."""
+    """Les déclarations de DATABASE_PASSWORD trouvées dans ce `spec`."""
     return [
         v
         for c in spec.get("containers") or []
@@ -199,7 +229,7 @@ def _entrees_de_la_variable(spec: dict) -> list[dict]:
 
 
 def _secrets_references_par_la_variable(spec: dict) -> list[str | None]:
-    """Le Secret que chaque déclaration de DB_PASSWORD désigne, ou None.
+    """Le Secret que chaque déclaration de DATABASE_PASSWORD désigne, ou None.
 
     Un `value:` nu rend None : c'est exactement ce que le setup pose, et ce que
     le travail doit remplacer.
@@ -334,6 +364,20 @@ def test_le_secret_porte_le_mot_de_passe(host):
         "l'application. Il se crée en une commande, sans écrire de YAML.",
     )
     porteurs = _porteurs(inventaire)
+    anciens = [
+        f"{nom}/{cle}"
+        for nom, contenu in inventaire.items()
+        for cle, valeur in contenu.items()
+        if valeur is not None and valeur.strip() == ANCIEN
+    ]
+    assert porteurs or not anciens, message(
+        en=f"{anciens} holds the OLD password, the one that leaked. A leaked "
+        "password is revoked: the Secret must hold the new one, read from "
+        f"~/{FICHIER_NOUVEAU}.",
+        fr=f"{anciens} porte l'ANCIEN mot de passe, celui qui a fuité. Un mot de "
+        "passe qui a fuité est révoqué : le Secret doit porter le nouveau, lu "
+        f"dans ~/{FICHIER_NOUVEAU}.",
+    )
     cles_lues = {nom: sorted(contenu) for nom, contenu in inventaire.items()}
     assert porteurs, message(
         en="A Secret exists, but none of its keys holds the password. Keys read: "
@@ -353,7 +397,7 @@ def test_le_secret_porte_le_mot_de_passe(host):
 # ----------------------------------------------------------------------
 # 2. La variable que l'application attend vient de CE Secret.
 # ----------------------------------------------------------------------
-def test_db_password_vient_du_secret_par_reference(host):
+def test_database_password_vient_du_secret_par_reference(host):
     nom_secret, _ = _secret_requis(host)
     spec = _spec_pod(host)
     declarees = _variables_declarees(spec)
@@ -432,18 +476,36 @@ def test_le_mot_de_passe_a_quitte_le_manifeste(host):
         en=f"Cannot read Deployment {DEPLOYMENT}. {diagnostic}",
         fr=f"Impossible de lire le Deployment {DEPLOYMENT}. {diagnostic}",
     )
-    assert VALEUR not in manifeste, message(
-        en=f"The password still appears in clear text in the manifest of "
-        f"{DEPLOYMENT}. That is precisely what had to stop: this manifest is "
-        "versioned, reviewed and copied, and anything that can read it can read "
-        "the value. Moving it into a Secret does not encrypt it, but it stops "
-        "sitting in the middle of the application's configuration.",
-        fr=f"Le mot de passe apparaît encore en clair dans le manifeste de "
-        f"{DEPLOYMENT}. C'est précisément ce qu'il fallait faire cesser : ce "
-        "manifeste est versionné, relu et copié, et tout ce qui peut le lire "
-        "peut lire la valeur. La déplacer dans un Secret ne la chiffre pas, "
-        "mais elle cesse d'être au milieu de la configuration de "
-        "l'application.",
+    en_clair = [nom for nom, valeur in (("ancien", ANCIEN), ("nouveau", _nouveau()))
+                if valeur in manifeste]
+    lignes = [ligne.strip()[:60] for ligne in manifeste.splitlines()
+              if ANCIEN in ligne or _nouveau() in ligne]
+    annotation = any("last-applied-configuration" in ligne or ligne.startswith("{")
+                     for ligne in lignes)
+    assert not en_clair, message(
+        en=f"A password ({', '.join(en_clair)}) still appears in clear text in the "
+        f"manifest of {DEPLOYMENT}. This manifest is versioned, reviewed and "
+        "copied, and anything that can read it can read the value. "
+        + ("It sits in the kubectl.kubernetes.io/last-applied-configuration "
+           "annotation, the copy that `kubectl apply` keeps of the applied "
+           "manifest: `kubectl set env` and `kubectl edit` do not update it. "
+           "Remove it with `kubectl annotate deployment "
+           f"{DEPLOYMENT} kubectl.kubernetes.io/last-applied-configuration- -n "
+           f"{NAMESPACE}`, or apply the full corrected manifest again."
+           if annotation else
+           "`kubectl get deployment -o yaml | grep` shows the line."),
+        fr=f"Un mot de passe ({', '.join(en_clair)}) apparaît encore en clair "
+        f"dans le manifeste de {DEPLOYMENT}. Ce manifeste est versionné, relu et "
+        "copié, et tout ce qui peut le lire peut lire la valeur. "
+        + ("Il est dans l'annotation "
+           "kubectl.kubernetes.io/last-applied-configuration, la copie que "
+           "`kubectl apply` garde du manifeste appliqué : `kubectl set env` et "
+           "`kubectl edit` ne la mettent pas à jour. Retirez-la avec `kubectl "
+           f"annotate deployment {DEPLOYMENT} "
+           f"kubectl.kubernetes.io/last-applied-configuration- -n {NAMESPACE}`, "
+           "ou réappliquez le manifeste corrigé en entier."
+           if annotation else
+           "`kubectl get deployment -o yaml | grep` montre la ligne."),
     )
 
 
@@ -476,14 +538,14 @@ def test_le_mot_de_passe_n_est_en_clair_nulle_part_ailleurs(host):
     for cm in json.loads(sortie).get("items", []):
         nom = (cm.get("metadata") or {}).get("name", "?")
         for cle, valeur in (cm.get("data") or {}).items():
-            if VALEUR in valeur:
+            if ANCIEN in valeur or _nouveau() in valeur:
                 fautifs.append(f"{nom}/{cle}")
         for cle, brut in (cm.get("binaryData") or {}).items():
             try:
                 texte = base64.b64decode(brut).decode()
             except (ValueError, UnicodeDecodeError):
                 continue
-            if VALEUR in texte:
+            if ANCIEN in texte or _nouveau() in texte:
                 fautifs.append(f"{nom}/{cle}")
     assert not fautifs, message(
         en=f"The password is written in clear text in {fautifs}. A ConfigMap is "
@@ -582,11 +644,10 @@ def test_un_pod_a_jour_porte_la_projection_du_secret(host):
 # ----------------------------------------------------------------------
 # 8. Dans le conteneur, la variable porte la valeur, et elle vient du Secret.
 # ----------------------------------------------------------------------
-def test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur(host):
-    """La valeur seule ne mesure rien : au départ, `DB_PASSWORD` porte DÉJÀ la
-    bonne valeur dans le conteneur, en clair depuis le manifeste, et c'est
-    précisément le défaut que le lab fait corriger. L'état demandé est donc la
-    valeur ET son origine, lue sur le Pod qui tourne."""
+def test_dans_le_conteneur_database_password_vient_du_secret_et_vaut_la_valeur(host):
+    """Au départ, `DATABASE_PASSWORD` porte l'ancien mot de passe, en clair
+    depuis le manifeste. L'état demandé est le nouveau ET son origine, lue sur
+    le Pod qui tourne."""
     nom_secret, _ = _secret_requis(host)
     pod = _pod_requis(host)
     spec = _spec_du_pod_reel(host, pod)
@@ -602,16 +663,16 @@ def test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur(host):
     references = _secrets_references_par_la_variable(spec)
     assert nom_secret in references, message(
         en=f"In running Pod {pod}, {VARIABLE} does not take its value from Secret "
-        f"{nom_secret!r}: {references}. Before you started, that variable ALREADY "
-        "carried the right value, written in clear text in the manifest, so its "
-        "value alone proves nothing. What is measured is where it comes from: "
+        f"{nom_secret!r}: {references}. Before you started, that variable "
+        "carried the old password, written in clear text in the manifest. What "
+        "is measured is where it comes from: "
         "valueFrom.secretKeyRef, read on the Pod that is running and not only on "
         "the template.",
         fr=f"Dans le Pod {pod} qui tourne, {VARIABLE} ne tire pas sa valeur du "
         f"Secret {nom_secret!r} : {references}. Avant que vous commenciez, cette "
-        "variable portait DÉJÀ la bonne valeur, écrite en clair dans le "
-        "manifeste : sa valeur seule ne prouve donc rien. Ce qui est mesuré, "
-        "c'est son origine : valueFrom.secretKeyRef, lu sur le Pod qui tourne et "
+        "variable portait l'ancien mot de passe, écrit en clair dans le "
+        "manifeste. Ce qui est mesuré, c'est son origine : "
+        "valueFrom.secretKeyRef, lu sur le Pod qui tourne et "
         "pas seulement sur le gabarit.",
     )
     rc, variable, diagnostic = _kubectl(
@@ -626,7 +687,7 @@ def test_dans_le_conteneur_db_password_vient_du_secret_et_vaut_la_valeur(host):
         f"sur {VARIABLE} : ce n'est pas un verdict sur votre manifeste. "
         f"{diagnostic}",
     )
-    assert variable == VALEUR, message(
+    assert variable == _nouveau(), message(
         en=f"Inside the container, {VARIABLE} carries \"{variable or 'nothing'}\", "
         "not the expected value. The reference to the Secret is declared, but it "
         "may not point at the key that holds the password: "
@@ -659,7 +720,7 @@ def test_dans_le_conteneur_le_fichier_porte_la_valeur(host):
         f"ajoutée : la clé {cle!r} donne {chemin}. Vérifiez le point de montage, "
         f"et que le volume désigne bien le Secret {nom_secret!r}. {diagnostic}",
     )
-    assert contenu == VALEUR, message(
+    assert contenu == _nouveau(), message(
         en=f"{chemin} exists but carries \"{contenu or 'nothing'}\", not the "
         "expected value. A mounted file holds exactly what its key holds, so it "
         "is the content of the Secret that is to be looked at, not the mount.",
