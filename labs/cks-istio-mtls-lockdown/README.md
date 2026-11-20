@@ -1,4 +1,4 @@
-# Require mTLS in a mesh, and prove it with a client left outside
+# Require mTLS in a mesh, and check it with a client left outside
 
 **CKS** lab, *Monitoring, Logging and Runtime Security* domain (20 % of the
 exam), Pod-to-Pod traffic encryption.

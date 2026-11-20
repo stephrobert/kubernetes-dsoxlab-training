@@ -1,5 +1,5 @@
 id: cks-istio-mtls-lockdown
-title: "Require mTLS in a mesh, and prove it with a client left outside"
+title: "Require mTLS in a mesh, and check it with a client left outside"
 level: monitoring-logging
 section: cks
 difficulty: advanced

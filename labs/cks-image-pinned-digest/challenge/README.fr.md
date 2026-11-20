@@ -1,4 +1,4 @@
-# Challenge : Épingler une image par son digest, et prouver que le tag ne suffit pas
+# Challenge : Épingler une image par son digest, et vérifier que le tag ne suffit pas
 
 ## La situation
 

@@ -1,4 +1,4 @@
-# Challenge : Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne
+# Challenge : Router deux applications sur un seul hôte, et vérifier que chacune reçoit la sienne
 
 ## La situation
 

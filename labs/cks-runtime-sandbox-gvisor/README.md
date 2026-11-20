@@ -1,4 +1,4 @@
-# Isolate a Pod from the host kernel, and prove it by reading its version
+# Isolate a Pod from the host kernel, and check it by reading its kernel version
 
 **CKS** lab, *Minimize Microservice Vulnerabilities* domain (20 % of the
 exam), sandbox isolation.

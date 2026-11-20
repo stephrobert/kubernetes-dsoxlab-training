@@ -1,4 +1,4 @@
-# Challenge : Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
+# Challenge : Exiger le mTLS dans un maillage, et le vérifier par un client qui reste dehors
 
 ## La situation
 

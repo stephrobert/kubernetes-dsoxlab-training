@@ -1,4 +1,4 @@
-# Challenge: Enforce an admission rule and prove the refusal, without guidance
+# Challenge: Enforce an admission rule and check the refusal, on your own and without hints
 
 ## The situation
 

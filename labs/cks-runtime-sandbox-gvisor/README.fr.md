@@ -1,4 +1,4 @@
-# Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
+# Isoler un Pod du noyau de l'hôte, et le vérifier en lisant sa version du noyau
 
 Lab **CKS**, domaine *Minimize Microservice Vulnerabilities* (20 % de
 l'épreuve), isolation par bac à sable.

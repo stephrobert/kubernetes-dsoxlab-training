@@ -1,4 +1,4 @@
-# Challenge: Require mTLS in a mesh, and prove it with a client left outside
+# Challenge: Require mTLS in a mesh, and check it with a client left outside
 
 ## The situation
 

@@ -1,4 +1,4 @@
-# Enforce an admission rule and prove the refusal, without guidance
+# Enforce an admission rule and check the refusal, on your own and without hints
 
 Challenge of the **Admission policies** module of the Kubernetes course, in the
 Put into practice section of the "VAP vs Kyverno vs Gatekeeper" lesson: the

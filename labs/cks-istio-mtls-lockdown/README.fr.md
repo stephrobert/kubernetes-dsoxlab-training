@@ -1,4 +1,4 @@
-# Exiger le mTLS dans un maillage, et le prouver par un client qui reste dehors
+# Exiger le mTLS dans un maillage, et le vérifier par un client qui reste dehors
 
 Lab **CKS**, domaine *Monitoring, Logging and Runtime Security* (20 % de
 l'épreuve), chiffrement du trafic entre Pods.

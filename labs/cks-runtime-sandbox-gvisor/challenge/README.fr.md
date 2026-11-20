@@ -1,4 +1,4 @@
-# Challenge : Isoler un Pod du noyau de l'hôte, et le prouver en lisant sa version
+# Challenge : Isoler un Pod du noyau de l'hôte, et le vérifier en lisant sa version du noyau
 
 ## La situation
 

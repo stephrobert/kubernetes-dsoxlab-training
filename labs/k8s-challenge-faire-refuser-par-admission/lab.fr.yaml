@@ -1,4 +1,4 @@
-title: "Imposer une règle d'admission et prouver le refus, sans guidage"
+title: "Imposer une règle d'admission et vérifier le refus, seul et sans indice"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/vap-vs-kyverno-gatekeeper/
 description: |
   Sans procédure, faire refuser par le cluster ce qui enfreint une règle de

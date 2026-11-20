@@ -1,4 +1,4 @@
-# Route two applications on a single host, and prove each gets its own
+# Route two applications on a single host, and check each gets its own
 
 **CKA** lab, *Services and Networking* domain (20 % of the exam), Ingress
 exposure.

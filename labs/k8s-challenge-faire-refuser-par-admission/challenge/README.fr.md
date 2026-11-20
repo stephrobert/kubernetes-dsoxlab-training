@@ -1,4 +1,4 @@
-# Challenge : Imposer une règle d'admission et prouver le refus, sans guidage
+# Challenge : Imposer une règle d'admission et vérifier le refus, seul et sans indice
 
 ## La situation
 

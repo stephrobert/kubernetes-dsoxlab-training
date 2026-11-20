@@ -1,4 +1,4 @@
-# Remplacer une image criblée de failles, et le prouver par un second scan
+# Remplacer une image criblée de failles, et le vérifier par un second scan
 
 Lab **CKS**, domaine *Supply Chain Security* (20 % de l'épreuve), compétence
 « Scan images for known vulnerabilities ».

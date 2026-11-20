@@ -1,4 +1,4 @@
-# Imposer une règle d'admission et prouver le refus, sans guidage
+# Imposer une règle d'admission et vérifier le refus, seul et sans indice
 
 Challenge du module **Politiques d'admission** de la formation Kubernetes, dans
 la section Mettre en pratique de la leçon « VAP vs Kyverno vs Gatekeeper » : le

@@ -1,4 +1,4 @@
-# Challenge : Signer une image, et prouver la signature en faisant refuser une autre
+# Challenge : Signer une image, et vérifier la signature en faisant refuser une autre
 
 ## La situation
 

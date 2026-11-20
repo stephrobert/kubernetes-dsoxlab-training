@@ -1,4 +1,4 @@
-# Router deux applications sur un seul hôte, et prouver que chacune reçoit la sienne
+# Router deux applications sur un seul hôte, et vérifier que chacune reçoit la sienne
 
 Lab **CKA**, domaine *Services and Networking* (20 % de l'épreuve), exposition
 par Ingress.
