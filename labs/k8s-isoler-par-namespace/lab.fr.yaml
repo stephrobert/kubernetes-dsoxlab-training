@@ -1,22 +1,22 @@
 title: "Isoler une application dans un namespace"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique
 description: |
-  Rangez l'application api et son Service dans leur namespace equipe-api, rien
-  dans default, puis depuis un Pod client de equipe-front joignez le Service par
-  son nom qualifié du namespace et consignez la réponse, et consignez ce que
-  donne le nom court depuis là.
+  L'application inventaire a été créée dans default par erreur. Rangez-la avec
+  son Service dans le namespace stock, retirez-la de default, puis depuis le Pod
+  caisse du namespace caisse joignez-la par son nom qualifié, consignez le Pod
+  qui répond, et consignez ce que donne le nom court.
 
 criteria:
   - id: l-application-est-dans-son-namespace
-    label: "Le Deployment et le Service api sont dans equipe-api, et rien ne s'appelle api dans default"
+    label: "Le Deployment et le Service inventaire sont dans stock, et plus dans default"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
   - id: le-nom-qualifie-repond
-    label: "Un Pod client de equipe-front joint api par son nom qualifié, réponse consignée"
+    label: "Le Pod caisse joint inventaire par son nom qualifié, et le Pod qui répond est consigné"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/
   - id: le-nom-court-echoue
-    label: "Depuis equipe-front, le nom court api échoue, et le constat est consigné"
+    label: "Depuis caisse, le nom court inventaire échoue, et le constat est consigné"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/services/

@@ -3,10 +3,10 @@
 `kubectl get` shows a table designed to be read by a human. For a script, or to
 keep a single value, kubectl can extract exactly the fields you want:
 **JSONPath** follows a path in the object, and **custom-columns** builds a
-table with your own columns. In this course, you find the path of a field, you
-extract it from an object then from a list, you build your columns, you filter
-and sort, then you see why a Deployment and its Pods do not always say the same
-thing.
+table with your own columns. The lesson shows both. This course stops on what
+catches people out: a key that contains dots, a case mistake that raises no
+error, a forgotten line break, a filter on the state of Pods, and a Deployment
+that does not say the same thing as its Pods.
 
 You work in a scratch namespace, `essai-extraction`, with an `inventaire`
 application. The challenge will ask you for other fields on another
@@ -25,13 +25,13 @@ dsoxlab run k8s-extraire-avec-kubectl
 You are now connected to the `k8s-kind.lab` machine. The kind cluster
 `boutique` is running there, and your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026.
 
 ## 📚 Exercise 1: find the path of a field
 
-Create the scratch namespace and the `inventaire` application, with three nginx
-Pods:
+Create the scratch namespace and the `inventaire` application, with three
+nginx Pods:
 
 ```bash
 kubectl create namespace essai-extraction
@@ -46,8 +46,8 @@ deployment "inventaire" successfully rolled out
 ```
 
 To extract a field, you need to know its **path**. You read it in the YAML of
-the object, following the indentation. Here, in the YAML of the Deployment, are
-the lines leading to the number of Pods and to the image (`grep` keeps only
+the object, following the indentation. Here, in the YAML of the Deployment,
+are the lines leading to the number of Pods and to the image (`grep` only keeps
 them):
 
 ```bash
@@ -63,75 +63,116 @@ spec:
       - image: nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-The number of Pods is therefore under `spec`, then `replicas`. The image is
-under `spec`, then `template`, then `spec`, then `containers`, at the first item
+The number of Pods is therefore in `spec`, then `replicas`. The image is in
+`spec`, then `template`, then `spec`, then `containers`, at the first element
 of the list (the dash), then `image`.
 
-## 📚 Exercise 2: JSONPath on an object
+## 📚 Exercise 2: a key that contains dots
 
-In JSONPath, that path is written with dots, starting from the root of the
-object. A list item is designated by its rank in square brackets, starting at
-0. `{"\n"}` adds a line break:
+The Deployment carries an annotation that Kubernetes keeps up to date: the
+number of its revision. Show its annotations:
 
 ```bash
-kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.spec.replicas}{"\n"}'
-kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+kubectl get deployment inventaire -n essai-extraction -o yaml | sed -n '/^  annotations:/,/^  [a-z]/p'
 ```
 
 ```text
-3
-nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2026-11-20T14:32:10Z"
 ```
 
-The single quotes around the expression stop the shell from interpreting the
-brackets and braces.
-
-## 📚 Exercise 3: JSONPath on a list
-
-`kubectl get pods` returns a **list**: the objects are stored under `.items`.
-`[*]` takes all of them:
+The key is `deployment.kubernetes.io/revision`. Write it as is in the JSONPath
+path:
 
 ```bash
-kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{.items[*].metadata.name}{"\n"}'
+kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.metadata.annotations.deployment.kubernetes.io/revision}{"\n"}'; echo "(code $?)"
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv inventaire-869d7bc7cf-dsws2 inventaire-869d7bc7cf-pq5ck
+
+(code 0)
 ```
 
-The three names fit on one line. For one line per Pod, `range … end` repeats a
-pattern for each object. Here, the name, a tab (`{"\t"}`), the IP address of
-the Pod, then a line break:
+An empty line, and code 0: no error. In JSONPath, the dot separates two
+levels. kubectl therefore looked for a `deployment` key, then inside it a
+`kubernetes` key, then `io/revision`. None of them exists, and kubectl returns
+nothing without saying a word. A `\` in front of each dot of the key says that
+it is part of the name:
 
 ```bash
-kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.podIP}{"\n"}{end}'
+kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}{"\n"}'
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv	10.244.0.25
-inventaire-869d7bc7cf-dsws2	10.244.0.26
-inventaire-869d7bc7cf-pq5ck	10.244.0.24
+1
+```
+
+Kubernetes labels and annotations often contain dots
+(`app.kubernetes.io/name`, `kubernetes.io/hostname`): the same `\.` works for
+all of them.
+
+## 📚 Exercise 3: a case mistake, without any error
+
+List each Pod with the node that hosts it. `range … end` repeats the pattern
+for each Pod, and `{"\t"}` puts a tab. The name of the field is written here
+with a mistake, `nodename` instead of `nodeName`:
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodename}{"\n"}{end}'; echo "(code $?)"
+```
+
+```text
+inventaire-869d7bc7cf-4wrrg
+inventaire-869d7bc7cf-mrxvn
+inventaire-869d7bc7cf-tmqqc
+(code 0)
+```
+
+The node column is empty, and the code is 0. JSONPath is case sensitive:
+`nodename` does not exist, and a missing field returns nothing, not an error.
+When a column stays empty, look for the real name of the field in the YAML:
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o yaml | grep -i -m1 'nodename'
+```
+
+```text
+    nodeName: boutique-control-plane
+```
+
+`grep -i` ignores case, and `-m1` stops at the first match. The real name is
+`nodeName`, with an uppercase `N`:
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\n"}{end}'
+```
+
+```text
+inventaire-869d7bc7cf-4wrrg	boutique-control-plane
+inventaire-869d7bc7cf-mrxvn	boutique-control-plane
+inventaire-869d7bc7cf-tmqqc	boutique-control-plane
 ```
 
 ## 📚 Exercise 4: without a line break
 
-JSONPath writes **only** what you ask for. Remove the `{"\n"}` from the
-pattern ("fin" means "end"):
+JSONPath writes **only** what you ask it to. Remove the `{"\n"}` from the
+pattern:
 
 ```bash
 kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{end}'; echo; echo '(fin)'
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtvinventaire-869d7bc7cf-dsws2inventaire-869d7bc7cf-pq5ck
+inventaire-869d7bc7cf-4wrrginventaire-869d7bc7cf-mrxvninventaire-869d7bc7cf-tmqqc
 (fin)
 ```
 
-The three names are glued into a single word, unreadable and unusable by a
+The three names are glued into a single word, unreadable and useless for a
 script. When a JSONPath output looks odd, first look for the missing line
 break.
 
-## 📚 Exercise 5: your own columns
+## 📚 Exercise 5: columns of your own
 
 `custom-columns` builds a table: each column has a title, a colon, then the
 path of the field. The path starts from each object, without `.items`:
@@ -142,40 +183,57 @@ kubectl get pods -l app=inventaire -n essai-extraction -o custom-columns=POD:.me
 
 ```text
 POD                           ADRESSE
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
 ```
 
-`--no-headers` removes the title line, for a script:
+`--no-headers` removes the line of titles, for a script:
 
 ```bash
 kubectl get pods -l app=inventaire -n essai-extraction -o custom-columns=POD:.metadata.name,ADRESSE:.status.podIP --no-headers
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
 ```
 
 ## 📚 Exercise 6: filter and sort
 
-JSONPath can filter a list with `?(…)`. `@` stands for the object being
-examined. Here, among the Pods of **all** namespaces (`-A`), keep only those of
-`essai-extraction`:
+Create a Pod that fails right away: its command exits with an error. Wait for
+it to reach the `Failed` phase, then list the Pods of the namespace:
 
 ```bash
-kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.namespace=="essai-extraction")]}{.metadata.name}{"\n"}{end}'
+kubectl run en-panne --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4 --restart=Never -n essai-extraction -- sh -c 'exit 1'
+kubectl wait --for=jsonpath='{.status.phase}'=Failed pod/en-panne -n essai-extraction --timeout=60s
+kubectl get pods -n essai-extraction
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv
-inventaire-869d7bc7cf-dsws2
-inventaire-869d7bc7cf-pq5ck
+pod/en-panne created
+pod/en-panne condition met
+NAME                          READY   STATUS    RESTARTS   AGE
+en-panne                      0/1     Error     0          2s
+inventaire-869d7bc7cf-4wrrg   1/1     Running   0          3s
+inventaire-869d7bc7cf-mrxvn   1/1     Running   0          3s
+inventaire-869d7bc7cf-tmqqc   1/1     Running   0          3s
 ```
 
-`--sort-by` sorts the output by a field, here the IP address:
+JSONPath can filter a list with `?(…)`. `@` stands for the object being
+examined. Here, keep only the Pods whose phase is not `Running`:
+
+```bash
+kubectl get pods -n essai-extraction -o jsonpath='{range .items[?(@.status.phase!="Running")]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
+```
+
+```text
+en-panne	Failed
+```
+
+In a big namespace, this filter finds in one command the Pods that are not
+running. `--sort-by` sorts the output by a field, here the IP address:
 
 ```bash
 kubectl get pods -l app=inventaire -n essai-extraction --sort-by=.status.podIP -o custom-columns=POD:.metadata.name,ADRESSE:.status.podIP
@@ -183,9 +241,9 @@ kubectl get pods -l app=inventaire -n essai-extraction --sort-by=.status.podIP -
 
 ```text
 POD                           ADRESSE
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
 ```
 
 ## 📚 Exercise 7: keep an output in a file
@@ -200,18 +258,18 @@ kubectl get pods -l app=inventaire -n essai-extraction -o 'custom-columns=POD:.m
 ```text
 4 /home/ansible/inventaire.txt
 POD                           IMAGE
-inventaire-869d7bc7cf-8cvtv   nginx:1.30.5@sha256:9bf97bd771
+inventaire-869d7bc7cf-4wrrg   nginx:1.30.5@sha256:9bf97bd771
 ```
 
-Four lines: the title line, then one per Pod.
+Four lines: the line of titles, then one per Pod.
 
 ## 📚 Exercise 8: what the Deployment wants, and what its Pods do
 
-**Pause** the Deployment update, then change its image:
+**Pause** the rollout of the Deployment, then change its image:
 
 ```bash
 kubectl rollout pause deployment/inventaire -n essai-extraction
-kubectl set image deployment/inventaire nginx=nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703 -n essai-extraction
+kubectl set image deployment/inventaire nginx=nginx:1.30.4@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c -n essai-extraction
 ```
 
 ```text
@@ -219,8 +277,8 @@ deployment.apps/inventaire paused
 deployment.apps/inventaire image updated
 ```
 
-Compare the image asked by the **Pod template** of the Deployment with the one
-of the running Pods:
+Compare the image asked for by the **Pod template** of the Deployment with the
+one of the running Pods:
 
 ```bash
 kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
@@ -228,15 +286,15 @@ kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .item
 ```
 
 ```text
-nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+nginx:1.30.4@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-The Deployment already **wants** 1.30.6, but its Pods still run 1.30.5: the
+The Deployment already **wants** 1.30.4, but its Pods still run 1.30.5: the
 pause blocked their replacement. To know what a Deployment asks for, read its
-template. To know what runs, read its Pods. Resume the update:
+template. To know what is running, read its Pods. Resume the rollout:
 
 ```bash
 kubectl rollout resume deployment/inventaire -n essai-extraction && kubectl rollout status deployment/inventaire -n essai-extraction --timeout=180s | tail -1

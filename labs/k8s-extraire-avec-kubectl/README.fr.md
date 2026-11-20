@@ -3,10 +3,11 @@
 `kubectl get` affiche un tableau pensé pour être lu par un humain. Pour un
 script, ou pour ne garder qu'une valeur, kubectl sait extraire exactement les
 champs voulus : **JSONPath** suit un chemin dans l'objet, et
-**custom-columns** construit un tableau avec vos propres colonnes. Dans ce
-cours, vous trouvez le chemin d'un champ, vous l'extrayez d'un objet puis d'une
-liste, vous construisez vos colonnes, vous filtrez et triez, puis vous voyez
-pourquoi un Deployment et ses Pods ne disent pas toujours la même chose.
+**custom-columns** construit un tableau avec vos propres colonnes. La leçon
+montre les deux. Ce cours s'arrête sur ce qui piège : une clé qui contient des
+points, une faute de casse qui ne lève aucune erreur, un retour à la ligne
+oublié, un filtre sur l'état des Pods, et un Deployment qui ne dit pas la même
+chose que ses Pods.
 
 Vous travaillez dans un namespace d'essai, `essai-extraction`, avec une
 application `inventaire`. Le challenge vous demandera d'autres champs sur une
@@ -26,7 +27,7 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `boutique` y tourne, et votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+20 novembre 2026.
 
 ## 📚 Exercice 1 : trouver le chemin d'un champ
 
@@ -65,50 +66,91 @@ Le nombre de Pods se trouve donc dans `spec`, puis `replicas`. L'image se
 trouve dans `spec`, puis `template`, puis `spec`, puis `containers`, au premier
 élément de la liste (le tiret), puis `image`.
 
-## 📚 Exercice 2 : JSONPath sur un objet
+## 📚 Exercice 2 : une clé qui contient des points
 
-En JSONPath, ce chemin s'écrit avec des points, en partant de la racine de
-l'objet. Un élément de liste se désigne par son rang entre crochets, en
-commençant à 0. `{"\n"}` ajoute un retour à la ligne :
+Le Deployment porte une annotation que Kubernetes tient à jour : le numéro de
+sa révision. Affichez ses annotations :
 
 ```bash
-kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.spec.replicas}{"\n"}'
-kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+kubectl get deployment inventaire -n essai-extraction -o yaml | sed -n '/^  annotations:/,/^  [a-z]/p'
 ```
 
 ```text
-3
-nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2026-11-20T14:32:10Z"
 ```
 
-Les apostrophes autour de l'expression empêchent le shell d'interpréter les
-crochets et les accolades.
-
-## 📚 Exercice 3 : JSONPath sur une liste
-
-`kubectl get pods` rend une **liste** : les objets sont rangés sous `.items`.
-`[*]` les prend tous :
+La clé est `deployment.kubernetes.io/revision`. Écrivez-la telle quelle dans
+le chemin JSONPath :
 
 ```bash
-kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{.items[*].metadata.name}{"\n"}'
+kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.metadata.annotations.deployment.kubernetes.io/revision}{"\n"}'; echo "(code $?)"
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv inventaire-869d7bc7cf-dsws2 inventaire-869d7bc7cf-pq5ck
+
+(code 0)
 ```
 
-Les trois noms tiennent sur une ligne. Pour une ligne par Pod, `range … end`
-répète un motif pour chaque objet. Ici, le nom, une tabulation (`{"\t"}`),
-l'adresse IP du Pod, puis un retour à la ligne :
+Une ligne vide, et le code 0 : aucune erreur. En JSONPath, le point sépare
+deux niveaux. kubectl a donc cherché une clé `deployment`, puis dedans une clé
+`kubernetes`, puis `io/revision`. Rien de cela n'existe, et kubectl rend du
+vide sans rien dire. Un `\` devant chaque point de la clé indique qu'il fait
+partie du nom :
 
 ```bash
-kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.podIP}{"\n"}{end}'
+kubectl get deployment inventaire -n essai-extraction -o jsonpath='{.metadata.annotations.deployment\.kubernetes\.io/revision}{"\n"}'
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv	10.244.0.25
-inventaire-869d7bc7cf-dsws2	10.244.0.26
-inventaire-869d7bc7cf-pq5ck	10.244.0.24
+1
+```
+
+Les labels et les annotations de Kubernetes contiennent souvent des points
+(`app.kubernetes.io/name`, `kubernetes.io/hostname`) : le même `\.` sert pour
+eux tous.
+
+## 📚 Exercice 3 : une faute de casse, sans aucune erreur
+
+Listez chaque Pod avec le nœud qui l'héberge. `range … end` répète le motif
+pour chaque Pod, et `{"\t"}` met une tabulation. Le nom du champ est ici écrit
+avec une faute, `nodename` au lieu de `nodeName` :
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodename}{"\n"}{end}'; echo "(code $?)"
+```
+
+```text
+inventaire-869d7bc7cf-4wrrg
+inventaire-869d7bc7cf-mrxvn
+inventaire-869d7bc7cf-tmqqc
+(code 0)
+```
+
+La colonne du nœud est vide, et le code vaut 0. JSONPath respecte la casse :
+`nodename` n'existe pas, et un champ absent rend du vide, pas une erreur. Quand
+une colonne reste vide, cherchez le vrai nom du champ dans le YAML :
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o yaml | grep -i -m1 'nodename'
+```
+
+```text
+    nodeName: boutique-control-plane
+```
+
+`grep -i` ignore la casse, et `-m1` s'arrête au premier résultat. Le vrai nom
+est `nodeName`, avec un `N` majuscule :
+
+```bash
+kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\n"}{end}'
+```
+
+```text
+inventaire-869d7bc7cf-4wrrg	boutique-control-plane
+inventaire-869d7bc7cf-mrxvn	boutique-control-plane
+inventaire-869d7bc7cf-tmqqc	boutique-control-plane
 ```
 
 ## 📚 Exercice 4 : sans retour à la ligne
@@ -121,7 +163,7 @@ kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .item
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtvinventaire-869d7bc7cf-dsws2inventaire-869d7bc7cf-pq5ck
+inventaire-869d7bc7cf-4wrrginventaire-869d7bc7cf-mrxvninventaire-869d7bc7cf-tmqqc
 (fin)
 ```
 
@@ -140,9 +182,9 @@ kubectl get pods -l app=inventaire -n essai-extraction -o custom-columns=POD:.me
 
 ```text
 POD                           ADRESSE
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
 ```
 
 `--no-headers` retire la ligne de titres, pour un script :
@@ -152,28 +194,45 @@ kubectl get pods -l app=inventaire -n essai-extraction -o custom-columns=POD:.me
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
 ```
 
 ## 📚 Exercice 6 : filtrer et trier
 
-JSONPath sait filtrer une liste avec `?(…)`. `@` désigne l'objet examiné. Ici,
-parmi les Pods de **tous** les namespaces (`-A`), ne garder que ceux de
-`essai-extraction` :
+Créez un Pod qui échoue tout de suite : sa commande sort en erreur. Attendez
+qu'il passe en phase `Failed`, puis listez les Pods du namespace :
 
 ```bash
-kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.namespace=="essai-extraction")]}{.metadata.name}{"\n"}{end}'
+kubectl run en-panne --image=busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4 --restart=Never -n essai-extraction -- sh -c 'exit 1'
+kubectl wait --for=jsonpath='{.status.phase}'=Failed pod/en-panne -n essai-extraction --timeout=60s
+kubectl get pods -n essai-extraction
 ```
 
 ```text
-inventaire-869d7bc7cf-8cvtv
-inventaire-869d7bc7cf-dsws2
-inventaire-869d7bc7cf-pq5ck
+pod/en-panne created
+pod/en-panne condition met
+NAME                          READY   STATUS    RESTARTS   AGE
+en-panne                      0/1     Error     0          2s
+inventaire-869d7bc7cf-4wrrg   1/1     Running   0          3s
+inventaire-869d7bc7cf-mrxvn   1/1     Running   0          3s
+inventaire-869d7bc7cf-tmqqc   1/1     Running   0          3s
 ```
 
-`--sort-by` trie la sortie selon un champ, ici l'adresse IP :
+JSONPath sait filtrer une liste avec `?(…)`. `@` désigne l'objet examiné. Ici,
+ne garder que les Pods dont la phase n'est pas `Running` :
+
+```bash
+kubectl get pods -n essai-extraction -o jsonpath='{range .items[?(@.status.phase!="Running")]}{.metadata.name}{"\t"}{.status.phase}{"\n"}{end}'
+```
+
+```text
+en-panne	Failed
+```
+
+Sur un gros namespace, ce filtre trouve en une commande les Pods qui ne
+tournent pas. `--sort-by` trie la sortie selon un champ, ici l'adresse IP :
 
 ```bash
 kubectl get pods -l app=inventaire -n essai-extraction --sort-by=.status.podIP -o custom-columns=POD:.metadata.name,ADRESSE:.status.podIP
@@ -181,9 +240,9 @@ kubectl get pods -l app=inventaire -n essai-extraction --sort-by=.status.podIP -
 
 ```text
 POD                           ADRESSE
-inventaire-869d7bc7cf-pq5ck   10.244.0.24
-inventaire-869d7bc7cf-8cvtv   10.244.0.25
-inventaire-869d7bc7cf-dsws2   10.244.0.26
+inventaire-869d7bc7cf-mrxvn   10.244.0.116
+inventaire-869d7bc7cf-tmqqc   10.244.0.117
+inventaire-869d7bc7cf-4wrrg   10.244.0.118
 ```
 
 ## 📚 Exercice 7 : garder une sortie dans un fichier
@@ -198,7 +257,7 @@ kubectl get pods -l app=inventaire -n essai-extraction -o 'custom-columns=POD:.m
 ```text
 4 /home/ansible/inventaire.txt
 POD                           IMAGE
-inventaire-869d7bc7cf-8cvtv   nginx:1.30.5@sha256:9bf97bd771
+inventaire-869d7bc7cf-4wrrg   nginx:1.30.5@sha256:9bf97bd771
 ```
 
 Quatre lignes : la ligne de titres, puis une par Pod.
@@ -209,7 +268,7 @@ Mettez la mise à jour du Deployment en **pause**, puis changez son image :
 
 ```bash
 kubectl rollout pause deployment/inventaire -n essai-extraction
-kubectl set image deployment/inventaire nginx=nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703 -n essai-extraction
+kubectl set image deployment/inventaire nginx=nginx:1.30.4@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c -n essai-extraction
 ```
 
 ```text
@@ -226,13 +285,13 @@ kubectl get pods -l app=inventaire -n essai-extraction -o jsonpath='{range .item
 ```
 
 ```text
-nginx:1.30.6@sha256:42c68eab6f7e22611786a9fe1d1c019e275c50185bd54b8f75dc2b9184322703
+nginx:1.30.4@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb
 ```
 
-Le Deployment **veut** déjà la 1.30.6, mais ses Pods tournent encore en
+Le Deployment **veut** déjà la 1.30.4, mais ses Pods tournent encore en
 1.30.5 : la pause a bloqué leur remplacement. Pour connaître ce qu'un
 Deployment demande, lisez son modèle. Pour savoir ce qui tourne, lisez ses
 Pods. Relancez la mise à jour :

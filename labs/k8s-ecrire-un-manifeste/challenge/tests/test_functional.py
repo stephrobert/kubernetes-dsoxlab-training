@@ -1,13 +1,19 @@
 """test_functional.py : k8s-ecrire-un-manifeste
 
 Ces tests lisent le manifeste ~/commandes/api.yaml, le soumettent à l'API en
---dry-run=server, puis lisent dans le cluster « lab » ce qu'il a créé et l'état
-du Deployment rapport, dont le setup a mémorisé l'uid. Un test vérifie un seul
-état demandé par l'énoncé.
+--dry-run=server, puis lisent dans le cluster « lab » ce qu'il a créé, et le
+Deployment api, dont le setup a mémorisé l'uid. Un test vérifie un seul état
+demandé par l'énoncé.
 
-Tous échouent avant le travail : le fichier n'existe pas, aucun objet api
-n'existe et rapport tourne sur une image introuvable. Une attente ne s'ouvre
-que si l'objet attendu existe déjà.
+Depuis le 2026-11-20, le fichier est FOURNI, avec trois fautes : la ConfigMap
+ne nomme pas son namespace, le port porte `protocol: tcp` (refusé par le
+serveur seul), et le sélecteur du Service vise `app: apy`. Une ancienne
+version d'api tourne déjà, à mettre à jour en place.
+
+Tous échouent avant le travail : le serveur refuse le fichier, la ConfigMap
+n'a pas de namespace, api tourne sur l'ancienne image sans configuration, et
+aucun Service n'existe. Une attente ne s'ouvre que si l'objet attendu existe
+déjà.
 
 Les messages disent ce qui manque, jamais la commande qui le pose.
 """
@@ -178,32 +184,25 @@ def test_le_conteneur_recoit_sa_configuration_de_api_config(host):
 
 
 # ----------------------------------------------------------------------
-# 6. rapport est corrigé en place, sans avoir été recréé.
+# 6. api est mis à jour en place, sans avoir été recréé.
 # ----------------------------------------------------------------------
-def test_rapport_est_corrige_sans_avoir_ete_recree(host):
+def test_api_est_mis_a_jour_sans_avoir_ete_recree(host):
     res = host.run(f"sudo cat {MEMOIRE}")
     if res.rc != 0:
         pytest.fail(message(
             en="The memory of the initial state is missing: run dsoxlab reset k8s-ecrire-un-manifeste.",
             fr="La mémoire de l'état initial est absente : lancez dsoxlab reset k8s-ecrire-un-manifeste.",
         ))
-    uid_initial = json.loads(res.stdout)["rapport_uid"]
-    d = _json(host, f"-n {NS} get deployment rapport")
-    # On n'attend que si la correction est posée : avant le travail, rapport
-    # existe déjà, en panne, et attendre sa disponibilité ne servirait à rien.
-    if d is not None and d["spec"]["template"]["spec"]["containers"][0].get("image") == IMAGE:
-        d = _attendre(host, f"-n {NS} get deployment rapport", lambda o: _disponible(o, 3))
+    uid_initial = json.loads(res.stdout)["api_uid"]
+    d = _json(host, f"-n {NS} get deployment api")
+    image = (d or {"spec": {"template": {"spec": {"containers": [{}]}}}})["spec"]["template"]["spec"]["containers"][0].get("image")
     assert d is not None and d["metadata"]["uid"] == uid_initial, message(
-        en="The rapport Deployment is not the one the lab installed: it was deleted, or deleted "
-        "then recreated. It had to be corrected in place.",
-        fr="Le Deployment rapport n'est plus celui que le lab a posé : il a été supprimé, ou supprimé "
-        "puis recréé. Il fallait le corriger en place.",
+        en="The api Deployment is not the one that was running at the start: it was deleted, or "
+        "deleted then recreated. Applying the corrected file updates it in place.",
+        fr="Le Deployment api n'est plus celui qui tournait au départ : il a été supprimé, ou "
+        "supprimé puis recréé. Appliquer le fichier corrigé le met à jour en place.",
     )
-    image = d["spec"]["template"]["spec"]["containers"][0].get("image")
-    s = d.get("status") or {}
-    assert image == IMAGE and d["spec"].get("replicas") == 3 and _disponible(d, 3), message(
-        en=f"rapport runs {image!r} with {s.get('availableReplicas', 0)} available replica(s) out of "
-        f"{d['spec'].get('replicas')}. Expected 3 available, on the image of the requirements.",
-        fr=f"rapport tourne en {image!r} avec {s.get('availableReplicas', 0)} réplica(s) disponible(s) "
-        f"sur {d['spec'].get('replicas')}. Attendu 3 disponibles, sur l'image du cahier des charges.",
+    assert image == IMAGE, message(
+        en=f"api still runs {image!r}: the corrected file has not been applied to it yet.",
+        fr=f"api tourne encore en {image!r} : le fichier corrigé ne lui a pas encore été appliqué.",
     )

@@ -1,9 +1,12 @@
 # Lab guidé de la leçon « kubectl api-resources et explain » (KUBERN-06-01) du
 # module « Déployer ses applications ». Il fait pratiquer la recette de la
-# leçon sur un type que l'apprenant n'a jamais vu : une CRD inventée,
-# Sauvegarde, en v1beta1, dont l'apiVersion ne se devine pas et dont les champs
-# requis ne se lisent qu'avec explain. Il fait aussi écrire une sonde trouvée
-# par explain, et dresser l'inventaire que kubectl get all ne donne pas.
+# leçon sur un type que l'apprenant n'a jamais vu : une CRD inventée, Export,
+# servie en v1alpha1 et en v1, dont seule la version que sert api-resources
+# porte les champs requis et la liste fermée des formats, lisibles avec
+# explain. Il fait aussi poser une sonde sur /healthz et un port nommé, et
+# dresser l'inventaire d'un namespace où get all ne voit ni quota, ni
+# NetworkPolicy, ni PodDisruptionBudget (challenge changé le 2026-11-20 : la
+# leçon déroulait l'ancien).
 id: k8s-explorer-l-api
 title: "Explore the API with api-resources and explain"
 level: application-deployment
@@ -47,15 +50,15 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: objet-de-la-crd
-    label: "The commandes-nuit backup exists, with the fields the schema requires"
+    label: "The ventes-hebdo export exists, with the fields and values the schema requires"
     tests:
-      - test_la_sauvegarde_commandes_nuit_existe_avec_les_champs_demandes
+      - test_l_export_ventes_hebdo_existe_avec_les_champs_demandes
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: sonde-trouvee-par-explain
-    label: "catalogue carries an HTTP readiness probe and its Pods are Ready"
+    label: "annuaire carries an HTTP readiness probe on /healthz and the web port, and its Pods are Ready"
     tests:
-      - test_catalogue_porte_une_sonde_de_disponibilite_http
+      - test_annuaire_porte_une_sonde_de_disponibilite_http
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
   - id: inventaire-complet

@@ -12,11 +12,11 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: objet-de-la-crd
-    label: "La sauvegarde commandes-nuit existe, avec les champs que le schéma exige"
+    label: "L'export ventes-hebdo existe, avec les champs et les valeurs que le schéma exige"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: sonde-trouvee-par-explain
-    label: "catalogue porte une sonde de disponibilité HTTP et ses Pods sont Ready"
+    label: "annuaire porte une sonde de disponibilité HTTP sur /healthz et le port web, et ses Pods sont Ready"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-api-resources-explain/
   - id: inventaire-complet

@@ -18,9 +18,7 @@ skills:
   - pod-networking
 distros:
   - ubuntu24
-# Page provisoire : la leçon L2 n'est pas encore publiée. URL cible (cadrage
-# CKNE) : /docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/capture-pod-traffic/
 lab_type: lab
 estimated_time: 40m
 
@@ -47,18 +45,18 @@ criteria:
     tests:
       - test_chaque_capture_vient_du_bon_pod
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/capture-pod-traffic/
   - id: signature-de-la-panne
     label: "Each capture holds the packets that prove the failure of its client: a reset, a SYN sent again with no answer, or NXDomain answers"
     tests:
       - test_chaque_capture_montre_la_panne
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/capture-pod-traffic/
   - id: cause-designee
     label: "~/captures/diagnostic.yaml names the right cause for each client, and none of the three failures was repaired"
     tests:
       - test_le_diagnostic_designe_la_bonne_cause
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/capture-pod-traffic/
 
 feedback: full

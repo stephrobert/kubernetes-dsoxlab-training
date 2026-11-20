@@ -52,9 +52,7 @@ skills:
   - llm-serving
 distros:
   - ubuntu24
-# Page provisoire : la leçon n'existe pas encore. URL cible (cadrage CKNE, L10) :
-# https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
 lab_type: lab
 estimated_time: 35m
 
@@ -81,31 +79,31 @@ criteria:
     tests:
       - test_le_pool_regroupe_les_trois_replicas
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
   - id: gateway-programmee
     label: "A Gateway of class istio in inference has an HTTP listener and the cluster declares it Programmed"
     tests:
       - test_la_gateway_est_programmee
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/gateway-api/
   - id: route-vers-le-pool
     label: "An HTTPRoute attached to the Gateway has the InferencePool as backend, Accepted and with its references Resolved"
     tests:
       - test_la_route_mene_au_pool
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
   - id: requetes-servies
     label: "Completion requests sent to the Gateway are answered by the replicas of the model"
     tests:
       - test_les_requetes_d_inference_aboutissent
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
   - id: repartition-selon-la-charge
     label: "Out of 30 requests, the saturated replica receives at most 10 %, where a plain Service would send it a third"
     tests:
       - test_la_repartition_evite_le_replica_sature
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/trafic-llm/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/route-llm-inference-traffic/
 
 feedback: full

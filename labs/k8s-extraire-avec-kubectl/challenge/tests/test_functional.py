@@ -4,8 +4,8 @@ Ces tests confrontent les extractions de l'apprenant à l'état réel : l'image
 du modèle de Pod du Deployment web, et le couple (Pod, nœud) de chaque Pod de
 web. Un test vérifie un seul état demandé par l'énoncé.
 
-Le setup a mis web en pause avant de changer son image : le modèle dit 1.30.6,
-les Pods tournent encore en 1.30.5. La valeur consignée doit être celle du
+Le setup a mis web en pause avant de changer son image : le modèle dit une
+variante de 1.30.6 tirée au hasard, les Pods tournent encore en 1.30.5. La valeur consignée doit être celle du
 modèle. Les deux listes se distinguent par leur forme : JSONPath n'écrit pas
 d'en-tête, custom-columns en écrit un.
 """

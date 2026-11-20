@@ -4,14 +4,15 @@ Un cluster accueille souvent plusieurs équipes ou plusieurs applications. Les
 **namespaces** les rangent dans des espaces séparés : chaque objet appartient à
 un namespace, et deux objets peuvent porter le même nom s'ils sont dans deux
 namespaces différents. Mais un namespace ne coupe pas le réseau : un Pod peut
-joindre un Service d'un autre namespace, s'il le nomme bien. Dans ce cours,
-vous créez deux namespaces, vous y rangez des objets de même nom, vous changez
-le namespace visé par défaut, puis vous faites parler deux Pods de part et
-d'autre.
+joindre un Service d'un autre namespace, s'il le nomme bien. La leçon montre
+ces règles. Ce cours vous fait voir les cas où l'on se trompe : un manifeste
+qui atterrit dans le namespace du contexte, un `-n` qui contredit le
+manifeste, un nom court qui ne se résout pas, et un namespace qui refuse de
+disparaître.
 
 Vous travaillez avec deux namespaces d'essai, `essai-nord` et `essai-sud`. Le
-challenge vous demandera de ranger une autre application : vous le ferez seul,
-à la fin.
+challenge vous demandera de remettre en ordre une autre application : vous le
+ferez seul, à la fin.
 
 Page associée : [Namespaces Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/).
 
@@ -27,7 +28,7 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `boutique` y tourne, et votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026.
+20 novembre 2026.
 
 ## 📚 Exercice 1 : les namespaces, et celui qu'on vise sans le dire
 
@@ -39,19 +40,20 @@ kubectl get namespaces
 
 ```text
 NAME                 STATUS   AGE
-acces                Active   25m
-configuration        Active   14m
-default              Active   25m
-kube-node-lease      Active   25m
-kube-public          Active   25m
-kube-system          Active   25m
-local-path-storage   Active   25m
+caisse               Active   1s
+default              Active   7h14m
+kube-node-lease      Active   7h14m
+kube-public          Active   7h14m
+kube-system          Active   7h14m
+local-path-storage   Active   7h14m
+stock                Active   1s
 ```
 
 `default` est le namespace par défaut. Ceux qui commencent par `kube-`
-appartiennent à Kubernetes lui-même. Votre liste peut en compter d'autres,
-laissés par les labs que vous avez déjà joués, comme `acces` et
-`configuration` ici.
+appartiennent à Kubernetes lui-même. `caisse` et `stock` sont ceux du
+challenge, posés par la préparation du lab : n'y touchez pas pendant le cours.
+Votre liste peut en compter d'autres, laissés par les labs que vous avez déjà
+joués.
 
 Une commande sans `-n` vise le namespace de votre **contexte** kubectl.
 Lisez-le :
@@ -70,12 +72,12 @@ commandes sans `-n` visent `default`.
 ## 📚 Exercice 2 : le même nom dans deux namespaces
 
 Créez les deux namespaces d'essai, puis un ConfigMap `reglages` dans chacun,
-avec une valeur différente :
+avec une valeur différente. Cherchez-le ensuite sans `-n` :
 
 ```bash
 kubectl create namespace essai-nord; kubectl create namespace essai-sud
 kubectl create configmap reglages --from-literal=region=nord -n essai-nord; kubectl create configmap reglages --from-literal=region=sud -n essai-sud
-kubectl get configmap reglages -n essai-nord -o jsonpath='{.data.region}{"\n"}'; kubectl get configmap reglages -n essai-sud -o jsonpath='{.data.region}{"\n"}'
+kubectl get configmap reglages
 ```
 
 ```text
@@ -83,21 +85,11 @@ namespace/essai-nord created
 namespace/essai-sud created
 configmap/reglages created
 configmap/reglages created
-nord
-sud
-```
-
-Deux objets `reglages`, un par namespace, chacun avec sa valeur : un namespace
-sépare les **noms**. Sans `-n`, kubectl cherche dans `default`, où il n'y a
-rien :
-
-```bash
-kubectl get configmap reglages
-```
-
-```text
 Error from server (NotFound): configmaps "reglages" not found
 ```
+
+Deux objets `reglages` coexistent, un par namespace. Sans `-n`, kubectl
+cherche dans `default`, où il n'y a rien.
 
 ## 📚 Exercice 3 : un namespace, ou tous
 
@@ -127,24 +119,77 @@ essai-nord   reglages   1      0s
 essai-sud    reglages   1      0s
 ```
 
-## 📚 Exercice 4 : changer le namespace par défaut du contexte
+## 📚 Exercice 4 : où atterrit un manifeste
 
-Taper `-n essai-nord` à chaque commande est vite pénible. Vous pouvez régler le
-namespace par défaut de votre contexte :
+Écrivez deux manifestes de ConfigMap. Le premier, `horaires`, ne dit pas de
+namespace. Le second, `tarifs`, en dit un dans `metadata.namespace` :
+`essai-sud`.
+
+```bash
+cat > ~/horaires.yaml <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: horaires
+data:
+  ouverture: "8h"
+YAML
+cat > ~/tarifs.yaml <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tarifs
+  namespace: essai-sud
+data:
+  ticket: "2 euros"
+YAML
+```
+
+Réglez le namespace par défaut du contexte sur `essai-nord`, puis appliquez
+`horaires` sans `-n`, et regardez où il est créé :
 
 ```bash
 kubectl config set-context --current --namespace=essai-nord
-kubectl get configmap reglages -o jsonpath='{.data.region}{"\n"}'
+kubectl apply -f ~/horaires.yaml
+kubectl get configmaps -A --field-selector metadata.name=horaires
 ```
 
 ```text
 Context "kind-boutique" modified.
-nord
+configmap/horaires created
+NAMESPACE    NAME       DATA   AGE
+essai-nord   horaires   1      0s
 ```
 
-Sans `-n`, la commande a visé `essai-nord`. C'est pratique, mais trompeur :
-oubliez ce réglage, et vos commandes suivantes agiront dans le mauvais
-namespace. Remettez `default` tout de suite :
+Un manifeste sans namespace atterrit dans celui du contexte. Le même fichier,
+appliqué par un collègue dont le contexte vise `default`, créerait l'objet
+dans `default`. Appliquez maintenant `tarifs`, toujours sans `-n` :
+
+```bash
+kubectl apply -f ~/tarifs.yaml
+kubectl get configmaps -A --field-selector metadata.name=tarifs
+```
+
+```text
+configmap/tarifs created
+NAMESPACE   NAME     DATA   AGE
+essai-sud   tarifs   1      0s
+```
+
+Le namespace écrit dans le manifeste l'emporte sur celui du contexte. Et si
+`-n` dit autre chose que le manifeste ?
+
+```bash
+kubectl apply -f ~/tarifs.yaml -n essai-nord
+```
+
+```text
+error: the namespace from the provided object "essai-sud" does not match the namespace "essai-nord". You must pass '--namespace=essai-sud' to perform this operation.
+```
+
+kubectl refuse et ne crée rien : il ne choisit pas entre deux namespaces qui se
+contredisent. Remettez le contexte sur `default` tout de suite, sinon vos
+commandes suivantes agiront dans `essai-nord` :
 
 ```bash
 kubectl config set-context --current --namespace=default
@@ -209,47 +254,87 @@ dans le namespace **du Pod**. Avec `carte.essai-nord`, le suffixe
 `svc.cluster.local` complète le nom, et il est trouvé. Le réseau, lui, n'a
 jamais été coupé.
 
-## 📚 Exercice 6 : supprimer un namespace supprime tout ce qu'il contient
+## 📚 Exercice 6 : un namespace qui refuse de disparaître
 
-Regardez ce que contient `essai-nord`, puis supprimez-le :
+Supprimer un namespace supprime tout ce qu'il contient. Mais un objet peut
+porter un **finalizer** : une marque qui demande à Kubernetes d'attendre avant
+de le supprimer, le temps qu'un programme fasse son travail de fin. Tant que la
+marque reste, l'objet reste, et son namespace aussi. Posez un finalizer
+inventé sur `reglages` d'`essai-nord`, puis supprimez le namespace sans
+attendre (`--wait=false`) :
 
 ```bash
-kubectl get all -n essai-nord
+kubectl patch configmap reglages -n essai-nord --type=merge -p '{"metadata":{"finalizers":["formation.exemple.fr/retenue"]}}'
+kubectl delete namespace essai-nord --wait=false
 ```
 
 ```text
-NAME                        READY   STATUS    RESTARTS   AGE
-pod/carte-5d5c55866-kbgsf   1/1     Running   0          5s
-
-NAME            TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
-service/carte   ClusterIP   10.96.56.18   <none>        80/TCP    5s
-
-NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/carte   1/1     1            1           5s
-
-NAME                              DESIRED   CURRENT   READY   AGE
-replicaset.apps/carte-5d5c55866   1         1         1       5s
-```
-
-```bash
-kubectl delete namespace essai-nord
-kubectl get all -n essai-nord
-```
-
-```text
+configmap/reglages patched
 namespace "essai-nord" deleted
-No resources found in essai-nord namespace.
 ```
 
-Le Pod, le Service, le Deployment et le ReplicaSet sont partis avec le
-namespace. C'est pratique pour faire le ménage, et dangereux pour la
-même raison : vérifiez toujours le nom avant de supprimer un namespace.
+Kubernetes vide le namespace, puis dit ce qui le bloque dans les conditions du
+namespace. La boucle les relit toutes les 5 secondes, 2 minutes au plus,
+jusqu'à ce que la condition `NamespaceFinalizersRemaining` passe à `True` :
+
+```bash
+debut=$SECONDS; for i in $(seq 1 24); do kubectl get namespace essai-nord -o jsonpath='{.status.conditions[?(@.type=="NamespaceFinalizersRemaining")].status}' | grep -q True && break; sleep 5; done; echo "attente : $((SECONDS - debut)) s"
+kubectl get namespace essai-nord
+kubectl get all,configmaps -n essai-nord
+```
+
+```text
+attente : 45 s
+NAME         STATUS        AGE
+essai-nord   Terminating   51s
+NAME                 DATA   AGE
+configmap/reglages   1      51s
+```
+
+Le namespace reste en `Terminating`, et il ne contient plus que `reglages`. Le
+Deployment, le Pod et le Service de `carte` sont partis. Lisez les conditions
+du namespace :
+
+```bash
+kubectl get namespace essai-nord -o jsonpath='{range .status.conditions[*]}{.type}={.status}: {.message}{"\n"}{end}'
+```
+
+```text
+NamespaceDeletionDiscoveryFailure=False: All resources successfully discovered
+NamespaceDeletionGroupVersionParsingFailure=False: All legacy kube types successfully parsed
+NamespaceDeletionContentFailure=False: All content successfully deleted, may be waiting on finalization
+NamespaceContentRemaining=True: Some resources are remaining: configmaps. has 1 resource instances
+NamespaceFinalizersRemaining=True: Some content in the namespace has finalizers remaining: formation.exemple.fr/retenue in 1 resource instances
+```
+
+Les deux dernières lignes nomment la cause : il reste un ConfigMap, retenu par
+le finalizer `formation.exemple.fr/retenue`. Ne relisez pas ces conditions trop
+tôt : pendant les premières secondes, elles disent encore que tout est
+supprimé, alors que le contenu part à peine.
+
+Ici, aucun programme ne viendra retirer ce finalizer : vous l'avez inventé.
+Retirez-le vous-même, et le namespace disparaît :
+
+```bash
+kubectl patch configmap reglages -n essai-nord --type=merge -p '{"metadata":{"finalizers":null}}'
+kubectl wait --for=delete namespace/essai-nord --timeout=60s
+```
+
+```text
+configmap/reglages patched
+namespace/essai-nord condition met
+```
+
+Sur un vrai cluster, un finalizer appartient à un programme, souvent un
+opérateur. Le retirer à la main saute le travail de fin que ce programme
+devait faire. Cherchez d'abord pourquoi il ne l'a pas fait.
 
 ## 🧹 Nettoyage
 
-Supprimez le second namespace d'essai :
+Supprimez les fichiers de travail et le second namespace d'essai :
 
 ```bash
+rm -f ~/horaires.yaml ~/tarifs.yaml
 kubectl delete namespace essai-sud
 ```
 
@@ -278,8 +363,8 @@ dsoxlab check k8s-isoler-par-namespace
 
 ## 🎯 Le challenge
 
-À vous, seul cette fois : ranger une application et un client dans deux
-namespaces, puis constater lequel des deux noms du Service répond.
+À vous, seul cette fois : une application a été créée dans le mauvais
+namespace. Rangez-la dans le bon, puis joignez-la depuis un autre namespace.
 
 ```bash
 dsoxlab run k8s-isoler-par-namespace

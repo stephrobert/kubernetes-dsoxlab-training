@@ -1,10 +1,11 @@
 title: "Écrire et valider un manifeste"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/#mettre-en-pratique
 description: |
-  Écrivez dans un même fichier multi-documents une ConfigMap, un Deployment et
-  un Service qui nomment leur namespace, faites-le valider par le serveur
-  d'API, appliquez-le, puis corrigez en place un Deployment existant et fautif,
-  sans le recréer.
+  Réparez le manifeste multi-documents d'un collègue (une ConfigMap, un
+  Deployment et un Service) jusqu'à ce que le serveur d'API l'accepte, que
+  chaque objet nomme son namespace et que le Service trouve ses Pods, puis
+  appliquez-le pour mettre à jour en place l'ancienne version du Deployment,
+  sans la recréer.
 
 criteria:
   - id: fichier-multi-documents
@@ -28,6 +29,6 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/
   - id: corrige-sans-recreer
-    label: "rapport est corrigé en place, sans avoir été recréé"
+    label: "api est mis à jour en place, sans avoir été recréé"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ecrire-manifests/

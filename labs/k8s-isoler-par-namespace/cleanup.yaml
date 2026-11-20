@@ -1,7 +1,7 @@
 ---
-# Joué par `dsoxlab clean` : retire les deux namespaces du lab, les objets api
-# créés par erreur dans default, et le relevé. Le cluster kind reste, il est le
-# socle partagé de la boutique.
+# Joué par `dsoxlab clean` : retire les deux namespaces du lab, les objets
+# inventaire laissés dans default, et le relevé. Le cluster kind reste, il est
+# le socle partagé de la boutique.
 - name: Nettoyer le lab k8s-isoler-par-namespace
   hosts: lab_target
   become: true
@@ -9,14 +9,14 @@
     - name: Supprimer les namespaces du lab
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kind/boutique.kubeconfig delete namespace
-        equipe-api equipe-front --ignore-not-found --wait=false
+        stock caisse --ignore-not-found --wait=false
       changed_when: true
       failed_when: false
 
-    - name: Retirer de default les objets api créés par erreur
+    - name: Retirer de default les objets inventaire
       ansible.builtin.command: >-
         kubectl --kubeconfig /etc/kind/boutique.kubeconfig -n default delete
-        deployment/api service/api --ignore-not-found
+        deployment/inventaire service/inventaire --ignore-not-found
       changed_when: true
       failed_when: false
 
