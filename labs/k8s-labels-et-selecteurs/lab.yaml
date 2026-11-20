@@ -13,10 +13,10 @@ level: application-design
 section: ckad
 difficulty: beginner
 description: |
-  In the etiquettes namespace, give every Pod of the web Deployment the label
-  env=prod in a way that survives their replacement, describe web with an
-  annotation, then record a selector with a negation that returns exactly the
-  Pods of api.
+  In the etiquettes namespace, give every Pod of the vitrine Deployment the
+  label palier=front in a way that survives their replacement, give vitrine a
+  contact annotation, then record a selector with a negation that returns
+  exactly the Pods of facturation.
 skills:
   - kubectl-label
   - kubectl-annotate
@@ -44,20 +44,20 @@ validation:
 
 criteria:
   - id: le-label-est-dans-le-modele
-    label: "env=prod is in the Pod template of web, so on all its Pods"
+    label: "palier=front is in the Pod template of vitrine, so on all its Pods"
     tests:
-      - test_env_prod_est_dans_le_modele_de_pod_de_web
+      - test_palier_front_est_dans_le_modele_de_pod_de_vitrine
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
-  - id: l-annotation-decrit-web
-    label: "The web Deployment carries a description annotation"
+  - id: l-annotation-contact-est-posee
+    label: "The vitrine Deployment carries a contact annotation"
     tests:
-      - test_une_annotation_description_est_posee_sur_web
+      - test_une_annotation_contact_est_posee_sur_vitrine
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/
-  - id: la-selection-rend-les-pods-de-api
-    label: "The recorded selector, with a negation, returns exactly the Pods of api"
+  - id: la-selection-rend-les-pods-de-facturation
+    label: "The recorded selector, with a negation, returns exactly the Pods of facturation"
     tests:
-      - test_le_selecteur_consigne_rend_exactement_les_pods_de_api
+      - test_le_selecteur_consigne_rend_exactement_les_pods_de_facturation
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-label-and-annotate/

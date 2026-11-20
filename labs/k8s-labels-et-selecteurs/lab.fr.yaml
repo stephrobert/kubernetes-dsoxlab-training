@@ -1,21 +1,21 @@
 title: "Étiqueter et sélectionner des Pods"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/#mettre-en-pratique
 description: |
-  Dans le namespace etiquettes, donnez à tous les Pods du Deployment web le
-  label env=prod d'une façon qui survit à leur remplacement, décrivez web par
-  une annotation, puis consignez un sélecteur à négation qui rend exactement
-  les Pods de api.
+  Dans le namespace etiquettes, donnez à tous les Pods du Deployment vitrine le
+  label palier=front d'une façon qui survit à leur remplacement, donnez à
+  vitrine une annotation contact, puis consignez un sélecteur à négation qui
+  rend exactement les Pods de facturation.
 
 criteria:
   - id: le-label-est-dans-le-modele
-    label: "env=prod est dans le modèle de Pod de web, donc sur tous ses Pods"
+    label: "palier=front est dans le modèle de Pod de vitrine, donc sur tous ses Pods"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
-  - id: l-annotation-decrit-web
-    label: "Le Deployment web porte une annotation description"
+  - id: l-annotation-contact-est-posee
+    label: "Le Deployment vitrine porte une annotation contact"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
-  - id: la-selection-rend-les-pods-de-api
-    label: "Le sélecteur consigné, à négation, rend exactement les Pods de api"
+  - id: la-selection-rend-les-pods-de-facturation
+    label: "Le sélecteur consigné, à négation, rend exactement les Pods de facturation"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-label-annotate/
