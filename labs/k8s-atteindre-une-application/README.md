@@ -4,9 +4,9 @@ An application running in the cluster cannot be reached directly from your
 machine: the addresses of Pods and Services only exist inside the cluster. To
 try it anyway, kubectl opens **tunnels**: `kubectl port-forward` links a port
 of your machine to a Pod or a Service, and `kubectl proxy` opens access to the
-cluster API. In this course, you create a Service after first looking at what
-it will contain, you open tunnels to a Pod then to a Service, and you go
-through the API.
+cluster API. The lesson shows these three commands when everything works. This
+course makes you read their messages when something is wrong: a Service with
+the wrong target port, a local port already taken, a Service without a Pod.
 
 You work in a scratch namespace, `essai-acces`, with a `miroir` application.
 The challenge will ask you for the same work on another application: you will
@@ -25,18 +25,20 @@ dsoxlab run k8s-atteindre-une-application
 You are now connected to the `k8s-kind.lab` machine. The kind cluster
 `boutique` is running there, and your kubectl already targets it.
 
-The outputs shown in this course were recorded on this machine on 19 November
+The outputs shown in this course were recorded on this machine on 20 November
 2026.
 
 ## 📚 Exercise 1: an application without a Service
 
 Create the scratch namespace and the `miroir` application: two agnhost Pods, a
-small test server, listening on port 8080. On the `/hostname` path, each Pod
+small test server, listening on port 9090. On the `/hostname` path, each Pod
 answers its own name.
 
 ```bash
 kubectl create namespace essai-acces
-kubectl create deployment miroir --image=registry.k8s.io/e2e-test-images/agnhost:2.61@sha256:101f3357d1ad890c3090e78ea6c6a47dc5137cbe19836796e13d5dcb2b84d2e6 --replicas=2 -n essai-acces -- /agnhost netexec --http-port=8080
+kubectl create deployment miroir \
+  --image=registry.k8s.io/e2e-test-images/agnhost:2.61@sha256:101f3357d1ad890c3090e78ea6c6a47dc5137cbe19836796e13d5dcb2b84d2e6 \
+  --replicas=2 -n essai-acces -- /agnhost netexec --http-port=9090
 kubectl rollout status deployment/miroir -n essai-acces --timeout=180s | tail -1
 kubectl get pods -n essai-acces
 ```
@@ -46,28 +48,20 @@ namespace/essai-acces created
 deployment.apps/miroir created
 deployment "miroir" successfully rolled out
 NAME                      READY   STATUS    RESTARTS   AGE
-miroir-67cbf77d75-8xqv7   1/1     Running   0          1s
-miroir-67cbf77d75-dknsx   1/1     Running   0          1s
+miroir-78b9b787d7-jbxhr   1/1     Running   0          1s
+miroir-78b9b787d7-jht9z   1/1     Running   0          1s
 ```
 
-## 📚 Exercise 2: look at a Service before creating it
+## 📚 Exercise 2: a tunnel to a Service with the wrong port
 
-`kubectl expose` creates a Service for you, and picks several values without
-telling you. `--dry-run=client -o yaml` shows the manifest it would write,
-**without creating anything**:
+`kubectl expose` picks values without telling you. `--dry-run=client -o yaml`
+shows the manifest it would write, without creating anything:
 
 ```bash
 kubectl expose deployment miroir --port=80 -n essai-acces --dry-run=client -o yaml
 ```
 
-```text
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: miroir
-  name: miroir
-  namespace: essai-acces
+```text title="Excerpt of the output"
 spec:
   ports:
   - port: 80
@@ -75,176 +69,229 @@ spec:
     targetPort: 80
   selector:
     app: miroir
-status:
-  loadBalancer: {}
 ```
 
-Two things to read:
-
-- `selector: app: miroir`: it took the Deployment selector;
-- `targetPort: 80`: without `--target-port`, it reuses the value of `--port`.
-  But the Pods listen on 8080: this Service would have found nothing.
-
-Create the real Service, with the right target port, then check that it found
-both Pods:
+Without `--target-port`, it reuses the value of `--port`: `targetPort: 80`.
+But the Pods listen on 9090. Create this faulty Service for real, and look at
+what it found:
 
 ```bash
-kubectl expose deployment miroir --port=80 --target-port=8080 -n essai-acces
+kubectl expose deployment miroir --port=80 -n essai-acces
 kubectl get endpointslices -n essai-acces -l kubernetes.io/service-name=miroir
 ```
 
 ```text
 service/miroir exposed
-NAME           ADDRESSTYPE   PORTS   ENDPOINTS               AGE
-miroir-pg69k   IPv4          8080    10.244.0.8,10.244.0.7   0s
+NAME           ADDRESSTYPE   PORTS   ENDPOINTS                 AGE
+miroir-nhpgp   IPv4          80      10.244.0.20,10.244.0.21   0s
 ```
 
-## 📚 Exercise 3: a tunnel to a Pod
-
-`kubectl port-forward` links a port of your machine to a port in the cluster.
-It runs as long as the command runs: start it in the background (the final
-`&`), with its messages in a log. Ports read "local, then remote": `19090:8080`
-links port 19090 of the machine to port 8080 of the Pod.
+Both Pods are there: the selector is right. The `PORTS` column says `80`, the
+port where the Service will send requests. Open a tunnel to this Service.
+`kubectl port-forward` runs as long as the command runs: start it in the
+background (the final `&`), with its messages in a log, and give it two
+seconds to open. Ports read "local, then remote": `19090:80` links port 19090
+of the machine to port 80 of the Service.
 
 ```bash
-POD=$(kubectl get pods -n essai-acces -o jsonpath='{.items[0].metadata.name}')
-echo $POD
-kubectl port-forward pod/$POD 19090:8080 -n essai-acces > /tmp/tunnel-pod.log 2>&1 &
+kubectl port-forward service/miroir 19090:80 -n essai-acces > /tmp/tunnel-faux.log 2>&1 &
+sleep 2
+curl -s -m 3 "http://127.0.0.1:19090/hostname"; echo "code curl : $?"
+cat /tmp/tunnel-faux.log
 ```
 
 ```text
-miroir-67cbf77d75-8xqv7
-```
-
-The shell also prints a `[1]` line followed by a process number: that is the
-number of the background job. Now query the local port (the `echo` adds the
-line break the answer does not have), then read the tunnel log:
-
-```bash
-curl -s 'http://127.0.0.1:19090/hostname'; echo
-cat /tmp/tunnel-pod.log
-```
-
-```text
-miroir-67cbf77d75-8xqv7
-Forwarding from 127.0.0.1:19090 -> 8080
-Forwarding from [::1]:19090 -> 8080
+code curl : 52
+Forwarding from 127.0.0.1:19090 -> 80
+Forwarding from [::1]:19090 -> 80
 Handling connection for 19090
+E1120 11:59:54.701770   14943 portforward.go:549] "An error occurred forwarding" err="error forwarding port 80 to pod 195d9c4f5fccf6ab1cd97c7a7ecf76e2471a519cf3bb60070716019321468575, uid : failed to execute portforward in network namespace \"/var/run/netns/cni-be65d530-395b-d828-cc7d-20007401e83d\": failed to connect to localhost:80 inside namespace \"195d9c4f5fccf6ab1cd97c7a7ecf76e2471a519cf3bb60070716019321468575\", IPv4: dial tcp4 127.0.0.1:80: connect: connection refused IPv6 dial tcp6 [::1]:80: connect: connection refused " localPort=19090 remotePort=80
+error: lost connection to pod
 ```
 
-The Pod answers through the tunnel. The log says where the tunnel leads, then
-one `Handling connection` line per request. Close it by killing job number 1:
+`curl` exits with code 52: the connection opened, then closed without an
+answer. The log says why: `failed to connect to localhost:80 inside namespace
+... connection refused`. The tunnel reached the Pod, on port 80, and nothing
+listens there. The last line, `lost connection to pod`, says that the tunnel
+stopped on its own. Replace the Service with one that has the right target
+port:
 
 ```bash
-kill %1
+kubectl delete service miroir -n essai-acces
+kubectl expose deployment miroir --port=80 --target-port=9090 -n essai-acces
+kubectl get endpointslices -n essai-acces -l kubernetes.io/service-name=miroir
 ```
 
-The shell confirms with a `Terminated` line.
+```text
+service "miroir" deleted from essai-acces namespace
+service/miroir exposed
+NAME           ADDRESSTYPE   PORTS   ENDPOINTS                 AGE
+miroir-w6svj   IPv4          9090    10.244.0.20,10.244.0.21   0s
+```
 
-## 📚 Exercise 4: a tunnel to the Service
+The `PORTS` column now says `9090`, the port where the Pods listen.
 
-A tunnel can also target the Service. Open it on local port 19091, then send
-four requests:
+## 📚 Exercise 3: a tunnel to the Service does not spread the load
+
+Open a tunnel to the fixed Service, on local port 19091, then send four
+requests. The `echo` adds the line break that the answer lacks:
 
 ```bash
 kubectl port-forward service/miroir 19091:80 -n essai-acces > /tmp/tunnel-svc.log 2>&1 &
-for i in 1 2 3 4; do curl -s 'http://127.0.0.1:19091/hostname'; echo; done
+sleep 2
+for i in 1 2 3 4; do curl -s "http://127.0.0.1:19091/hostname"; echo; done
 cat /tmp/tunnel-svc.log
 ```
 
 ```text
-miroir-67cbf77d75-8xqv7
-miroir-67cbf77d75-8xqv7
-miroir-67cbf77d75-8xqv7
-miroir-67cbf77d75-8xqv7
-Forwarding from 127.0.0.1:19091 -> 8080
-Forwarding from [::1]:19091 -> 8080
+miroir-78b9b787d7-jbxhr
+miroir-78b9b787d7-jbxhr
+miroir-78b9b787d7-jbxhr
+miroir-78b9b787d7-jbxhr
+Forwarding from 127.0.0.1:19091 -> 9090
+Forwarding from [::1]:19091 -> 9090
 Handling connection for 19091
 Handling connection for 19091
 Handling connection for 19091
 Handling connection for 19091
 ```
 
-Four times the same Pod. A tunnel to a Service does **not** spread the
-requests: at start-up, kubectl picks **one** Pod of the Service, and the whole
-tunnel leads to it. The log confirms it: `-> 8080`, the Pod port, not 80, the
-Service port. Close this tunnel:
+Four times the same Pod. A tunnel to a Service does **not** spread requests:
+at startup, kubectl picks **one** Pod of the Service, and the whole tunnel
+leads to it. The log confirms it: `-> 9090`, the port of the Pod, not 80, the
+port of the Service. Close this tunnel by killing job number 1:
 
 ```bash
 kill %1
 ```
 
-## 📚 Exercise 5: the tunnel dies with its process
+## 📚 Exercise 4: the tunnel dies with its process
 
 Open a tunnel, check that it answers, close it, then query it again:
 
 ```bash
 kubectl port-forward service/miroir 19092:80 -n essai-acces > /tmp/tunnel-2.log 2>&1 &
-curl -s 'http://127.0.0.1:19092/hostname'; echo
+sleep 2
+curl -s "http://127.0.0.1:19092/hostname"; echo
 kill %1
+sleep 1
 curl -s -m 2 http://127.0.0.1:19092/hostname || echo "plus rien sur 19092 (code $?)"
 ```
 
 ```text
-miroir-67cbf77d75-8xqv7
+miroir-78b9b787d7-jbxhr
 plus rien sur 19092 (code 7)
 ```
 
-A tunnel is not an object of the cluster, like a Service: it is a **process**
-on your machine. Once the process is killed, the local port leads nowhere
-(`curl` exits with code 7, connection refused; "plus rien sur" means "nothing
-left on"). If you close your SSH session, your tunnels stop with it.
+A tunnel is not a cluster object, like a Service: it is a **process** on your
+machine. Once the process is killed, the local port leads nowhere (`curl`
+exits with code 7, connection refused). If you close your SSH session, your
+tunnels stop with it.
 
-## 📚 Exercise 6: a local port already taken
+## 📚 Exercise 5: a local port already taken
 
 A local port serves only one tunnel at a time. Open one on 19093, then try to
 open a second one on the same port, in the foreground this time:
 
 ```bash
 kubectl port-forward service/miroir 19093:80 -n essai-acces > /tmp/tunnel-a.log 2>&1 &
+sleep 2
 kubectl port-forward service/miroir 19093:80 -n essai-acces; echo "code du second tunnel : $?"
 ```
 
 ```text
 Unable to listen on port 19093: Listeners failed to create with the following errors: [unable to create listener: Error listen tcp4 127.0.0.1:19093: bind: address already in use unable to create listener: Error listen tcp6 [::1]:19093: bind: address already in use]
-error: unable to listen on any of the requested ports: [{19093 8080}]
+error: unable to listen on any of the requested ports: [{19093 9090}]
 code du second tunnel : 1
 ```
 
-Refused: `address already in use`. If a tunnel refuses to start, first look for
-an old tunnel still open on the same port. Close the first one:
+Refused: `address already in use`. Without the `sleep 2`, the second tunnel
+could start before the first one and take the port in its place. If a tunnel
+refuses to start, first look for an old tunnel still open on the same port.
+Close the first one:
 
 ```bash
 kill %1
 ```
 
-## 📚 Exercise 7: go through the API with kubectl proxy
+## 📚 Exercise 6: go through the API with kubectl proxy
 
 `kubectl proxy` opens local access to the **cluster API**, with your kubectl
-rights. Through the API, you can also reach a Service, at a long but regular
-address: `/api/v1/namespaces/<namespace>/services/<service>:<port>/proxy/<path>`.
+rights. Through the API, you also reach a Service, at a long but regular
+address:
+`/api/v1/namespaces/<namespace>/services/<service>:<port>/proxy/<path>`.
+Start the proxy, then query `miroir` twice: with a path, then with nothing
+after `proxy`. The `-w` option of `curl` prints the HTTP code and the
+redirect address:
 
 ```bash
 kubectl proxy --port=8001 > /tmp/proxy.log 2>&1 &
+sleep 2
 cat /tmp/proxy.log
-curl -s 'http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy/hostname'; echo
-kill %1
+curl -s "http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy/hostname"; echo
+curl -s -o /dev/null -w "%{http_code} %{redirect_url}\n" http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy
 ```
 
 ```text
 Starting to serve on 127.0.0.1:8001
-miroir-67cbf77d75-8xqv7
+miroir-78b9b787d7-jbxhr
+301 http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy/
 ```
 
-The request went through the API, then through the Service, to a Pod. Unlike
-`port-forward`, a single proxy gives access to every Service of the cluster.
+The first request goes through the API, then through the Service, to a Pod.
+The second one gets a `301` code: the API redirects to the same address ending
+with a slash. A browser follows this redirect by itself, `curl` does not.
+
+Now scale `miroir` down to zero Pods, wait for the Pods to go away, then query
+again:
+
+```bash
+kubectl scale deployment miroir --replicas=0 -n essai-acces
+kubectl wait --for=delete pod -l app=miroir -n essai-acces --timeout=60s
+curl -s -w "\ncode HTTP %{http_code}\n" http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy/hostname
+```
+
+```text title="Excerpt of the output"
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "no endpoints available for service \"miroir\"",
+  "reason": "ServiceUnavailable",
+  "code": 503
+}
+code HTTP 503
+```
+
+Through the API, the failure is spelled out: `no endpoints available`, with
+code 503. Bring back two Pods, check that the Service answers again, then
+close the proxy:
+
+```bash
+kubectl scale deployment miroir --replicas=2 -n essai-acces
+kubectl rollout status deployment/miroir -n essai-acces --timeout=120s | tail -1
+sleep 2
+curl -s "http://127.0.0.1:8001/api/v1/namespaces/essai-acces/services/miroir:80/proxy/hostname"; echo
+kill %1
+```
+
+```text title="Excerpt of the output"
+deployment "miroir" successfully rolled out
+miroir-78b9b787d7-dxbt8
+```
+
+Unlike `port-forward`, a single proxy gives access to every Service of the
+cluster.
 
 ## 🧹 Clean up
 
-Delete the scratch namespace, with everything in it:
+First delete what you created during the exercises: the scratch namespace,
+with everything in it, and the tunnel logs.
 
 ```bash
 kubectl delete namespace essai-acces
+rm -f /tmp/tunnel-*.log /tmp/proxy.log
 ```
 
 ```text
