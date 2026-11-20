@@ -1,41 +1,39 @@
 # Challenge: Get inside a container with no shell using kubectl debug
 
-## The situation
+## 📍 The situation
 
-In the namespace **`lab`**, a team runs its own DNS resolver, the Pod
-**`distroless-app`**. Its image is built on CoreDNS, and it is **distroless**:
-a single static binary, no shell, no `ls`, no `ps`. That is a good security
-practice, until the day you have to look at what is going on inside.
-`kubectl exec` answers that `sh` does not exist, and the logs say nothing about
-what the process is doing.
+In the **`lab`** namespace, a team runs its own DNS resolver, the
+**`distroless-app`** Pod. Its image is built on CoreDNS, and it is
+**distroless**: a single static binary, with no shell, no `ls` and no `ps`.
+That is good security practice, until the day you have to look at what happens
+inside. `kubectl exec` answers that `sh` does not exist, and the logs say
+nothing about what the process does.
 
-The team asks you for the list of the processes that are **really** running in
-that container, seen from the inside.
+The team asks you for the list of the processes that **really** run in that
+container, seen from the inside.
 
-## What you must achieve
+## 🎯 What you must obtain
 
-1. The Pod `distroless-app` carries an ephemeral container named
-   **`debugger`**, which shares the process namespace of the container
-   `distroless-app`.
-
+1. The `distroless-app` Pod has an ephemeral container named **`debugger`**,
+   which shares the process space of the `distroless-app` container.
 2. From that container, the list of processes has been written to
-   **`/tmp/debug-output.txt`**: the `coredns` process of the application must
-   be readable in it. The `debugger` container **stays alive**, so that the
-   file can be read again.
+   **`/tmp/debug-output.txt`**: you can read in it the application's `coredns`
+   process. The `debugger` container **stays alive**, so the file can be read
+   again.
 
-## Useful bearings
+## 🧭 Useful landmarks
 
 An ephemeral container is added to a running Pod, without restarting it, and
-can never be removed from it. It sees the processes of another container only
+can never be removed from it. It only sees the processes of another container
 if you ask for it explicitly.
 
-The tooling image does not matter, as long as it has a shell and `ps`: busybox
-is enough.
+The tool image does not matter, as long as it has a shell and `ps`: busybox is
+enough.
 
-## How you will know it works
+## ✅ How you will know it works
 
-The tests read the definition of the Pod, then read back the file in the
-`debugger` container.
+The tests read the Pod definition, then read the file again in the `debugger`
+container.
 
 ```bash
 dsoxlab check cka-kubectl-debug
