@@ -2,9 +2,17 @@
 
 Ces tests lisent dans le cluster « lab » l'image d'affiche et le digest que ses
 Pods font tourner, comparé à celui que le setup a mémorisé ; le relevé
-~/galerie/releve.txt et sa date, comparée à celle du Secret qui répare
-vignettes ; puis d'où vient le Secret de pull de vignettes. Un test vérifie un
+~/galerie/releve.txt et sa date, comparée à la création du Pod de vignettes qui
+tourne ; puis d'où vient le Secret de pull de vignettes. Un test vérifie un
 seul état demandé par l'énoncé.
+
+Depuis le 2026-11-20, le ServiceAccount de vignettes porte DÉJÀ un Secret de
+pull, posé par la préparation avec un mot de passe faux : le registre répond
+401 Unauthorized (mesuré sur kind, registry 3.1.2). La cause attendue n'est
+plus le « no basic auth credentials » que la leçon imprime, et les mots
+génériques (secret, identifiant) ne suffisent plus. La réparation corrige un
+Secret qui existe : sa date de création ne dit plus rien, c'est la naissance
+du Pod qui tourne qui la marque.
 
 Tous échouent avant le travail : affiche tourne sur un tag, le relevé n'existe
 pas, et vignettes est en ImagePullBackOff.
@@ -27,13 +35,9 @@ ADMIN = "sudo kubectl --kubeconfig /etc/kind/lab.kubeconfig"
 NS = "galerie"
 MEMOIRE = "/var/lib/dsoxlab/gerer-les-images.json"
 REGISTRE = "localhost:30500"
-#: Ce qui dit la cause d'un pull refusé par un registre privé : l'état que
-#: Kubernetes affiche, ou une phrase qui parle d'authentification.
-CAUSE = re.compile(
-    r"auth|credential|identifiant|401|unauthori[sz]ed|mot de passe|password|access denied|accès refusé"
-    r"|imagepullsecret|docker-registry|secret",
-    re.IGNORECASE,
-)
+#: Ce qui dit la cause d'un pull refusé pour un mauvais mot de passe : le code
+#: et le mot que le registre renvoie, lus dans les événements du Pod.
+CAUSE = re.compile(r"401|unauthori[sz]ed", re.IGNORECASE)
 ATTENTE = 90
 PAS = 3
 
@@ -123,22 +127,24 @@ def test_la_cause_du_pull_refuse_est_consignee_avant_la_reparation(host):
     cause = next((ligne.partition(":")[2] for ligne in contenu.splitlines()
                   if ligne.strip().lower().startswith("cause")), "")
     assert CAUSE.search(cause), message(
-        en="~/galerie/releve.txt does not say on a cause: line why vignettes cannot pull its image: "
-        "what the registry expects and does not receive.",
+        en="~/galerie/releve.txt does not say on a cause: line why vignettes cannot pull its image, "
+        "as the registry answers it: its status code and the word that goes with it, read in the "
+        "events of the Pod. A general word (secret, credentials) is not enough.",
         fr="~/galerie/releve.txt ne dit pas, sur une ligne cause:, pourquoi vignettes ne tire pas son "
-        "image : ce que le registre attend et ne reçoit pas.",
+        "image, comme le registre le répond : son code de statut et le mot qui l'accompagne, lus "
+        "dans les événements du Pod. Un mot général (secret, identifiants) ne suffit pas.",
     )
-    # Toute réparation passe par un Secret docker-registry, où qu'on le rattache
-    # ensuite (ServiceAccount ou template) : c'est sa date qui marque la réparation.
-    secrets = (_json(host, f"-n {NS} get secrets") or {}).get("items", [])
-    dates = [datetime.fromisoformat(s["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp()
-             for s in secrets if s.get("type") == "kubernetes.io/dockerconfigjson"]
+    # La réparation corrige un Secret qui existe, puis recrée les Pods : c'est
+    # la naissance des Pods de vignettes qui la marque.
+    dates = [datetime.fromisoformat(p["metadata"]["creationTimestamp"].replace("Z", "+00:00")).timestamp()
+             for p in _pods(host, "vignettes")]
     ecrit = int(host.check_output(f"stat -c %Y {chemin}"))
     assert not dates or ecrit <= min(dates), message(
         en="The cause was written, or rewritten, after the repair: ~/galerie/releve.txt is more recent "
-        "than the pull Secret. The diagnosis comes first, then the file is left untouched.",
+        "than the Pods of vignettes. The diagnosis comes first, then the file is left untouched.",
         fr="La cause a été écrite, ou réécrite, après la réparation : ~/galerie/releve.txt est plus "
-        "récent que le Secret de pull. Le diagnostic vient d'abord, puis on ne touche plus au fichier.",
+        "récent que les Pods de vignettes. Le diagnostic vient d'abord, puis on ne touche plus au "
+        "fichier.",
     )
 
 

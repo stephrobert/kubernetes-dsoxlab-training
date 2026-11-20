@@ -101,6 +101,13 @@ trap - EXIT
 
 kubectl create namespace galerie
 kubectl -n galerie create serviceaccount vignettes
+# Le Secret de pull d'un collègue, rattaché au ServiceAccount, mais avec un
+# mot de passe faux : le registre répond 401. Avant le 2026-11-20, aucun Secret
+# n'était posé, et la cause (« no basic auth credentials ») était celle que la
+# leçon imprime.
+kubectl -n galerie create secret docker-registry galerie-registre \
+  --docker-server=localhost:30500 --docker-username="$UTILISATEUR" --docker-password=Vignettes-2025
+kubectl -n galerie patch serviceaccount vignettes -p '{"imagePullSecrets":[{"name":"galerie-registre"}]}'
 kubectl apply -f - <<'EOF'
 apiVersion: apps/v1
 kind: Deployment

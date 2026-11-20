@@ -1,16 +1,17 @@
 # Figer une image par digest et tirer d'un registre privé
 
-Une image se désigne par un **tag** (`nginx:1.30`) ou par un **digest**
+Une image se désigne par un **tag** (`nginx:1.29`) ou par un **digest**
 (`nginx@sha256:…`). Un tag peut changer de contenu d'un jour à l'autre, un
-digest désigne toujours exactement la même image. Dans ce cours, vous lisez
-l'image qu'un Pod fait vraiment tourner, vous la figez par son digest, vous
-lisez pourquoi une image ne se tire pas, puis vous donnez à un ServiceAccount
-les identifiants d'un registre privé.
+digest désigne toujours exactement la même image. La leçon montre comment
+figer une image et comment donner des identifiants à un ServiceAccount. Ce
+cours part de ce qui rate : un digest mal recopié, un registre qui refuse un
+client sans identifiants, et un Secret qui vise le mauvais serveur, sans que
+le message change.
 
 Vous travaillez dans un namespace d'essai, `essai-images`, avec les
-Deployments `banniere`, `faute` et `miniatures`. Le registre privé
-`localhost:30500` est celui que le lab a installé. Le challenge porte sur
-d'autres Deployments, dans un autre namespace : vous le ferez seul, à la fin.
+Deployments `banniere` et `miniatures`. Le registre privé `localhost:30500`
+est celui que le lab a installé. Le challenge porte sur d'autres Deployments,
+dans un autre namespace : vous le ferez seul, à la fin.
 
 Page associée : [Les images dans Kubernetes](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/images-kubernetes/).
 
@@ -26,15 +27,15 @@ Vous êtes maintenant connecté à la machine `k8s-kind.lab`. Le cluster kind
 `lab` y tourne, et votre kubectl le vise déjà.
 
 Les sorties montrées dans ce cours ont été relevées sur cette machine le
-19 novembre 2026, avec Kubernetes 1.37.
+20 novembre 2026, avec Kubernetes v1.37.0.
 
 ## 📚 Exercice 1 : un tag, et ce qu'il désigne aujourd'hui
 
-Créez le namespace d'essai et un Deployment `banniere` sur le tag `nginx:1.30` :
+Créez le namespace d'essai et un Deployment `banniere` sur le tag `nginx:1.29` :
 
 ```bash
 kubectl create namespace essai-images
-kubectl create deployment banniere --image=nginx:1.30 -n essai-images && kubectl rollout status deployment/banniere -n essai-images --timeout=180s | tail -1
+kubectl create deployment banniere --image=nginx:1.29 -n essai-images && kubectl rollout status deployment/banniere -n essai-images --timeout=180s | tail -1
 ```
 
 ```text
@@ -51,83 +52,74 @@ kubectl get pods -n essai-images -l app=banniere -o jsonpath='{range .items[*]}{
 ```
 
 ```text
-nginx:1.30
-docker.io/library/nginx:1.30
-docker.io/library/nginx@sha256:7fad6c0dff97965adbddf28027d934b111fc0221a554315dc274712f3fba24d3
+nginx:1.29
+docker.io/library/nginx:1.29
+docker.io/library/nginx@sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87ea
 ```
 
-La spec ne dit que `nginx:1.30`. Le statut dit ce que ce tag désignait **au
-moment du lancement** : le digest `sha256:7fad…`. Si l'éditeur publie demain
-une nouvelle image sous le même tag, les prochains Pods ne tourneront plus sur
-la même chose.
+La spec ne dit que `nginx:1.29`. Le statut dit ce que ce tag désignait **au
+moment du lancement** : le digest `sha256:1881…`. Votre digest peut être
+différent : le tag `nginx:1.29` suit les correctifs de la version 1.29.
 
-## 📚 Exercice 2 : figer l'image par son digest
+## 📚 Exercice 2 : un digest mal recopié
 
-Récupérez le digest dans le statut (`sed` garde ce qui suit le `@`), puis
-mettez-le dans l'image du Deployment :
+Un digest se recopie mal facilement : 64 caractères, sans erreur visible à
+l'œil. Simulez la faute. La commande lit le digest du Pod, en change le
+dernier caractère, puis passe le Deployment sur ce faux digest :
 
 ```bash
-D=$(kubectl get pods -n essai-images -l app=banniere -o jsonpath='{.items[0].status.containerStatuses[0].imageID}' | sed 's/.*@//'); echo "$D"; kubectl set image deployment/banniere nginx=nginx@$D -n essai-images && kubectl rollout status deployment/banniere -n essai-images --timeout=180s | tail -1
+D=$(kubectl get pods -n essai-images -l app=banniere -o jsonpath='{.items[0].status.containerStatuses[0].imageID}' | sed 's/.*@//'); echo "$D"; FAUX=$(echo "$D" | sed 's/.$/0/'); [ "$FAUX" = "$D" ] && FAUX=$(echo "$D" | sed 's/.$/1/'); echo "$FAUX"; kubectl set image deployment/banniere nginx=nginx@$FAUX -n essai-images
+sleep 20; kubectl get pods -n essai-images -l app=banniere
 ```
 
 ```text
-sha256:7fad6c0dff97965adbddf28027d934b111fc0221a554315dc274712f3fba24d3
+sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87ea
+sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87e0
+deployment.apps/banniere image updated
+NAME                        READY   STATUS             RESTARTS   AGE
+banniere-57dbb788b5-mlhvr   0/1     ImagePullBackOff   0          20s
+banniere-7f66886dd-wsnxw    1/1     Running            0          20s
+```
+
+Le nouveau Pod ne tire pas son image, l'ancien sert toujours. Le pourquoi est
+dans les événements du Pod en attente. `sed` garde la section `Events`, `grep`
+la ligne d'échec, et `fold` la coupe en lignes de 100 caractères :
+
+```bash
+P=$(kubectl get pods -n essai-images -l app=banniere --field-selector=status.phase=Pending -o name | head -1); kubectl describe $P -n essai-images | sed -n '/^Events:/,$p' | grep -E 'Failed to pull' | head -1 | fold -w 100
+```
+
+```text
+  Warning  Failed     5s (x2 over 19s)  kubelet            spec.containers{nginx}: Failed to pull im
+age "nginx@sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87e0": rpc error: code
+ = NotFound desc = failed to pull and unpack image "docker.io/library/nginx@sha256:1881968aff6f7cdcc
+4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87e0": failed to resolve reference "docker.io/library/ngi
+nx@sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87e0": docker.io/library/nginx
+@sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87e0: not found
+```
+
+`not found` : aucune image ne porte ce digest. C'est le même message qu'un tag
+qui n'existe pas. Revenez à la version précédente, puis figez cette fois le
+bon digest, lu sur un Pod en marche (`status.phase=Running`) :
+
+```bash
+kubectl rollout undo deployment/banniere -n essai-images; kubectl rollout status deployment/banniere -n essai-images --timeout=120s | tail -1
+D=$(kubectl get pods -n essai-images -l app=banniere --field-selector=status.phase=Running -o jsonpath='{.items[0].status.containerStatuses[0].imageID}' | sed 's/.*@//'); kubectl set image deployment/banniere nginx=nginx@$D -n essai-images && kubectl rollout status deployment/banniere -n essai-images --timeout=180s | tail -1; kubectl get deployment banniere -n essai-images -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+```
+
+```text
+deployment.apps/banniere rolled back
+deployment "banniere" successfully rolled out
 deployment.apps/banniere image updated
 deployment "banniere" successfully rolled out
+nginx@sha256:1881968aff6f7cdcc4b888c00a11f4ce241ad7ec957e0cb4a9e19e93a3ff87ea
 ```
 
-Relisez l'image du Deployment, puis le digest de ses Pods :
+Le Deployment est figé sur le digest que ses Pods faisaient tourner. Lisez
+toujours ce digest sur un Pod `Running` : juste après un `undo`, un Pod qui
+n'a pas encore démarré n'en a pas.
 
-```bash
-kubectl get deployment banniere -n essai-images -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'; kubectl get pods -n essai-images -l app=banniere -o jsonpath='{range .items[*]}{.status.containerStatuses[0].imageID}{"\n"}{end}'
-```
-
-```text
-nginx@sha256:7fad6c0dff97965adbddf28027d934b111fc0221a554315dc274712f3fba24d3
-docker.io/library/nginx@sha256:7fad6c0dff97965adbddf28027d934b111fc0221a554315dc274712f3fba24d3
-docker.io/library/nginx@sha256:7fad6c0dff97965adbddf28027d934b111fc0221a554315dc274712f3fba24d3
-```
-
-Le Deployment est figé sur le digest que ses Pods faisaient tourner. Les deux
-lignes de Pods sont le nouveau Pod et l'ancien, encore en train de s'arrêter :
-même digest, donc exactement la même image.
-
-## 📚 Exercice 3 : une image qui n'existe pas
-
-Créez un Deployment `faute` sur un tag qui n'existe pas :
-
-```bash
-kubectl create deployment faute --image=nginx:1.30-introuvable -n essai-images; sleep 20; kubectl get pods -n essai-images -l app=faute
-```
-
-```text
-deployment.apps/faute created
-NAME                    READY   STATUS             RESTARTS   AGE
-faute-b7c5d55d5-fzckt   0/1     ImagePullBackOff   0          20s
-```
-
-`ImagePullBackOff` dit seulement que l'image ne se tire pas, et que Kubernetes
-attend avant de réessayer. Le **pourquoi** est dans les événements du Pod.
-`kubectl describe` les affiche à la fin de sa sortie. `sed` garde la section
-`Events`, `grep` la ligne d'échec, et `fold` la coupe en lignes de 100
-caractères :
-
-```bash
-P=$(kubectl get pods -n essai-images -l app=faute -o name | head -1); kubectl describe $P -n essai-images | sed -n '/^Events:/,$p' | grep -E 'Failed to pull' | head -1 | fold -w 100
-```
-
-```text
-  Warning  Failed     4s (x2 over 19s)  kubelet            spec.containers{nginx}: Failed to pull im
-age "nginx:1.30-introuvable": rpc error: code = NotFound desc = failed to pull and unpack image "doc
-ker.io/library/nginx:1.30-introuvable": failed to resolve reference "docker.io/library/nginx:1.30-in
-trouvable": docker.io/library/nginx:1.30-introuvable: not found
-```
-
-Le registre répond `NotFound` puis `not found` : ce tag n'existe pas. Une autre
-cause donnerait un autre message. Lisez toujours ce message avant de corriger
-quoi que ce soit.
-
-## 📚 Exercice 4 : un registre privé, sans identifiants
+## 📚 Exercice 3 : un registre privé, sans identifiants
 
 Créez un ServiceAccount `miniatures`, puis un Deployment `miniatures` qui
 l'utilise et tire une image du registre privé du lab. `sed` ajoute la ligne
@@ -143,84 +135,106 @@ sleep 20; kubectl get pods -n essai-images -l app=miniatures
 serviceaccount/miniatures created
 deployment.apps/miniatures created
 NAME                          READY   STATUS             RESTARTS   AGE
-miniatures-6846cd68cb-b8452   0/1     ImagePullBackOff   0          20s
+miniatures-6846cd68cb-krkc8   0/1     ImagePullBackOff   0          20s
 ```
 
-L'image ne se tire pas. Le message exact est dans les événements du Pod, comme
-à l'exercice 3 : le challenge vous demandera de le lire vous-même.
-
-## 📚 Exercice 5 : donner les identifiants au ServiceAccount
-
-Les identifiants d'un registre se rangent dans un Secret de type
-`docker-registry`. Créez-le avec l'adresse du registre et ses identifiants :
+Lisez le message d'échec dans les événements du namespace :
 
 ```bash
-kubectl create secret docker-registry registre-essai --docker-server=localhost:30500 --docker-username=galerie --docker-password=Vignettes-2026 -n essai-images
+kubectl get events -n essai-images --field-selector reason=Failed -o custom-columns=MESSAGE:.message --no-headers | grep -m1 'localhost:30500' | fold -w 100
+```
+
+```text
+Failed to pull image "localhost:30500/galerie/vignettes:1.0": failed to pull and unpack image "local
+host:30500/galerie/vignettes:1.0": failed to resolve reference "localhost:30500/galerie/vignettes:1.
+0": pull access denied, repository does not exist or may require authorization: authorization failed
+: no basic auth credentials
+```
+
+`no basic auth credentials` : le client n'a envoyé aucun identifiant. Retenez
+ce message : un registre qui reçoit un **mauvais** mot de passe répond
+autrement.
+
+## 📚 Exercice 4 : un Secret qui vise le mauvais serveur
+
+Créez un Secret `docker-registry`, mais pour un autre serveur,
+`localhost:5000`, une faute de copie courante. Rattachez-le au ServiceAccount,
+puis remplacez les Pods :
+
+```bash
+kubectl create secret docker-registry registre-essai --docker-server=localhost:5000 --docker-username=galerie --docker-password=Vignettes-2026 -n essai-images
+kubectl patch serviceaccount miniatures -n essai-images -p '{"imagePullSecrets":[{"name":"registre-essai"}]}'
+kubectl rollout restart deployment/miniatures -n essai-images; sleep 25; kubectl get pods -n essai-images -l app=miniatures -o custom-columns='POD:.metadata.name,ETAT:.status.containerStatuses[0].state.waiting.reason,SECRETS:.spec.imagePullSecrets'
 ```
 
 ```text
 secret/registre-essai created
-```
-
-Plutôt que d'écrire ce Secret dans chaque Pod, rattachez-le au ServiceAccount
-par son champ `imagePullSecrets` :
-
-```bash
-kubectl patch serviceaccount miniatures -n essai-images -p '{"imagePullSecrets":[{"name":"registre-essai"}]}'; kubectl get serviceaccount miniatures -n essai-images -o jsonpath='{.imagePullSecrets}{"\n"}'
-```
-
-```text
 serviceaccount/miniatures patched
-[{"name":"registre-essai"}]
-```
-
-Attendez un peu, puis regardez le Pod existant : son état, et les Secrets
-qu'il porte :
-
-```bash
-sleep 15; kubectl get pods -n essai-images -l app=miniatures -o custom-columns='POD:.metadata.name,ETAT:.status.containerStatuses[0].state.waiting.reason,SECRETS:.spec.imagePullSecrets'
-```
-
-```text
-POD                           ETAT           SECRETS
-miniatures-6846cd68cb-b8452   ErrImagePull   <none>
-```
-
-Toujours en échec, et sans Secret (`<none>`). Le ServiceAccount donne ses
-`imagePullSecrets` à un Pod **au moment où le Pod est créé**. Ce Pod existait
-avant : il ne les recevra jamais.
-
-## 📚 Exercice 6 : seuls les nouveaux Pods reçoivent le Secret
-
-`kubectl rollout restart` remplace les Pods du Deployment par des Pods neufs :
-
-```bash
-kubectl rollout restart deployment/miniatures -n essai-images && kubectl rollout status deployment/miniatures -n essai-images --timeout=180s | tail -1; sleep 5
-kubectl get pods -n essai-images -l app=miniatures -o custom-columns='POD:.metadata.name,PRET:.status.containerStatuses[0].ready,SECRETS:.spec.imagePullSecrets'
-```
-
-```text
 deployment.apps/miniatures restarted
-deployment "miniatures" successfully rolled out
-POD                           PRET   SECRETS
-miniatures-646b467959-bq76n   true   [map[name:registre-essai]]
+POD                           ETAT               SECRETS
+miniatures-666c6d7978-4nj7t   ImagePullBackOff   [map[name:registre-essai]]
+miniatures-6846cd68cb-krkc8   ImagePullBackOff   <none>
 ```
 
-Le nouveau Pod porte le Secret, a tiré son image et tourne. Pourtant, le
-Deployment lui-même ne cite aucun Secret (`echo '(fin)'` marque la fin de la
-sortie) :
+Le nouveau Pod porte bien le Secret, et pourtant il échoue. Son message, lu
+sur ce seul Pod :
 
 ```bash
+P=$(kubectl get pods -n essai-images -l app=miniatures -o jsonpath='{range .items[?(@.spec.imagePullSecrets)]}{.metadata.name}{end}'); kubectl get events -n essai-images --field-selector involvedObject.name=$P,reason=Failed -o custom-columns=MESSAGE:.message --no-headers | grep -m1 'localhost:30500' | fold -w 100
+```
+
+```text
+Failed to pull image "localhost:30500/galerie/vignettes:1.0": failed to pull and unpack image "local
+host:30500/galerie/vignettes:1.0": failed to resolve reference "localhost:30500/galerie/vignettes:1.
+0": pull access denied, repository does not exist or may require authorization: authorization failed
+: no basic auth credentials
+```
+
+Le même message qu'à l'exercice 3 : un Secret pour un autre serveur ne sert à
+rien, et le kubelet tire comme s'il n'en avait aucun. La cause ne se voit que
+dans le Secret. Son champ `.dockerconfigjson` est encodé en base64 :
+
+```bash
+kubectl get secret registre-essai -n essai-images -o jsonpath='{.data.\.dockerconfigjson}' | base64 -d; echo
+```
+
+```text
+{"auths":{"localhost:5000":{"username":"galerie","password":"Vignettes-2026","auth":"Z2FsZXJpZTpWaWduZXR0ZXMtMjAyNg=="}}}
+```
+
+`localhost:5000`, au lieu de `localhost:30500`. Corrigez le Secret **en
+place**, sous le même nom : `--dry-run=client -o yaml` fabrique le nouveau
+Secret, et `kubectl replace` remplace l'ancien. Attendez une minute, sans
+toucher aux Pods :
+
+```bash
+kubectl create secret docker-registry registre-essai --docker-server=localhost:30500 --docker-username=galerie --docker-password=Vignettes-2026 -n essai-images --dry-run=client -o yaml | kubectl replace -f -
+sleep 60; kubectl get pods -n essai-images -l app=miniatures -o custom-columns='POD:.metadata.name,PRET:.status.containerStatuses[0].ready,ETAT:.status.containerStatuses[0].state.waiting.reason,SECRETS:.spec.imagePullSecrets'
+```
+
+```text
+secret/registre-essai replaced
+POD                           PRET   ETAT     SECRETS
+miniatures-666c6d7978-4nj7t   true   <none>   [map[name:registre-essai]]
+```
+
+Le Pod qui portait déjà le Secret a tiré son image tout seul, au tour suivant
+de ses essais : le kubelet relit le **contenu** du Secret à chaque tentative.
+L'ancien Pod, sans Secret, a disparu avec la fin du déploiement. Un Pod né
+**avant** que le ServiceAccount ait son Secret ne le reçoit jamais : il faut le
+remplacer. Le Deployment, lui, ne cite toujours aucun Secret :
+
+```bash
+kubectl rollout status deployment/miniatures -n essai-images --timeout=120s | tail -1
 kubectl get deployment miniatures -n essai-images -o jsonpath='{.spec.template.spec.imagePullSecrets}'; echo '(fin)'
 ```
 
 ```text
+deployment "miniatures" successfully rolled out
 (fin)
 ```
 
-Rien avant `(fin)` : c'est le ServiceAccount qui a ajouté le Secret au Pod.
-Les identifiants restent ainsi à un seul endroit, et aucun manifeste de Pod ne
-les cite.
+Rien avant `(fin)` : c'est le ServiceAccount qui ajoute le Secret aux Pods.
 
 ## 🧹 Nettoyage
 
