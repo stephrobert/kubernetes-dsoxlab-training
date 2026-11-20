@@ -322,6 +322,9 @@ sections:
       - cka-etcd-backup-restore
       # Les API retirées se repèrent avant toute montée de version.
       - k8s-detecter-les-api-depreciees
+      # Challenge de la compétence « Détecter et migrer les API dépréciées
+      # avant une montée de version » (commande du 2026-11-20).
+      - k8s-challenge-migrer-les-api-retirees
       # Niveau 4, lot A (vague 1) : la PKI du cluster (renouveler, donner un
       # accès par CSR), puis cert-manager.
       - kubeadm-verifier-et-renouveler-les-certificats
@@ -350,6 +353,9 @@ sections:
       # Lab guidé de la leçon 14-11 « Modifier une ressource en production »
       # (D103) : patch strategic, JSON et dérive avec Git, sur le cluster kubeadm.
       - k8s-modifier-une-ressource-en-production
+      # Challenge de la compétence « Modifier des ressources de façon
+      # déclarative, sans dériver de Git » (commande du 2026-11-20).
+      - k8s-challenge-ramener-le-cluster-au-depot
       - cka-node-drain-cordon
       # Lab guidé de la leçon 14-13 « Gérer les nœuds » (D103) : étiquette, rôle,
       # annotation et taint NoExecute sur un worker, sur le cluster kubeadm.
@@ -435,7 +441,13 @@ sections:
       - ckad-init-container
       - ckad-multi-container-sidecar
       - ckad-job-cronjob
+      # Challenge de la compétence « Exécuter des tâches ponctuelles et
+      # planifiées » (commande du 2026-11-20), dans la leçon Jobs et CronJobs.
+      - k8s-challenge-executer-et-planifier-des-taches
       - ckad-volumes-partage-entre-conteneurs
+      # Challenge de la compétence « Composer un Pod multi-conteneurs »
+      # (commande du 2026-11-20), dans la leçon Init containers et sidecars.
+      - k8s-challenge-composer-un-pod-multi-conteneurs
       - ckad-probes-all-types
       - ckad-pod-resources-labels
       - ckad-in-place-pod-vertical-scaling
@@ -590,6 +602,9 @@ sections:
       - k8s-attacher-une-seconde-interface
       # Leçon L4 : sur le cluster prêt du socle, que son setup remonte.
       - k8s-auditer-les-flux-avec-hubble
+      # Challenge de la compétence « Retrouver, compter et journaliser les
+      # flux refusés avec Hubble » (commande du 2026-11-20).
+      - k8s-challenge-retrouver-les-flux-refuses
       # Leçon L5 : le plan de contrôle BGP de Cilium face à un routeur FRR
       # 10.6.2 hors du cluster (sur k8s-cp.lab, espace de noms réseau à lui).
       - k8s-annoncer-un-service-en-bgp

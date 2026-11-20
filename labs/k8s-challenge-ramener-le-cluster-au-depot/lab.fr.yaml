@@ -1,0 +1,30 @@
+title: "Ramener au dépôt Git les modifications faites en direct"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/#mettre-en-pratique
+description: |
+  Sans guidage, retrouvez les modifications faites en direct sur un cluster,
+  reportez dans les manifestes versionnés celle que l'équipe garde, défaites
+  les autres, et laissez le cluster et le dépôt identiques, sans recréer
+  aucun objet.
+
+criteria:
+  - id: diff-vide
+    label: "kubectl diff sur le dépôt ne trouve aucun écart"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
+  - id: replicas-commites
+    label: "Le nombre de réplicas monté pendant la nuit est gardé et commité dans le dépôt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+  - id: modifications-defaites
+    label: "Les autres modifications faites en direct, y compris celle que kubectl diff ne montre pas, ont disparu"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/
+  - id: objets-preserves
+    label: "Le Deployment et la ConfigMap ont été modifiés, pas recréés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/
+  - id: application-alignee
+    label: "Chaque réplica tourne sur la configuration du dépôt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-create-apply/

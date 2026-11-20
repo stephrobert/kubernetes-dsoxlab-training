@@ -1,0 +1,82 @@
+# Challenge de la compétence k8s.batch.run, « Exécuter des tâches ponctuelles
+# et planifiées (Job, CronJob) », commandé par Stéphane le 2026-11-20 (relayé
+# par le blog). Il prolonge le lab guidé ckad-job-cronjob sans le refaire :
+# un Job indexé dont le nombre de complétions dépend du cluster, un CronJob
+# au planning, au fuseau et à l'historique imposés, et un Job en échec à
+# diagnostiquer puis à recréer.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Cinq
+# critères à poids égal, seuil 80, deux bloquants sur le cœur du geste.
+# Aucun indice (D91).
+id: k8s-challenge-executer-et-planifier-des-taches
+title: "Run one-off and scheduled tasks with Jobs and CronJobs"
+level: application-design
+section: ckad
+difficulty: intermediate
+description: |
+  Without guidance, run an indexed Job that processes each lot of a list
+  once, schedule a CronJob with an imposed schedule, time zone, concurrency
+  and history, start one of its runs by hand, and repair a failed Job.
+skills:
+  - job
+  - cronjob
+  - indexed-job
+  - batch
+  - troubleshooting
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/#put-it-into-practice
+lab_type: challenge
+exam_passing_score: 80
+exam_blocking_checks:
+  # Le cœur du geste : un Job indexé qui traite chaque lot une fois, et un
+  # CronJob planifié comme demandé.
+  - test_facturer_lots_traite_chaque_lot_une_fois
+  - test_relance_impayes_est_planifie_comme_demande
+estimated_time: 40m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: job-indexe
+    label: "facturer-lots is an indexed Job that processed each lot once, by its own index"
+    tests:
+      - test_facturer_lots_traite_chaque_lot_une_fois
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
+  - id: parallelisme-et-reprises
+    label: "facturer-lots runs two Pods at a time and allows one retry"
+    tests:
+      - test_facturer_lots_respecte_le_parallelisme_et_les_reprises
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
+  - id: cronjob-planifie
+    label: "relance-impayes follows the requested schedule, time zone, concurrency and history"
+    tests:
+      - test_relance_impayes_est_planifie_comme_demande
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
+  - id: execution-manuelle
+    label: "A run started by hand from relance-impayes has completed"
+    tests:
+      - test_un_job_lance_a_la_main_depuis_relance_impayes_a_reussi
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/
+  - id: job-repare
+    label: "export-compta, recreated with its configuration, has completed"
+    tests:
+      - test_export_compta_relance_avec_sa_configuration_a_reussi
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/jobs-and-cronjobs/

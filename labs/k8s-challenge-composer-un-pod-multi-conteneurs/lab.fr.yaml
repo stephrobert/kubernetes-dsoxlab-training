@@ -1,0 +1,29 @@
+title: "Composer un Pod multi-conteneurs : init container, sidecar natif, volumes partagés"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
+description: |
+  Sans guidage, composez un Deployment dont les Pods préparent leur page avec
+  un init container, la servent en lecture seule, et relaient leur journal
+  d'accès par un sidecar natif qui lit un volume partagé et borné.
+
+criteria:
+  - id: page-preparee
+    label: "La page écrite par l'init container à partir du titre de vitrine est servie par chaque Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: sidecar-natif
+    label: "Un sidecar natif relaie chaque accès du serveur"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
+  - id: lecture-seule
+    label: "Le serveur monte la page en lecture seule, l'init container l'écrit"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: volume-borne
+    label: "Les journaux vivent dans un volume temporaire plafonné à 32Mi, partagé par le serveur et le sidecar"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/
+  - id: replicas-prets
+    label: "Deux réplicas prêts, sans redémarrage"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/

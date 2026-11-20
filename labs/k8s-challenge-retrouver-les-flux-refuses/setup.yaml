@@ -1,0 +1,38 @@
+---
+# Joué par `dsoxlab run`, sur le modèle de k8s-auditer-les-flux-avec-hubble :
+#
+#   1. le socle Cilium à l'étape `cluster` : le cluster sans kube-proxy des
+#      hôtes net-*, Cilium 1.20.5 avec Hubble, Relay et les métriques du
+#      socle. Une configuration laissée par un passage précédent (métriques
+#      par Pod, export des flux) est ramenée à celle du socle ;
+#   2. les journaux d'export Hubble d'un passage précédent sont retirés des
+#      trois nœuds, APRÈS le retour des agents à une configuration qui
+#      n'exporte rien ;
+#   3. la situation du lab (fixtures/prepare.sh) : un refus de sortie tiré au
+#      sort dans livraison, et un refus voisin.
+- name: Préparer le lab k8s-challenge-retrouver-les-flux-refuses
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster Cilium sans kube-proxy
+      ansible.builtin.include_tasks: ../../shared/cilium-cluster.yml
+      vars:
+        cilium_etape: cluster
+
+    - name: Retirer les journaux d'export Hubble d'un passage précédent
+      ansible.builtin.shell: |
+        rm -f /var/run/cilium/hubble/events* /var/run/cilium/hubble/refus*
+      args:
+        executable: /bin/bash
+      changed_when: true
+      delegate_to: "{{ noeud }}"
+      loop: "{{ cilium_workers + [inventory_hostname] }}"
+      loop_control:
+        loop_var: noeud
+
+    - name: Poser les deux namespaces et le refus de sortie tiré au sort
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,28 @@
+title: "Détecter et migrer les API retirées avant une montée de version"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique
+description: |
+  Sans guidage, trouvez les manifestes d'un dépôt qui emploient une API que
+  Kubernetes a retirée, nommez chacun avec sa remplaçante dans un rapport,
+  migrez-les sans changer leur intention, et appliquez le dépôt.
+
+criteria:
+  - id: rapport
+    label: "Le rapport nomme chaque API retirée du dépôt et sa remplaçante, et rien d'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: depot-accepte
+    label: "Chaque manifeste du dépôt est toujours là et accepté par l'API server"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: depot-applique
+    label: "Le dépôt migré est appliqué, kubectl diff ne trouve aucun écart"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: intention-gardee
+    label: "Les objets décrivent ce que décrivaient les manifestes hérités"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
+  - id: registre-disponible
+    label: "registre tourne avec ses deux réplicas"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/
