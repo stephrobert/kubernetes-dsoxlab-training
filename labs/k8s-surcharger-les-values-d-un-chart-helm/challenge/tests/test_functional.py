@@ -78,11 +78,12 @@ def test_la_montee_garde_les_reglages_de_l_exploitation(host):
     replicas, couleur = valeurs.get("replicaCount"), (valeurs.get("ui") or {}).get("color")
     assert replicas == 3 and couleur == "#ff6b00", message(
         en=f"After the upgrade, the values give replicaCount={replicas!r} and ui.color={couleur!r}: the operations "
-        "settings (3 and #ff6b00) were lost. An upgrade without values starts again from the chart defaults; "
-        "--reuse-values or a values file keeps them.",
+        "settings (3 and #ff6b00) were lost. A helm upgrade that receives values starts again from the chart "
+        "defaults; the release's values saved with helm get values -o yaml and passed back with -f keep them.",
         fr=f"Après la montée, les values donnent replicaCount={replicas!r} et ui.color={couleur!r} : les réglages "
-        "de l'exploitation (3 et #ff6b00) sont perdus. Un upgrade sans values repart des défauts du chart ; "
-        "--reuse-values ou un fichier de values les garde.",
+        "de l'exploitation (3 et #ff6b00) sont perdus. Un helm upgrade qui reçoit des values repart des défauts "
+        "du chart ; les values de la release, enregistrées par helm get values -o yaml et repassées par -f, "
+        "les gardent.",
     )
 
 

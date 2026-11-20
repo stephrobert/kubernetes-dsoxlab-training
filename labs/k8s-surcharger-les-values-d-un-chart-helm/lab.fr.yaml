@@ -1,4 +1,5 @@
 title: "Surcharger les values d'un chart Helm sans tomber dans le piège du typage"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
 description: |
   La release catalogue (chart podinfo 6.16.0) porte deux réglages posés par
   l'exploitation. Montez-la en 6.17.0 sans les perdre, et fixez le message de
@@ -7,7 +8,13 @@ description: |
 criteria:
   - id: message-chaine
     label: "Les values de la release portent ui.message comme la chaîne '2026', pas l'entier"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
   - id: montee-sans-perte
     label: "La release tourne en podinfo 6.17.0 et garde les réglages de l'exploitation (3 réplicas, #ff6b00)"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
   - id: message-servi
     label: "podinfo répond le message 2026"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/

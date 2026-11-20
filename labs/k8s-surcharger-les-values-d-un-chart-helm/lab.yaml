@@ -15,9 +15,7 @@ skills:
   - set-string
 distros:
   - ubuntu24
-# La leçon n'a pas encore de jumelle anglaise (404 relevé le 2026-11-16) : le
-# lab pointe la page française.
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-values/
 lab_type: lab
 estimated_time: 20m
 
@@ -45,18 +43,18 @@ criteria:
     tests:
       - test_le_message_est_une_chaine
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-values/
   - id: montee-sans-perte
     label: "The release runs podinfo 6.17.0 and still carries the operations settings (3 replicas, #ff6b00)"
     tests:
       - test_la_montee_garde_les_reglages_de_l_exploitation
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-values/
   - id: message-servi
     label: "podinfo answers the message 2026"
     tests:
       - test_l_application_sert_le_message
     lessons:
-      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/helm/values/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-values/
 
 feedback: full
