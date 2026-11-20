@@ -13,8 +13,9 @@ section: kcna
 difficulty: beginner
 description: |
   On the multi-node kind cluster, record for the worker architecture-worker2
-  its container runtime, the version of its kubelet, its CPU and memory
-  capacity, and its Ready condition, as the Node declares them.
+  what sets it apart from the other nodes: its internal address, the address
+  range of its Pods, its Machine ID and the time it became Ready, as the Node
+  declares them.
 skills:
   - kubectl-get-nodes
   - kubectl-describe-node
@@ -43,27 +44,27 @@ validation:
   persistence_after_reboot: false
 
 criteria:
-  - id: le-runtime-du-worker-est-consigne
-    label: "The container runtime of architecture-worker2 and its version are recorded"
+  - id: l-adresse-interne-est-consignee
+    label: "The internal address of architecture-worker2 is recorded"
     tests:
-      - test_le_runtime_du_worker_est_consigne
+      - test_l_adresse_interne_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
-  - id: la-version-du-kubelet-est-consignee
-    label: "The kubelet version of architecture-worker2 is recorded"
+  - id: la-plage-des-pods-est-consignee
+    label: "The Pod address range of architecture-worker2 is recorded"
     tests:
-      - test_la_version_du_kubelet_est_consignee
+      - test_la_plage_des_pods_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
-  - id: la-capacite-du-worker-est-consignee
-    label: "The CPU and memory capacity of architecture-worker2 are recorded"
+  - id: le-machine-id-est-consigne
+    label: "The Machine ID of architecture-worker2 is recorded"
     tests:
-      - test_la_capacite_en_cpu_et_en_memoire_est_consignee
+      - test_le_machine_id_est_consigne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
-  - id: la-condition-ready-est-consignee
-    label: "The Ready condition of architecture-worker2 is recorded"
+  - id: l-heure-du-passage-a-ready-est-consignee
+    label: "The time architecture-worker2 became Ready is recorded"
     tests:
-      - test_la_condition_ready_est_consignee
+      - test_l_heure_du_passage_a_ready_est_consignee
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/

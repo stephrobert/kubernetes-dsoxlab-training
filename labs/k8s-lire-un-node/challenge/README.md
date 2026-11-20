@@ -10,30 +10,31 @@ waits for what the **`architecture-worker2`** node says about itself.
 
 For the `architecture-worker2` node, fill in the sheet:
 
-1. After **`runtime`**: the program that starts its containers, and its
-   version.
+1. After **`adresse-interne`**: its internal IP address.
 
-2. After **`version-kubelet`**: the version of its kubelet.
+2. After **`plage-des-pods`**: the address range from which its Pods get their
+   address.
 
-3. After **`cpu`** and **`memoire`**: its processor and memory **capacity**.
+3. After **`machine-id`**: its machine identifier.
 
-4. After **`condition-ready`**: the value of its **Ready** condition.
+4. After **`ready-depuis`**: the date and time it became **Ready**.
 
 ## 🧭 Useful pointers
 
-`kubectl get nodes -o wide` gives one line per node, with the runtime and the
-kubelet version. `kubectl describe node` gives the whole sheet: the conditions
-(`Conditions`), the capacity (`Capacity`), what is left for Pods
-(`Allocatable`), then the versions (`System Info`).
+`kubectl describe node` gives the whole sheet of a node, section by section:
+the conditions (`Conditions`), the addresses (`Addresses`), the capacity
+(`Capacity`), the versions and identifiers (`System Info`), then the Pod
+address range (`PodCIDR`).
 
-`Capacity` is what the machine has. `Allocatable` is what is left for the
-Pods. The sheet asks for the **capacity**.
+These four values belong to `architecture-worker2`: the other nodes have
+other ones. Read the sheet of that node, and copy each value alone on its
+line.
 
 ## ✅ How you will know it is right
 
 The tests compare your sheet with what `architecture-worker2` declares at
-check time. Several ways of writing are accepted: a version with or without
-its `v`, a memory in Ki, Mi or Gi.
+check time. The time is copied as `kubectl describe node` shows it, or in the
+`2026-11-20T07:28:14Z` format of `kubectl get -o yaml`.
 
 ```bash
 dsoxlab check k8s-lire-un-node

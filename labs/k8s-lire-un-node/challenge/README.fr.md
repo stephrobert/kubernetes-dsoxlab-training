@@ -10,30 +10,32 @@ attend ce que le nœud **`architecture-worker2`** dit de lui-même.
 
 Pour le nœud `architecture-worker2`, complétez la fiche :
 
-1. Après **`runtime`** : le programme qui lance ses conteneurs, et sa version.
+1. Après **`adresse-interne`** : son adresse IP interne.
 
-2. Après **`version-kubelet`** : la version de son kubelet.
+2. Après **`plage-des-pods`** : la plage d'adresses dans laquelle ses Pods
+   reçoivent leur adresse.
 
-3. Après **`cpu`** et **`memoire`** : sa **capacité** en processeur et en
-   mémoire.
+3. Après **`machine-id`** : son identifiant de machine.
 
-4. Après **`condition-ready`** : la valeur de sa condition **Ready**.
+4. Après **`ready-depuis`** : la date et l'heure auxquelles il est devenu
+   **Ready**.
 
 ## 🧭 Les repères utiles
 
-`kubectl get nodes -o wide` donne une ligne par nœud, avec le runtime et la
-version du kubelet. `kubectl describe node` donne la fiche complète : les
-conditions (`Conditions`), la capacité (`Capacity`), ce qui reste aux Pods
-(`Allocatable`), puis les versions (`System Info`).
+`kubectl describe node` donne la fiche complète d'un nœud, section par
+section : les conditions (`Conditions`), les adresses (`Addresses`), la
+capacité (`Capacity`), les versions et identifiants (`System Info`), puis la
+plage d'adresses des Pods (`PodCIDR`).
 
-`Capacity`, c'est ce que la machine possède. `Allocatable`, c'est ce qui reste
-aux Pods. La fiche demande la **capacité**.
+Ces quatre valeurs sont propres à `architecture-worker2` : les autres nœuds en
+ont d'autres. Lisez bien la fiche de ce nœud-là, et recopiez chaque valeur
+seule sur sa ligne.
 
 ## ✅ Comment vous saurez que c'est bon
 
 Les tests comparent votre fiche à ce que déclare `architecture-worker2` au
-moment du contrôle. Plusieurs façons d'écrire sont acceptées : une version
-avec ou sans son `v`, une mémoire en Ki, Mi ou Gi.
+moment du contrôle. L'heure se recopie telle que `kubectl describe node`
+l'affiche, ou au format `2026-11-20T07:28:14Z` de `kubectl get -o yaml`.
 
 ```bash
 dsoxlab check k8s-lire-un-node
