@@ -1,45 +1,48 @@
-# Challenge : Attendre une dépendance avec un init container
+# Challenge : Réparer le gardien d'une application
 
 ## 📍 La situation
 
-Dans le namespace **`lab`**, l'application **`app`** lit sa configuration au
-démarrage sur un serveur interne, exposé par le Service **`config-svc`** sur le
-port 80. Quand ce serveur n'est pas là, l'application démarre quand même, sans
-configuration. Elle se comporte alors mal pendant des heures avant que
-quelqu'un s'en aperçoive.
+Dans le namespace **`lab`**, le Pod **`facturation`** calcule les factures
+avec les prix du service de tarifs. Ce service est exposé par le Service
+**`tarifs-svc`**. Sans lui, la facturation sort des montants à zéro.
 
-L'équipe veut que l'application **n'aille pas plus loin tant que `config-svc`
-ne répond pas**. Le Service existe déjà, mais rien ne tourne derrière lui pour
-l'instant. C'est la situation de départ, et c'est celle qu'il faut savoir
-gérer.
+Un init container, **`attendre-tarifs`**, devait empêcher `facturation` de
+démarrer tant que les tarifs ne répondent pas. Pourtant `facturation` tourne
+déjà, alors que rien ne répond derrière `tarifs-svc`. Le gardien n'a rien
+retenu.
 
 ## 🎯 Ce que vous devez obtenir
 
-1. Un Pod **`app`** dans `lab`, avec un init container nommé
-   **`wait-for-config`** qui attend que `http://config-svc/` réponde, puis un
-   conteneur principal nommé **`main`**, image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`.
-2. Tant que rien ne répond derrière `config-svc`, le Pod `app` reste en
+1. Un Pod **`facturation`** dans `lab`, dont l'init container
+   **`attendre-tarifs`** attend une vraie réponse de `tarifs-svc`, puis un
+   conteneur principal **`main`**, image
+   `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`.
+2. Tant que rien ne répond derrière `tarifs-svc`, `facturation` reste en
    **`Init`** : constatez-le.
-3. Un Pod **`config-server`** dans `lab`, image `nginx:1.30.5@sha256:9bf97bd7714f5e24c1ccd545ecb9eb5435cb6d109c97cebb15e7e455e0239edb`, avec le
-   label **`app=config`**, que le Service `config-svc` sélectionne.
-4. Une fois `config-server` prêt, l'init container se termine et `app` passe
+3. Un Pod **`tarifs`** dans `lab`, même image nginx, que `tarifs-svc`
+   sélectionne.
+4. Une fois `tarifs` prêt, l'init container se termine et `facturation` passe
    en `Running` sans que vous ayez rien fait d'autre.
 
 ## 🧭 Les repères utiles
 
-Un init container s'exécute avant les conteneurs principaux, jusqu'au bout, et
-le Pod attend qu'il réussisse. Une boucle `until` avec `wget` fait un très bon
-gardien, dans l'image
-`busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4`.
+Commencez par lire ce que fait le gardien actuel et comment le Service est
+déclaré : son sélecteur et son port. `kubectl describe` montre l'un et
+l'autre.
 
-Un Service se résout dans le DNS dès qu'il existe, même sans aucune adresse
-derrière lui : attendre que le nom se résolve n'attend rien. Attendre une
-réponse HTTP, oui.
+On ne peut pas changer les init containers d'un Pod qui existe : il faut le
+recréer.
+
+Une attente bornée vaut mieux qu'une attente sans fin : un gardien qui
+abandonne après un nombre d'essais met le Pod en erreur, ce qui se voit, et
+Kubernetes le relance. Une boucle `until` avec `wget` fait un bon gardien,
+dans l'image
+`busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4`.
 
 ## ✅ Comment vous saurez que c'est bon
 
-Les tests lisent la définition du Pod `app`, les adresses du Service, et l'état
-de l'init container, qui doit s'être terminé avec succès.
+Les tests lisent la définition de `facturation`, interrogent `tarifs-svc`,
+et comparent l'ordre de démarrage des deux Pods.
 
 ```bash
 dsoxlab check ckad-init-container

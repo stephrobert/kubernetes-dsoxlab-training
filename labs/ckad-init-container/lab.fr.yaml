@@ -1,17 +1,18 @@
-title: "Attendre une dépendance avec un init container"
+title: "Réparer le gardien d'une application avec un init container"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
 description: |
-  Empêcher une application de démarrer avant que le Service dont elle dépend
-  ne réponde, avec un init container qui attend. Observer le Pod bloqué en
-  Init, poser la dépendance, et voir l'application partir toute seule.
+  Une application tourne déjà alors que sa dépendance ne répond pas : son
+  init container ne fait que résoudre un nom. Diagnostiquer le gardien et le
+  Service, recréer le Pod avec un gardien qui attend une vraie réponse, puis
+  poser la dépendance et voir l'application partir toute seule.
 
 criteria:
   - id: gardien-qui-attend-le-service
-    label: "app a un init container qui attend config-svc, puis son conteneur principal"
+    label: "facturation a un init container qui attend une réponse de tarifs-svc sur son port, puis son conteneur principal"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: dependance-derriere-le-service
-    label: "config-server répond derrière config-svc"
+    label: "tarifs répond derrière tarifs-svc, sur le port 8080"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: init-termine-avec-succes
@@ -19,6 +20,6 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/
   - id: running-seul-quand-la-dependance-repond
-    label: "app est passé seul en Running quand la dépendance a répondu"
+    label: "facturation est passé seul en Running quand tarifs a répondu"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/

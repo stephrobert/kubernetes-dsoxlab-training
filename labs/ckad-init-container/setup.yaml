@@ -1,7 +1,9 @@
 ---
-# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace et
-# le Service sans backend, et retire les Pods qu'un passage précédent aurait
-# laissés.
+# Joué par `dsoxlab run` avant d'ouvrir la session : il pose le namespace, le
+# Service tarifs-svc sans backend et un Pod facturation dont le gardien ne
+# fait qu'un nslookup, et retire les Pods qu'un passage précédent aurait
+# laissés. Challenge refait le 2026-11-20 (audit H) : il reprenait le scénario
+# de la leçon.
 #
 # Transposé de K8sExamLab, dont la consigne faisait attendre « que le Service
 # soit résolvable par DNS » : un Service se résout dès qu'il existe, même
