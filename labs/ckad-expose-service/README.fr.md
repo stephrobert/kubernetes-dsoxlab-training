@@ -244,11 +244,11 @@ command terminated with exit code 1
 ```
 
 Les endpoints sont là, sur le port `9090` : le sélecteur est bon, Kubernetes a
-trouvé les Pods. Rien ne vérifie pourtant qu'ils écoutent sur ce port.
-`Connection refused` veut dire que la requête est arrivée au Pod, et que rien
-n'y écoute sur ce port. Retenez la différence : **pas d'endpoint**, c'est le
-sélecteur qui est faux ; **des endpoints, et une connexion refusée**, c'est
-le port cible. Supprimez ce Service :
+trouvé les Pods. Rien ne vérifie pourtant qu'ils écoutent sur ce port. Sur ce
+cluster, un Service sans aucun endpoint répond lui aussi `Connection refused` :
+le message ne suffit donc pas à trouver la cause. La liste des endpoints, si.
+**Pas d'endpoint**, c'est le sélecteur qui est faux ; **des endpoints, et pas
+de réponse**, c'est le port cible. Supprimez ce Service :
 
 ```bash
 kubectl delete service annuaire-faux -n essai-expose

@@ -382,11 +382,11 @@ def test_le_service_repond_sous_son_nom_depuis_le_client(sondage):
         en=f"{len(sondage['echecs'])} request(s) out of {REQUETES} failed from {CLIENT} "
         f"towards http://{SERVICE}:{PORT_SERVICE}/ : {sorted(set(sondage['echecs']))}. The name resolves "
         "through the cluster DNS inside the namespace; a Service with no ready endpoint "
-        "resolves and then never answers (download timed out).",
+        "resolves and then refuses the connection.",
         fr=f"{len(sondage['echecs'])} requête(s) sur {REQUETES} ont échoué depuis {CLIENT} "
         f"vers http://{SERVICE}:{PORT_SERVICE}/ : {sorted(set(sondage['echecs']))}. Le nom se résout par "
         "le DNS du cluster dans le namespace ; un Service sans endpoint prêt se résout "
-        "puis ne répond jamais (download timed out).",
+        "puis refuse la connexion.",
     )
 
 

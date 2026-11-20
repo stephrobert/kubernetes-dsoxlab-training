@@ -242,11 +242,11 @@ command terminated with exit code 1
 ```
 
 The endpoints are there, on port `9090`: the selector is right, Kubernetes
-found the Pods. Yet nothing checks that they listen on that port.
-`Connection refused` means the request reached the Pod, and nothing listens on
-that port there. Keep the difference in mind: **no endpoint**, the selector is
-wrong; **endpoints, and a refused connection**, it is the target port. Delete
-this Service:
+found the Pods. Yet nothing checks that they listen on that port. On this
+cluster, a Service with no endpoint at all also answers `Connection refused`:
+the message is not enough to find the cause. The list of endpoints is. **No
+endpoint**, the selector is wrong; **endpoints, and no answer**, it is the
+target port. Delete this Service:
 
 ```bash
 kubectl delete service annuaire-faux -n essai-expose
