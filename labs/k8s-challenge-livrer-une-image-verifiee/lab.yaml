@@ -18,7 +18,7 @@
 # module : une image épinglée qui tourne vraiment, une image analysée qui
 # porte moins de failles, et un cluster qui n'admet que du signé.
 id: k8s-challenge-livrer-une-image-verifiee
-title: "Let only verified images in, without guidance"
+title: "Let only verified images in, on your own and without hints"
 level: supply-chain-security
 section: cks
 difficulty: advanced

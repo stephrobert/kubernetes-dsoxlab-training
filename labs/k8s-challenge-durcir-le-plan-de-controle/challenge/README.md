@@ -1,4 +1,4 @@
-# Challenge: Fix a cluster's CIS findings, without guidance
+# Challenge: Fix a cluster's CIS findings, on your own and without hints
 
 ## The situation
 

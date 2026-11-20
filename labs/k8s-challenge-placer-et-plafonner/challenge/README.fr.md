@@ -1,4 +1,4 @@
-# Challenge : Placer des Pods, plafonner un namespace et dimensionner, sans guidage
+# Challenge : Placer des Pods, plafonner un namespace et dimensionner, seul et sans indice
 
 ## La situation
 

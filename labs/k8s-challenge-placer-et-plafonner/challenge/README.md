@@ -1,4 +1,4 @@
-# Challenge: Place Pods, cap a namespace and scale, without guidance
+# Challenge: Place Pods, cap a namespace and scale, on your own and without hints
 
 ## The situation
 

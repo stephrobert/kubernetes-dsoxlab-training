@@ -18,7 +18,7 @@
 # Quatre états, à poids égal, un par état de la fiche. Seuil 70 : trois sur
 # quatre. Aucun bloquant, la fiche n'en désigne pas.
 id: k8s-challenge-reseau-avance
-title: "Repair, open, route out and audit the flows of a Cilium cluster, without guidance"
+title: "Repair, open, route out and audit the flows of a Cilium cluster, on your own and without hints"
 level: advanced-traffic-management
 section: ckne
 difficulty: advanced

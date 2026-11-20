@@ -1,4 +1,4 @@
-# Ne laisser entrer que des images vérifiées, sans guidage
+# Ne laisser entrer que des images vérifiées, seul et sans indice
 
 Challenge du module **Chaîne d'approvisionnement** de la formation Kubernetes,
 dans la section Mettre en pratique de la leçon « Image Scanning (Grype/Trivy) » :

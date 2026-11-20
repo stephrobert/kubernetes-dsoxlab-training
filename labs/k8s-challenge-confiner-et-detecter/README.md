@@ -1,4 +1,4 @@
-# Confine a Pod and detect abnormal activity, without guidance
+# Confine a Pod and detect abnormal activity, on your own and without hints
 
 Challenge of the **Confine and detect** module of the Kubernetes course, in
 the Put into practice section of the "Runtime Sandboxes (gVisor, Kata)"

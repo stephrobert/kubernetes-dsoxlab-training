@@ -1,4 +1,4 @@
-# Confiner un Pod et détecter une activité anormale, sans guidage
+# Confiner un Pod et détecter une activité anormale, seul et sans indice
 
 Challenge du module **Confiner et détecter** de la formation Kubernetes, dans
 la section Mettre en pratique de la leçon « Runtime Sandboxes (gVisor, Kata) » :

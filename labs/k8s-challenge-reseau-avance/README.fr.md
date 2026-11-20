@@ -1,4 +1,4 @@
-# Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, sans guidage
+# Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, seul et sans indice
 
 Challenge du module **Réseau avancé** de la formation Kubernetes (niveau 6,
 CKNE), dans la section Mettre en pratique de la leçon « Faire sortir le trafic

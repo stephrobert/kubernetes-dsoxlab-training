@@ -1,4 +1,4 @@
-# Let only verified images in, without guidance
+# Let only verified images in, on your own and without hints
 
 Challenge of the **Supply chain** module of the Kubernetes course, in the Put
 into practice section of the "Image Scanning (Grype/Trivy)" lesson: a

@@ -1,4 +1,4 @@
-# Challenge: Let only verified images in, without guidance
+# Challenge: Let only verified images in, on your own and without hints
 
 ## The situation
 

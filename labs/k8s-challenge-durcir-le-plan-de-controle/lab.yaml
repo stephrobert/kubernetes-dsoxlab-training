@@ -16,7 +16,7 @@
 # compte moins d'échecs, et un journal qui trace vraiment. Ce sont les deux
 # preuves que l'outil donne, et non le fichier qu'on a écrit.
 id: k8s-challenge-durcir-le-plan-de-controle
-title: "Fix a cluster's CIS findings, without guidance"
+title: "Fix a cluster's CIS findings, on your own and without hints"
 level: cluster-hardening
 section: cks
 difficulty: advanced

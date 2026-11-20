@@ -1,4 +1,4 @@
-# Challenge: Confine a Pod and detect abnormal activity, without guidance
+# Challenge: Confine a Pod and detect abnormal activity, on your own and without hints
 
 ## The situation
 

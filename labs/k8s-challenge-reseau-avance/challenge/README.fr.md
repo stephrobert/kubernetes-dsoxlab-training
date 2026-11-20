@@ -1,4 +1,4 @@
-# Challenge : Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, sans guidage
+# Challenge : Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, seul et sans indice
 
 ## La situation
 

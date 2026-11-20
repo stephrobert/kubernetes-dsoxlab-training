@@ -1,4 +1,4 @@
-# Fix a cluster's CIS findings, without guidance
+# Fix a cluster's CIS findings, on your own and without hints
 
 Challenge of the **Harden the cluster** module of the Kubernetes course, in the
 Put into practice section of the "Audit Logs" lesson: an API server to harden

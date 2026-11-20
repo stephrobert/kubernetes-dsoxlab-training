@@ -1,4 +1,4 @@
-# Repair, open, route out and audit the flows of a Cilium cluster, without guidance
+# Repair, open, route out and audit the flows of a Cilium cluster, on your own and without hints
 
 Challenge of the **Advanced networking** module of the Kubernetes course
 (level 6, CKNE), in the Practice section of the lesson "Route traffic out

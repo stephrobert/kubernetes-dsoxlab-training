@@ -1,4 +1,4 @@
-# Challenge : Confiner un Pod et détecter une activité anormale, sans guidage
+# Challenge : Confiner un Pod et détecter une activité anormale, seul et sans indice
 
 ## La situation
 

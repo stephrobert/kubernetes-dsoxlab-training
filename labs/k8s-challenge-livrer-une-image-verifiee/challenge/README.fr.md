@@ -1,4 +1,4 @@
-# Challenge : Ne laisser entrer que des images vérifiées, sans guidage
+# Challenge : Ne laisser entrer que des images vérifiées, seul et sans indice
 
 ## La situation
 

@@ -1,4 +1,4 @@
-# Placer des Pods, plafonner un namespace et dimensionner, sans guidage
+# Placer des Pods, plafonner un namespace et dimensionner, seul et sans indice
 
 Challenge du module **Scheduling et capacité** de la formation Kubernetes,
 dans la section Mettre en pratique de la leçon « Ajuster les ressources d'un

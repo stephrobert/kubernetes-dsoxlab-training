@@ -1,4 +1,4 @@
-# Corriger les écarts CIS d'un cluster, sans guidage
+# Corriger les écarts CIS d'un cluster, seul et sans indice
 
 Challenge du module **Durcir le cluster** de la formation Kubernetes, dans la
 section Mettre en pratique de la leçon « Audit Logs » : un API server à durcir

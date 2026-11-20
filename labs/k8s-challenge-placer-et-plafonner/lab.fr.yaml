@@ -1,4 +1,4 @@
-title: "Placer des Pods, plafonner un namespace et dimensionner, sans guidage"
+title: "Placer des Pods, plafonner un namespace et dimensionner, seul et sans indice"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
 description: |
   Sans procédure, réserver un nœud à une application, en écarter les autres,

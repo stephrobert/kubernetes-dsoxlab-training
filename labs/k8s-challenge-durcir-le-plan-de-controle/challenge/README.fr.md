@@ -1,4 +1,4 @@
-# Challenge : Corriger les écarts CIS d'un cluster, sans guidage
+# Challenge : Corriger les écarts CIS d'un cluster, seul et sans indice
 
 ## La situation
 

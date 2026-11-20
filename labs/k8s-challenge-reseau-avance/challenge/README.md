@@ -1,4 +1,4 @@
-# Challenge: Repair, open, route out and audit the flows of a Cilium cluster, without guidance
+# Challenge: Repair, open, route out and audit the flows of a Cilium cluster, on your own and without hints
 
 ## The situation
 
