@@ -1,0 +1,85 @@
+# Challenge de la compétence k8s.pod.compose, « Composer un Pod
+# multi-conteneurs : init, sidecar, volumes partagés », commandé par Stéphane
+# le 2026-11-20 (relayé par le blog). Il assemble ce que les labs guidés
+# ckad-init-container, ckad-multi-container-sidecar et
+# ckad-volumes-partage-entre-conteneurs montrent séparément, sur d'autres
+# objets : une page écrite par un init container à partir d'un titre tiré au
+# sort, servie en lecture seule, et un journal d'accès relayé par un sidecar
+# natif depuis un volume borné.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Cinq
+# critères à poids égal, seuil 80, deux bloquants sur le cœur du geste.
+# Aucun indice (D91).
+id: k8s-challenge-composer-un-pod-multi-conteneurs
+title: "Compose a multi-container Pod: init container, native sidecar, shared volumes"
+level: application-design
+section: ckad
+difficulty: intermediate
+description: |
+  Without guidance, compose a Deployment whose Pods prepare their page with
+  an init container, serve it read-only, and pass on their access log
+  through a native sidecar reading a bounded shared volume.
+skills:
+  - init-container
+  - native-sidecar
+  - volumes
+  - emptydir
+  - multi-container-pod
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/#put-it-into-practice
+lab_type: challenge
+exam_passing_score: 80
+exam_blocking_checks:
+  # Le cœur du geste : la page préparée par l'init container et servie, et
+  # le sidecar natif qui relaie les accès.
+  - test_la_page_preparee_par_l_init_container_est_servie
+  - test_le_sidecar_natif_relaie_les_acces
+estimated_time: 40m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: page-preparee
+    label: "The page written by the init container from the vitrine title is served by every Pod"
+    tests:
+      - test_la_page_preparee_par_l_init_container_est_servie
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
+  - id: sidecar-natif
+    label: "A native sidecar passes on each access of the server"
+    tests:
+      - test_le_sidecar_natif_relaie_les_acces
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/
+  - id: lecture-seule
+    label: "The server mounts the page read-only, the init container writes it"
+    tests:
+      - test_le_serveur_lit_la_page_en_lecture_seule
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
+  - id: volume-borne
+    label: "The logs live in a temporary volume capped at 32Mi, shared by the server and the sidecar"
+    tests:
+      - test_les_journaux_vivent_dans_un_volume_borne_et_partage
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/
+  - id: replicas-prets
+    label: "Two replicas ready, with no restart"
+    tests:
+      - test_deux_replicas_prets_sans_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/init-containers-and-sidecars/

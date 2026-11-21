@@ -1,0 +1,83 @@
+# Challenge de la compétence k8s.api.migrate, « Détecter et migrer les API
+# dépréciées avant une montée de version », commandé par Stéphane le
+# 2026-11-20 (relayé par le blog). Il prolonge le lab guidé
+# k8s-detecter-les-api-depreciees sans le refaire : d'autres types d'objets
+# (Deployment et NetworkPolicy en extensions/v1beta1, RBAC v1beta1,
+# PriorityClass, EndpointSlice), une liste tirée au sort, un rapport qui
+# nomme aussi l'API de remplacement, et deux migrations qui changent la forme
+# des champs.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Cinq
+# critères à poids égal, seuil 80, deux bloquants sur le cœur du geste.
+# Aucun indice (D91).
+id: k8s-challenge-migrer-les-api-retirees
+title: "Detect and migrate removed APIs before an upgrade"
+level: cluster-architecture-installation-configuration
+section: cka
+difficulty: intermediate
+description: |
+  Without guidance, find which manifests of a repository use an API that
+  Kubernetes has removed, report each one with its replacement, migrate
+  them without changing their intent, and apply the repository.
+skills:
+  - api-deprecation
+  - api-migration
+  - kubectl-dry-run
+  - upgrade-preparation
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/#put-it-into-practice
+lab_type: challenge
+exam_passing_score: 80
+exam_blocking_checks:
+  # Le cœur du geste : un rapport juste, et un dépôt entièrement accepté.
+  - test_le_rapport_nomme_chaque_api_retiree_et_sa_remplacante
+  - test_chaque_manifeste_du_depot_est_accepte_par_l_api_server
+estimated_time: 40m
+
+certification_tags:
+  - cka
+  - api-migration
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: rapport
+    label: "The report names each removed API of the repository and its replacement, and nothing else"
+    tests:
+      - test_le_rapport_nomme_chaque_api_retiree_et_sa_remplacante
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/
+  - id: depot-accepte
+    label: "Every manifest of the repository is still there and accepted by the API server"
+    tests:
+      - test_chaque_manifeste_du_depot_est_accepte_par_l_api_server
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/
+  - id: depot-applique
+    label: "The migrated repository is applied, kubectl diff finds no gap"
+    tests:
+      - test_le_depot_est_applique_tel_quel
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/
+  - id: intention-gardee
+    label: "The objects describe what the inherited manifests described"
+    tests:
+      - test_les_objets_decrivent_la_meme_intention
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/
+  - id: registre-disponible
+    label: "registre runs with its two replicas"
+    tests:
+      - test_le_registre_tourne_avec_ses_deux_replicas
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/manage-api-deprecations/

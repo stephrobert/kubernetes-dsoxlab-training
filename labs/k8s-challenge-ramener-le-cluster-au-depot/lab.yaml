@@ -1,0 +1,87 @@
+# Challenge de la compétence k8s.change.declare, « Modifier des ressources
+# Kubernetes de façon déclarative, sans dériver de Git », commandé par
+# Stéphane le 2026-11-20 (relayé par le blog). La leçon montre une dérive
+# (des réplicas montés en direct) et son report dans Git ; le challenge en
+# pose trois, dont une que `kubectl diff` ne montre pas, et exige que les
+# objets soient ramenés au dépôt sans être recréés.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Cinq
+# critères à poids égal, seuil 80, trois bloquants sur le cœur du geste.
+# Aucun indice (D91).
+id: k8s-challenge-ramener-le-cluster-au-depot
+title: "Bring live changes back to the Git repository, declaratively"
+level: workloads-scheduling
+section: cka
+difficulty: intermediate
+description: |
+  Without guidance, find the changes made live on a cluster, carry the one
+  the team keeps into the versioned manifests, undo the others, and leave
+  the cluster and the repository identical, without recreating any object.
+skills:
+  - kubectl-apply
+  - kubectl-diff
+  - drift
+  - git
+  - declarative
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-edit-patch-replace/#put-it-into-practice
+lab_type: challenge
+exam_passing_score: 80
+exam_blocking_checks:
+  # Le cœur du geste : le dépôt et le cluster identiques, et le changement
+  # gardé reporté et commité.
+  - test_kubectl_diff_est_vide_sur_le_depot
+  - test_la_montee_en_replicas_est_reportee_et_commitee
+  # Recréer les objets ramène aussi le diff à zéro : c'est contourner le geste,
+  # pas le faire (triche mesurée à 80/100 avant ce blocage, le 2026-11-20).
+  - test_les_objets_n_ont_pas_ete_recrees
+estimated_time: 35m
+
+certification_tags:
+  - cka
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: diff-vide
+    label: "kubectl diff on the repository finds no gap"
+    tests:
+      - test_kubectl_diff_est_vide_sur_le_depot
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-edit-patch-replace/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-create-apply/
+  - id: replicas-commites
+    label: "The replica count raised during the night is kept and committed in the repository"
+    tests:
+      - test_la_montee_en_replicas_est_reportee_et_commitee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-edit-patch-replace/
+  - id: modifications-defaites
+    label: "The other live changes, including the one kubectl diff does not show, are gone"
+    tests:
+      - test_les_modifications_en_direct_non_voulues_ont_disparu
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-create-apply/
+  - id: objets-preserves
+    label: "The Deployment and the ConfigMap were changed, not recreated"
+    tests:
+      - test_les_objets_n_ont_pas_ete_recrees
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-edit-patch-replace/
+  - id: application-alignee
+    label: "Every replica runs on the configuration of the repository"
+    tests:
+      - test_l_application_tourne_sur_la_configuration_du_depot
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-create-apply/

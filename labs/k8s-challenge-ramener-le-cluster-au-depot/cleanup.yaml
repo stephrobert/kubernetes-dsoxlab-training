@@ -1,0 +1,22 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : supprime le namespace
+# annuaire, le dépôt de l'apprenant et la mémoire de la préparation. Le
+# cluster reste.
+- name: Défaire le lab k8s-challenge-ramener-le-cluster-au-depot
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace annuaire
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dépôt de l'apprenant et la mémoire
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/annuaire"
+        - /var/lib/dsoxlab/challenge-ramener-le-cluster-au-depot.json

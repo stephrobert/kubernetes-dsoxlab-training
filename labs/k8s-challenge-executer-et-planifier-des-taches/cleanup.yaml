@@ -1,0 +1,19 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : tout vit dans le namespace
+# compta, le supprimer suffit, avec la mémoire de la préparation. Le cluster
+# reste.
+- name: Défaire le lab k8s-challenge-executer-et-planifier-des-taches
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace compta
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer la mémoire de la préparation
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/challenge-executer-et-planifier-des-taches.json
+        state: absent

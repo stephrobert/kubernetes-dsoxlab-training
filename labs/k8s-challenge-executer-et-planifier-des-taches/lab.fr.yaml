@@ -1,0 +1,29 @@
+title: "Exécuter des tâches ponctuelles et planifiées avec Jobs et CronJobs"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique
+description: |
+  Sans guidage, lancez un Job indexé qui traite une fois chaque lot d'une
+  liste, planifiez un CronJob au planning, au fuseau, à la concurrence et à
+  l'historique imposés, lancez une de ses exécutions à la main, et réparez
+  un Job en échec.
+
+criteria:
+  - id: job-indexe
+    label: "facturer-lots est un Job indexé qui a traité chaque lot une fois, par son propre index"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: parallelisme-et-reprises
+    label: "facturer-lots fait tourner deux Pods à la fois et accorde une reprise"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: cronjob-planifie
+    label: "relance-impayes suit le planning, le fuseau, la concurrence et l'historique demandés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: execution-manuelle
+    label: "Une exécution lancée à la main depuis relance-impayes a réussi"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/
+  - id: job-repare
+    label: "export-compta, recréé avec sa configuration, a réussi"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/

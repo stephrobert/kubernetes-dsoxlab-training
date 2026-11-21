@@ -1,0 +1,82 @@
+# Challenge de la compétence k8s.network.observe, « Retrouver, compter et
+# journaliser les flux refusés avec Hubble », commandé par Stéphane le
+# 2026-11-20 (relayé par le blog). Il prolonge le lab guidé
+# k8s-auditer-les-flux-avec-hubble sans le refaire : une politique de SORTIE
+# (le refus se voit sur le nœud du client, tiré au sort), une destination
+# tirée au sort parmi deux, une métrique qui doit nommer la source ET la
+# destination, et un journal qui ne garde que les refus d'un namespace, alors
+# qu'un second namespace refuse aussi sur le même nœud.
+#
+# `lab_type: challenge` : c'est ce qui autorise `exam_passing_score`. Trois
+# critères à poids égal, seuil 70, donc les trois exigés, dont deux
+# bloquants sur le cœur du geste. Aucun indice (D91).
+#
+# RISQUE R3 du cadrage, comme le lab guidé : Cilium 1.20.5 déclare
+# Kubernetes 1.33 à 1.36, et le cluster tourne en 1.37.
+id: k8s-challenge-retrouver-les-flux-refuses
+title: "Find, count and log refused flows with Hubble"
+level: observability
+section: ckne
+difficulty: advanced
+description: |
+  Without guidance, find with Hubble the flow an egress policy refuses and on
+  which node, make the drop metric name its source and destination, and log
+  the refusals of one namespace only to a file on the node, without lifting
+  the refusal.
+skills:
+  - hubble
+  - cilium
+  - network-observability
+  - networkpolicy
+  - helm
+distros:
+  - ubuntu24
+# La leçon hubble/ n'a pas de jumelle anglaise : l'URL française vaut pour
+# les deux langues, comme pour k8s-auditer-les-flux-avec-hubble.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/#mettre-en-pratique
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Le cœur du geste : le flux refusé désigné, et la métrique qui le compte.
+  - test_le_flux_refuse_est_designe
+  - test_la_metrique_compte_le_refus_avec_source_et_destination
+estimated_time: 45m
+
+certification_tags:
+  - ckne
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: net-cp.lab
+      # Le client refusé tourne sur l'un des deux workers, tiré au sort : les
+      # deux sont utilisés en même temps que le plan de contrôle.
+      roles:
+        worker1: net-w1.lab
+        worker2: net-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: flux-designe
+    label: "The ConfigMap refus names the source, the destination and the node of the refused flow"
+    tests:
+      - test_le_flux_refuse_est_designe
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+  - id: metrique-du-refus
+    label: "hubble_drop_total names the source and destination of the refusal, still grows, and the allowed flow still passes"
+    tests:
+      - test_la_metrique_compte_le_refus_avec_source_et_destination
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+  - id: journal-des-refus
+    label: "The node logs the refusals of livraison, and nothing else"
+    tests:
+      - test_les_refus_de_livraison_et_eux_seuls_sont_journalises
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/

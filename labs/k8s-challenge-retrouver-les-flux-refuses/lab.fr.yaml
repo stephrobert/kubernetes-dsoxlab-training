@@ -1,0 +1,21 @@
+title: "Retrouver, compter et journaliser les flux refusés avec Hubble"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/#mettre-en-pratique
+description: |
+  Sans guidage, retrouvez avec Hubble le flux qu'une politique de sortie
+  refuse et sur quel nœud, faites nommer sa source et sa destination à la
+  métrique des refus, et journalisez sur le nœud les seuls refus d'un
+  namespace, sans lever le refus.
+
+criteria:
+  - id: flux-designe
+    label: "Le ConfigMap refus nomme la source, la destination et le nœud du flux refusé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+  - id: metrique-du-refus
+    label: "hubble_drop_total nomme la source et la destination du refus, augmente encore, et le flux permis passe toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/
+  - id: journal-des-refus
+    label: "Le nœud journalise les refus de livraison, et rien d'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/

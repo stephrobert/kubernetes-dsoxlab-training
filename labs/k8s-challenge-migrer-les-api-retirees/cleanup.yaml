@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab clean` et `dsoxlab reset` : supprime le namespace
+# plateforme, la PriorityClass (hors namespace), le dépôt de l'apprenant, la
+# mémoire et le générateur. Le cluster reste.
+- name: Défaire le lab k8s-challenge-migrer-les-api-retirees
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de travail et la PriorityClass
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace plateforme
+          --ignore-not-found --wait=true --timeout=180s
+        - >-
+          kubectl --kubeconfig /etc/kubernetes/admin.conf delete priorityclass
+          plateforme-critique --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le dépôt de l'apprenant, la mémoire et le générateur
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/home/{{ ansible_user | default('ansible') }}/plateforme"
+        - /var/lib/dsoxlab/challenge-migrer-les-api-retirees.json
+        - /var/lib/dsoxlab/generer-plateforme.py
