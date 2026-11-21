@@ -54,7 +54,7 @@ distros:
   - debian13
 # Provisoire : URL cible dans le commentaire d'en-tête.
 doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-administer-a-cluster/
-lab_type: challenge
+lab_type: capstone
 exam_passing_score: 70
 exam_blocking_checks:
   - test_p01_le_worker_reinitialise_est_ready_en_1_37

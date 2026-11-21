@@ -1,4 +1,4 @@
-# Level 3 test: expose, configure and ship an application
+# Level 3 exam: place, secure and deliver an application
 
 End-of-level test of the Kubernetes course: from requirements that name no
 Kubernetes object, ship and repair a festival application. Route two web
@@ -12,7 +12,7 @@ criteria of equal weight, pass mark 70, six critical criteria, no hint.
 |---|---|
 | Target | `k8s-kind.lab`, kind cluster `capacite` (Kubernetes 1.37, one control plane and three workers), spaces `festival`, `paiement` and `partenaires` |
 | Duration | about 120 minutes |
-| Related page | [Level 3 exam: expose, configure and ship an application](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-an-application/) |
+| Related page | [Level 3 exam: place, secure and deliver an application](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-an-application/) |
 
 ```bash
 dsoxlab run    k8s-epreuve-livrer-une-application

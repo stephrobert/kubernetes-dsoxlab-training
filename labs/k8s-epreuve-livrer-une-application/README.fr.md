@@ -1,4 +1,4 @@
-# Épreuve du niveau 3 : exposer, configurer et livrer une application
+# Épreuve du niveau 3 : placer, sécuriser et livrer une application
 
 Épreuve de fin de niveau de la formation Kubernetes : d'après un cahier des
 charges qui ne nomme aucun objet Kubernetes, livrez et remettez en état
@@ -13,7 +13,7 @@ critères de même poids, seuil 70, six critères critiques, aucun indice.
 |---|---|
 | Cible | `k8s-kind.lab`, cluster kind `capacite` (Kubernetes 1.37, un control plane et trois workers), espaces `festival`, `paiement` et `partenaires` |
 | Durée | environ 120 minutes |
-| Page associée | [Épreuve du niveau 3 : exposer, configurer et livrer une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/) |
+| Page associée | [Épreuve du niveau 3 : placer, sécuriser et livrer une application](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/) |
 
 ```bash
 dsoxlab run    k8s-epreuve-livrer-une-application

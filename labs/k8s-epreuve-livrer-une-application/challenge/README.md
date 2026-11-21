@@ -1,4 +1,4 @@
-# Challenge: Level 3 test: expose, configure and ship an application
+# Challenge: Level 3 exam: place, secure and deliver an application
 
 ## The situation
 

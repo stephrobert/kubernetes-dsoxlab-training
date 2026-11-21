@@ -21,7 +21,7 @@
 # Il tourne sur le cluster kind « capacite » (un control plane, trois workers) :
 # le placement exige un nœud réservé et deux nœuds où répartir le frontend.
 id: k8s-epreuve-livrer-une-application
-title: "Level 3 test: expose, configure and ship an application"
+title: "Level 3 exam: place, secure and deliver an application"
 level: services-networking
 section: cka
 difficulty: advanced
@@ -51,7 +51,7 @@ distros:
 # https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/livrer-une-application/
 # En attendant, l'index de la formation, PROVISOIREMENT.
 doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-an-application/
-lab_type: challenge
+lab_type: capstone
 exam_passing_score: 70
 exam_blocking_checks:
   # Les six critères critiques de la fiche, sans compensation (D06).
