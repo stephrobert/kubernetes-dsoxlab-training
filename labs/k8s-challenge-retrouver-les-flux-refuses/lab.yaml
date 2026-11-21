@@ -33,7 +33,7 @@ distros:
   - ubuntu24
 # La leçon hubble/ n'a pas de jumelle anglaise : l'URL française vaut pour
 # les deux langues, comme pour k8s-auditer-les-flux-avec-hubble.
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/retrouver-les-flux-refuses/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

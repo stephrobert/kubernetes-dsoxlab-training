@@ -27,7 +27,7 @@ skills:
   - multi-container-pod
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/application-volumes/#put-it-into-practice
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/composer-un-pod-multi-conteneurs/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 80
 exam_blocking_checks:

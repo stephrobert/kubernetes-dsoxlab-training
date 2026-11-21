@@ -1,5 +1,5 @@
 title: "Lire un cluster : quel composant fait quoi"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/lire-un-cluster/#mettre-en-pratique
 description: |
   Sur un cluster kind à quatre nœuds, trouver quel Node porte le control plane,
   nommer les Pods de ses quatre composants avec leur rôle, lire le runtime de

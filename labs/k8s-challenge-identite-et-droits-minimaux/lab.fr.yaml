@@ -1,5 +1,5 @@
 title: "Donner à une application sa propre identité et le moindre droit"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/identite-et-droits-minimaux/#mettre-en-pratique
 description: |
   Sans procédure, donner à un outil d'observation sa propre identité, le
   laisser lire le journal des Pods d'un autre namespace et rien de plus, couper

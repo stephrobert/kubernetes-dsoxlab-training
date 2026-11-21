@@ -1,5 +1,5 @@
 title: "Livrer la vitrine et remettre le stock en marche"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/fondamentaux/controle-connaissances/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/premier-deploiement/#mettre-en-pratique
 description: |
   Sur un cluster kind, régler kubectl sur le bon cluster et le bon namespace,
   livrer la vitrine à trois réplicas derrière un Service qui répond, consigner

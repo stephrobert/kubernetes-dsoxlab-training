@@ -1,5 +1,5 @@
 title: "Exécuter des tâches ponctuelles et planifiées avec Jobs et CronJobs"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/jobs-cronjobs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/executer-et-planifier-des-taches/#mettre-en-pratique
 description: |
   Sans guidage, lancez un Job indexé qui traite une fois chaque lot d'une
   liste, planifiez un CronJob au planning, au fuseau, à la concurrence et à

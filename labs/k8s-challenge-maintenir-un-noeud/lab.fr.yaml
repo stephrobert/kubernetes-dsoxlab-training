@@ -1,5 +1,5 @@
 title: "Vider, maintenir et remettre en service un nœud, puis monter le cluster de version"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/maintenir-un-noeud/#mettre-en-pratique
 description: |
   Sans procédure, protéger une application par un budget de perturbation,
   vider un worker et le remettre en service, garder la trace de l'opération,

@@ -1,5 +1,5 @@
 title: "Garder des données au-delà de la vie d'un Pod"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/storageclass/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/donnees-qui-survivent/#mettre-en-pratique
 description: |
   Sans guidage, obtenez un volume d'une StorageClass, écrivez un fichier témoin
   depuis un Pod, prouvez qu'il survit à la recréation de ce Pod, gardez les
