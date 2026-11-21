@@ -3404,16 +3404,17 @@
  "cks-api-server-hardening": {
   "apres": {
    "echecs": [],
-   "passed": 2,
+   "passed": 3,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 2
+   "total": 3
   },
   "avant": {
    "echecs": [
-    "test_le_manifeste_porte_les_trois_flags",
+    "test_l_api_server_refuse_les_suites_cbc",
+    "test_le_manifeste_porte_les_deux_flags",
     "test_le_profileur_est_ferme_et_l_api_sert_toujours"
    ],
    "passed": 0,
@@ -3421,18 +3422,18 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 2
+   "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 377,
+  "date": "2026-11-21",
+  "duree_s": 269,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
    "cluster photographié, v1.37.2, 12 objets hors kube-system",
-   "avant le travail : 0/2",
-   "après la solution : 2/2",
-   "après clean et run : 0/2",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-cks-api-server-hardening.log",
@@ -3440,7 +3441,8 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_le_manifeste_porte_les_trois_flags",
+    "test_l_api_server_refuse_les_suites_cbc",
+    "test_le_manifeste_porte_les_deux_flags",
     "test_le_profileur_est_ferme_et_l_api_sert_toujours"
    ],
    "passed": 0,
@@ -3448,7 +3450,7 @@
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 2
+   "total": 3
   },
   "verdict": "VALIDE"
  },
@@ -3637,8 +3639,8 @@
   },
   "avant": {
    "echecs": [
-    "test_l_audit_rejoue_compte_moins_d_echecs",
-    "test_les_trois_composants_portent_la_correction"
+    "test_le_total_baisse_et_le_noeud_reste_pret",
+    "test_les_deux_controles_vises_passent"
    ],
    "passed": 0,
    "recorded": true,
@@ -3648,8 +3650,8 @@
    "total": 2
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 488,
+  "date": "2026-11-21",
+  "duree_s": 157,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
@@ -3664,8 +3666,8 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_l_audit_rejoue_compte_moins_d_echecs",
-    "test_les_trois_composants_portent_la_correction"
+    "test_le_total_baisse_et_le_noeud_reste_pret",
+    "test_les_deux_controles_vises_passent"
    ],
    "passed": 0,
    "recorded": true,
