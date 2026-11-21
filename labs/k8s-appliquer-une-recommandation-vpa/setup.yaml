@@ -33,12 +33,23 @@
         update_cache: true
         cache_valid_time: 3600
 
+    - name: Voir si le dépôt du VPA est déjà là
+      # Le clone d'un premier run reste en place (cleanup.yaml s'en sert pour
+      # vpa-down.sh). Rejouer le module git sur ce clone superficiel d'un tag
+      # échoue avec ansible-core : « 'NoneType' object has no attribute
+      # 'startswith' » (mesuré le 2026-11-21, à chaque reset). On ne clone donc
+      # que s'il manque.
+      ansible.builtin.stat:
+        path: "{{ vpa_depot }}/vertical-pod-autoscaler/hack/vpa-up.sh"
+      register: depot_vpa
+
     - name: Récupérer le dépôt du VPA à son tag {{ vpa_version }}
       ansible.builtin.git:
         repo: https://github.com/kubernetes/autoscaler.git
         dest: "{{ vpa_depot }}"
         version: "vertical-pod-autoscaler-{{ vpa_version }}"
         depth: 1
+      when: not depot_vpa.stat.exists
 
     - name: Installer metrics-server, le VPA et l'application
       ansible.builtin.script: fixtures/prepare.sh
