@@ -5108,6 +5108,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-appliquer-et-verifier-ses-manifests": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_l_annuaire_tourne_dans_les_deux_variantes",
+    "test_la_livraison_attend_la_disponibilite",
+    "test_la_production_est_montee_et_le_diff_l_a_montre",
+    "test_le_delai_de_disponibilite_vient_du_cahier",
+    "test_les_deux_variantes_se_construisent_depuis_une_base",
+    "test_les_objets_sont_appliques_de_facon_declarative"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-21",
+  "duree_s": 205,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 20 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-appliquer-et-verifier-ses-manifests.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_annuaire_tourne_dans_les_deux_variantes",
+    "test_la_livraison_attend_la_disponibilite",
+    "test_la_production_est_montee_et_le_diff_l_a_montre",
+    "test_le_delai_de_disponibilite_vient_du_cahier",
+    "test_les_deux_variantes_se_construisent_depuis_une_base",
+    "test_les_objets_sont_appliques_de_facon_declarative"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-choisir-le-bon-workload": {
   "apres": {
    "echecs": [],
