@@ -1,5 +1,5 @@
 title: "Composer un Pod multi-conteneurs : init container, sidecar natif, volumes partagés"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/init-containers-sidecars/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/volumes-applicatifs/#mettre-en-pratique
 description: |
   Sans guidage, composez un Deployment dont les Pods préparent leur page avec
   un init container, la servent en lecture seule, et relaient leur journal
