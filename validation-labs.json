@@ -8499,6 +8499,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-mesurer-un-slo-et-ecrire-un-runbook": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_le_budget_d_erreur_restant_est_juste",
+    "test_le_catalogue_repond_sur_sa_bonne_image",
+    "test_le_runbook_remet_le_service_apres_la_meme_panne",
+    "test_le_runbook_se_rejoue_sans_rien_abimer",
+    "test_le_sli_et_le_slo_sont_consignes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 330,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-mesurer-un-slo-et-ecrire-un-runbook.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_budget_d_erreur_restant_est_juste",
+    "test_le_catalogue_repond_sur_sa_bonne_image",
+    "test_le_runbook_remet_le_service_apres_la_meme_panne",
+    "test_le_runbook_se_rejoue_sans_rien_abimer",
+    "test_le_sli_et_le_slo_sont_consignes"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-modifier-une-ressource-en-production": {
   "apres": {
    "echecs": [],
