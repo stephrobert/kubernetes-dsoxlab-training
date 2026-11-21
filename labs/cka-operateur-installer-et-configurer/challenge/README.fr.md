@@ -44,7 +44,8 @@ quay.io/mongodb/mongodb-community-server:9.0.8-ubi8@sha256:77351e6c8e806a5f55949
    digest**.
 
 6. **En ne modifiant que la ressource**, vous avez fixé le seuil des opérations
-   lentes de mongod à **250 ms** (`operationProfiling.slowOpThresholdMs`), et
+   lentes de mongod à la valeur que donne **`~/mongodb/consigne.txt`**
+   (`operationProfiling.slowOpThresholdMs`, en millisecondes), et
    mongod a **redémarré avec ce réglage**.
 
 ## Les repères utiles

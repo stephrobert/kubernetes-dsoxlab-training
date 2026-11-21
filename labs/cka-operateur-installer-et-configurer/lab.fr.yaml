@@ -27,6 +27,6 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: reglage-applique
-    label: "mongod démarre avec le seuil de 250 ms posé par la ressource"
+    label: "mongod démarre avec le seuil de la consigne, posé par la ressource"
     lessons:
       - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators/
