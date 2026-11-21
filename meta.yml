@@ -376,6 +376,10 @@ sections:
       # Le challenge du module Fiabiliser et exploiter (niveau 4), sur le cluster
       # kubeadm : son check évacue lui-même le worker.
       - k8s-challenge-garantir-la-disponibilite
+      # Lab guidé de la leçon SRE et exploitation (runbook, SLI, SLO, budget
+      # d'erreur), commandé le 2026-11-21 : au moins une leçon avec lab guidé
+      # entre le challenge du module et l'épreuve du niveau.
+      - k8s-mesurer-un-slo-et-ecrire-un-runbook
       # L'épreuve de fin du niveau 4 (KUBERN-EPREUVE-N4), qui suppose tous les
       # modules du niveau joués : elle croise installation, haute
       # disponibilité, sauvegarde, montée de version, maintenance et dépannage.

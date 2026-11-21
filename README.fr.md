@@ -248,7 +248,7 @@ Quatre domaines. Kubernetes Fundamentals pèse 44 %, le plus lourd : de quoi un 
 
 Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celui qui sépare ceux qui connaissent Kubernetes de ceux qui savent l'exploiter.
 
-58 lab(s).
+59 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -307,9 +307,10 @@ Cinq domaines. Le troubleshooting pèse 30 %, plus que tout autre, et c'est celu
 | 53 | [`k8s-challenge-maintenir-un-noeud`](labs/k8s-challenge-maintenir-un-noeud/) | Vider, maintenir et remettre en service un nœud, puis monter le cluster de version | cluster-architecture-installation-configuration | 60m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/) |
 | 54 | [`k8s-faire-la-routine-d-exploitation`](labs/k8s-faire-la-routine-d-exploitation/) | Résorber une semaine d'accumulation sans effacer la preuve | troubleshooting | 20m | 2026-11-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/) |
 | 55 | [`k8s-challenge-garantir-la-disponibilite`](labs/k8s-challenge-garantir-la-disponibilite/) | Garantir la disponibilité d'une application pendant une maintenance | workloads-scheduling | 45m | 2026-11-14 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/) |
-| 56 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Épreuve du niveau 4 : administrer un cluster | capstone, plusieurs domaines | 180m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/administrer-un-cluster/) |
-| 57 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone : remettre le portail en service, sans personne à qui demander | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
-| 58 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | Examen blanc CKA : 17 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-17 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 56 | [`k8s-mesurer-un-slo-et-ecrire-un-runbook`](labs/k8s-mesurer-un-slo-et-ecrire-un-runbook/) | Écrire un runbook qui se rejoue, et mesurer le SLO d'une application | troubleshooting | 30m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/) |
+| 57 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Épreuve du niveau 4 : administrer un cluster | capstone, plusieurs domaines | 180m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/administrer-un-cluster/) |
+| 58 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone : remettre le portail en service, sans personne à qui demander | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
+| 59 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | Examen blanc CKA : 17 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-17 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/) |
 
 ### CKAD, Certified Kubernetes Application Developer
 
@@ -432,7 +433,7 @@ Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Sec
 | 14 | [`k8s-epreuve-reseau-avance`](labs/k8s-epreuve-reseau-avance/) | Épreuve du niveau 6 : exposer et protéger un service sur Cilium | capstone, plusieurs domaines | 120m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/) |
 | 15 | [`ckne-capstone-relier-deux-sites`](labs/ckne-capstone-relier-deux-sites/) | Capstone : relier deux sites, annoncer un Service au réseau et le servir en HTTPS | capstone, plusieurs domaines | 75m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercices/) |
 
-Total : **161 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **162 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 

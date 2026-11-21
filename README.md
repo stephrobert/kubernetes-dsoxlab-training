@@ -246,7 +246,7 @@ Four domains. Kubernetes Fundamentals weighs 44 %, the heaviest: what a cluster 
 
 Five domains. Troubleshooting weighs 30 %, more than any other, and it is the one that separates those who know Kubernetes from those who can operate it.
 
-58 lab(s).
+59 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -305,9 +305,10 @@ Five domains. Troubleshooting weighs 30 %, more than any other, and it is the on
 | 53 | [`k8s-challenge-maintenir-un-noeud`](labs/k8s-challenge-maintenir-un-noeud/) | Drain, maintain and bring a node back into service, then upgrade the cluster | cluster-architecture-installation-configuration | 60m | 2026-11-14 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/) |
 | 54 | [`k8s-faire-la-routine-d-exploitation`](labs/k8s-faire-la-routine-d-exploitation/) | Clear a week of accumulation without erasing the evidence | troubleshooting | 20m | 2026-11-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/) |
 | 55 | [`k8s-challenge-garantir-la-disponibilite`](labs/k8s-challenge-garantir-la-disponibilite/) | Keep an application available during a maintenance | workloads-scheduling | 45m | 2026-11-14 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-operations-routine/) |
-| 56 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Level 4 test: administer a cluster | capstone, several domains | 180m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-administer-a-cluster/) |
-| 57 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) |
-| 58 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-17 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) |
+| 56 | [`k8s-mesurer-un-slo-et-ecrire-un-runbook`](labs/k8s-mesurer-un-slo-et-ecrire-un-runbook/) | Write a runbook that replays, and measure an application's SLO | troubleshooting | 30m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/) |
+| 57 | [`k8s-epreuve-administrer-un-cluster`](labs/k8s-epreuve-administrer-un-cluster/) | Level 4 test: administer a cluster | capstone, several domains | 180m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-administer-a-cluster/) |
+| 58 | [`cka-capstone-portail`](labs/cka-capstone-portail/) | Capstone: bring the portal back, with nobody left to ask | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) |
+| 59 | [`cka-examen-blanc`](labs/cka-examen-blanc/) | CKA mock exam: 17 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-17 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/) |
 
 ### CKAD, Certified Kubernetes Application Developer
 
@@ -430,7 +431,7 @@ Five domains in the CKNE curriculum. Service Networking and DNS and Network Secu
 | 14 | [`k8s-epreuve-reseau-avance`](labs/k8s-epreuve-reseau-avance/) | Level 6 test: expose and protect a service on Cilium | capstone, several domains | 120m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/) |
 | 15 | [`ckne-capstone-relier-deux-sites`](labs/ckne-capstone-relier-deux-sites/) | Capstone: link two sites, announce a Service to the network and serve it over HTTPS | capstone, several domains | 75m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercises/) |
 
-Total: **161 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **162 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 
