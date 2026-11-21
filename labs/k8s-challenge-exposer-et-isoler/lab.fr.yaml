@@ -1,5 +1,5 @@
 title: "Exposer une application et isoler ses flux"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/exposer-et-isoler/#mettre-en-pratique
 description: |
   Sans guidage, routez deux applications par hôte et par chemin, réparez un
   Service hérité, rendez à un Pod client sa résolution de noms, puis isolez une

@@ -1,5 +1,5 @@
 title: "Challenge : sauvegarder, restaurer et remettre un cluster en ordre"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/pki-cluster-kubernetes/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/sauvegarder-et-restaurer/#mettre-en-pratique
 description: |
   Sans procédure. Prendre une sauvegarde fraîche d'etcd, restaurer etcd depuis
   la sauvegarde de la veille sur un répertoire de données neuf, migrer un dépôt

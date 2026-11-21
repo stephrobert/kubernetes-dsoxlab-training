@@ -1,5 +1,5 @@
 title: "Retrouver, compter et journaliser les flux refusés avec Hubble"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/hubble/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/retrouver-les-flux-refuses/#mettre-en-pratique
 description: |
   Sans guidage, retrouvez avec Hubble le flux qu'une politique de sortie
   refuse et sur quel nœud, faites nommer sa source et sa destination à la

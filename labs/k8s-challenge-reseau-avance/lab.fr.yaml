@@ -1,5 +1,5 @@
 title: "Réparer, ouvrir, faire sortir et auditer les flux d'un cluster Cilium, seul et sans indice"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/egress-gateway/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/reseau-avance/#mettre-en-pratique
 description: |
   Sans procédure, sur un cluster Cilium sans kube-proxy : faire répondre de
   nouveau un Service qui ne sert personne, sans réinstaller kube-proxy, ouvrir un seul

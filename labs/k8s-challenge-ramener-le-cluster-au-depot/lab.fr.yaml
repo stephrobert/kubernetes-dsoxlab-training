@@ -1,5 +1,5 @@
 title: "Ramener au dépôt Git les modifications faites en direct"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-edit-patch-replace/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/ramener-le-cluster-au-depot/#mettre-en-pratique
 description: |
   Sans guidage, retrouvez les modifications faites en direct sur un cluster,
   reportez dans les manifestes versionnés celle que l'équipe garde, défaites

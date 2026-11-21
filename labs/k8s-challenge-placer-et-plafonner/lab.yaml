@@ -39,7 +39,7 @@ skills:
   - hpa
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/vertical-pod-scaling/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/placer-et-plafonner/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

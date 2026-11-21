@@ -1,5 +1,5 @@
 title: "Installer un cluster kubeadm, y joindre un nœud et rendre le plan de contrôle hautement disponible"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/installer-un-cluster/#mettre-en-pratique
 description: |
   Sans procédure, préparer un worker réinitialisé et le joindre au cluster
   kubeadm de façon qu'il survive à un redémarrage, prouver qu'il fait tourner

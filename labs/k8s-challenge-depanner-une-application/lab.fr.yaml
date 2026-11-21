@@ -1,5 +1,5 @@
 title: "Remettre en service une application en panne et son cluster"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/depanner-un-noeud-kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/depanner-une-application/#mettre-en-pratique
 description: |
   Sans procédure, réparer quatre pannes à la fois sur un cluster kubeadm : un
   Deployment qui redémarre en boucle, un Pod dont l'image ne se télécharge pas,

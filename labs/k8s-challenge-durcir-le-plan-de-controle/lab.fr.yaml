@@ -1,5 +1,5 @@
 title: "Corriger les écarts CIS d'un cluster, seul et sans indice"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/audit-logs/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/durcir-le-plan-de-controle/#mettre-en-pratique
 description: |
   Sans procédure, durcir l'API server d'un cluster kubeadm, corriger l'écart
   que l'audit CIS reproche à trois composants du plan de contrôle, le prouver

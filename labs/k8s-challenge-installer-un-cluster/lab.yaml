@@ -44,7 +44,7 @@ skills:
 distros:
   - ubuntu24
   - debian13
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/ha-control-plane/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/installer-un-cluster/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

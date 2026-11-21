@@ -1,5 +1,5 @@
 title: "Ne laisser entrer que des images vérifiées, seul et sans indice"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/livrer-une-image-verifiee/#mettre-en-pratique
 description: |
   Sans procédure, épingler un Deployment sur son digest, débarrasser un
   Dockerfile des constats de l'analyse statique, signer une image et publier

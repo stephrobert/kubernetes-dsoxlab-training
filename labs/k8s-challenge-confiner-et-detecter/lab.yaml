@@ -41,7 +41,7 @@ distros:
   - ubuntu24
 # La leçon hôte (KUBERN-15-18) n'a pas de jumelle anglaise : l'URL française
 # reste ici, et lab.fr.yaml ne la répète pas.
-doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/confiner-et-detecter/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
