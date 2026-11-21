@@ -569,6 +569,10 @@ sections:
       # AppArmor, seccomp, gVisor, la NetworkPolicy par défaut et le mTLS. Il y
       # ajoute Falco, dont cks-falco-detecter-un-shell a posé les bases.
       - k8s-challenge-confiner-et-detecter
+      # Lab guidé de la leçon Falco contre Tetragon (observer puis bloquer la
+      # lecture d'un fichier sensible), commandé le 2026-11-21 : au moins une
+      # leçon avec lab guidé entre le challenge du module et l'épreuve du niveau.
+      - k8s-observer-et-bloquer-avec-tetragon
       # L'épreuve de fin du niveau 5 (KUBERN-EPREUVE-N5), après tous les labs
       # du niveau qu'elle croise : plan de contrôle, audit, admission,
       # confinement, réseau, Falco et chaîne d'approvisionnement.

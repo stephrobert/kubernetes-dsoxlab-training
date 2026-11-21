@@ -368,7 +368,7 @@ Five application-facing domains. « Application Environment, Configuration and S
 
 Six domains. Three of them weigh 20 % each, so 60 % between them. Several of their skills cannot be checked on a containerised cluster, which is the reason this catalogue uses virtual machines.
 
-34 lab(s).
+35 lab(s).
 
 | # | Lab | Title | Blueprint domain | Duration | Validated | Companion lesson |
 |---|---|---|---|---|---|---|
@@ -403,9 +403,10 @@ Six domains. Three of them weigh 20 % each, so 60 % between them. Several of the
 | 29 | [`cks-falco-detecter-un-shell`](labs/cks-falco-detecter-un-shell/) | Make Falco raise an alert on a shell opened in a protected namespace | monitoring-logging | 25m | 2026-11-16 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/) |
 | 30 | [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/) | Isolate a Pod from the host kernel, and check it by reading its kernel version | minimize-vulnerabilities | 25m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/) |
 | 31 | [`k8s-challenge-confiner-et-detecter`](labs/k8s-challenge-confiner-et-detecter/) | Confine a Pod and detect abnormal activity, on your own and without hints | monitoring-logging | 75m | 2026-11-15 | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/confiner-et-detecter/#mettre-en-pratique) |
-| 32 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Level 5 test: secure a cluster | capstone, several domains | 150m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-secure-a-cluster/) |
-| 33 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) |
-| 34 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-17 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) |
+| 32 | [`k8s-observer-et-bloquer-avec-tetragon`](labs/k8s-observer-et-bloquer-avec-tetragon/) | Observe a sensitive file being read with Tetragon, then block it | runtime-security | 35m | no | [lesson](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/) |
+| 33 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Level 5 test: secure a cluster | capstone, several domains | 150m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-secure-a-cluster/) |
+| 34 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone: open an enclave for a team you do not trust | capstone, several domains | 45m | 2026-11-13 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) |
+| 35 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | CKS mock exam: 16 tasks in 120 minutes | capstone, several domains | 120m | 2026-11-17 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/) |
 
 ### Advanced networking (CKNE)
 
@@ -431,7 +432,7 @@ Five domains in the CKNE curriculum. Service Networking and DNS and Network Secu
 | 14 | [`k8s-epreuve-reseau-avance`](labs/k8s-epreuve-reseau-avance/) | Level 6 test: expose and protect a service on Cilium | capstone, several domains | 120m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-advanced-networking/) |
 | 15 | [`ckne-capstone-relier-deux-sites`](labs/ckne-capstone-relier-deux-sites/) | Capstone: link two sites, announce a Service to the network and serve it over HTTPS | capstone, several domains | 75m | 2026-11-18 | [lesson](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercises/) |
 
-Total: **162 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
+Total: **163 lab(s)**. The validation column carries the date of the last run of `scripts/valider-labs.py`, which plays the lab in both directions and checks that it leaves no trace. A shippable lab is not a validated lab.
 
 **Runtime validated: Kubernetes v1.37.0, v1.37.2.** **Reference curriculum: CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). The two move at different speeds: the labs run on a newer Kubernetes than the published exam curriculum, which is why they are stated separately rather than as one version.
 

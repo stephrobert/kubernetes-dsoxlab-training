@@ -1,0 +1,71 @@
+id: k8s-observer-et-bloquer-avec-tetragon
+title: "Observe a sensitive file being read with Tetragon, then block it"
+level: runtime-security
+section: cks
+difficulty: advanced
+description: |
+  An API key mounted from a Secret is read by one of the Pods of the namespace
+  comptes. Make Tetragon see these reads, find which Pod and which binary read
+  the key from its events, then switch the policy to blocking: the read is
+  killed, and nothing else is.
+skills:
+  - tetragon
+  - ebpf
+  - tracing-policy
+  - runtime-security
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+lab_type: lab
+estimated_time: 35m
+
+# Lab guidé de la leçon « Falco contre Tetragon », commandé le 2026-11-21 : une
+# leçon avec lab guidé entre le challenge du module (k8s-challenge-confiner-et-
+# detecter) et l'épreuve du niveau 5. Objets distincts du challenge (coffre,
+# lecteur, calcul, règles Falco). Tetragon 1.8.0 (chart cilium/tetragon), la
+# leçon montre la 1.7.1 : même TracingPolicy, même action Sigkill.
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      # Les Pods de l'application peuvent tourner sur le worker, et Tetragon y
+      # a son agent : déclaré en rôle pour que `start` le monte.
+      roles:
+        worker: k8s-w1.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: lecture-observee
+    label: "Tetragon reports a read of the key, with the Pod and the binary"
+    tests:
+      - test_tetragon_voit_la_lecture_de_la_cle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+  - id: lecteur-identifie
+    label: "The report names the Pod and the binary that read the key"
+    tests:
+      - test_le_constat_nomme_le_lecteur_de_la_cle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+  - id: lecture-bloquee
+    label: "Reading the key kills the process"
+    tests:
+      - test_la_lecture_de_la_cle_est_bloquee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+  - id: blocage-cible
+    label: "The blocking only targets the key: other files are still read"
+    tests:
+      - test_le_blocage_ne_vise_que_la_cle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+
+feedback: full

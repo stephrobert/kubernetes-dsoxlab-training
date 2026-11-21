@@ -370,7 +370,7 @@ Cinq domaines orientés application. « Application Environment, Configuration a
 
 Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plusieurs compétences y sont invérifiables sur un cluster en conteneur, ce qui est la raison d'être des VM de ce catalogue.
 
-34 lab(s).
+35 lab(s).
 
 | # | Lab | Titre | Domaine du blueprint | Durée | Validé | Leçon jumelée |
 |---|---|---|---|---|---|---|
@@ -405,9 +405,10 @@ Six domaines. Trois d'entre eux pèsent 20 % chacun, soit 60 % à eux seuls. Plu
 | 29 | [`cks-falco-detecter-un-shell`](labs/cks-falco-detecter-un-shell/) | Faire lever par Falco une alerte sur un shell ouvert dans un namespace protégé | monitoring-logging | 25m | 2026-11-16 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco/) |
 | 30 | [`cks-runtime-sandbox-gvisor`](labs/cks-runtime-sandbox-gvisor/) | Isoler un Pod du noyau de l'hôte, et le vérifier en lisant sa version du noyau | minimize-vulnerabilities | 25m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/) |
 | 31 | [`k8s-challenge-confiner-et-detecter`](labs/k8s-challenge-confiner-et-detecter/) | Confiner un Pod et détecter une activité anormale, seul et sans indice | monitoring-logging | 75m | 2026-11-15 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/confiner-et-detecter/#mettre-en-pratique) |
-| 32 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Épreuve du niveau 5 : sécuriser un cluster | capstone, plusieurs domaines | 150m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/) |
-| 33 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
-| 34 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | Examen blanc CKS : 16 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-17 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 32 | [`k8s-observer-et-bloquer-avec-tetragon`](labs/k8s-observer-et-bloquer-avec-tetragon/) | Observer la lecture d'un fichier sensible avec Tetragon, puis la bloquer | runtime-security | 35m | non | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/) |
+| 33 | [`k8s-epreuve-securiser-un-cluster`](labs/k8s-epreuve-securiser-un-cluster/) | Épreuve du niveau 5 : sécuriser un cluster | capstone, plusieurs domaines | 150m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/) |
+| 34 | [`cks-capstone-enclave`](labs/cks-capstone-enclave/) | Capstone : ouvrir une enclave pour une équipe qui n'est pas de confiance | capstone, plusieurs domaines | 45m | 2026-11-13 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
+| 35 | [`cks-examen-blanc`](labs/cks-examen-blanc/) | Examen blanc CKS : 16 tâches en 120 minutes | capstone, plusieurs domaines | 120m | 2026-11-17 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/) |
 
 ### Réseau avancé (CKNE)
 
@@ -433,7 +434,7 @@ Cinq domaines au programme de la CKNE. Service Networking and DNS et Network Sec
 | 14 | [`k8s-epreuve-reseau-avance`](labs/k8s-epreuve-reseau-avance/) | Épreuve du niveau 6 : exposer et protéger un service sur Cilium | capstone, plusieurs domaines | 120m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/reseau-avance/) |
 | 15 | [`ckne-capstone-relier-deux-sites`](labs/ckne-capstone-relier-deux-sites/) | Capstone : relier deux sites, annoncer un Service au réseau et le servir en HTTPS | capstone, plusieurs domaines | 75m | 2026-11-18 | [leçon](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckne/exercices/) |
 
-Total : **162 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
+Total : **163 lab(s)**. La colonne « Validé » porte la date du dernier passage de `scripts/valider-labs.py`, qui joue le lab dans les deux sens et vérifie qu'il ne laisse aucune trace. Un lab livrable n'est pas un lab validé.
 
 **Runtime validé : Kubernetes v1.37.0, v1.37.2.** **Curriculum de référence : CKA v1.37, CKAD v1.37, CKS v1.37, KCNA PDF 2026-03-22 (c2df915), CKNE PDF 2026-10-01 (f423fa4)** ([cncf/curriculum](https://github.com/cncf/curriculum)). Les deux n'avancent pas à la même vitesse : les labs tournent sur un Kubernetes plus récent que le curriculum publié, et les annoncer séparément évite de laisser croire que l'examen porte sur la version du runtime.
 
