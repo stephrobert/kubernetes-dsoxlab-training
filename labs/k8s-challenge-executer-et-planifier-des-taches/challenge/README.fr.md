@@ -35,8 +35,8 @@ Toutes les tâches utilisent l'image
 
 ## 🧭 Les repères utiles
 
-Ne supprimez pas les Pods des Jobs une fois terminés : leurs journaux servent
-de preuve.
+Ne supprimez pas les Pods des Jobs que vous avez réussis : leurs journaux
+servent de preuve.
 
 ## ✅ Comment vous saurez que c'est bon
 

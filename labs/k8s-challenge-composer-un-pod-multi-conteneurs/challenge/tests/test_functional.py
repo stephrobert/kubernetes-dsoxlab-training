@@ -88,6 +88,19 @@ def _par_nom(conteneurs: list[dict]) -> dict[str, dict]:
     return {c["name"]: c for c in conteneurs or []}
 
 
+def _page(host, ip: str, titre: str) -> str:
+    """La page d'un Pod, réessayée 30 s : un Pod est déclaré prêt dès que ses
+    conteneurs démarrent quand il n'a pas de sonde, avant que nginx écoute."""
+    corps = ""
+    fin = time.monotonic() + 30
+    while time.monotonic() < fin:
+        corps = host.run(f"curl -sS -m 5 http://{ip}/").stdout
+        if titre in corps:
+            break
+        time.sleep(2)
+    return corps
+
+
 # ----------------------------------------------------------------------
 # 1. La page préparée par l'init container est servie. BLOQUANT.
 # ----------------------------------------------------------------------
@@ -109,7 +122,7 @@ def test_la_page_preparee_par_l_init_container_est_servie(host, titre):
     for pod in pods:
         etats = {s["name"]: s.get("state") or {} for s in pod["status"].get("initContainerStatuses") or []}
         fini = (etats.get(INIT, {}).get("terminated") or {}).get("reason")
-        corps = host.run(f"curl -sS -m 5 http://{pod['status']['podIP']}/").stdout
+        corps = _page(host, pod["status"]["podIP"], titre)
         assert fini == "Completed" and titre in corps, message(
             en=f"Pod {pod['metadata']['name']}: {INIT} is {fini or 'not finished'}, and its home page "
             f"{'carries' if titre in corps else 'does not carry'} the title of the ConfigMap vitrine. Expected "

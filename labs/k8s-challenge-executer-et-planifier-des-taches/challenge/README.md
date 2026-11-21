@@ -33,7 +33,7 @@ Every task uses the image
 
 ## 🧭 Useful landmarks
 
-Do not delete the Pods of the Jobs once they are finished: their logs are the
+Do not delete the Pods of the Jobs that succeeded: their logs are the
 evidence.
 
 ## ✅ How you will know it works
