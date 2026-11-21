@@ -45,7 +45,8 @@ quay.io/mongodb/mongodb-community-server:9.0.8-ubi8@sha256:77351e6c8e806a5f55949
    digest**.
 
 6. **By editing only the resource**, you have set mongod's slow operation
-   threshold to **250 ms** (`operationProfiling.slowOpThresholdMs`), and mongod
+   threshold to the value given by **`~/mongodb/consigne.txt`**
+   (`operationProfiling.slowOpThresholdMs`, in milliseconds), and mongod
    has **restarted with that setting**.
 
 ## Useful bearings

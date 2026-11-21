@@ -77,3 +77,12 @@
         path: /opt/local-path-provisioner
         state: absent
       delegate_to: k8s-w1.lab
+
+    - name: Effacer le seuil tiré au sort et sa consigne
+      # Le prochain run tire une nouvelle valeur.
+      ansible.builtin.shell: |
+        maison="$(getent passwd '{{ ansible_user | default('ansible') }}' | cut -d: -f6)"
+        rm -f /var/lib/dsoxlab/operateur-seuil.json "$maison/mongodb/consigne.txt"
+      args:
+        executable: /bin/bash
+      changed_when: true

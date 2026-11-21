@@ -42,6 +42,33 @@
           local-path storageclass.kubernetes.io/is-default-class=true --overwrite
       changed_when: true
 
+    - name: Tirer au sort le seuil des opérations lentes
+      # Depuis le 2026-11-20 (décisions 1 et 2 de Stéphane) : la leçon règle
+      # le seuil à 250 ms ; le challenge demande une valeur que la
+      # préparation tire, entre 120 et 490 ms, par pas de 10. L'apprenant la
+      # lit dans ~/mongodb/consigne.txt ; la mémoire, lisible par root
+      # seulement, sert aux tests.
+      ansible.builtin.shell: |
+        set -euo pipefail
+        maison="$(getent passwd '{{ ansible_user | default('ansible') }}' | cut -d: -f6)"
+        # Tirage gardé d'un run à l'autre : un `dsoxlab run` rejoué ne change
+        # pas la consigne sous les pieds de l'apprenant. cleanup.yaml l'efface.
+        if [ -s /var/lib/dsoxlab/operateur-seuil.json ]; then
+          seuil=$(grep -o '[0-9]\+' /var/lib/dsoxlab/operateur-seuil.json)
+        else
+          seuil=$(( (12 + RANDOM % 38) * 10 ))
+        fi
+        install -d -o '{{ ansible_user | default('ansible') }}' -m 0755 "$maison/mongodb"
+        printf 'seuil-operations-lentes-ms: %s\n' "$seuil" > "$maison/mongodb/consigne.txt"
+        chown '{{ ansible_user | default('ansible') }}' "$maison/mongodb/consigne.txt"
+        install -d -m 0755 /var/lib/dsoxlab
+        install -m 0600 /dev/null /var/lib/dsoxlab/operateur-seuil.tmp
+        printf '{"seuil_ms": %s}\n' "$seuil" > /var/lib/dsoxlab/operateur-seuil.tmp
+        mv /var/lib/dsoxlab/operateur-seuil.tmp /var/lib/dsoxlab/operateur-seuil.json
+      args:
+        executable: /bin/bash
+      changed_when: true
+
     - name: Attendre que le provisionneur réponde
       ansible.builtin.command:
         cmd: >-

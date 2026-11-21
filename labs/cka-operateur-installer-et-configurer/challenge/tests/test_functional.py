@@ -6,7 +6,8 @@ mongod lui-même, jamais les commandes tapées.
 Deux d'entre eux ferment des raccourcis :
 - le StatefulSet et le Service doivent APPARTENIR à la ressource registre : un
   replica set monté à la main, sans opérateur, porterait les mêmes noms ;
-- le seuil de 250 ms se lit dans les options de démarrage de mongod, que
+- le seuil, tiré au sort par la préparation (décisions 1 et 2 du 2026-11-20 :
+  la leçon montre 250 ms), se lit dans les options de démarrage de mongod, que
   l'opérateur écrit dans sa configuration. Un réglage posé à chaud dans mongod
   changerait la valeur courante, pas ces options, et disparaîtrait au premier
   redémarrage.
@@ -35,7 +36,7 @@ RESSOURCE = "registre"
 SERVICE = f"{RESSOURCE}-svc"
 POD = f"{RESSOURCE}-0"
 CONNEXION = f"{RESSOURCE}-admin-atelier"
-SEUIL_MS = 250
+MEMOIRE = "/var/lib/dsoxlab/operateur-seuil.json"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 
 BUDGET_S = 240
@@ -188,7 +189,7 @@ def test_mongod_tourne_sur_le_serveur_epingle(host):
 
 
 # ----------------------------------------------------------------------
-# 6. Le seuil de 250 ms est appliqué au démarrage de mongod.
+# 6. Le seuil de la consigne est appliqué au démarrage de mongod.
 # ----------------------------------------------------------------------
 def _seuil_au_demarrage(host) -> object:
     secret = _objet(host, f"-n {NAMESPACE} get secret {CONNEXION}")
@@ -209,27 +210,40 @@ def _seuil_au_demarrage(host) -> object:
         return res.stdout.strip()
 
 
-def _declare_le_seuil(config: dict) -> bool:
+def _seuil_attendu(host) -> int | None:
+    """Le seuil tiré par la préparation, que seul root lit."""
+    res = host.run(f"sudo cat {MEMOIRE}")
+    if res.rc != 0:
+        return None
+    return int(json.loads(res.stdout)["seuil_ms"])
+
+
+def _declare_le_seuil(config: dict, attendu: int | None) -> bool:
     """La clé s'écrit à plat (« operationProfiling.slowOpThresholdMs ») ou imbriquée."""
-    if config.get("operationProfiling.slowOpThresholdMs") == SEUIL_MS:
+    if config.get("operationProfiling.slowOpThresholdMs") == attendu:
         return True
-    return (config.get("operationProfiling") or {}).get("slowOpThresholdMs") == SEUIL_MS
+    return (config.get("operationProfiling") or {}).get("slowOpThresholdMs") == attendu
 
 
-def test_mongod_demarre_avec_un_seuil_de_250_ms(host):
+def test_mongod_demarre_avec_le_seuil_de_la_consigne(host):
+    SEUIL_MS = _seuil_attendu(host)
+    assert SEUIL_MS is not None, message(
+        en="The memory of the preparation is missing: `dsoxlab reset` sets the situation back.",
+        fr="La mémoire de la préparation manque : `dsoxlab reset` repose la situation.",
+    )
     seuil = _seuil_au_demarrage(host)
     declare = ((_ressource(host) or {}).get("spec") or {}).get("additionalMongodConfig") or {}
     # On n'attend que si la ressource déclare le seuil : l'opérateur est alors en
     # train de l'appliquer. Sinon, rien ne viendra.
-    if seuil != SEUIL_MS and _declare_le_seuil(declare):
+    if seuil != SEUIL_MS and _declare_le_seuil(declare, SEUIL_MS):
         fin = _echeance()
         while seuil != SEUIL_MS and time.monotonic() < fin:
             time.sleep(PAS_S)
             seuil = _seuil_au_demarrage(host)
     assert seuil == SEUIL_MS, message(
-        en=f"mongod started with a slow operation threshold of {seuil}. Expected {SEUIL_MS} ms, written by the "
+        en=f"mongod started with a slow operation threshold of {seuil}. Expected {SEUIL_MS} ms, the value of ~/mongodb/consigne.txt, written by the "
         "operator into the mongod configuration: a value set live in mongod is not part of its startup options.",
-        fr=f"mongod a démarré avec un seuil d'opérations lentes de {seuil}. Attendu {SEUIL_MS} ms, écrit par "
+        fr=f"mongod a démarré avec un seuil d'opérations lentes de {seuil}. Attendu {SEUIL_MS} ms, la valeur de ~/mongodb/consigne.txt, écrite par "
         "l'opérateur dans la configuration de mongod : une valeur posée à chaud dans mongod ne fait pas partie de "
         "ses options de démarrage.",
     )

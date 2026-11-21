@@ -83,9 +83,9 @@ criteria:
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
   - id: reglage-applique
-    label: "mongod starts with the 250 ms threshold set through the resource"
+    label: "mongod starts with the threshold of the instructions, set through the resource"
     tests:
-      - test_mongod_demarre_avec_un_seuil_de_250_ms
+      - test_mongod_demarre_avec_le_seuil_de_la_consigne
     lessons:
       - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/operators/
 
