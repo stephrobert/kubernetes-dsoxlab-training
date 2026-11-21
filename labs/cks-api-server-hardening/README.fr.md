@@ -153,8 +153,8 @@ dsoxlab check cks-api-server-hardening
 
 ## 🎯 Le challenge
 
-À vous, seul cette fois : fermer le profileur de l'API server et poser deux
-réglages de durcissement, sans casser l'API.
+À vous, seul cette fois : fermer le profileur de l'API server et retirer ses
+suites de chiffrement les plus faibles, sans casser l'API.
 
 ```bash
 dsoxlab run cks-api-server-hardening

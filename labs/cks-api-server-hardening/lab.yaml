@@ -5,7 +5,7 @@ section: cks
 difficulty: advanced
 description: |
   The API server exposes its Go profiler to anyone who can reach it, and a
-  kubeadm cluster leaves it on. Close it and raise the TLS floor, then prove
+  kubeadm cluster leaves it on. Close it and drop the CBC cipher suites, then prove
   both halves: the profiler answers 404, and the cluster still works.
 skills:
   - api-server
