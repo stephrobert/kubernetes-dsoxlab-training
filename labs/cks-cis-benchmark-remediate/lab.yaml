@@ -4,13 +4,13 @@ level: cluster-setup
 section: cks
 difficulty: advanced
 description: |
-  kube-bench audits the control plane against the CIS benchmark and fails ten
-  checks on a stock kubeadm cluster. Fix the three that share one cause, then
+  kube-bench audits a worker against the CIS benchmark and fails two checks on
+  a stock kubeadm cluster. Fix these two checks, which share one cause, then
   prove it the only honest way: run the audit again and count.
 skills:
   - cis-benchmark
   - kube-bench
-  - control-plane
+  - worker-node
   - remediation
 distros:
   - ubuntu24
@@ -33,6 +33,10 @@ runtime:
   targets:
     - name: cp
       host: k8s-cp.lab
+      # Le worker audité : kube-bench tourne dessus, et la remédiation s'y
+      # joue. Déclaré en rôle pour que `start` le monte avec le control plane.
+      roles:
+        worker: k8s-w1.lab
   default: cp
 
 validation:

@@ -1,10 +1,10 @@
 # Bring down a CIS audit count, and check it with a second audit
 
 The lesson presents the CIS Benchmark and the kube-bench tool that checks it.
-Here, auditing and fixing the control plane is the challenge: this course
-audits a **worker**. It adds cases the lesson does not show: kube-bench run as
-a Job on a given node, the `node` target, reading the summary, the list of
-gaps, then one check read with its remediation.
+This course adds cases the lesson does not show: kube-bench run as a Job on a
+given node, the `node` target, reading the summary, the list of gaps, then one
+check read with its remediation. Fixing the worker's failures is the
+challenge: the course reads the audit, it fixes nothing.
 
 You work in a scratch namespace, `essai-cis`, with a Job of your own,
 `essai-bench-noeud`. The challenge has its own Job: you will do it on your
@@ -108,28 +108,28 @@ kubectl logs job/essai-bench-noeud -n essai-cis | grep -E '^\[(FAIL|WARN)\]'
 [WARN] 4.2.14 Ensure that the --seccomp-default parameter is set to true (Manual)
 ```
 
-Both failures are about **file permissions**: the kubelet's service file and
-its configuration file are too open. `(Automated)` means kube-bench checked it
-itself, `(Manual)` that it could not.
+Two failures and six warnings. `(Automated)` means kube-bench checked it
+itself, `(Manual)` that it could not: a warning calls for a decision, not a
+command.
 
 ## 🔧 Exercise 3: a check and its remediation
 
-At the end of the report, each gap has its remediation. Read the first one
-(`contrôle` means "check"):
+At the end of the report, each gap has its remediation. Read the one of
+4.2.13, the limit on the number of processes per Pod:
 
 ```bash
-N=$(kubectl logs job/essai-bench-noeud -n essai-cis | grep -m1 -E '^\[(FAIL|WARN)\]' | awk '{print $2}'); echo "contrôle $N"; kubectl logs job/essai-bench-noeud -n essai-cis | sed -n '/^== Remediations node/,/^== Summary/p' | grep -A2 "^$N "
+kubectl logs job/essai-bench-noeud -n essai-cis | sed -n '/^== Remediations node/,/^== Summary/p' | grep -A1 '^4.2.13 '
 ```
 
 ```text
-contrôle 4.1.1
-4.1.1 Run the below command (based on the file location on your system) on the each worker node.
-For example, chmod 600 /lib/systemd/system/kubelet.service
+4.2.13 Decide on an appropriate level for this parameter and set it,
+either via the --pod-max-pids command line parameter or the PodPidsLimit configuration file setting.
 ```
 
-The remediation gives the command, with the file's path on this system. It is
-run on the audited node, here `k8s-w1.lab`. A fix only counts once checked by
-a second audit.
+For a manual check, the remediation gives no ready-made command: it names the
+kubelet setting (`--pod-max-pids` or `podPidsLimit`) and leaves the value to
+you. A remediation is run on the audited node, and a fix only counts once
+checked by a second audit.
 
 ## 🧹 Clean-up
 
@@ -165,8 +165,8 @@ untouched.
 
 ## 🎯 The challenge
 
-Your turn, on your own this time: audit the control plane, make three checks
-that share the same flaw pass, and prove it with a second audit.
+Your turn, on your own this time: make the worker's two failing checks pass,
+since they share the same flaw, and prove it with a second audit.
 
 ```bash
 dsoxlab run cks-cis-benchmark-remediate

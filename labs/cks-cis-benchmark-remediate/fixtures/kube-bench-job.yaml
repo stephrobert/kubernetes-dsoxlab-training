@@ -7,19 +7,22 @@ spec:
   backoffLimit: 1
   template:
     spec:
-      nodeName: k8s-cp.lab
+      nodeName: k8s-w1.lab
       hostPID: true
       restartPolicy: Never
       containers:
         - name: kube-bench
-          image: aquasec/kube-bench:latest
-          command: ["kube-bench", "run", "--targets", "master", "--json"]
+          image: aquasec/kube-bench:v0.16.0@sha256:75506f222d1eb6ce2a751a5533bdc0a3b54c898e2e49e7751d0ee22cfb862679
+          command: ["kube-bench", "run", "--targets", "node", "--json"]
           volumeMounts:
-            - name: var-lib-etcd
-              mountPath: /var/lib/etcd
-              readOnly: true
             - name: var-lib-kubelet
               mountPath: /var/lib/kubelet
+              readOnly: true
+            - name: etc-systemd
+              mountPath: /etc/systemd
+              readOnly: true
+            - name: lib-systemd
+              mountPath: /lib/systemd
               readOnly: true
             - name: etc-kubernetes
               mountPath: /etc/kubernetes
@@ -28,10 +31,12 @@ spec:
               mountPath: /usr/local/mount-from-host/bin
               readOnly: true
       volumes:
-        - name: var-lib-etcd
-          hostPath: {path: /var/lib/etcd}
         - name: var-lib-kubelet
           hostPath: {path: /var/lib/kubelet}
+        - name: etc-systemd
+          hostPath: {path: /etc/systemd}
+        - name: lib-systemd
+          hostPath: {path: /lib/systemd}
         - name: etc-kubernetes
           hostPath: {path: /etc/kubernetes}
         - name: usr-bin
