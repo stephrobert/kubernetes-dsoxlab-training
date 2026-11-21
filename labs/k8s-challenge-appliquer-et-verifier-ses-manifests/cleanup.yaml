@@ -1,0 +1,26 @@
+---
+# Joué par `dsoxlab clean` : retire les deux variantes, le répertoire de travail
+# et la mémoire du tirage. Le cluster kind « lab » reste : il appartient au socle.
+- name: Nettoyer le challenge k8s-challenge-appliquer-et-verifier-ses-manifests
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer les namespaces des deux variantes
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kind/lab.kubeconfig delete namespace
+        annuaire-recette annuaire-production --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Trouver le répertoire de l'apprenant
+      ansible.builtin.command: getent passwd {{ ansible_user | default('ansible') }}
+      register: session
+      changed_when: false
+
+    - name: Retirer le répertoire de travail et la mémoire du tirage
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ session.stdout.split(':')[5] }}/annuaire"
+        - /var/lib/dsoxlab/challenge-appliquer-et-verifier-ses-manifests.json
