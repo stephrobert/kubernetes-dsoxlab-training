@@ -54,7 +54,7 @@ distros:
 #   https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/epreuves/securiser-un-cluster/
 # URL provisoire, celle de la formation, en attendant que la page existe.
 doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-secure-a-cluster/
-lab_type: challenge
+lab_type: capstone
 exam_passing_score: 70
 exam_blocking_checks:
   # Les sept contrôles critiques de la fiche (D06), sans compensation.

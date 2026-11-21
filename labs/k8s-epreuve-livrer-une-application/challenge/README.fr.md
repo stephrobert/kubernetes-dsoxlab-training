@@ -1,4 +1,4 @@
-# Challenge : Épreuve du niveau 3 : exposer, configurer et livrer une application
+# Challenge : Épreuve du niveau 3 : placer, sécuriser et livrer une application
 
 ## La situation
 

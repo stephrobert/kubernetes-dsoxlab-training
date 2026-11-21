@@ -42,7 +42,7 @@ skills:
 distros:
   - debian13
 doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/exam-ship-and-update-an-application/
-lab_type: challenge
+lab_type: capstone
 exam_passing_score: 70
 exam_blocking_checks:
   # Les cinq critères critiques de la grille (D35), sans compensation.
