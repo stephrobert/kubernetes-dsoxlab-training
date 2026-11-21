@@ -1,5 +1,5 @@
 title: "Relier un ConfigMap, un Secret et un Service à un Deployment"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/bilan-ressources-base/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/namespaces/#mettre-en-pratique
 description: |
   Dans un namespace dédié, faire tourner la vitrine à trois réplicas, lui
   donner une valeur de configuration depuis un ConfigMap et un mot de passe
