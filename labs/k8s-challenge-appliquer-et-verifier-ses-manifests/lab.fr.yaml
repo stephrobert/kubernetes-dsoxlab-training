@@ -1,0 +1,21 @@
+title: "Appliquer et vérifier ses manifests, d'après un cahier des charges"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+description: |
+  Sans guidage, écrivez les manifests d'une application d'après un cahier des
+  charges qui ne nomme jamais les objets, trouvez avec explain le champ d'API
+  demandé, livrez deux variantes depuis une base Kustomize, appliquez-les de
+  façon déclarative, montrez le diff avant de monter la production de version,
+  et livrez avec un script qui attend que l'application soit disponible.
+criteria:
+  - id: variantes-depuis-une-base
+    label: "La recette et la production se construisent depuis une même base Kustomize, chacune avec son namespace"
+  - id: application-livree
+    label: "annuaire tourne dans les deux variantes, joignable sur le port 8080, avec le nombre d'exemplaires demandé"
+  - id: champ-trouve
+    label: "Le délai du cahier des charges est posé sur le bon champ d'API"
+  - id: application-declarative
+    label: "Les objets de production ont été appliqués de façon déclarative"
+  - id: diff-avant-montee
+    label: "La production tourne sur la nouvelle version, et le diff l'a montré avant de l'appliquer"
+  - id: livraison-attendue
+    label: "Le script de livraison ne rend la main qu'une fois la production disponible"

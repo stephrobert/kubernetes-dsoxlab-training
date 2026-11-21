@@ -1,0 +1,93 @@
+# Challenge du module « Écrire et appliquer ses manifests » (niveau 2),
+# commandé le 2026-11-21 (décision D02 : un challenge par module). Il note les
+# gestes des cinq labs guidés du module sans en refaire un : trouver un champ
+# d'API avec explain, écrire les manifests d'après un cahier des charges qui ne
+# nomme pas les objets, appliquer de façon déclarative, montrer le diff avant
+# une modification, attendre la disponibilité, livrer deux variantes depuis une
+# base Kustomize. Objets distincts de k8s-challenge-manifest-robuste et de
+# l'épreuve N2.
+#
+# `lab_type: challenge` : six critères à poids égal, seuil 70, deux bloquants.
+# Aucun indice (D91). Le doc_url pointe provisoirement la leçon Kustomize, la
+# dernière du module, en attendant la page du challenge.
+id: k8s-challenge-appliquer-et-verifier-ses-manifests
+title: "Apply and check your manifests, from a set of requirements"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Without guidance, write the manifests of an application from requirements
+  that never name the objects, find the API field asked for with explain, ship
+  two variants from one Kustomize base, apply them declaratively, show the
+  diff before upgrading production, and deliver with a script that waits for
+  the application to be available.
+skills:
+  - kubectl-explain
+  - manifests
+  - kubectl-apply
+  - kubectl-diff
+  - kubectl-wait
+  - kustomize
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Le cœur du geste, qu'aucun total ne compense : deux variantes depuis une
+  # même base, et une livraison qui attend la disponibilité.
+  - test_les_deux_variantes_se_construisent_depuis_une_base
+  - test_la_livraison_attend_la_disponibilite
+estimated_time: 45m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: variantes-depuis-une-base
+    label: "Acceptance and production are built from one Kustomize base, each with its namespace"
+    tests:
+      - test_les_deux_variantes_se_construisent_depuis_une_base
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
+  - id: application-livree
+    label: "annuaire runs in both variants, reachable on port 8080, with the requested number of copies"
+    tests:
+      - test_l_annuaire_tourne_dans_les_deux_variantes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/write-kubernetes-manifests/
+  - id: champ-trouve
+    label: "The delay of the requirements is set on the right API field"
+    tests:
+      - test_le_delai_de_disponibilite_vient_du_cahier
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-api-resources-explain/
+  - id: application-declarative
+    label: "The production objects were applied declaratively"
+    tests:
+      - test_les_objets_sont_appliques_de_facon_declarative
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubectl-create-apply/
+  - id: diff-avant-montee
+    label: "Production runs the new version, and the diff showed it before it was applied"
+    tests:
+      - test_la_production_est_montee_et_le_diff_l_a_montre
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/
+  - id: livraison-attendue
+    label: "The delivery script hands back only once production is available"
+    tests:
+      - test_la_livraison_attend_la_disponibilite
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kubectl-wait-diff/

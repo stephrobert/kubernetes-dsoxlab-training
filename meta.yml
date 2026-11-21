@@ -436,6 +436,10 @@ sections:
       - k8s-creer-ou-appliquer
       - k8s-verifier-et-attendre
       - ckad-kustomize-overlays
+      # Le challenge du module « Écrire et appliquer ses manifests » (niveau 2),
+      # commandé le 2026-11-21 : explain, manifests d'après un cahier des charges,
+      # apply déclaratif, diff avant modification, attente, deux variantes Kustomize.
+      - k8s-challenge-appliquer-et-verifier-ses-manifests
       # Labs guidés des leçons Helm (règle 17, issues #218 et #219) : inspecter et
       # restaurer une release, puis surcharger les values, Helm 4.3.2 et podinfo.
       - k8s-inspecter-et-restaurer-une-release-helm
