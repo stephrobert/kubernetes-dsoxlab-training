@@ -1,5 +1,5 @@
 title: "Livrer un manifeste robuste à partir d'un cahier des charges"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/debug-applications/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/manifest-robuste/#mettre-en-pratique
 description: |
   Sans guidage, livrez une application depuis une base Kustomize unique en deux
   variantes, avec init container, sidecar natif, budgets et sondes, planifiez

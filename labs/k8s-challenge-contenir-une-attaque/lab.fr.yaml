@@ -1,4 +1,5 @@
 title: "Détecter et contenir une persistance et un déni de service"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/contenir-une-attaque/#mettre-en-pratique
 # Page provisoire, comme dans lab.yaml. URL cible (leçon hôte KUBERN-S-06) :
 # https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/deni-de-service-cluster/
 description: |

@@ -20,7 +20,7 @@ skills:
   - api-migration
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/cluster-pki/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/sauvegarder-et-restaurer/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 50m

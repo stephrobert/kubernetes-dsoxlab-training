@@ -1,5 +1,5 @@
 title: "Garantir la disponibilité d'une application pendant une maintenance"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/taches-quotidiennes-admin-kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/garantir-la-disponibilite/#mettre-en-pratique
 description: |
   Sans procédure, faire tourner une application en trois exemplaires répartis
   sur les nœuds, protégés par un budget de perturbation, avec des sondes qui

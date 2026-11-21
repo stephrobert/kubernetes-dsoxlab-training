@@ -29,7 +29,7 @@ skills:
   - replicaset-controller
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/worker-nodes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/lire-un-cluster/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 30m

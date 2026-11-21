@@ -1,5 +1,5 @@
 title: "Confiner un Pod et détecter une activité anormale, seul et sans indice"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/confiner-et-detecter/#mettre-en-pratique
 description: |
   Sans procédure, confiner des Pods face au noyau avec AppArmor, seccomp et un
   runtime bac à sable, exiger le TLS mutuel dans un maillage, fermer un

@@ -1,5 +1,5 @@
 title: "Choisir et déployer le bon workload pour trois besoins"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operators-crds-developpeurs/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/choisir-le-bon-workload/#mettre-en-pratique
 description: |
   Sans guidage, servez trois besoins décrits sans nommer d'objet : une base dont
   les réplicas gardent une identité stable et leurs données, un agent sur chaque

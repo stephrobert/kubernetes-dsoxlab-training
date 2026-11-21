@@ -34,7 +34,7 @@ skills:
   - static-pod
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/audit-logs/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/durcir-le-plan-de-controle/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

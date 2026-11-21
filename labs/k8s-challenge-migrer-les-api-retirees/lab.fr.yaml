@@ -1,5 +1,5 @@
 title: "Détecter et migrer les API retirées avant une montée de version"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/api-deprecations/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/migrer-les-api-retirees/#mettre-en-pratique
 description: |
   Sans guidage, trouvez les manifestes d'un dépôt qui emploient une API que
   Kubernetes a retirée, nommez chacun avec sa remplaçante dans un rapport,

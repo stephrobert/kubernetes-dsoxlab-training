@@ -33,7 +33,7 @@ skills:
   - kubectl-set-image
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/basic-resources-knowledge-check/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/relier-config-et-service/#mettre-en-pratique
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 30m
