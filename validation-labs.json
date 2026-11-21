@@ -2400,8 +2400,8 @@
   "avant": {
    "echecs": [
     "test_l_application_tourne_et_repond",
-    "test_l_historique_montre_les_trois_revisions",
-    "test_la_montee_en_charge_a_eu_lieu_puis_a_ete_annulee"
+    "test_l_historique_montre_les_deux_versions_du_chart_puis_le_retour",
+    "test_la_revision_2_portait_ses_valeurs_et_le_retour_les_retire"
    ],
    "passed": 0,
    "recorded": true,
@@ -2411,12 +2411,12 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-17",
-  "duree_s": 136,
+  "date": "2026-11-21",
+  "duree_s": 149,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 22 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -2428,8 +2428,8 @@
   "rejeu": {
    "echecs": [
     "test_l_application_tourne_et_repond",
-    "test_l_historique_montre_les_trois_revisions",
-    "test_la_montee_en_charge_a_eu_lieu_puis_a_ete_annulee"
+    "test_l_historique_montre_les_deux_versions_du_chart_puis_le_retour",
+    "test_la_revision_2_portait_ses_valeurs_et_le_retour_les_retire"
    ],
    "passed": 0,
    "recorded": true,
@@ -2505,10 +2505,10 @@
   },
   "avant": {
    "echecs": [
-    "test_app_a_un_init_container_qui_attend_config_svc",
-    "test_app_est_passe_seul_en_running_quand_la_dependance_a_repondu",
-    "test_config_server_repond_derriere_config_svc",
-    "test_l_init_container_s_est_termine_avec_succes"
+    "test_facturation_a_un_gardien_qui_attend_tarifs_svc",
+    "test_facturation_est_passe_seul_en_running_quand_tarifs_a_repondu",
+    "test_l_init_container_s_est_termine_avec_succes",
+    "test_tarifs_repond_derriere_tarifs_svc"
    ],
    "passed": 0,
    "recorded": true,
@@ -2518,12 +2518,12 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 152,
+  "date": "2026-11-21",
+  "duree_s": 154,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 22 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -2534,10 +2534,10 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
-    "test_app_a_un_init_container_qui_attend_config_svc",
-    "test_app_est_passe_seul_en_running_quand_la_dependance_a_repondu",
-    "test_config_server_repond_derriere_config_svc",
-    "test_l_init_container_s_est_termine_avec_succes"
+    "test_facturation_a_un_gardien_qui_attend_tarifs_svc",
+    "test_facturation_est_passe_seul_en_running_quand_tarifs_a_repondu",
+    "test_l_init_container_s_est_termine_avec_succes",
+    "test_tarifs_repond_derriere_tarifs_svc"
    ],
    "passed": 0,
    "recorded": true,
@@ -7967,12 +7967,12 @@
    "total": 3
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 147,
+  "date": "2026-11-21",
+  "duree_s": 347,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 12 objets hors kube-system",
+   "cluster photographié, v1.37.0, 80 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -9126,12 +9126,12 @@
    "total": 3
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-16",
-  "duree_s": 223,
+  "date": "2026-11-21",
+  "duree_s": 233,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 22 objets hors kube-system",
    "avant le travail : 0/3",
    "après la solution : 3/3",
    "après clean et run : 0/3",
@@ -9217,37 +9217,38 @@
  "k8s-verifier-et-attendre": {
   "apres": {
    "echecs": [],
-   "passed": 4,
+   "passed": 5,
    "recorded": true,
    "score": 100,
    "skipped": 0,
    "status": "passed",
-   "total": 4
+   "total": 5
   },
   "avant": {
    "echecs": [
+    "test_deployer_sh_attend_les_jobs_et_s_arrete_sur_un_echec",
     "test_deployer_sh_sait_s_arreter",
     "test_la_version_2_tourne_et_la_migration_est_terminee",
     "test_le_cluster_correspond_au_dossier",
-    "test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff"
+    "test_le_releve_donne_la_revision_de_la_version_2"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 5
   },
   "cible": "k8s-kind.lab",
-  "date": "2026-11-11",
-  "duree_s": 103,
+  "date": "2026-11-21",
+  "duree_s": 180,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.0, 20 objets hors kube-system",
-   "avant le travail : 0/4",
-   "après la solution : 4/4",
-   "après clean et run : 0/4",
+   "cluster photographié, v1.37.0, 80 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
    "cluster rendu intact"
   ],
   "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-verifier-et-attendre.log",
@@ -9255,17 +9256,18 @@
   "raisons": [],
   "rejeu": {
    "echecs": [
+    "test_deployer_sh_attend_les_jobs_et_s_arrete_sur_un_echec",
     "test_deployer_sh_sait_s_arreter",
     "test_la_version_2_tourne_et_la_migration_est_terminee",
     "test_le_cluster_correspond_au_dossier",
-    "test_le_releve_donne_les_codes_de_sortie_de_kubectl_diff"
+    "test_le_releve_donne_la_revision_de_la_version_2"
    ],
    "passed": 0,
    "recorded": true,
    "score": 0,
    "skipped": 0,
    "status": "failed",
-   "total": 4
+   "total": 5
   },
   "verdict": "VALIDE"
  },
