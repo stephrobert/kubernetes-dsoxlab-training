@@ -1074,7 +1074,7 @@
     "test_l_operateur_est_disponible_sur_son_image_epinglee",
     "test_la_crd_mongodbcommunity_est_etablie",
     "test_le_statefulset_et_le_service_appartiennent_a_registre",
-    "test_mongod_demarre_avec_un_seuil_de_250_ms",
+    "test_mongod_demarre_avec_le_seuil_de_la_consigne",
     "test_mongod_tourne_sur_le_serveur_epingle",
     "test_registre_est_running"
    ],
@@ -1086,12 +1086,12 @@
    "total": 6
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 271,
+  "date": "2026-11-21",
+  "duree_s": 263,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/6",
    "après la solution : 6/6",
    "après clean et run : 0/6",
@@ -1105,7 +1105,7 @@
     "test_l_operateur_est_disponible_sur_son_image_epinglee",
     "test_la_crd_mongodbcommunity_est_etablie",
     "test_le_statefulset_et_le_service_appartiennent_a_registre",
-    "test_mongod_demarre_avec_un_seuil_de_250_ms",
+    "test_mongod_demarre_avec_le_seuil_de_la_consigne",
     "test_mongod_tourne_sur_le_serveur_epingle",
     "test_registre_est_running"
    ],
@@ -4857,12 +4857,12 @@
    "total": 5
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 378,
+  "date": "2026-11-21",
+  "duree_s": 329,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/5",
    "après la solution : 5/5",
    "après clean et run : 0/5",
@@ -6053,6 +6053,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-migrer-les-api-retirees": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_chaque_manifeste_du_depot_est_accepte_par_l_api_server",
+    "test_le_depot_est_applique_tel_quel",
+    "test_le_rapport_nomme_chaque_api_retiree_et_sa_remplacante",
+    "test_le_registre_tourne_avec_ses_deux_replicas",
+    "test_les_objets_decrivent_la_meme_intention"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 158,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-migrer-les-api-retirees.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_chaque_manifeste_du_depot_est_accepte_par_l_api_server",
+    "test_le_depot_est_applique_tel_quel",
+    "test_le_rapport_nomme_chaque_api_retiree_et_sa_remplacante",
+    "test_le_registre_tourne_avec_ses_deux_replicas",
+    "test_les_objets_decrivent_la_meme_intention"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-placer-et-plafonner": {
   "apres": {
    "echecs": [],
@@ -6177,6 +6234,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-ramener-le-cluster-au-depot": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_kubectl_diff_est_vide_sur_le_depot",
+    "test_l_application_tourne_sur_la_configuration_du_depot",
+    "test_la_montee_en_replicas_est_reportee_et_commitee",
+    "test_les_modifications_en_direct_non_voulues_ont_disparu",
+    "test_les_objets_n_ont_pas_ete_recrees"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 183,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-ramener-le-cluster-au-depot.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_kubectl_diff_est_vide_sur_le_depot",
+    "test_l_application_tourne_sur_la_configuration_du_depot",
+    "test_la_montee_en_replicas_est_reportee_et_commitee",
+    "test_les_modifications_en_direct_non_voulues_ont_disparu",
+    "test_les_objets_n_ont_pas_ete_recrees"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-relier-config-et-service": {
   "apres": {
    "echecs": [],
@@ -6288,6 +6402,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 4
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-retrouver-les-flux-refuses": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_la_metrique_compte_le_refus_avec_source_et_destination",
+    "test_le_flux_refuse_est_designe",
+    "test_les_refus_de_livraison_et_eux_seuls_sont_journalises"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "net-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 730,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 18 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-retrouver-les-flux-refuses.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_la_metrique_compte_le_refus_avec_source_et_destination",
+    "test_le_flux_refuse_est_designe",
+    "test_les_refus_de_livraison_et_eux_seuls_sont_journalises"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
