@@ -1,0 +1,60 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session. Trois temps :
+#   1. sur le control plane : le socle, la jonction du second worker
+#      optionnel k8s-w2.lab, puis l'API server ouvert à l'anonyme
+#      (fixtures/prepare-api.sh) ;
+#   2. sur k8s-w2.lab : ce qu'un ancien modèle de serveur y a laissé
+#      (fixtures/prepare-noeud.sh) : deux services superflus, un compte de
+#      prestataire qui entre par mot de passe et tient sudo, un kubelet ouvert
+#      à l'anonyme avec son port en lecture seule, et aucun pare-feu.
+#
+# Le nœud travaillé est l'hôte OPTIONNEL k8s-w2.lab, comme dans les trois labs
+# guidés du module : une politique `drop` ou un AllowGroups mal écrits y
+# enferment dehors un nœud jetable, pas le cluster partagé.
+#
+# Rejouable : chaque script repart de l'état d'origine avant de poser la
+# situation. Le kubelet de k8s-w2 repart de lui-même, puisque la jonction
+# réécrit sa configuration à chaque passage (cleanup.yaml fait un kubeadm
+# reset).
+- name: Préparer le cluster du challenge durcir-les-noeuds-et-l-acces-api
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Joindre le second worker au cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: present
+
+    # Un nœud optionnel détruit puis remonté revient avec une NOUVELLE clé
+    # d'hôte : `ssh k8s-w2.lab` serait refusé depuis le control plane (vécu le
+    # 2026-11-17 dans les labs guidés). accept-new acceptera la nouvelle.
+    - name: Oublier une ancienne clé d'hôte du second worker
+      ansible.builtin.shell: >-
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts -R {{ item }};
+        ssh-keygen -f /home/{{ ansible_user | default('ubuntu') }}/.ssh/known_hosts
+        -R {{ hostvars[item].ansible_host | default(item) }}
+      loop: "{{ groups['lab_worker2'] | default([]) }}"
+      become: true
+      become_user: "{{ ansible_user | default('ubuntu') }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Ouvrir l'API server à l'anonyme
+      ansible.builtin.script: fixtures/prepare-api.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+- name: Laisser k8s-w2.lab tel que l'ancien modèle l'a livré
+  hosts: lab_worker2
+  become: true
+  tasks:
+    - name: Poser la situation du nœud
+      ansible.builtin.script: fixtures/prepare-noeud.sh
+      args:
+        executable: /bin/bash

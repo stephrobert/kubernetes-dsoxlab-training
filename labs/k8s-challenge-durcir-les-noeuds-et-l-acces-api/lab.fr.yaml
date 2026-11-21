@@ -1,0 +1,24 @@
+title: "Durcir un nœud worker et l'accès à l'API server, sans casser le cluster"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+description: |
+  Sans procédure, ramenez un nœud worker livré depuis un ancien modèle de
+  serveur à ce dont Kubernetes a besoin : services superflus retirés, SSH
+  réservé à un groupe et par clé, compte de prestataire privé de ses droits,
+  kubelet fermé à l'anonyme, pare-feu qui survit au redémarrage. Puis
+  restreignez l'accès anonyme à l'API server sans casser les sondes de santé
+  ni kubeadm join.
+criteria:
+  - id: surface-reduite
+    label: "k8s-w2 ne fait plus tourner les services superflus : apache2 purgé, la socket d'inventaire arrêtée et désactivée"
+  - id: ssh-reserve
+    label: "Seuls les membres de ops-noeuds (ansible et student) ouvrent une session SSH sur k8s-w2, par clé, jamais root"
+  - id: prestataire-sans-droit
+    label: "Le compte du prestataire est gardé, sans plus aucun droit sudo"
+  - id: kubelet-ferme
+    label: "Le kubelet de k8s-w2 répond 401 à l'anonyme, 403 à un compte sans droit, et son port en lecture seule est fermé"
+  - id: pare-feu
+    label: "Une chaîne d'entrée en drop ferme k8s-w2, et SSH depuis le control plane, le kubelet et le trafic des Pods passent toujours"
+  - id: api-anonyme
+    label: "L'API server ne répond à l'anonyme que sur les chemins de santé et cluster-info, sans liaison RBAC en trop"
+  - id: durci-apres-redemarrage
+    label: "Après un vrai redémarrage, k8s-w2 revient Ready, avec son pare-feu, sans ses ports superflus, le kubelet toujours fermé"

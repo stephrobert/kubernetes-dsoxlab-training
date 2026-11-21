@@ -1,0 +1,216 @@
+---
+# Joué par `dsoxlab clean` : rend l'API server tel que kubeadm l'a posé, retire
+# la lecture publique, puis rend k8s-w2.lab sans rien de ce que le challenge ou
+# l'apprenant y a ajouté, et le retire du cluster (kubeadm reset, qui efface
+# aussi la configuration du kubelet modifiée).
+#
+# On attend que l'API réponde ET que son Pod statique soit revenu Running :
+# /healthz répond avant que l'objet Pod ne sorte de Pending, et le validateur
+# photographie le cluster dans cette fenêtre (cks-restreindre-l-acces-anonyme).
+- name: Rendre l'API server du control plane
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Restaurer le manifeste de l'API server
+      ansible.builtin.copy:
+        src: /var/backups/kube-apiserver.avant-durcir-les-noeuds.yaml
+        dest: /etc/kubernetes/manifests/kube-apiserver.yaml
+        remote_src: true
+        mode: "0600"
+      register: _manifeste
+      failed_when: false
+
+    - name: Retirer la configuration d'authentification
+      ansible.builtin.file:
+        path: /etc/kubernetes/authn-config.yaml
+        state: absent
+
+    - name: Laisser le kubelet voir le manifeste restauré
+      ansible.builtin.pause:
+        seconds: 20
+      when: _manifeste is changed
+
+    - name: Attendre que l'API server réponde à nouveau
+      ansible.builtin.command: kubectl get --raw /healthz
+      register: sante
+      until: sante.rc == 0
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Attendre que le Pod statique de l'API server soit Running
+      ansible.builtin.command: >-
+        kubectl -n kube-system get pods -l component=kube-apiserver
+        -o jsonpath={.items[*].status.phase}
+      register: phase_api
+      until: phase_api.stdout.split() | unique == ["Running"]
+      retries: 40
+      delay: 3
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer la lecture publique
+      ansible.builtin.command: kubectl delete clusterrolebinding annuaire-public --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les namespaces de sonde qu'un test interrompu aurait laissés
+      ansible.builtin.command: >-
+        kubectl delete namespace sonde-durcissement sonde-durcissement-jeton
+        --ignore-not-found --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+- name: Rendre k8s-w2.lab à son état d'origine
+  hosts: lab_worker2
+  become: true
+  ignore_unreachable: true
+  vars:
+    fichiers_de_l_image:
+      - 50-cloud-init.conf
+      - 60-cloudimg-settings.conf
+  tasks:
+    - name: Désactiver le service nftables, sans l'arrêter (ExecStop vide tout)
+      ansible.builtin.systemd:
+        name: nftables.service
+        enabled: false
+      failed_when: false
+
+    - name: Lister les tables de la famille inet
+      ansible.builtin.shell:
+        cmd: set -o pipefail && nft list tables | awk '$2 == "inet" {print $3}'
+        executable: /bin/bash
+      register: _tables_inet
+      changed_when: false
+      failed_when: false
+
+    - name: Retirer les tables inet
+      ansible.builtin.command: nft delete table inet {{ item }}
+      loop: "{{ _tables_inet.stdout_lines | default([]) }}"
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les fichiers de règles
+      ansible.builtin.file:
+        path: /etc/nftables.d
+        state: absent
+
+    - name: Rendre le nftables.conf livré
+      ansible.builtin.copy:
+        src: /var/backups/nftables.conf.livre
+        dest: /etc/nftables.conf
+        remote_src: true
+        mode: "0644"
+      failed_when: false
+
+    - name: Arrêter les minuteurs laissés par systemd-run
+      ansible.builtin.shell:
+        cmd: >-
+          for t in $(systemctl list-units --type=timer --no-legend 'run-*' | awk '{print $1}');
+          do systemctl stop "$t"; done
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Lister les fichiers de sshd_config.d
+      ansible.builtin.find:
+        paths: /etc/ssh/sshd_config.d
+        patterns: "*"
+      register: _sshd_d
+
+    - name: Retirer tout fichier SSH ajouté par le challenge ou l'apprenant
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _sshd_d.files | rejectattr('path', 'search', '/(' ~ (fichiers_de_l_image | join('|')) ~ ')$') | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Retirer la clé d'essai des comptes conservés
+      ansible.builtin.lineinfile:
+        path: "/home/{{ item }}/.ssh/authorized_keys"
+        regexp: "lab-durcir-essai$"
+        state: absent
+      loop: [student, ansible]
+      failed_when: false
+
+    - name: Fermer les sessions du prestataire
+      ansible.builtin.shell:
+        cmd: loginctl terminate-user prestataire; pkill -KILL -u prestataire; sleep 2
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le compte du prestataire
+      ansible.builtin.user:
+        name: prestataire
+        state: absent
+        remove: true
+        force: true
+
+    - name: Retirer ses droits sudo
+      ansible.builtin.file:
+        path: /etc/sudoers.d/90-prestataire
+        state: absent
+
+    - name: Retirer le groupe ops-noeuds
+      ansible.builtin.group:
+        name: ops-noeuds
+        state: absent
+
+    - name: Retirer le répertoire des essais
+      ansible.builtin.file:
+        path: /root/.lab-durcir
+        state: absent
+
+    - name: Vérifier puis recharger sshd
+      ansible.builtin.shell:
+        cmd: sshd -t && systemctl reload ssh
+      changed_when: true
+      failed_when: false
+
+    - name: Démasquer ce que l'apprenant aurait masqué
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        masked: false
+      loop: [releve-inventaire.socket, apache2.service]
+      failed_when: false
+
+    - name: Arrêter et retirer le relevé d'inventaire
+      ansible.builtin.systemd:
+        name: releve-inventaire.socket
+        state: stopped
+        enabled: false
+      failed_when: false
+
+    - name: Supprimer ses unités
+      ansible.builtin.file:
+        path: "/etc/systemd/system/{{ item }}"
+        state: absent
+      loop: [releve-inventaire.socket, releve-inventaire@.service]
+
+    - name: Purger apache2 et ses dépendances
+      ansible.builtin.apt:
+        name: [apache2, apache2-bin, apache2-data, apache2-utils]
+        state: absent
+        purge: true
+        autoremove: true
+        lock_timeout: 300
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Recharger systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+- name: Retirer le second worker du cluster
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Retirer le second worker du cluster
+      ansible.builtin.include_tasks: ../../shared/noeud-optionnel.yml
+      vars:
+        noeuds_optionnels: "{{ groups['lab_worker2'] | default([]) }}"
+        noeud_optionnel_etat: absent
