@@ -2618,14 +2618,14 @@
   "avant": {
    "echecs": [
     "test_chaque_service_trouve_ses_pods",
-    "test_dev_a_un_replica_disponible",
-    "test_dev_passe_a_la_version_2_par_son_overlay",
-    "test_la_configuration_vient_d_une_configmap_generee",
+    "test_la_configuration_generee_porte_le_mode_de_chaque_palier",
     "test_le_cluster_correspond_aux_overlays",
     "test_les_deux_environnements_ont_la_meme_structure",
     "test_les_overlays_derivent_d_une_meme_base",
-    "test_les_pods_portent_le_label_de_leur_environnement",
-    "test_prod_a_trois_replicas_disponibles"
+    "test_les_pods_portent_le_label_de_leur_palier",
+    "test_production_a_quatre_replicas_disponibles",
+    "test_recette_a_deux_replicas_disponibles",
+    "test_recette_passe_a_la_version_2_par_son_overlay"
    ],
    "passed": 0,
    "recorded": true,
@@ -2635,12 +2635,12 @@
    "total": 9
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-13",
-  "duree_s": 157,
+  "date": "2026-11-21",
+  "duree_s": 155,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/9",
    "après la solution : 9/9",
    "après clean et run : 0/9",
@@ -2652,14 +2652,14 @@
   "rejeu": {
    "echecs": [
     "test_chaque_service_trouve_ses_pods",
-    "test_dev_a_un_replica_disponible",
-    "test_dev_passe_a_la_version_2_par_son_overlay",
-    "test_la_configuration_vient_d_une_configmap_generee",
+    "test_la_configuration_generee_porte_le_mode_de_chaque_palier",
     "test_le_cluster_correspond_aux_overlays",
     "test_les_deux_environnements_ont_la_meme_structure",
     "test_les_overlays_derivent_d_une_meme_base",
-    "test_les_pods_portent_le_label_de_leur_environnement",
-    "test_prod_a_trois_replicas_disponibles"
+    "test_les_pods_portent_le_label_de_leur_palier",
+    "test_production_a_quatre_replicas_disponibles",
+    "test_recette_a_deux_replicas_disponibles",
+    "test_recette_passe_a_la_version_2_par_son_overlay"
    ],
    "passed": 0,
    "recorded": true,
@@ -5167,6 +5167,63 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-composer-un-pod-multi-conteneurs": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_deux_replicas_prets_sans_redemarrage",
+    "test_la_page_preparee_par_l_init_container_est_servie",
+    "test_le_serveur_lit_la_page_en_lecture_seule",
+    "test_le_sidecar_natif_relaie_les_acces",
+    "test_les_journaux_vivent_dans_un_volume_borne_et_partage"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 221,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 38 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-composer-un-pod-multi-conteneurs.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_deux_replicas_prets_sans_redemarrage",
+    "test_la_page_preparee_par_l_init_container_est_servie",
+    "test_le_serveur_lit_la_page_en_lecture_seule",
+    "test_le_sidecar_natif_relaie_les_acces",
+    "test_les_journaux_vivent_dans_un_volume_borne_et_partage"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-confiner-et-detecter": {
   "apres": {
    "echecs": [],
@@ -5491,6 +5548,63 @@
    "skipped": 0,
    "status": "failed",
    "total": 7
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-challenge-executer-et-planifier-des-taches": {
+  "apres": {
+   "echecs": [],
+   "passed": 5,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 5
+  },
+  "avant": {
+   "echecs": [
+    "test_export_compta_relance_avec_sa_configuration_a_reussi",
+    "test_facturer_lots_respecte_le_parallelisme_et_les_reprises",
+    "test_facturer_lots_traite_chaque_lot_une_fois",
+    "test_relance_impayes_est_planifie_comme_demande",
+    "test_un_job_lance_a_la_main_depuis_relance_impayes_a_reussi"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-21",
+  "duree_s": 161,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 22 objets hors kube-system",
+   "avant le travail : 0/5",
+   "après la solution : 5/5",
+   "après clean et run : 0/5",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-executer-et-planifier-des-taches.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_export_compta_relance_avec_sa_configuration_a_reussi",
+    "test_facturer_lots_respecte_le_parallelisme_et_les_reprises",
+    "test_facturer_lots_traite_chaque_lot_une_fois",
+    "test_relance_impayes_est_planifie_comme_demande",
+    "test_un_job_lance_a_la_main_depuis_relance_impayes_a_reussi"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 5
   },
   "verdict": "VALIDE"
  },
@@ -7896,7 +8010,7 @@
    "echecs": [
     "test_la_derniere_version_du_chart_est_relevee",
     "test_la_release_est_revenue_a_la_revision_saine",
-    "test_la_revision_en_echec_est_nommee",
+    "test_les_revisions_en_echec_sont_nommees",
     "test_les_tests_du_chart_passent"
    ],
    "passed": 0,
@@ -7907,12 +8021,12 @@
    "total": 4
   },
   "cible": "k8s-cp.lab",
-  "date": "2026-11-16",
-  "duree_s": 340,
+  "date": "2026-11-21",
+  "duree_s": 561,
   "ecarts": [],
   "etapes": [
    "socle amorcé, le lab a été joué puis nettoyé une fois",
-   "cluster photographié, v1.37.2, 12 objets hors kube-system",
+   "cluster photographié, v1.37.2, 44 objets hors kube-system",
    "avant le travail : 0/4",
    "après la solution : 4/4",
    "après clean et run : 0/4",
@@ -7925,7 +8039,7 @@
    "echecs": [
     "test_la_derniere_version_du_chart_est_relevee",
     "test_la_release_est_revenue_a_la_revision_saine",
-    "test_la_revision_en_echec_est_nommee",
+    "test_les_revisions_en_echec_sont_nommees",
     "test_les_tests_du_chart_passent"
    ],
    "passed": 0,
