@@ -13,8 +13,9 @@ Nobody uses it, and it is open.
 
 1. The profiler **no longer answers**.
 
-2. Two other hardening settings are applied to the API server: **effective
-   revocation of service account tokens**, and a **TLS version floor** at 1.2.
+2. The API server **no longer negotiates any CBC cipher suite** in TLS 1.2.
+   It keeps the **AES-GCM** and **ChaCha20-Poly1305** suites, which legitimate
+   clients use.
 
 3. **The cluster still works.** `kubectl get nodes` answers, and the API
    server's static Pod is back to `Running`.
@@ -40,8 +41,11 @@ get stuck, copying it back restores the cluster.
 
 ## How you will know it works
 
-The last test exercises **both halves** of the requirement: `/debug/pprof/`
-must return an error, **and** `/version` must answer normally. An API server
+The profiler test exercises **both halves** of the requirement:
+`/debug/pprof/` must return an error, **and** `/version` must answer normally.
+The cipher suite test opens a real TLS 1.2 connection with `openssl`, once with
+a CBC suite, once with an AES-GCM suite: it measures what the server accepts,
+not what its manifest says. An API server
 at a standstill closes the profiler just as surely as a well-placed flag, and
 that is hardening's most common contradiction.
 

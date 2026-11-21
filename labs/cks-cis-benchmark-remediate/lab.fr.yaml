@@ -1,7 +1,7 @@
 title: "Faire baisser le compte d'un audit CIS, et le vérifier par un second audit"
 doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
 description: |
-  kube-bench audite le control plane contre le référentiel CIS et échoue à dix
-  contrôles sur un cluster kubeadm sorti de l'installation. Corrigez les trois
-  qui partagent une même cause, puis prouvez-le de la seule façon honnête :
-  relancez l'audit et comptez.
+  kube-bench audite un worker contre le référentiel CIS et lui reproche deux
+  contrôles sur un cluster kubeadm sorti de l'installation. Corrigez ces deux
+  contrôles, qui partagent une même cause, puis prouvez-le de la seule façon
+  honnête : relancez l'audit et comptez.

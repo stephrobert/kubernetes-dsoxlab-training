@@ -13,9 +13,9 @@ Personne ne s'en sert, et il est ouvert.
 
 1. Le profileur **ne répond plus**.
 
-2. Deux autres réglages de durcissement sont posés sur l'API server : la
-   **révocation effective des jetons de compte de service**, et un **plancher
-   de version TLS** à 1.2.
+2. L'API server **ne négocie plus de suite de chiffrement CBC** en TLS 1.2.
+   Il garde les suites **AES-GCM** et **ChaCha20-Poly1305**, que les clients
+   légitimes utilisent.
 
 3. **Le cluster fonctionne toujours.** `kubectl get nodes` répond, et le Pod
    statique de l'API server est revenu en `Running`.
@@ -42,8 +42,11 @@ de blocage, le recopier à sa place rend le cluster.
 
 ## Comment vous saurez que c'est bon
 
-Le dernier test exerce **les deux moitiés** de l'exigence : `/debug/pprof/`
-doit rendre une erreur, **et** `/version` doit répondre normalement. Un API
+Le test du profileur exerce **les deux moitiés** de l'exigence :
+`/debug/pprof/` doit rendre une erreur, **et** `/version` doit répondre
+normalement. Le test des suites de chiffrement ouvre une vraie connexion TLS
+1.2 avec `openssl`, une fois avec une suite CBC, une fois avec une suite
+AES-GCM : il mesure ce que le serveur accepte, pas ce que dit son manifeste. Un API
 server à l'arrêt ferme le profileur aussi sûrement qu'un flag bien posé, et
 c'est le contresens le plus fréquent du durcissement.
 

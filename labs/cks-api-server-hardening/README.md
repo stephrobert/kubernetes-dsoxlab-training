@@ -154,8 +154,8 @@ untouched.
 
 ## 🎯 The challenge
 
-Your turn, on your own this time: close the API server's profiler and set two
-hardening settings, without breaking the API.
+Your turn, on your own this time: close the API server's profiler and drop its
+weakest cipher suites, without breaking the API.
 
 ```bash
 dsoxlab run cks-api-server-hardening
