@@ -1,13 +1,21 @@
 """test_functional.py : cks-api-server-hardening
 
-Deux affirmations qui lisent le manifeste du nœud et interrogent l'API server
+Trois affirmations qui lisent le manifeste du nœud et interrogent l'API server
 lui-même, jamais les commandes tapées.
 
-Le dernier test exerce les deux moitiés de la même exigence, et c'est tout
-l'enjeu d'un durcissement : la porte visée doit être fermée, ET le service
-doit continuer de rendre le sien. Un API server arrêté ferme le profileur
-aussi sûrement qu'un flag bien posé, et c'est le contresens le plus fréquent
-du domaine.
+Le test du profileur exerce les deux moitiés de la même exigence, et c'est
+tout l'enjeu d'un durcissement : la porte visée doit être fermée, ET le
+service doit continuer de rendre le sien. Un API server arrêté ferme le
+profileur aussi sûrement qu'un flag bien posé, et c'est le contresens le plus
+fréquent du domaine.
+
+Le test des suites de chiffrement mesure le serveur par une vraie poignée de
+main TLS 1.2, et pas la présence d'un flag. Il remplace, le 2026-11-21, une
+exigence de plancher TLS 1.2 qui n'avait aucun effet observable : l'API server
+de Kubernetes 1.37 refuse déjà TLS 1.1 sans réglage. Ce qu'il accepte par
+défaut, et qui se mesure, ce sont des suites CBC comme ECDHE-RSA-AES128-SHA.
+Le client ouvre `SECLEVEL=0` : sans lui, OpenSSL 3 refuserait certaines
+suites de son côté et ferait croire à un refus du serveur.
 """
 
 from __future__ import annotations
@@ -20,9 +28,11 @@ KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
 MANIFESTE = "/etc/kubernetes/manifests/kube-apiserver.yaml"
 FLAGS_ATTENDUS = (
     "--profiling=false",
-    "--service-account-lookup=true",
-    "--tls-min-version=",
+    "--tls-cipher-suites=",
 )
+API = "127.0.0.1:6443"
+SUITE_CBC = "ECDHE-RSA-AES128-SHA"
+SUITE_AEAD = "ECDHE-RSA-AES128-GCM-SHA256"
 
 
 @pytest.fixture(scope="module")
@@ -37,9 +47,9 @@ def _kubectl(host, args: str):
 
 
 # ----------------------------------------------------------------------
-# 1. Les trois flags sont dans le manifeste.
+# 1. Les deux flags sont dans le manifeste.
 # ----------------------------------------------------------------------
-def test_le_manifeste_porte_les_trois_flags(host):
+def test_le_manifeste_porte_les_deux_flags(host):
     """Ce test ne prouve rien à lui seul, et c'est assumé : un flag écrit dans
     un manifeste que le kubelet n'a pas repris ne change rien. Il est là pour
     que l'échec soit diagnosticable."""
@@ -123,4 +133,40 @@ def test_le_profileur_est_ferme_et_l_api_sert_toujours(host):
         fr="Le profileur est bien fermé, mais l'API ne sert plus les requêtes "
         "ordinaires non plus. Un composant arrêté ferme toutes ses portes : "
         f"ce n'est pas un durcissement. Sortie : {diagnostic}",
+    )
+
+
+# ----------------------------------------------------------------------
+# 3. L'API server ne négocie plus de suite CBC, et garde les suites AEAD.
+# ----------------------------------------------------------------------
+def _suite_negociee(host, suite: str) -> str:
+    """La suite que le serveur accepte quand le client ne propose que `suite`, ou ''."""
+    res = host.run(
+        f"echo | openssl s_client -connect {API} -tls1_2 "
+        f"-cipher '{suite}@SECLEVEL=0' 2>&1 | grep -o -m1 'Cipher is [A-Z0-9-]*'"
+    )
+    return res.stdout.strip().removeprefix("Cipher is ")
+
+
+def test_l_api_server_refuse_les_suites_cbc(host):
+    """Un client qui ne propose qu'une suite CBC doit être refusé, et un client
+    qui propose une suite AES-GCM doit toujours passer : refuser tout TLS 1.2
+    fermerait aussi la porte aux clients légitimes."""
+    vue = _suite_negociee(host, SUITE_CBC)
+    assert vue != SUITE_CBC, message(
+        en=f"The API server still negotiates {SUITE_CBC} in TLS 1.2. CBC suites "
+        "are accepted by default: --tls-cipher-suites limits the server to the "
+        "suites it lists, and the kubelet must have picked up the manifest.",
+        fr=f"L'API server négocie encore {SUITE_CBC} en TLS 1.2. Les suites CBC "
+        "sont acceptées par défaut : --tls-cipher-suites limite le serveur aux "
+        "suites qu'il liste, et le kubelet doit avoir repris le manifeste.",
+    )
+    vue = _suite_negociee(host, SUITE_AEAD)
+    assert vue == SUITE_AEAD, message(
+        en=f"The API server no longer accepts {SUITE_AEAD} in TLS 1.2 (negotiated: "
+        f"{vue or 'nothing'}). Keep the AES-GCM and ChaCha20-Poly1305 suites: "
+        "refusing them closes the door to legitimate clients too.",
+        fr=f"L'API server n'accepte plus {SUITE_AEAD} en TLS 1.2 (négocié : "
+        f"{vue or 'rien'}). Gardez les suites AES-GCM et ChaCha20-Poly1305 : les "
+        "refuser ferme aussi la porte aux clients légitimes.",
     )

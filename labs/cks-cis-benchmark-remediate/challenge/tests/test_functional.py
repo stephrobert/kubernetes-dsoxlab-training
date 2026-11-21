@@ -1,17 +1,18 @@
 """test_functional.py : cks-cis-benchmark-remediate
 
-Deux affirmations qui lisent les manifestes du nœud et relancent l'audit,
-jamais les commandes tapées.
+Deux affirmations qui relancent l'audit du worker, jamais les commandes tapées.
 
-Le dernier test relance kube-bench et compte. C'est le seul moyen honnête de
-mesurer une remédiation : un rapport qui affirme avoir corrigé quelque chose
-sans relancer l'outil n'affirme rien de vérifiable, et c'est exactement ce que
-le lab hérité demandait, sous la forme d'un ConfigMap de texte libre.
+Depuis le 2026-11-21, le lab audite le WORKER k8s-w1.lab (cible node de
+kube-bench) et non plus le control plane : le profilage qu'il faisait corriger
+est le sujet de cks-api-server-hardening, et les deux labs se recouvraient.
 
-Le seuil n'est pas fixe. On exige que les trois contrôles visés passent ET que
-le total d'échecs ait baissé, ce qui reste vrai quelle que soit la version du
-référentiel : kube-bench en ajoute à chaque publication, et un nombre écrit en
-dur serait faux à la prochaine.
+Les deux tests relancent kube-bench et comptent. C'est le seul moyen honnête
+de mesurer une remédiation : un rapport qui affirme avoir corrigé quelque
+chose sans relancer l'outil n'affirme rien de vérifiable.
+
+Le seuil n'est pas fixe au-delà des deux contrôles visés : on exige qu'ils
+passent ET que le total d'échecs du nœud ait baissé, ce qui attrape une
+correction qui en casserait une autre au passage.
 """
 
 from __future__ import annotations
@@ -24,13 +25,13 @@ from conftest import lab_host, lab_target_host, message
 
 NAMESPACE = "conformite"
 KUBECTL = "kubectl --kubeconfig /etc/kubernetes/admin.conf"
-MANIFESTES = "/etc/kubernetes/manifests"
-COMPOSANTS = ("kube-apiserver", "kube-controller-manager", "kube-scheduler")
-#: Les trois contrôles que le référentiel reproche au control plane par
-#: défaut, et qui partagent une même cause.
-CONTROLES_VISES = ("1.2.15", "1.3.2", "1.4.1")
-#: Mesuré le 2026-09-16 sur ce socle : dix échecs avant toute correction.
-ECHECS_AU_DEPART = 10
+NOEUD = "k8s-w1.lab"
+#: Les deux contrôles que le référentiel reproche au worker par défaut, et qui
+#: partagent une même cause : des fichiers du kubelet trop ouverts.
+CONTROLES_VISES = ("4.1.1", "4.1.9")
+#: Mesuré le 2026-11-21 sur ce socle avec kube-bench v0.16.0 : deux échecs sur
+#: la cible node avant toute correction, 4.1.1 et 4.1.9.
+ECHECS_AU_DEPART = 2
 
 
 @pytest.fixture(scope="module")
@@ -44,46 +45,36 @@ def _kubectl(host, args: str):
     return res.rc, res.stdout.strip(), res.stderr.strip()
 
 
-def _audit(host) -> dict:
-    """Relance kube-bench et rend son rapport, décodé.
+@pytest.fixture(scope="module")
+def rapport(host) -> dict:
+    """Relance kube-bench sur le worker et rend son rapport, décodé.
 
-    L'audit est REJOUÉ ici, et non lu dans un fichier que le candidat aurait
-    laissé : un rapport peut être édité, un audit qui tourne sous nos yeux ne
-    peut pas l'être.
+    L'audit est REJOUÉ ici, une fois pour les deux tests, et non lu dans un
+    fichier que le candidat aurait laissé : un rapport peut être édité, un
+    audit qui tourne sous nos yeux ne peut pas l'être.
     """
     _kubectl(host, f"-n {NAMESPACE} delete job kube-bench --ignore-not-found --wait=true")
     rc, _, diagnostic = _kubectl(host, "apply -f /root/kube-bench-job.yaml")
-    assert rc == 0, message(
-        en=f"The kube-bench Job could not be created. {diagnostic}",
-        fr=f"Le Job kube-bench n'a pas pu être créé. {diagnostic}",
-    )
-
+    if rc != 0:
+        pytest.fail(message(
+            en=f"The kube-bench Job could not be created. {diagnostic}",
+            fr=f"Le Job kube-bench n'a pas pu être créé. {diagnostic}",
+        ))
     rc, _, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} wait --for=condition=complete job/kube-bench --timeout=300s"
     )
-    assert rc == 0, message(
-        en=f"The kube-bench audit did not finish. {diagnostic}",
-        fr=f"L'audit kube-bench ne s'est pas terminé. {diagnostic}",
-    )
-    rc, pod, _ = _kubectl(
-        host, f"-n {NAMESPACE} get pods -l job-name=kube-bench "
-        "-o jsonpath='{.items[0].metadata.name}'"
-    )
-    assert rc == 0 and pod, message(
-        en="The audit's Pod cannot be found.",
-        fr="Le Pod de l'audit est introuvable.",
-    )
-    rc, journal, diagnostic = _kubectl(host, f"-n {NAMESPACE} logs {pod}")
-    assert rc == 0 and journal, message(
-        en=f"The audit wrote nothing. {diagnostic}",
-        fr=f"L'audit n'a rien écrit. {diagnostic}",
-    )
-
+    if rc != 0:
+        pytest.fail(message(
+            en=f"The kube-bench audit did not finish. {diagnostic}",
+            fr=f"L'audit kube-bench ne s'est pas terminé. {diagnostic}",
+        ))
+    rc, journal, diagnostic = _kubectl(host, f"-n {NAMESPACE} logs job/kube-bench")
     debut = journal.find("{")
-    assert debut >= 0, message(
-        en="kube-bench's output contains no JSON.",
-        fr="La sortie de kube-bench ne contient pas de JSON.",
-    )
+    if rc != 0 or debut < 0:
+        pytest.fail(message(
+            en=f"The audit wrote no JSON report. {diagnostic}",
+            fr=f"L'audit n'a écrit aucun rapport JSON. {diagnostic}",
+        ))
     return json.loads(journal[debut:])
 
 
@@ -98,90 +89,51 @@ def _resultats(rapport: dict) -> dict[str, str]:
 
 
 # ----------------------------------------------------------------------
-# 1. Les trois manifestes portent la correction.
+# 1. Les deux contrôles visés passent à l'audit rejoué.
 # ----------------------------------------------------------------------
-def test_les_trois_composants_portent_la_correction(host):
-    """Le référentiel reproche le même réglage à trois composants. En corriger
-    un seul laisse deux portes ouvertes, et c'est l'erreur la plus courante :
-    on lit le premier échec, on corrige, on croit avoir fini."""
-    manquants = []
-    for composant in COMPOSANTS:
-        res = host.run(f"sudo cat {MANIFESTES}/{composant}.yaml")
-        if res.rc != 0:
-            manquants.append(f"{composant} (manifeste illisible)")
-        elif "--profiling=false" not in res.stdout:
-            manquants.append(composant)
-    assert not manquants, message(
-        en=f"These components were not fixed: {', '.join(manquants)}. The "
-        "CIS benchmark holds the same setting against all three, under three "
-        "different numbers.",
-        fr=f"Ces composants n'ont pas été corrigés : {', '.join(manquants)}. Le "
-        "référentiel CIS reproche le même réglage aux trois, sous trois "
-        "numéros différents.",
-    )
-
-
-# ----------------------------------------------------------------------
-# 2. LE test : l'audit rejoué compte moins d'échecs.
-# ----------------------------------------------------------------------
-def test_l_audit_rejoue_compte_moins_d_echecs(host):
-    """On relance l'outil, on ne relit pas un rapport.
-
-    Les trois contrôles visés doivent passer, et le total d'échecs doit avoir
-    baissé. Cette seconde condition attrape une correction qui en casserait
-    une autre au passage, ce qu'un contrôle par contrôle ne verrait pas.
-    """
-    # On ATTEND que le control plane soit revenu avant de mesurer quoi que ce
-    # soit. Trois Pods statiques redémarrent, et l'état de chaque objet met un
-    # instant à remonter : mesuré le 2026-09-16, le test lisait « Running
-    # Running Running Pending » et rendait ROUGE un travail juste. C'est le
-    # même piège que le NodePort et que le Pod statique de l'audit : un état
-    # correct dans l'API n'est pas encore un état stabilisé.
-    #
-    # Cette vérification n'a pas de test à elle : « le control plane répond »
-    # est vrai AVANT le travail comme après, et un test toujours vrai ne
-    # mesure rien.
-    for _ in range(40):
-        rc, phases, _ = _kubectl(
-            host,
-            "-n kube-system get pods -l tier=control-plane "
-            "-o jsonpath='{.items[*].status.phase}'",
-        )
-        if rc == 0 and phases and "Pending" not in phases:
-            break
-        host.run("sleep 3")
-    assert rc == 0 and phases and "Pending" not in phases, message(
-        en=f"A control plane Pod stays {phases or 'in an unreadable state'} after "
-        "two minutes. The kubelet could not restart it with the "
-        "new settings: `sudo crictl ps -a` then `sudo crictl logs <id>` "
-        "give the reason.",
-        fr=f"Un Pod du control plane reste en {phases or 'état illisible'} après "
-        "deux minutes. Le kubelet n'a pas réussi à le redémarrer avec les "
-        "nouveaux réglages : `sudo crictl ps -a` puis `sudo crictl logs <id>` "
-        "donnent la raison.",
-    )
-
-    rapport = _audit(host)
+def test_les_deux_controles_vises_passent(rapport):
+    """Le référentiel reproche la même faiblesse à deux fichiers. En corriger
+    un seul en laisse un ouvert, et c'est l'erreur la plus courante : on lit le
+    premier échec, on corrige, on croit avoir fini."""
     etats = _resultats(rapport)
-
-    encore_en_echec = [c for c in CONTROLES_VISES if etats.get(c) != "PASS"]
-    assert not encore_en_echec, message(
-        en="These CIS controls still fail after the audit was replayed: "
-        + ", ".join(f"{c} ({etats.get(c, 'absent from the report')})" for c in encore_en_echec)
-        + ". The manifest may be fixed without the kubelet having picked up "
-        "the Pod: check that the component restarted.",
-        fr="Ces contrôles CIS échouent toujours après l'audit rejoué : "
-        + ", ".join(f"{c} ({etats.get(c, 'absent du rapport')})" for c in encore_en_echec)
-        + ". Le manifeste est peut-être corrigé sans que le kubelet ait repris "
-        "le Pod : vérifiez que le composant a redémarré.",
+    encore = [c for c in CONTROLES_VISES if etats.get(c) != "PASS"]
+    assert not encore, message(
+        en="These CIS controls still fail when the audit of the worker is replayed: "
+        + ", ".join(f"{c} ({etats.get(c, 'absent from the report')})" for c in encore)
+        + ". The remediation is run on the audited node, k8s-w1.lab, not on the "
+        "control plane.",
+        fr="Ces contrôles CIS échouent toujours à l'audit rejoué du worker : "
+        + ", ".join(f"{c} ({etats.get(c, 'absent du rapport')})" for c in encore)
+        + ". La remédiation se joue sur le nœud audité, k8s-w1.lab, pas sur le "
+        "control plane.",
     )
 
+
+# ----------------------------------------------------------------------
+# 2. Le total baisse, et le worker reste un nœud du cluster.
+# ----------------------------------------------------------------------
+def test_le_total_baisse_et_le_noeud_reste_pret(host, rapport):
+    """Un nœud qui ne sert plus passe aussi l'audit de ses fichiers : on exige
+    donc dans le même test que le total d'échecs ait baissé ET que le worker
+    soit toujours Ready."""
     total = sum(int(c.get("total_fail", 0)) for c in rapport.get("Controls", []))
     assert total < ECHECS_AU_DEPART, message(
-        en=f"The audit still counts {total} failure(s), against {ECHECS_AU_DEPART} at "
-        "the start. Fixing one control by breaking another does not bring the "
-        "count down, and that is what this global measurement catches.",
-        fr=f"L'audit compte encore {total} échec(s), contre {ECHECS_AU_DEPART} au "
-        "départ. Corriger un contrôle en cassant un autre ne fait pas baisser "
-        "le compte, et c'est ce que cette mesure globale attrape.",
+        en=f"The audit of the worker still counts {total} failure(s), against "
+        f"{ECHECS_AU_DEPART} at the start. Fixing one control by breaking another "
+        "does not bring the count down.",
+        fr=f"L'audit du worker compte encore {total} échec(s), contre "
+        f"{ECHECS_AU_DEPART} au départ. Corriger un contrôle en cassant un autre "
+        "ne fait pas baisser le compte.",
+    )
+    rc, pret, _ = _kubectl(
+        host,
+        "get node " + NOEUD + " -o jsonpath='{.status.conditions[?(@.type==\"Ready\")].status}'",
+    )
+    assert rc == 0 and pret == "True", message(
+        en=f"The worker {NOEUD} is no longer Ready ({pret or 'unreadable'}). A "
+        "hardening that stops the kubelet is not one: `systemctl status kubelet` "
+        "on the node gives the reason.",
+        fr=f"Le worker {NOEUD} n'est plus Ready ({pret or 'illisible'}). Un "
+        "durcissement qui arrête le kubelet n'en est pas un : `systemctl status "
+        "kubelet` sur le nœud donne la raison.",
     )

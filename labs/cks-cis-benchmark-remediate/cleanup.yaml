@@ -1,85 +1,24 @@
 ---
-# Joué par `dsoxlab clean` : rend les trois manifestes du control plane tels
-# qu'ils étaient, puis retire le namespace d'audit.
+# Joué par `dsoxlab clean` : rend aux fichiers du kubelet du worker leurs
+# droits d'installation, puis retire le namespace d'audit.
 #
-# Les trois composants sont des Pods STATIQUES : leurs fichiers vivent sur le
-# nœud, hors du cluster, et le validateur ne les photographie pas. Les laisser
-# modifiés ferait passer le premier test du prochain passage avant tout
-# travail.
+# Ces fichiers vivent sur le nœud, hors du cluster, et le validateur ne les
+# photographie pas. Les laisser resserrés ferait passer le premier test du
+# prochain passage avant tout travail.
 - name: Nettoyer le lab cks-cis-benchmark-remediate
   hosts: lab_target
   become: true
+  vars:
+    noeud_audite: k8s-w1.lab
   tasks:
-    - name: Relever l'empreinte des Pods statiques avant la restauration
-      # Le kubelet recrée un Pod statique dont le manifeste change, mais pas
-      # tout de suite : juste après la copie, le Pod miroir montre encore
-      # l'ancien conteneur Running. Attendre « rien en Pending » passait alors
-      # aussitôt, puis le Pod repassait Pending (mesuré le 2026-11-12). On
-      # attend donc que son empreinte change.
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
-        get pod {{ item }}-{{ inventory_hostname }}
-        -o jsonpath={.metadata.annotations.kubernetes\\.io/config\\.hash}
+    - name: Rendre aux fichiers du kubelet du worker leurs droits d'installation
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: "0644"
       loop:
-        - kube-apiserver
-        - kube-controller-manager
-        - kube-scheduler
-      register: empreintes_avant
-      changed_when: false
-      failed_when: false
-
-    - name: Restaurer les manifestes du control plane
-      register: restauration
-      ansible.builtin.copy:
-        src: "/var/backups/{{ item }}.avant-cis.yaml"
-        dest: "/etc/kubernetes/manifests/{{ item }}.yaml"
-        remote_src: true
-        mode: "0600"
-      loop:
-        - kube-apiserver
-        - kube-controller-manager
-        - kube-scheduler
-      failed_when: false
-
-    - name: Attendre que l'API server réponde à nouveau
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw /healthz
-      register: sante
-      until: sante.rc == 0
-      retries: 40
-      delay: 3
-      changed_when: false
-      failed_when: false
-
-    - name: Attendre que chaque Pod statique restauré ait changé d'empreinte et soit prêt
-      ansible.builtin.shell: |
-        set -o pipefail
-        K="kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system"
-        pod="{{ item.0.item }}-{{ inventory_hostname }}"
-        empreinte=$($K get pod "$pod" -o jsonpath='{.metadata.annotations.kubernetes\.io/config\.hash}')
-        pret=$($K get pod "$pod" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
-        [ -n "$empreinte" ] && [ "$empreinte" != "{{ item.0.stdout }}" ] && [ "$pret" = "True" ]
-      args:
-        executable: /bin/bash
-      loop: "{{ empreintes_avant.results | zip(restauration.results) | list }}"
-      when: item.1.changed
-      register: recree
-      until: recree.rc == 0
-      retries: 60
-      delay: 3
-      changed_when: false
-      failed_when: false
-
-    - name: Attendre que les Pods du control plane soient Running
-      ansible.builtin.command: >-
-        kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system
-        get pods -l tier=control-plane
-        -o jsonpath={.items[*].status.phase}
-      register: phases
-      until: phases.stdout and 'Pending' not in phases.stdout
-      retries: 40
-      delay: 3
-      changed_when: false
+        - /lib/systemd/system/kubelet.service
+        - /var/lib/kubelet/config.yaml
+      delegate_to: "{{ noeud_audite }}"
       failed_when: false
 
     - name: Supprimer le namespace d'audit

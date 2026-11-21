@@ -1,11 +1,39 @@
 ---
 # Joué par `dsoxlab run` avant d'ouvrir la session.
+#
+# Le lab audite le WORKER k8s-w1.lab (cible node de kube-bench). Depuis le
+# 2026-11-21, il ne touche plus au control plane : le profilage, qu'il faisait
+# corriger, est le sujet de cks-api-server-hardening.
 - name: Préparer le lab cks-cis-benchmark-remediate
   hosts: lab_target
   become: true
+  vars:
+    noeud_audite: k8s-w1.lab
+    # Les deux fichiers que les contrôles 4.1.1 et 4.1.9 jugent trop ouverts
+    # sur un nœud kubeadm sorti de l'installation. On les remet dans cet état,
+    # 0644, pour qu'un passage précédent ne fasse pas réussir le lab d'avance.
+    fichiers_kubelet:
+      - /lib/systemd/system/kubelet.service
+      - /var/lib/kubelet/config.yaml
   tasks:
     - name: Installer le socle, le cluster kubeadm du catalogue
       ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Remettre les fichiers du kubelet du worker dans leur état d'installation
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: "0644"
+      loop: "{{ fichiers_kubelet }}"
+      delegate_to: "{{ noeud_audite }}"
+
+    - name: Tirer l'image de kube-bench sur le worker audité
+      # Le premier audit du candidat ne doit pas passer plusieurs minutes à la
+      # télécharger.
+      ansible.builtin.command: >-
+        crictl pull aquasec/kube-bench:v0.16.0@sha256:75506f222d1eb6ce2a751a5533bdc0a3b54c898e2e49e7751d0ee22cfb862679
+      delegate_to: "{{ noeud_audite }}"
+      changed_when: false
+      failed_when: false
 
     - name: Déposer le Job kube-bench sur le nœud
       ansible.builtin.copy:
