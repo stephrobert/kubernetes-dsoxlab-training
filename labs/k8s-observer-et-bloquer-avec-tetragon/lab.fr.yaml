@@ -1,0 +1,16 @@
+title: "Observer la lecture d'un fichier sensible avec Tetragon, puis la bloquer"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+description: |
+  Une clé d'API montée depuis un Secret est lue par l'un des Pods du namespace
+  comptes. Faites voir ces lectures à Tetragon, trouvez dans ses événements
+  quel Pod et quel binaire lisent la clé, puis passez la politique en blocage :
+  la lecture est tuée, et rien d'autre.
+criteria:
+  - id: lecture-observee
+    label: "Tetragon rapporte une lecture de la clé, avec le Pod et le binaire"
+  - id: lecteur-identifie
+    label: "Le constat nomme le Pod et le binaire qui lisent la clé"
+  - id: lecture-bloquee
+    label: "Lire la clé tue le processus"
+  - id: blocage-cible
+    label: "Le blocage ne vise que la clé : les autres fichiers se lisent toujours"

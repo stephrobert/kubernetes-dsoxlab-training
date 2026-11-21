@@ -1,0 +1,41 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+#
+# Tetragon 1.8.0, la dernière version du chart cilium/tetragon (publiée le
+# 2026-10-30), indépendant du CNI : le cluster du module reste en Calico.
+# Les nœuds ont le BTF que Tetragon exige (noyau 6.8, /sys/kernel/btf/vmlinux,
+# relevé le 2026-11-21).
+- name: Préparer le lab k8s-observer-et-bloquer-avec-tetragon
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser Helm 4.3.2 avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: helm
+        outil_version: "4.3.2"
+        outil_verification: version --short
+
+    - name: Installer Tetragon 1.8.0
+      ansible.builtin.shell: |
+        set -euo pipefail
+        helm repo add cilium https://helm.cilium.io --force-update
+        helm repo update cilium
+        helm upgrade --install tetragon cilium/tetragon --version 1.8.0 \
+          --namespace kube-system --wait --timeout 5m
+        kubectl -n kube-system rollout status ds/tetragon --timeout=300s
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: true
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

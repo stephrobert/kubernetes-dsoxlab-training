@@ -1,0 +1,43 @@
+---
+# Joué par `dsoxlab clean` : retire les politiques, l'application, puis
+# Tetragon lui-même et ses CRD. Le validateur photographie le cluster avant le
+# lab et après le nettoyage : un Tetragon laissé en place serait un écart, et
+# une TracingPolicy oubliée continuerait de tuer des processus au lab suivant.
+- name: Nettoyer le lab k8s-observer-et-bloquer-avec-tetragon
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Retirer toutes les TracingPolicy, d'abord
+      ansible.builtin.shell: |
+        kubectl delete tracingpolicies.cilium.io --all --ignore-not-found
+        kubectl delete tracingpoliciesnamespaced.cilium.io --all -A --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: kubectl delete namespace comptes --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Désinstaller Tetragon
+      ansible.builtin.command: helm uninstall tetragon --namespace kube-system --wait --timeout 5m
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les CRD de Tetragon, que helm uninstall laisse
+      ansible.builtin.shell: |
+        kubectl get crd -o name | grep -E 'cilium\.io' | grep -iE 'tracingpolic|podinfo' \
+          | xargs -r kubectl delete --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer la mémoire du tirage
+      ansible.builtin.file:
+        path: /var/lib/dsoxlab/k8s-observer-et-bloquer-avec-tetragon.json
+        state: absent
