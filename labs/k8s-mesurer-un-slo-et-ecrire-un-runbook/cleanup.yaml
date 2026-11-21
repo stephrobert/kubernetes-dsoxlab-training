@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab clean` : retire l'application, le journal de la sonde, la
+# mémoire du tirage, et le runbook écrit pendant le lab. Laisser le runbook
+# ferait réussir son test au passage suivant, avant tout travail.
+- name: Nettoyer le lab k8s-mesurer-un-slo-et-ecrire-un-runbook
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace de l'application
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace catalogue
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Trouver le répertoire de la session
+      ansible.builtin.command: getent passwd {{ ansible_user | default('ansible') }}
+      register: session
+      changed_when: false
+
+    - name: Retirer le journal, la mémoire du tirage et le runbook
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /srv/catalogue
+        - /var/lib/dsoxlab/k8s-mesurer-un-slo-et-ecrire-un-runbook.json
+        - "{{ session.stdout.split(':')[5] }}/runbooks/catalogue-indisponible.sh"

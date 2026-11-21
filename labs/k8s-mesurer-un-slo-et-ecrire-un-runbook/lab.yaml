@@ -1,0 +1,75 @@
+id: k8s-mesurer-un-slo-et-ecrire-un-runbook
+title: "Write a runbook that replays, and measure an application's SLO"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  The application catalogue is down after a bad image was pushed. Write the
+  runbook that brings it back, so that anyone can replay it at the next
+  incident without breaking anything, then measure its availability over the
+  last 30 days against its objective, and say how much error budget is left.
+skills:
+  - runbook
+  - sli-slo
+  - error-budget
+  - rollout-undo
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise vérifiée : le lab pointe la page
+# française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+lab_type: lab
+estimated_time: 30m
+
+# Lab guidé de la leçon « SRE et exploitation Kubernetes au quotidien »,
+# commandé le 2026-11-21 : une leçon avec lab guidé entre le challenge du module
+# Fiabiliser et exploiter (k8s-challenge-garantir-la-disponibilite) et
+# l'épreuve du niveau 4. L'alerte sur le SLO n'en fait pas partie : la leçon
+# n'enseigne pas comment l'écrire, elle va dans le challenge d'observation.
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: service-rendu
+    label: "The catalogue application answers again, on its last good image"
+    tests:
+      - test_le_catalogue_repond_sur_sa_bonne_image
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+  - id: runbook-efficace
+    label: "The runbook brings the service back after the same incident, replayed by someone else"
+    tests:
+      - test_le_runbook_remet_le_service_apres_la_meme_panne
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+  - id: runbook-rejouable
+    label: "Replayed on a healthy service, the runbook exits 0 and changes nothing"
+    tests:
+      - test_le_runbook_se_rejoue_sans_rien_abimer
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+  - id: sli-mesure
+    label: "The availability SLI over 30 days and the 99.5 % SLO are recorded"
+    tests:
+      - test_le_sli_et_le_slo_sont_consignes
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+  - id: budget-juste
+    label: "The remaining error budget, in minutes, is right"
+    tests:
+      - test_le_budget_d_erreur_restant_est_juste
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+
+feedback: full
