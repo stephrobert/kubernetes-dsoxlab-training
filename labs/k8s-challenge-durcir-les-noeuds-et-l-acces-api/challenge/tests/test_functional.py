@@ -177,11 +177,26 @@ def _servir_et_joindre(cp) -> tuple[bool, str]:
                       "containers": [{"name": "c", "image": BUSYBOX, "command": ["sleep", "600"]}]}},
         ],
     }
-    cp.run(f"echo '{json.dumps(manifeste)}' | {KUBECTL} apply -f -")
+    # Juste après un redémarrage de l'API server, le controller manager met
+    # quelques secondes à reprendre : le compte de service `default` d'un
+    # namespace neuf n'existe pas encore, et l'API refuse les Pods (mesuré le
+    # 2026-11-22 : premier passage sans Pod, les suivants verts).
+    for _ in range(30):
+        if cp.run(f"{KUBECTL} -n {NS} get serviceaccount default").rc == 0:
+            break
+        time.sleep(2)
+    applique = cp.run(f"echo '{json.dumps(manifeste)}' | {KUBECTL} apply -f -")
     try:
-        pret = cp.run(f"{KUBECTL} -n {NS} wait --for=condition=Ready pod/web pod/client --timeout=150s")
+        if applique.rc != 0:
+            return False, f"les Pods de sonde ne se créent pas : {applique.stderr.strip()[:200]}"
+        pret = cp.run(f"{KUBECTL} -n {NS} wait --for=condition=Ready pod/web pod/client --timeout=240s")
         if pret.rc != 0:
-            return False, f"Pods de sonde pas prêts : {pret.stderr.strip()[:160]}"
+            etat = cp.run(f"{KUBECTL} -n {NS} get pods -o wide --no-headers").stdout.strip()
+            evenements = cp.run(
+                f"{KUBECTL} -n {NS} get events --sort-by=.lastTimestamp -o custom-columns=R:.reason,M:.message "
+                "--no-headers"
+            ).stdout.strip().splitlines()[-3:]
+            return False, f"Pods de sonde pas prêts ({etat}) : {' / '.join(evenements)[:300]}"
         res = cp.run(f"{KUBECTL} -n {NS} exec client -- wget -qO- -T 5 http://web.{NS}/")
         if "Welcome to nginx" not in res.stdout:
             return False, "un Pod de k8s-w1 ne joint pas le Pod de k8s-w2 par son Service"
