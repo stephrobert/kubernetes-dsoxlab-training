@@ -1,0 +1,49 @@
+---
+- name: Préparer le challenge k8s-challenge-livrer-avec-helm-et-gitops
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle kind
+      ansible.builtin.include_tasks: ../../shared/kind-cluster.yml
+      vars:
+        kind_cluster_name: lab
+
+    - name: Poser Helm 4.3.2 avec mise
+      ansible.builtin.include_tasks: ../../shared/outil-par-mise.yml
+      vars:
+        outil_nom: helm
+        outil_version: "4.3.2"
+        outil_verification: version --short
+
+    # Les clés d'hôte de la VM, telles que le réseau kind la voit (172.18.0.1,
+    # la passerelle du réseau docker « kind »), passent par les values du
+    # chart : Helm 4 applique côté serveur, et un ConfigMap modifié à la main
+    # fait échouer l'upgrade suivant (mesuré le 2026-11-22). --force-conflicts
+    # reprend la main sur une configuration retouchée par l'apprenant.
+    - name: Installer Argo CD (chart 10.10.5, Argo CD v3.5.5), sans Dex, notifications ni ApplicationSet
+      ansible.builtin.shell: |
+        set -euo pipefail
+        install -d -m 0700 /root/.lab-livrer
+        ssh-keyscan -T 5 172.18.0.1 2> /dev/null | sort > /root/.lab-livrer/hotes-connus
+        test -s /root/.lab-livrer/hotes-connus
+        helm repo add argo https://argoproj.github.io/argo-helm --force-update
+        helm repo update argo
+        helm upgrade --install argocd argo/argo-cd --version 10.10.5 \
+          --namespace argocd --create-namespace --force-conflicts \
+          --set dex.enabled=false --set notifications.enabled=false \
+          --set applicationSet.replicas=0 \
+          --set-file configs.ssh.extraHosts=/root/.lab-livrer/hotes-connus \
+          --wait --timeout 10m
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+      changed_when: true
+
+    - name: Poser le registre, le contexte de build, le chart et le dépôt Git
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kind/lab.kubeconfig
+        LAB_USER: "{{ ansible_user | default('ansible') }}"

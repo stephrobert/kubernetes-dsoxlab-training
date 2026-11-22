@@ -446,6 +446,10 @@ sections:
       - ckad-helm-install-upgrade
       - k8s-surcharger-les-values-d-un-chart-helm
       - k8s-gerer-les-images
+      # Le challenge du module « Empaqueter et livrer » (niveau 2), commandé le
+      # 2026-11-21 : image construite et épinglée par digest, release Helm depuis
+      # un fichier de values, mise à jour puis retour, et Argo CD synchronisé.
+      - k8s-challenge-livrer-avec-helm-et-gitops
       - ckad-init-container
       - ckad-multi-container-sidecar
       - ckad-job-cronjob

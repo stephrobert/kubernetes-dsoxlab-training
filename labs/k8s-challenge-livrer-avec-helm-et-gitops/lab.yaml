@@ -1,0 +1,102 @@
+# Challenge du module « Empaqueter et livrer » (niveau 2), commandé le
+# 2026-11-21 (décision D02 : un challenge par module). Il note les gestes des
+# labs guidés du module sans en refaire un : installer une release avec un
+# fichier de values, la mettre à jour puis revenir à une révision, construire
+# une image et la faire tourner épinglée par digest, et faire suivre un dépôt
+# Git par un outil GitOps jusqu'à l'état synchronisé.
+#
+# L'outil GitOps est Argo CD, installé par Helm comme le montre la leçon GitOps
+# du site (elle cite le chart 10.9.6, Argo CD v3.5.3 ; le challenge épingle la
+# dernière version, chart 10.10.5, Argo CD v3.5.5, même version majeure).
+# Mesuré le 2026-11-22 sur la VM kind (3 Go) : avec le cluster « lab », 1,65 Go
+# utilisés, sans Dex, notifications ni ApplicationSet. Le dépôt Git vit sur la
+# VM et Argo CD le lit en SSH par 172.18.0.1, la passerelle du réseau kind.
+#
+# Objets distincts de k8s-challenge-livrer-une-image-verifiee (signature, scan,
+# admission) et de k8s-challenge-ramener-le-cluster-au-depot (dérive corrigée
+# à la main).
+#
+# `lab_type: challenge` : six critères à poids égal, seuil 70, deux bloquants.
+# Aucun indice (D91). Le doc_url pointe provisoirement la leçon GitOps, en
+# attendant la page du challenge.
+id: k8s-challenge-livrer-avec-helm-et-gitops
+title: "Ship an application with Helm and GitOps, from a built image"
+level: application-deployment
+section: ckad
+difficulty: intermediate
+description: |
+  Without guidance, build an image and push it to the cluster registry,
+  install it with Helm from a values file and pinned by digest, upgrade the
+  release then bring it back to the revision asked for, and make Argo CD
+  follow a Git repository until it is synchronised on a change you pushed.
+skills:
+  - docker-build
+  - image-digest
+  - helm
+  - helm-rollback
+  - argocd
+  - gitops
+distros:
+  - debian13
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/delivery/gitops/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Le cœur du geste, qu'aucun total ne compense : l'image construite qui
+  # tourne par son digest, et Argo CD synchronisé sur le dernier commit.
+  - test_la_vitrine_tourne_par_digest
+  - test_argo_cd_suit_le_depot_jusqu_a_la_synchro
+estimated_time: 60m
+
+certification_tags:
+  - ckad
+
+runtime:
+  type: vm
+  targets:
+    - name: kind
+      host: k8s-kind.lab
+  default: kind
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: image-construite
+    label: "The image is built from ~/livraison/app and pushed to the cluster registry as vitrine:1.0"
+    tests:
+      - test_l_image_est_construite_et_poussee
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/images-conteneurs/ecrire-dockerfile/
+  - id: release-depuis-values
+    label: "The release vitrine is installed from the values file, with 2 copies"
+    tests:
+      - test_la_release_est_installee_avec_le_fichier_de_values
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-values/
+  - id: image-par-digest
+    label: "vitrine runs the built image, pulled by its digest"
+    tests:
+      - test_la_vitrine_tourne_par_digest
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kubernetes-images/
+  - id: mise-a-jour-et-retour
+    label: "The release was upgraded to 3 copies, then brought back to revision 1"
+    tests:
+      - test_la_release_est_mise_a_jour_puis_ramenee_a_la_revision_1
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-install-releases/
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/tools/helm/helm-command-reference/
+  - id: argo-cd-synchronise
+    label: "Argo CD follows the catalogue repository, with automated sync, Synced and Healthy on its last commit"
+    tests:
+      - test_argo_cd_suit_le_depot_jusqu_a_la_synchro
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/delivery/gitops/
+  - id: changement-par-git
+    label: "The change to 2 copies of catalogue is written in Git, pushed, and running in the cluster"
+    tests:
+      - test_le_changement_passe_par_git
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/delivery/gitops/
