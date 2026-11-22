@@ -33,7 +33,7 @@ skills:
   - least-privilege
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/identite-et-droits-minimaux/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/challenges/identity-and-least-privilege/#put-it-into-practice
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
