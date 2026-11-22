@@ -13,7 +13,7 @@ You work in the `essai-capture` namespace, with an `echo` server and a
 Pods and other failures, drawn at random: you will do it on your own, at the
 end.
 
-Related page: [Capture the traffic of a Pod](https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/reseau-avance/capturer-trafic-pod/) (in French).
+Related page: [Capture the traffic of a Pod](https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/capture-pod-traffic/).
 
 ## 🔧 Before you start
 
