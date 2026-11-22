@@ -6094,6 +6094,65 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-challenge-livrer-avec-helm-et-gitops": {
+  "apres": {
+   "echecs": [],
+   "passed": 6,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 6
+  },
+  "avant": {
+   "echecs": [
+    "test_argo_cd_suit_le_depot_jusqu_a_la_synchro",
+    "test_l_image_est_construite_et_poussee",
+    "test_la_release_est_installee_avec_le_fichier_de_values",
+    "test_la_release_est_mise_a_jour_puis_ramenee_a_la_revision_1",
+    "test_la_vitrine_tourne_par_digest",
+    "test_le_changement_passe_par_git"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "cible": "k8s-kind.lab",
+  "date": "2026-11-22",
+  "duree_s": 228,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.0, 21 objets hors kube-system",
+   "avant le travail : 0/6",
+   "après la solution : 6/6",
+   "après clean et run : 0/6",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-challenge-livrer-avec-helm-et-gitops.log",
+  "kubernetes": "v1.37.0",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_argo_cd_suit_le_depot_jusqu_a_la_synchro",
+    "test_l_image_est_construite_et_poussee",
+    "test_la_release_est_installee_avec_le_fichier_de_values",
+    "test_la_release_est_mise_a_jour_puis_ramenee_a_la_revision_1",
+    "test_la_vitrine_tourne_par_digest",
+    "test_le_changement_passe_par_git"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 6
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-challenge-livrer-une-image-verifiee": {
   "apres": {
    "echecs": [],
