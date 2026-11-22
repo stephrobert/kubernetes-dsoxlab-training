@@ -535,6 +535,10 @@ sections:
       # join, le kubelet fermé, NodeRestriction rendu. Après le durcissement
       # du profileur, sur le même Pod statique.
       - cks-restreindre-l-acces-anonyme
+      # Le challenge du module Identités, accès et nœuds (niveau 5), après ses
+      # quatre labs guidés : surface, SSH et sudo, kubelet et pare-feu de
+      # k8s-w2, puis l'anonyme restreint sur l'API server.
+      - k8s-challenge-durcir-les-noeuds-et-l-acces-api
       - cks-apparmor-confiner-un-pod
       - cks-seccomp-profile
       - cks-pod-security-admission

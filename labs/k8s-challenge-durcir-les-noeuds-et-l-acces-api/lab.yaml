@@ -1,0 +1,121 @@
+# Challenge du module « Identités, accès et nœuds » (niveau 5), commandé le
+# 2026-11-21 (décision D02 : un challenge par module). Il note les gestes des
+# quatre labs guidés du module sans en refaire un :
+#
+#   - cks-reduire-la-surface-du-noeud : purger un paquet, désactiver une unité
+#     qu'aucun paquet ne fournit, ici activée par une socket ;
+#   - cks-restreindre-l-acces-au-noeud : SSH réservé à un groupe, par clé, et
+#     un compte réduit à rien ;
+#   - cks-fermer-l-acces-reseau-au-noeud : une chaîne d'entrée en drop qui
+#     laisse passer les flux du cluster et survit au redémarrage ;
+#   - cks-restreindre-l-acces-anonyme : l'anonyme gardé sur la santé et la
+#     découverte de kubeadm join, et ici le kubelet d'un WORKER fermé, port en
+#     lecture seule compris.
+#
+# Objets distincts des labs guidés (apache2 et une socket sur 9090, compte
+# prestataire, groupe ops-noeuds, liaison annuaire-public) et sans
+# recouvrement avec k8s-challenge-durcir-le-plan-de-controle (kube-bench,
+# audit) ni l'épreuve N5.
+#
+# `lab_type: challenge` : sept critères à poids égal, seuil 70, deux bloquants.
+# Aucun indice (D91). Le doc_url pointe provisoirement la leçon « Durcir les
+# nœuds », en attendant la page du challenge.
+id: k8s-challenge-durcir-les-noeuds-et-l-acces-api
+title: "Harden a worker node and the access to the API server, without breaking the cluster"
+level: system-hardening
+section: cks
+difficulty: advanced
+description: |
+  Without guidance, take a worker node delivered from an old server template
+  down to what Kubernetes needs: superfluous services removed, SSH reserved to
+  one group by key, a contractor account stripped of its rights, a kubelet
+  closed to anonymous clients, a firewall that survives a reboot. Then restrict
+  anonymous access to the API server without breaking the health probes or
+  kubeadm join.
+skills:
+  - attack-surface
+  - ssh-hardening
+  - sudo
+  - kubelet-authentication
+  - nftables
+  - anonymous-auth
+distros:
+  - ubuntu24
+# La leçon n'a pas encore de jumelle anglaise (relevé du 2026-11-17) : le
+# challenge pointe la page française.
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+lab_type: challenge
+exam_passing_score: 70
+exam_blocking_checks:
+  # Les deux « sans rien casser » du module, qu'aucun total ne compense :
+  # l'API server fermé sans perdre la santé ni kubeadm join, et le nœud qui
+  # reste durci et Ready après un vrai redémarrage.
+  - test_l_api_server_ne_repond_a_l_anonyme_que_pour_la_sante
+  - test_le_noeud_reste_durci_apres_redemarrage
+estimated_time: 60m
+
+certification_tags:
+  - cks
+
+# Le nœud travaillé est l'hôte OPTIONNEL k8s-w2.lab, comme dans les labs
+# guidés : une erreur dans AllowGroups ou dans une politique drop enferme
+# dehors un nœud jetable, pas le cluster partagé.
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+      roles:
+        worker: k8s-w1.lab
+        worker2: k8s-w2.lab
+  default: cp
+
+validation:
+  functional: true
+  security: true
+  persistence_after_reboot: true
+
+criteria:
+  - id: surface-reduite
+    label: "k8s-w2 no longer runs the superfluous services: apache2 purged, the inventory socket stopped and disabled"
+    tests:
+      - test_la_surface_du_noeud_est_reduite
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: ssh-reserve
+    label: "Only the members of ops-noeuds (ansible and student) open an SSH session on k8s-w2, by key, never root"
+    tests:
+      - test_ssh_est_reserve_au_groupe_et_par_cle
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: prestataire-sans-droit
+    label: "The contractor account is kept, with no sudo rights left"
+    tests:
+      - test_le_prestataire_perd_ses_droits
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+      - https://www.stephane-robert.info/docs/cloud/securite/iam/
+  - id: kubelet-ferme
+    label: "The kubelet of k8s-w2 answers 401 to anonymous clients, 403 to an account with no rights, and its read-only port is closed"
+    tests:
+      - test_le_kubelet_refuse_l_anonyme_et_delegue
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+  - id: pare-feu
+    label: "A drop input chain closes k8s-w2, while SSH from the control plane, the kubelet and the Pod traffic still pass"
+    tests:
+      - test_le_pare_feu_ne_laisse_passer_que_les_flux_utiles
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
+  - id: api-anonyme
+    label: "The API server answers anonymous clients only on the health paths and cluster-info, with no extra RBAC binding"
+    tests:
+      - test_l_api_server_ne_repond_a_l_anonyme_que_pour_la_sante
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/restreindre-acces-api-server/
+  - id: durci-apres-redemarrage
+    label: "After a real reboot, k8s-w2 comes back Ready, with its firewall, without its superfluous ports, kubelet still closed"
+    tests:
+      - test_le_noeud_reste_durci_apres_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/durcir-les-noeuds/
