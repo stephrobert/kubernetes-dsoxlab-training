@@ -131,8 +131,8 @@ the server on `k8s-w1`. Leave `k8s-w2` (`exit`), then, from `k8s-cp`, start
 the server capture in the background and the probe capture right after:
 
 ```bash
-ssh k8s-w1.lab 'dev=$(ip route get 10.244.38.94 | grep -o "dev [^ ]*" | cut -d" " -f2); mkdir -p /tmp/essai-captures; sudo timeout 7 tcpdump -i $dev -nn -U -w /tmp/essai-captures/echo.pcap tcp' &
-ssh k8s-w2.lab 'dev=$(ip route get 10.244.223.33 | grep -o "dev [^ ]*" | cut -d" " -f2); mkdir -p /tmp/essai-captures; sudo timeout 7 tcpdump -i $dev -nn -U -w /tmp/essai-captures/sonde.pcap tcp'; wait
+ssh k8s-w1.lab 'dev=$(ip route get 10.244.38.94 | grep -o "dev [^ ]*" | cut -d" " -f2); mkdir -p /tmp/essai-captures; sudo timeout 7 tcpdump -i $dev -nn -U -w /tmp/essai-captures/echo.pcap tcp 2>/dev/null' &
+ssh k8s-w2.lab 'dev=$(ip route get 10.244.223.33 | grep -o "dev [^ ]*" | cut -d" " -f2); mkdir -p /tmp/essai-captures; sudo timeout 7 tcpdump -i $dev -nn -U -w /tmp/essai-captures/sonde.pcap tcp 2>/dev/null'; wait
 ssh k8s-w2.lab 'sudo tcpdump -nn -r /tmp/essai-captures/sonde.pcap 2>/dev/null | head -2'
 ssh k8s-w1.lab 'sudo tcpdump -nn -r /tmp/essai-captures/echo.pcap 2>/dev/null | head -2'
 ```
@@ -202,7 +202,7 @@ exist, first short, then complete with a final dot. Replace `cali84f4a66edb5`
 with the interface found in exercise 1:
 
 ```bash
-ssh k8s-w2.lab 'sudo mkdir -p /tmp/essai-captures; sudo timeout 12 tcpdump -i cali84f4a66edb5 -nn -U -w /tmp/essai-captures/dns-court.pcap udp port 53' &
+ssh k8s-w2.lab 'sudo mkdir -p /tmp/essai-captures; sudo timeout 12 tcpdump -i cali84f4a66edb5 -nn -U -w /tmp/essai-captures/dns-court.pcap udp port 53 2>/dev/null' &
 sleep 2; time kubectl -n essai-capture exec sonde -- curl -sS -m 8 'http://inconnu-essai/'; wait
 ssh k8s-w2.lab "sudo tcpdump -nn -r /tmp/essai-captures/dns-court.pcap 2>/dev/null | grep 'A? inconnu' | cut -d' ' -f3-"
 ```
@@ -234,7 +234,7 @@ with the same identifier. Those last two sends, unanswered, bring the command
 to 5 seconds. Run the measure again with the complete name:
 
 ```bash
-ssh k8s-w2.lab 'sudo timeout 12 tcpdump -i cali84f4a66edb5 -nn -U -w /tmp/essai-captures/dns-complet.pcap udp port 53' &
+ssh k8s-w2.lab 'sudo timeout 12 tcpdump -i cali84f4a66edb5 -nn -U -w /tmp/essai-captures/dns-complet.pcap udp port 53 2>/dev/null' &
 sleep 2; time kubectl -n essai-capture exec sonde -- curl -sS -m 8 'http://inconnu-essai.essai-capture.svc.cluster.local./'; wait
 ssh k8s-w2.lab "sudo tcpdump -nn -r /tmp/essai-captures/dns-complet.pcap 2>/dev/null | grep 'A? inconnu' | cut -d' ' -f3-"
 ```
