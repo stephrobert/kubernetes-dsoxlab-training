@@ -1,5 +1,5 @@
 title: "Appliquer et vérifier ses manifests, d'après un cahier des charges"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/outils/kustomize/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/appliquer-et-verifier-ses-manifests/#mettre-en-pratique
 description: |
   Sans guidage, écrivez les manifests d'une application d'après un cahier des
   charges qui ne nomme jamais les objets, trouvez avec explain le champ d'API
