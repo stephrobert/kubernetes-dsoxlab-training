@@ -8,8 +8,8 @@
 # l'épreuve N2.
 #
 # `lab_type: challenge` : six critères à poids égal, seuil 70, deux bloquants.
-# Aucun indice (D91). Le doc_url pointe provisoirement la leçon Kustomize, la
-# dernière du module, en attendant la page du challenge.
+# Aucun indice (D91). Le doc_url pointe la page du challenge, section
+# « Mettre en pratique » (publiée le 2026-11-22).
 id: k8s-challenge-appliquer-et-verifier-ses-manifests
 title: "Apply and check your manifests, from a set of requirements"
 level: application-deployment
@@ -30,7 +30,7 @@ skills:
   - kustomize
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/kustomize/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/challenges/apply-and-check-your-manifests/#put-it-into-practice
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:
