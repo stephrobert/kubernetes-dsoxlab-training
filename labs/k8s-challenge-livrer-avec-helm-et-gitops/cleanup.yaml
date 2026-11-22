@@ -1,0 +1,87 @@
+---
+# Joué par `dsoxlab clean` : retire tout ce que le challenge et l'apprenant ont
+# posé sur k8s-kind.lab. Le cluster kind « lab » reste : il appartient au socle,
+# mais il doit revenir tel que le socle l'a laissé, donc sans Argo CD ni ses CRD.
+- name: Nettoyer le challenge k8s-challenge-livrer-avec-helm-et-gitops
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kind/lab.kubeconfig
+  tasks:
+    # Une Application sans finalizer se supprime sans retirer ce qu'elle a
+    # déployé : le namespace catalogue part plus bas, explicitement.
+    - name: Retirer les Applications Argo CD
+      ansible.builtin.command: kubectl -n argocd delete applications.argoproj.io --all --wait=true --timeout=120s
+      changed_when: true
+      failed_when: false
+
+    - name: Désinstaller la release vitrine
+      ansible.builtin.command: helm uninstall vitrine --namespace vitrine --wait --timeout 5m
+      changed_when: true
+      failed_when: false
+
+    - name: Désinstaller Argo CD
+      ansible.builtin.command: helm uninstall argocd --namespace argocd --wait --timeout 5m
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les namespaces du challenge
+      ansible.builtin.command: >-
+        kubectl delete namespace vitrine catalogue registre argocd
+        --ignore-not-found --wait=true --timeout=300s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les CRD d'Argo CD, que helm uninstall laisse
+      ansible.builtin.shell: |
+        kubectl get crd -o name | grep -E '\.argoproj\.io$' | xargs -r kubectl delete --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer les images poussées en local
+      ansible.builtin.shell: |
+        docker image ls --format '{{ "{{" }}.Repository{{ "}}" }}:{{ "{{" }}.Tag{{ "}}" }}' \
+          | { grep -E '^localhost:30500/' || true; } | xargs -r docker image rm -f
+      args:
+        executable: /bin/bash
+      changed_when: true
+      failed_when: false
+
+    - name: Trouver le répertoire de l'apprenant
+      ansible.builtin.command: getent passwd {{ ansible_user | default('ansible') }}
+      register: session
+      changed_when: false
+
+    - name: Sortir l'apprenant du groupe git
+      ansible.builtin.command: gpasswd -d {{ ansible_user | default('ansible') }} git
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le compte git et son dépôt
+      ansible.builtin.user:
+        name: git
+        state: absent
+        remove: true
+        force: true
+
+    - name: Retirer le groupe git
+      ansible.builtin.group:
+        name: git
+        state: absent
+
+    - name: Retirer l'exception safe.directory du dépôt
+      ansible.builtin.command: git config --system --unset-all safe.directory /srv/git/catalogue.git
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le répertoire de travail, la clé d'Argo CD et la mémoire du tirage
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ session.stdout.split(':')[5] }}/livraison"
+        - /srv/git
+        - /root/.lab-livrer
+        - /var/lib/dsoxlab/challenge-livrer-avec-helm-et-gitops.json

@@ -1,0 +1,21 @@
+title: "Livrer une application avec Helm et GitOps, depuis une image construite"
+doc_url: https://www.stephane-robert.info/docs/devops/delivery/gitops/
+description: |
+  Sans procédure, construisez une image et poussez-la dans le registre du
+  cluster, installez-la avec Helm depuis un fichier de values et épinglée par
+  digest, mettez la release à jour puis ramenez-la à la révision demandée, et
+  faites suivre un dépôt Git par Argo CD jusqu'à la synchronisation sur un
+  changement que vous avez poussé.
+criteria:
+  - id: image-construite
+    label: "L'image est construite depuis ~/livraison/app et poussée dans le registre du cluster en vitrine:1.0"
+  - id: release-depuis-values
+    label: "La release vitrine est installée depuis le fichier de values, avec 2 exemplaires"
+  - id: image-par-digest
+    label: "vitrine fait tourner l'image construite, tirée par son digest"
+  - id: mise-a-jour-et-retour
+    label: "La release a été mise à jour à 3 exemplaires, puis ramenée à la révision 1"
+  - id: argo-cd-synchronise
+    label: "Argo CD suit le dépôt catalogue, en synchro automatique, Synced et Healthy sur son dernier commit"
+  - id: changement-par-git
+    label: "Le passage à 2 exemplaires de catalogue est écrit dans Git, poussé, et tourne dans le cluster"

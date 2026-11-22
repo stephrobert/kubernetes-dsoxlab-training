@@ -98,6 +98,7 @@ SANS_INDICE = {
     "k8s-challenge-reseau-avance": "D91, challenge de module sans indice",
     "k8s-challenge-appliquer-et-verifier-ses-manifests": "D91, challenge de module sans indice (2026-11-21)",
     "k8s-challenge-durcir-les-noeuds-et-l-acces-api": "D91, challenge de module sans indice (2026-11-21)",
+    "k8s-challenge-livrer-avec-helm-et-gitops": "D91, challenge de module sans indice (2026-11-22)",
     "ckne-capstone-relier-deux-sites": "D91, capstone CKNE sans indice, décision du 2026-11-18",
 }
 
