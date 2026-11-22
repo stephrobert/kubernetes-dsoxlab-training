@@ -39,7 +39,7 @@ skills:
   - hpa
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/placer-et-plafonner/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/challenges/place-and-cap/#put-it-into-practice
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

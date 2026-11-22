@@ -1,5 +1,5 @@
 title: "Écrire un runbook qui se rejoue, et mesurer le SLO d'une application"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/sre-exploitation-kubernetes/#mettre-en-pratique
 description: |
   L'application catalogue est tombée après le déploiement d'une mauvaise image.
   Écrivez le runbook qui la remet en service, pour que n'importe qui puisse le

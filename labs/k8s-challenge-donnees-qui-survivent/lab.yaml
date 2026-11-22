@@ -25,7 +25,7 @@ skills:
   - troubleshooting
 distros:
   - debian13
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/donnees-qui-survivent/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/challenges/data-that-survives/#put-it-into-practice
 lab_type: challenge
 exam_passing_score: 70
 exam_blocking_checks:

@@ -36,7 +36,7 @@ skills:
   - hubble
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/challenges/reseau-avance/#mettre-en-pratique
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/challenges/repair-and-audit-cilium/#put-it-into-practice
 lab_type: challenge
 exam_passing_score: 70
 estimated_time: 60m
