@@ -1,5 +1,5 @@
 title: "Observer la lecture d'un fichier sensible avec Tetragon, puis la bloquer"
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/falco-vs-tetragon/#mettre-en-pratique
 description: |
   Une clé d'API montée depuis un Secret est lue par l'un des Pods du namespace
   comptes. Faites voir ces lectures à Tetragon, trouvez dans ses événements
