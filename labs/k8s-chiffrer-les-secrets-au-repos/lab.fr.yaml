@@ -1,0 +1,21 @@
+title: "Chiffrer les Secrets au repos dans etcd et limiter qui les lit"
+doc_url: https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/#mettre-en-pratique
+description: |
+  L'API server écrit les Secrets en clair dans etcd, et un ServiceAccount lit
+  tous les Secrets de son namespace. Chiffrez les Secrets au repos avec
+  secretbox, réécrivez ceux qui existent déjà, et réduisez le ServiceAccount
+  au seul Secret dont il a besoin.
+
+criteria:
+  - id: nouveau-chiffre
+    label: "Un Secret écrit maintenant est stocké dans etcd avec le préfixe k8s:enc:secretbox:v1:"
+    lessons:
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/
+  - id: existants-chiffres
+    label: "cle-banque et cle-paie, créés avant, sont chiffrés dans etcd et toujours lisibles par l'API"
+    lessons:
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/
+  - id: lecture-limitee
+    label: "Le ServiceAccount facturation lit cle-banque, et rien d'autre : ni cle-paie, ni list, ni watch"
+    lessons:
+      - https://www.stephane-robert.info/docs/securiser/secrets/secrets-kubernetes/

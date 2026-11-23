@@ -568,6 +568,10 @@ sections:
       # Le challenge du module Chaîne d'approvisionnement (niveau 5), posé
       # dans la leçon « Image Scanning » : épingler, analyser, signer, et un
       # cluster qui refuse le non signé (Kyverno posé par le setup).
+      # Lab guidé de la leçon « Protéger les Secrets Kubernetes » : chiffrement
+      # au repos (secretbox), réécriture, RBAC au Secret près, sur le cluster
+      # kubeadm. Placé avant le challenge du module « secrets et chaîne ».
+      - k8s-chiffrer-les-secrets-au-repos
       - k8s-challenge-livrer-une-image-verifiee
       - cks-audit-log-policy
       # Le challenge du module Durcir le cluster (niveau 5), posé dans la
