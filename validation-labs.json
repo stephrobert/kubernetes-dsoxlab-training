@@ -6867,6 +6867,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-chiffrer-les-secrets-au-repos": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_facturation_ne_lit_que_cle_banque",
+    "test_les_secrets_existants_sont_chiffres_et_restent_lisibles",
+    "test_un_nouveau_secret_est_chiffre_par_secretbox"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-23",
+  "duree_s": 457,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 190 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-chiffrer-les-secrets-au-repos.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_facturation_ne_lit_que_cle_banque",
+    "test_les_secrets_existants_sont_chiffres_et_restent_lisibles",
+    "test_un_nouveau_secret_est_chiffre_par_secretbox"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-configurer-par-configmap": {
   "apres": {
    "echecs": [],
@@ -8177,6 +8230,59 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-imposer-des-regles-avec-gatekeeper": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_gatekeeper_refuse_un_registre_non_autorise_dans_entrepot_seulement",
+    "test_gatekeeper_tourne_dans_la_version_demandee",
+    "test_l_audit_releve_ancien_stock"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-23",
+  "duree_s": 512,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 190 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-imposer-des-regles-avec-gatekeeper.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_gatekeeper_refuse_un_registre_non_autorise_dans_entrepot_seulement",
+    "test_gatekeeper_tourne_dans_la_version_demandee",
+    "test_l_audit_releve_ancien_stock"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-inspecter-et-restaurer-une-release-helm": {
   "apres": {
    "echecs": [],
@@ -8347,6 +8453,61 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-interroger-prometheus-en-promql": {
+  "apres": {
+   "echecs": [],
+   "passed": 4,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 4
+  },
+  "avant": {
+   "echecs": [
+    "test_memoire_par_namespace",
+    "test_p95_duree_api",
+    "test_redemarrages_atelier",
+    "test_top3_cpu_pods"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-23",
+  "duree_s": 256,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 180 objets hors kube-system",
+   "avant le travail : 0/4",
+   "après la solution : 4/4",
+   "après clean et run : 0/4",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-interroger-prometheus-en-promql.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_memoire_par_namespace",
+    "test_p95_duree_api",
+    "test_redemarrages_atelier",
+    "test_top3_cpu_pods"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 4
   },
   "verdict": "VALIDE"
  },
@@ -9226,6 +9387,57 @@
   },
   "verdict": "VALIDE"
  },
+ "k8s-reperer-les-signaux-d-un-cluster": {
+  "apres": {
+   "echecs": [],
+   "passed": 2,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 2
+  },
+  "avant": {
+   "echecs": [
+    "test_l_alerte_oomkilled_se_declenche_sur_memoire_courte",
+    "test_l_alerte_throttling_se_declenche_sur_calcul_serre"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 2
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-23",
+  "duree_s": 547,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 180 objets hors kube-system",
+   "avant le travail : 0/2",
+   "après la solution : 2/2",
+   "après clean et run : 0/2",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-reperer-les-signaux-d-un-cluster.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_l_alerte_oomkilled_se_declenche_sur_memoire_courte",
+    "test_l_alerte_throttling_se_declenche_sur_calcul_serre"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 2
+  },
+  "verdict": "VALIDE"
+ },
  "k8s-router-des-requetes-d-inference": {
   "apres": {
    "echecs": [],
@@ -9504,6 +9716,59 @@
    "skipped": 0,
    "status": "failed",
    "total": 6
+  },
+  "verdict": "VALIDE"
+ },
+ "k8s-valider-et-modifier-a-l-admission": {
+  "apres": {
+   "echecs": [],
+   "passed": 3,
+   "recorded": true,
+   "score": 100,
+   "skipped": 0,
+   "status": "passed",
+   "total": 3
+  },
+  "avant": {
+   "echecs": [
+    "test_le_label_equipe_est_pose_dans_ateliers_seulement",
+    "test_le_webhook_orphelin_ne_bloque_plus_ateliers",
+    "test_un_pod_privilegie_est_refuse_par_une_politique_dans_ateliers_seulement"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
+  },
+  "cible": "k8s-cp.lab",
+  "date": "2026-11-23",
+  "duree_s": 404,
+  "ecarts": [],
+  "etapes": [
+   "socle amorcé, le lab a été joué puis nettoyé une fois",
+   "cluster photographié, v1.37.2, 199 objets hors kube-system",
+   "avant le travail : 0/3",
+   "après la solution : 3/3",
+   "après clean et run : 0/3",
+   "cluster rendu intact"
+  ],
+  "journal": "/home/bob/.cache/dsoxlab/kubernetes-dsoxlab-training/validation-k8s-valider-et-modifier-a-l-admission.log",
+  "kubernetes": "v1.37.2",
+  "raisons": [],
+  "rejeu": {
+   "echecs": [
+    "test_le_label_equipe_est_pose_dans_ateliers_seulement",
+    "test_le_webhook_orphelin_ne_bloque_plus_ateliers",
+    "test_un_pod_privilegie_est_refuse_par_une_politique_dans_ateliers_seulement"
+   ],
+   "passed": 0,
+   "recorded": true,
+   "score": 0,
+   "skipped": 0,
+   "status": "failed",
+   "total": 3
   },
   "verdict": "VALIDE"
  },
