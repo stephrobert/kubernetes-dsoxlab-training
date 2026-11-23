@@ -1,0 +1,18 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab k8s-interroger-prometheus-en-promql
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Poser le socle de supervision (Prometheus et kube-state-metrics)
+      ansible.builtin.include_tasks: ../../shared/supervision.yml
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

@@ -1,0 +1,79 @@
+# Lab guidé de la leçon « PromQL », commandé par la session du site le
+# 2026-11-22 (commande de labs guidés, validée par Stéphane).
+#
+# La situation : le socle de supervision du catalogue (shared/supervision.yml :
+# Prometheus v3.16.0 et kube-state-metrics v2.20.0) collecte le cluster.
+# L'apprenant range quatre requêtes dans le ConfigMap requetes
+# d'atelier-promql : mémoire par namespace, top 3 CPU des Pods, P95 de la
+# durée des requêtes HTTP de Prometheus par handler, redémarrages d'atelier
+# sur 10 minutes. Les tests évaluent chaque requête et une requête de
+# référence AU MÊME INSTANT (paramètre time de l'API), et comparent série par
+# série : sans cela, deux requêtes sur des compteurs vivants ne rendraient
+# jamais les mêmes nombres.
+#
+# Le cours travaille les mêmes gestes sur d'autres questions (filtres et regex
+# ancrées, rate et increase sur les requêtes de Prometheus, agrégation par
+# nœud, P95 de la taille des réponses, top 3 mémoire). Distinct du challenge à
+# venir « santé du cluster ». Mesuré le 2026-11-23 sur kubeadm v1.37.2.
+id: k8s-interroger-prometheus-en-promql
+title: "Answer operations questions with PromQL"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  Prometheus collects the cluster. Write the four PromQL queries the team
+  needs: memory per namespace, the three Pods that use the most CPU, the P95
+  duration of Prometheus HTTP requests, and the recent restarts of a
+  workshop namespace.
+skills:
+  - prometheus
+  - promql
+  - histogram-quantile
+  - aggregation
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/outils/observabilite/metriques/prometheus/promql/#put-it-into-practice
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: memoire-namespace
+    label: "The query memoire-par-namespace returns the memory in use per namespace"
+    tests:
+      - test_memoire_par_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: top3-cpu
+    label: "The query top3-cpu-pods returns the three Pods that use the most CPU"
+    tests:
+      - test_top3_cpu_pods
+    lessons:
+      - https://www.stephane-robert.info/en/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: p95-api
+    label: "The query p95-duree-api returns the P95 duration of Prometheus HTTP requests per handler"
+    tests:
+      - test_p95_duree_api
+    lessons:
+      - https://www.stephane-robert.info/en/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: redemarrages
+    label: "The query redemarrages-atelier returns the restarts of atelier-promql over 10 minutes"
+    tests:
+      - test_redemarrages_atelier
+    lessons:
+      - https://www.stephane-robert.info/en/docs/outils/observabilite/metriques/prometheus/promql/
+
+feedback: full
