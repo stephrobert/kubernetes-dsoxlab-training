@@ -1,0 +1,70 @@
+---
+# Pose le socle de supervision sur le cluster kubeadm : kube-state-metrics
+# v2.20.0 et Prometheus v3.16.0, pour les labs qui éprouvent l'observabilité
+# et PromQL.
+#
+# À inclure depuis le `setup.yaml` d'un lab, après le socle kubeadm :
+#
+#     - name: Poser le socle de supervision
+#       ansible.builtin.include_tasks: ../../shared/supervision.yml
+#
+# Le lab qui l'inclut appelle `shared/supervision-retirer.yml` dans son
+# `cleanup.yaml` : ClusterRoles, liaisons et namespace sont des objets de
+# CLUSTER, et le Deployment kube-state-metrics vit dans kube-system, que la
+# photographie du validateur compare au replica près.
+#
+# POURQUOI DES MANIFESTES, et pas kube-prometheus-stack.
+#
+# Le chart pose un opérateur, une dizaine de CRD, Grafana, Alertmanager et des
+# centaines de règles : un apprenant qui cherche d'où vient une série s'y
+# perd, et le retrait laisse des CRD. Deux manifestes courts montrent les
+# trois sources de la leçon, sans rien d'autre.
+#
+# VERSIONS, relevées le 2026-11-23 sur GitHub : Prometheus v3.16.0 (publiée le
+# 2026-11-05) et kube-state-metrics v2.20.0 (2026-08-18), les dernières
+# stables. Le manifeste de kube-state-metrics réunit les cinq fichiers de
+# examples/standard au tag v2.20.0, mis en un seul document kind: List (le
+# dépôt refuse les YAML à plusieurs documents), objets inchangés.
+
+- name: Déposer les manifestes du socle de supervision
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../shared/supervision/{{ item }}"
+    dest: "/var/lib/dsoxlab/{{ item }}"
+    mode: "0644"
+  loop:
+    - kube-state-metrics-v2.20.0.yaml
+    - prometheus-v3.16.0.yaml
+
+- name: Installer kube-state-metrics et Prometheus
+  ansible.builtin.command:
+    cmd: "kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /var/lib/dsoxlab/{{ item }}"
+  loop:
+    - kube-state-metrics-v2.20.0.yaml
+    - prometheus-v3.16.0.yaml
+  changed_when: true
+
+- name: Attendre kube-state-metrics et Prometheus
+  ansible.builtin.command:
+    cmd: "kubectl --kubeconfig /etc/kubernetes/admin.conf -n {{ item }} --timeout=300s"
+  loop:
+    - kube-system rollout status deployment/kube-state-metrics
+    - supervision rollout status deployment/prometheus
+  changed_when: false
+
+- name: Attendre que Prometheus collecte les trois sources
+  # Une cible apparaît « unknown » avant son premier passage, 15 secondes au
+  # plus. Sans cette attente, un test lancé juste après le setup lirait une
+  # série absente et conclurait à tort.
+  # jq -e sort en 1 quand l'expression rend false.
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsS http://localhost:30090/api/v1/targets \
+      | jq -e '[.data.activeTargets[] | select(.health == "up") | .labels.job] | unique
+               | contains(["cadvisor", "kube-state-metrics", "kubelet"])'
+  args:
+    executable: /bin/bash
+  register: _cibles
+  until: _cibles.rc == 0
+  retries: 30
+  delay: 5
+  changed_when: false

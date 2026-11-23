@@ -1,0 +1,20 @@
+title: "Installer Gatekeeper, imposer une règle et lire son audit"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/gatekeeper/#mettre-en-pratique
+description: |
+  Installez Gatekeeper, puis faites-lui refuser dans le namespace entrepot
+  toute image qui ne vient pas du registre autorisé par l'équipe, et laissez
+  son audit trouver le Pod qui tournait déjà depuis un autre registre.
+
+criteria:
+  - id: gatekeeper-installe
+    label: "Gatekeeper v3.23.1 tourne dans gatekeeper-system, contrôleur et audit prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/gatekeeper/
+  - id: registre-refuse
+    label: "Dans entrepot, Gatekeeper refuse une image d'un autre registre que registry.k8s.io/, et entrepot-temoin n'est pas touché"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/gatekeeper/
+  - id: audit-existant
+    label: "L'audit d'une contrainte liste ancien-stock, qui tournait avant la règle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/gatekeeper/

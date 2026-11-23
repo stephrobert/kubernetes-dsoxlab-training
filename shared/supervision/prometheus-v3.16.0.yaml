@@ -1,0 +1,152 @@
+# Prometheus v3.16.0 pour les labs d'observabilité du catalogue.
+#
+# Volontairement SANS opérateur : un Deployment, sa configuration dans un
+# ConfigMap, ses règles dans un autre. C'est la forme la plus courte qui montre
+# d'où vient chaque série, et elle n'ajoute aucune CRD au cluster.
+#
+# Trois sources, celles que la leçon « Observabilité Kubernetes » enseigne :
+#   - kube-state-metrics (job kube-state-metrics), l'état des objets ;
+#   - le kubelet (job kubelet, /metrics), la santé du nœud ;
+#   - cAdvisor, intégré au kubelet (job cadvisor, /metrics/cadvisor), la
+#     consommation des conteneurs.
+# Le kubelet est joint par l'API server (/api/v1/nodes/<nœud>/proxy/...), avec
+# le jeton du ServiceAccount : pas de port 10250 à ouvrir, pas de certificat à
+# faire confiance.
+#
+# Les règles vivent dans le ConfigMap prometheus-regles, monté sous
+# /etc/prometheus/regles. --web.enable-lifecycle permet de les recharger par
+# un POST sur /-/reload. Le Service est en NodePort 30090 : depuis le nœud,
+# http://localhost:30090 répond.
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: supervision
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: prometheus
+    namespace: supervision
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    name: supervision-prometheus
+  rules:
+  - apiGroups:
+    - ''
+    resources:
+    - nodes
+    - nodes/metrics
+    - nodes/proxy
+    - services
+    - endpoints
+    - pods
+    verbs:
+    - get
+    - list
+    - watch
+  - nonResourceURLs:
+    - /metrics
+    verbs:
+    - get
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: supervision-prometheus
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: supervision-prometheus
+  subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: supervision
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: prometheus-config
+    namespace: supervision
+  data:
+    prometheus.yml: "global:\n  scrape_interval: 15s\n  evaluation_interval: 15s\nrule_files:\n  - /etc/prometheus/regles/*.yaml\nscrape_configs:\n  - job_name: prometheus\n    static_configs:\n      - targets: [\"localhost:9090\"]\n  - job_name: kube-state-metrics\n    static_configs:\n      - targets: [\"kube-state-metrics.kube-system.svc:8080\"]\n  - job_name: kubelet\n    scheme: https\n    authorization:\n      credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n    tls_config:\n      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n    kubernetes_sd_configs:\n      - role: node\n    relabel_configs:\n      - target_label: __address__\n        replacement: kubernetes.default.svc:443\n      - source_labels: [__meta_kubernetes_node_name]\n        target_label: __metrics_path__\n        replacement: /api/v1/nodes/${1}/proxy/metrics\n      - source_labels: [__meta_kubernetes_node_name]\n        target_label: node\n  - job_name: cadvisor\n    scheme: https\n\
+      \    authorization:\n      credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n    tls_config:\n      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n    kubernetes_sd_configs:\n      - role: node\n    relabel_configs:\n      - target_label: __address__\n        replacement: kubernetes.default.svc:443\n      - source_labels: [__meta_kubernetes_node_name]\n        target_label: __metrics_path__\n        replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor\n      - source_labels: [__meta_kubernetes_node_name]\n        target_label: node\n"
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: prometheus-regles
+    namespace: supervision
+  data: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: prometheus
+    namespace: supervision
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: prometheus
+    template:
+      metadata:
+        labels:
+          app: prometheus
+      spec:
+        serviceAccountName: prometheus
+        nodeSelector:
+          kubernetes.io/hostname: k8s-cp.lab
+        tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        containers:
+        - name: prometheus
+          image: quay.io/prometheus/prometheus:v3.16.0
+          args:
+          - --config.file=/etc/prometheus/config/prometheus.yml
+          - --storage.tsdb.path=/prometheus
+          - --storage.tsdb.retention.time=6h
+          - --web.enable-lifecycle
+          ports:
+          - containerPort: 9090
+            name: web
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: web
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+          - name: config
+            mountPath: /etc/prometheus/config
+          - name: regles
+            mountPath: /etc/prometheus/regles
+          - name: donnees
+            mountPath: /prometheus
+        volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: regles
+          configMap:
+            name: prometheus-regles
+        - name: donnees
+          emptyDir: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: prometheus
+    namespace: supervision
+  spec:
+    type: NodePort
+    selector:
+      app: prometheus
+    ports:
+    - name: web
+      port: 9090
+      targetPort: web
+      nodePort: 30090

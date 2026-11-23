@@ -1,0 +1,28 @@
+---
+# Joué par `dsoxlab run` avant d'ouvrir la session.
+- name: Préparer le lab k8s-imposer-des-regles-avec-gatekeeper
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Installer le socle, le cluster kubeadm du catalogue
+      ansible.builtin.include_tasks: ../../shared/kubeadm-cluster.yml
+
+    - name: Déposer le manifeste épinglé de Gatekeeper et le script qui le retire
+      # prepare.sh les utilise : ansible.builtin.script ne copie que le script
+      # qu'il joue. Le manifeste est celui de la release v3.23.1 (sha256 du
+      # fichier amont 3c178abe6de4dcdcd2810c2945468a0d7a15ccf0036e324b73308643e94d6f72),
+      # mis en un seul document kind: List, objets inchangés.
+      ansible.builtin.copy:
+        src: "fixtures/{{ item.src }}"
+        dest: "/var/lib/dsoxlab/{{ item.dest }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { src: gatekeeper-v3.23.1.yaml, dest: gatekeeper-v3.23.1.yaml, mode: "0644" }
+        - { src: retirer-gatekeeper.sh, dest: retirer-gatekeeper.sh, mode: "0700" }
+
+    - name: Poser la situation du lab
+      ansible.builtin.script: fixtures/prepare.sh
+      args:
+        executable: /bin/bash
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf

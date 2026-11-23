@@ -1,0 +1,25 @@
+title: "Répondre aux questions d'exploitation en PromQL"
+doc_url: https://www.stephane-robert.info/docs/outils/observabilite/metriques/prometheus/promql/#mettre-en-pratique
+description: |
+  Prometheus collecte le cluster. Écrivez les quatre requêtes PromQL dont
+  l'équipe a besoin : la mémoire par namespace, les trois Pods qui consomment
+  le plus de CPU, le P95 de la durée des requêtes HTTP de Prometheus, et les
+  redémarrages récents d'un namespace d'atelier.
+
+criteria:
+  - id: memoire-namespace
+    label: "La requête memoire-par-namespace rend la mémoire utilisée par namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: top3-cpu
+    label: "La requête top3-cpu-pods rend les trois Pods qui consomment le plus de CPU"
+    lessons:
+      - https://www.stephane-robert.info/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: p95-api
+    label: "La requête p95-duree-api rend le P95 de la durée des requêtes HTTP de Prometheus par handler"
+    lessons:
+      - https://www.stephane-robert.info/docs/outils/observabilite/metriques/prometheus/promql/
+  - id: redemarrages
+    label: "La requête redemarrages-atelier rend les redémarrages d'atelier-promql sur 10 minutes"
+    lessons:
+      - https://www.stephane-robert.info/docs/outils/observabilite/metriques/prometheus/promql/

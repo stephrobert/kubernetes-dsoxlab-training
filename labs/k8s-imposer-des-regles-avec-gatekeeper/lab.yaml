@@ -1,0 +1,73 @@
+# Lab guidé de la leçon « OPA Gatekeeper », commandé par la session du site le
+# 2026-11-22 (commande de labs guidés, validée par Stéphane).
+#
+# La situation : pas de Gatekeeper sur le cluster kubeadm, et dans entrepot un
+# Pod ancien-stock qui tourne depuis Docker Hub. L'apprenant installe
+# Gatekeeper v3.23.1, écrit un ConstraintTemplate et une Constraint qui
+# n'autorisent que registry.k8s.io/ dans entrepot, en deny, et laisse l'audit
+# relever ancien-stock. entrepot-temoin vérifie que rien ne déborde.
+#
+# Le manifeste de la release est dans fixtures/ (amont sha256 3c178abe…94d6f72,
+# mis en kind: List) :
+# le setup et le nettoyage retirent Gatekeeper sans dépendre du réseau.
+# Gatekeeper ne génère de ValidatingAdmissionPolicy que pour les templates en
+# CEL : un template Rego n'en laisse aucune derrière lui.
+#
+# Volontairement distinct du challenge du module,
+# k8s-challenge-faire-refuser-par-admission (PSA, Pod reconstruit, VAP sur les
+# tags). Mesuré le 2026-11-23 sur kubeadm v1.37.2.
+id: k8s-imposer-des-regles-avec-gatekeeper
+title: "Install Gatekeeper, enforce a rule and read its audit"
+level: minimize-vulnerabilities
+section: cks
+difficulty: intermediate
+description: |
+  Install Gatekeeper, then make it refuse in the entrepot namespace every
+  image that does not come from the registry the team allows, and let its
+  audit find the Pod that was already running from another registry.
+skills:
+  - gatekeeper
+  - opa
+  - rego
+  - admission-control
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/gatekeeper/#put-it-into-practice
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: gatekeeper-installe
+    label: "Gatekeeper v3.23.1 runs in gatekeeper-system, controller and audit ready"
+    tests:
+      - test_gatekeeper_tourne_dans_la_version_demandee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/gatekeeper/
+  - id: registre-refuse
+    label: "In entrepot, Gatekeeper refuses an image from another registry than registry.k8s.io/, and entrepot-temoin is untouched"
+    tests:
+      - test_gatekeeper_refuse_un_registre_non_autorise_dans_entrepot_seulement
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/gatekeeper/
+  - id: audit-existant
+    label: "The audit of a constraint lists ancien-stock, which was running before the rule"
+    tests:
+      - test_l_audit_releve_ancien_stock
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/gatekeeper/
+
+feedback: full

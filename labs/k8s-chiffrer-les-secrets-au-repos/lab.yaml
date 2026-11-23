@@ -1,0 +1,74 @@
+# Lab guidé de la leçon « Protéger les Secrets Kubernetes », commandé par la
+# session du site le 2026-11-22 (commande de labs guidés, validée par Stéphane).
+#
+# La situation : l'API server du cluster kubeadm écrit les Secrets en clair
+# dans etcd, deux Secrets de tresorerie y sont lisibles, et le ServiceAccount
+# facturation lit tous les Secrets du namespace. L'apprenant chiffre au repos
+# avec secretbox, réécrit les Secrets existants, puis réduit facturation au
+# seul Secret dont il a besoin.
+#
+# Le setup et le nettoyage passent par fixtures/dechiffrer.sh : rendre le
+# manifeste d'origine avant d'avoir déchiffré tous les Secrets les rendrait
+# illisibles pour les labs suivants. Le validateur ne photographie ni etcd ni
+# le manifeste, ce script est donc la seule garde.
+#
+# Volontairement distinct du challenge du module « secrets et chaîne »,
+# k8s-challenge-livrer-une-image-verifiee (images, Trivy, cosign, Kyverno), et
+# des challenges qui auditent la lecture des Secrets. Mesuré le 2026-11-23 sur
+# kubeadm v1.37.2, etcd 3.7.0.
+id: k8s-chiffrer-les-secrets-au-repos
+title: "Encrypt Secrets at rest in etcd and limit who reads them"
+level: minimize-vulnerabilities
+section: cks
+difficulty: intermediate
+description: |
+  The API server writes Secrets to etcd in clear text, and a ServiceAccount
+  reads every Secret of its namespace. Encrypt Secrets at rest with
+  secretbox, rewrite the ones already there, and reduce the ServiceAccount to
+  the only Secret it needs.
+skills:
+  - encryption-at-rest
+  - etcd
+  - secrets
+  - rbac
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/secrets/protect-kubernetes-secrets/#put-it-into-practice
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: nouveau-chiffre
+    label: "A Secret written now is stored in etcd with the prefix k8s:enc:secretbox:v1:"
+    tests:
+      - test_un_nouveau_secret_est_chiffre_par_secretbox
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/secrets/protect-kubernetes-secrets/
+  - id: existants-chiffres
+    label: "cle-banque and cle-paie, created before, are encrypted in etcd and still readable through the API"
+    tests:
+      - test_les_secrets_existants_sont_chiffres_et_restent_lisibles
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/secrets/protect-kubernetes-secrets/
+  - id: lecture-limitee
+    label: "The ServiceAccount facturation reads cle-banque, and nothing else: neither cle-paie nor list nor watch"
+    tests:
+      - test_facturation_ne_lit_que_cle_banque
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/secrets/protect-kubernetes-secrets/
+
+feedback: full

@@ -1,0 +1,19 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Le namespace du lab d'abord, puis le socle de supervision : son ClusterRole,
+# sa liaison, son namespace et le Deployment kube-state-metrics de kube-system
+# survivraient au lab, et la photographie du validateur les verrait.
+- name: Nettoyer le lab k8s-interroger-prometheus-en-promql
+  hosts: lab_target
+  become: true
+  tasks:
+    - name: Supprimer le namespace du lab
+      ansible.builtin.command: >-
+        kubectl --kubeconfig /etc/kubernetes/admin.conf delete namespace atelier-promql
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
+
+    - name: Retirer le socle de supervision
+      ansible.builtin.include_tasks: ../../shared/supervision-retirer.yml

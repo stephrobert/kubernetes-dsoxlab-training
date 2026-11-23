@@ -1,0 +1,43 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Les webhooks, les politiques et leurs liaisons sont des objets de CLUSTER :
+# ils survivraient aux namespaces, et la photographie du validateur les verrait.
+# Pire, une politique laissée en place refuserait ou modifierait des Pods dans
+# les labs suivants.
+- name: Nettoyer le lab k8s-valider-et-modifier-a-l-admission
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Supprimer le webhook du lab
+      ansible.builtin.command: >-
+        kubectl delete validatingwebhookconfiguration controle-ateliers --ignore-not-found
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les politiques d'admission et leurs liaisons
+      # La liaison d'abord : une politique sans liaison n'agit sur rien, tandis
+      # qu'une liaison qui désigne une politique absente est une erreur bruyante.
+      ansible.builtin.shell: |
+        set -eu
+        kubectl get mutatingadmissionpolicybinding -o name \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+        kubectl get mutatingadmissionpolicy -o name \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+        kubectl get validatingadmissionpolicybinding -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+        kubectl get validatingadmissionpolicy -o name \
+          | grep -vE 'safe-upgrades' \
+          | xargs -r kubectl delete --ignore-not-found >/dev/null
+      changed_when: true
+      failed_when: false
+
+    - name: Supprimer les namespaces du lab
+      ansible.builtin.command: >-
+        kubectl delete namespace ateliers ateliers-temoin ateliers-outils
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false

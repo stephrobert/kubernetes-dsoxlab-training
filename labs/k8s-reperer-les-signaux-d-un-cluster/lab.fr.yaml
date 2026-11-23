@@ -1,0 +1,17 @@
+title: "Repérer les signaux clés d'un cluster et les alerter en PromQL"
+doc_url: https://www.stephane-robert.info/docs/observabilite/pratiques/observabilite-kubernetes/#mettre-en-pratique
+description: |
+  Prometheus collecte les trois sources de métriques du cluster. Dans le
+  namespace signaux, un conteneur manque sans cesse de mémoire et un autre
+  est bridé par sa limite CPU. Écrivez les deux alertes qui les repèrent,
+  sans repérer le Pod témoin, qui reste calme.
+
+criteria:
+  - id: alerte-oom
+    label: "L'alerte SignauxOOMKilled se déclenche pour memoire-courte, et pas pour temoin-calme"
+    lessons:
+      - https://www.stephane-robert.info/docs/observabilite/pratiques/observabilite-kubernetes/
+  - id: alerte-throttling
+    label: "L'alerte SignauxThrottling se déclenche pour calcul-serre, et pas pour temoin-calme"
+    lessons:
+      - https://www.stephane-robert.info/docs/observabilite/pratiques/observabilite-kubernetes/

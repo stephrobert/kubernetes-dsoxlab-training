@@ -1,0 +1,31 @@
+---
+# Retire le socle de supervision posé par `shared/supervision.yml`.
+#
+# À inclure depuis le `cleanup.yaml` d'un lab :
+#
+#     - name: Retirer le socle de supervision
+#       ansible.builtin.include_tasks: ../../shared/supervision-retirer.yml
+#
+# Les manifestes sont redéposés d'abord : un nettoyage peut être joué sur un
+# nœud où le setup n'a jamais tourné, ou après un redémarrage qui a vidé
+# /var/lib/dsoxlab.
+
+- name: Déposer les manifestes du socle de supervision
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../shared/supervision/{{ item }}"
+    dest: "/var/lib/dsoxlab/{{ item }}"
+    mode: "0644"
+  loop:
+    - kube-state-metrics-v2.20.0.yaml
+    - prometheus-v3.16.0.yaml
+
+- name: Retirer Prometheus et kube-state-metrics
+  ansible.builtin.command:
+    cmd: >-
+      kubectl --kubeconfig /etc/kubernetes/admin.conf delete
+      -f /var/lib/dsoxlab/{{ item }} --ignore-not-found --wait=true --timeout=180s
+  loop:
+    - prometheus-v3.16.0.yaml
+    - kube-state-metrics-v2.20.0.yaml
+  changed_when: true
+  failed_when: false

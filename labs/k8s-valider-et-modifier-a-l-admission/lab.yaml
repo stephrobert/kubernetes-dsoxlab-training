@@ -1,0 +1,72 @@
+# Lab guidé de la leçon « Admission Controllers », commandé par la session du
+# site le 2026-11-22 (commande de labs guidés, validée par Stéphane).
+#
+# La situation : dans ateliers, plus aucun Pod ne se crée. Un webhook de
+# validation en failurePolicy Fail appelle un Service sans endpoint, reste d'un
+# contrôleur désinstallé. L'apprenant le retrouve et le retire, puis pose les
+# deux policies natives de la leçon : une MutatingAdmissionPolicy qui ajoute le
+# label equipe=ateliers, et une ValidatingAdmissionPolicy qui refuse les
+# conteneurs privileged, initContainers compris. ateliers-temoin vérifie
+# qu'aucune des deux ne déborde.
+#
+# Volontairement distinct du challenge du module,
+# k8s-challenge-faire-refuser-par-admission (Pod Security Admission, Pod
+# privilégié reconstruit, images par tag), et du lab guidé
+# cks-validating-admission-policy (images non épinglées). Mesuré le 2026-11-23
+# sur kubeadm v1.37.2.
+id: k8s-valider-et-modifier-a-l-admission
+title: "Unblock a namespace, then validate and modify at admission without a webhook"
+level: cluster-hardening
+section: cks
+difficulty: intermediate
+description: |
+  No Pod can be created in the ateliers namespace any more. Find the webhook
+  that blocks it and remove it, then have the API server itself add a default
+  label and refuse privileged containers, in this namespace only.
+skills:
+  - admission-control
+  - validating-webhook
+  - mutatingadmissionpolicy
+  - validatingadmissionpolicy
+  - cel
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/admission-controllers/#put-it-into-practice
+lab_type: lab
+estimated_time: 30m
+
+certification_tags:
+  - cks
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: webhook-retire
+    label: "The orphaned webhook controle-ateliers is removed and an ordinary Pod is accepted in ateliers again"
+    tests:
+      - test_le_webhook_orphelin_ne_bloque_plus_ateliers
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/admission-controllers/
+  - id: label-par-defaut
+    label: "A Pod submitted without labels to ateliers receives equipe=ateliers, and a Pod of ateliers-temoin does not"
+    tests:
+      - test_le_label_equipe_est_pose_dans_ateliers_seulement
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/admission-controllers/
+  - id: privileged-refuse
+    label: "A policy refuses privileged containers, init containers included, in ateliers only"
+    tests:
+      - test_un_pod_privilegie_est_refuse_par_une_politique_dans_ateliers_seulement
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/admission-controllers/
+
+feedback: full
