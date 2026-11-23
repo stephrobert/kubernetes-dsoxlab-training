@@ -551,6 +551,9 @@ sections:
       # Lab guidé de la leçon « Admission Controllers » : un webhook orphelin à
       # retirer, puis une MAP et une VAP natives, sur le cluster kubeadm.
       - k8s-valider-et-modifier-a-l-admission
+      # Lab guidé de la leçon « OPA Gatekeeper » : installer v3.23.1, registres
+      # autorisés en deny, audit d'un Pod existant, gator, sur le cluster kubeadm.
+      - k8s-imposer-des-regles-avec-gatekeeper
       # Le challenge du module Politiques d'admission (niveau 5), posé dans la
       # leçon « VAP vs Kyverno vs Gatekeeper » : standard restricted, Pod
       # privilégié reconstruit et politique native, sur le cluster kubeadm.

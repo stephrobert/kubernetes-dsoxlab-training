@@ -1,0 +1,31 @@
+---
+# Joué par `dsoxlab clean`.
+#
+# Gatekeeper pose des CRD, deux webhooks, un ClusterRole et un namespace : tous
+# survivraient au namespace du lab, et ses webhooks continueraient d'examiner
+# chaque requête des labs suivants. fixtures/retirer-gatekeeper.sh les retire
+# dans l'ordre (contraintes, templates, manifeste).
+- name: Nettoyer le lab k8s-imposer-des-regles-avec-gatekeeper
+  hosts: lab_target
+  become: true
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: Déposer le manifeste épinglé de Gatekeeper
+      ansible.builtin.copy:
+        src: fixtures/gatekeeper-v3.23.1.yaml
+        dest: /var/lib/dsoxlab/gatekeeper-v3.23.1.yaml
+        mode: "0644"
+
+    - name: Retirer Gatekeeper et tout ce qu'il a créé
+      ansible.builtin.script: fixtures/retirer-gatekeeper.sh
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Supprimer les namespaces du lab
+      ansible.builtin.command: >-
+        kubectl delete namespace entrepot entrepot-temoin
+        --ignore-not-found --wait=true --timeout=180s
+      changed_when: true
+      failed_when: false
