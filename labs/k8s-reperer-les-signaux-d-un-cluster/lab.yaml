@@ -1,0 +1,66 @@
+# Lab guidé de la leçon « Observabilité Kubernetes », commandé par la session
+# du site le 2026-11-22 (commande de labs guidés, validée par Stéphane).
+#
+# La situation : le socle de supervision du catalogue (shared/supervision.yml :
+# Prometheus v3.16.0 et kube-state-metrics v2.20.0, sans opérateur) collecte
+# kube-state-metrics, le kubelet et cAdvisor. Dans signaux, memoire-courte est
+# tué en OOMKilled en boucle, calcul-serre est bridé par sa limite CPU, et
+# temoin-calme dort sous des limites qu'il n'atteint jamais. L'apprenant écrit
+# deux alertes, SignauxOOMKilled et SignauxThrottling, que Prometheus doit
+# déclencher sur les bons Pods et pas sur le témoin.
+#
+# Le cours travaille les trois sources et les signaux Pending, redémarrages et
+# NotReady, puis une alerte sur un Pod en attente : le challenge garde les deux
+# autres signaux. Distinct du challenge à venir « santé du cluster », qui ne
+# demande pas d'écrire d'alerte. Mesuré le 2026-11-23 sur kubeadm v1.37.2.
+id: k8s-reperer-les-signaux-d-un-cluster
+title: "Spot the key signals of a cluster and alert on them with PromQL"
+level: troubleshooting
+section: cka
+difficulty: intermediate
+description: |
+  Prometheus collects the three metric sources of the cluster. In the signaux
+  namespace, one container keeps running out of memory and another is held
+  back by its CPU limit. Write the two alerts that catch them, without
+  catching the quiet control Pod.
+skills:
+  - prometheus
+  - promql
+  - kube-state-metrics
+  - cadvisor
+  - alerting
+distros:
+  - ubuntu24
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/reliability/kubernetes-observability/#put-it-into-practice
+lab_type: lab
+estimated_time: 35m
+
+certification_tags:
+  - cka
+
+runtime:
+  type: vm
+  targets:
+    - name: cp
+      host: k8s-cp.lab
+  default: cp
+
+validation:
+  functional: true
+  persistence_after_reboot: false
+
+criteria:
+  - id: alerte-oom
+    label: "The SignauxOOMKilled alert fires for memoire-courte, and not for temoin-calme"
+    tests:
+      - test_l_alerte_oomkilled_se_declenche_sur_memoire_courte
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/reliability/kubernetes-observability/
+  - id: alerte-throttling
+    label: "The SignauxThrottling alert fires for calcul-serre, and not for temoin-calme"
+    tests:
+      - test_l_alerte_throttling_se_declenche_sur_calcul_serre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/reliability/kubernetes-observability/
+
+feedback: full

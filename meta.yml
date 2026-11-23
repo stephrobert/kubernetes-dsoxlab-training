@@ -335,6 +335,10 @@ sections:
       # Lab guidé de la leçon 14-02 « Observer la santé d'un cluster » (D103) :
       # metrics-server, kubectl top et réservation des nœuds, sur le cluster kubeadm.
       - k8s-observer-la-sante-d-un-cluster
+      # Lab guidé de la leçon « Observabilité Kubernetes » : les trois sources,
+      # les signaux clés et deux alertes PromQL, sur le socle de supervision
+      # (shared/supervision.yml).
+      - k8s-reperer-les-signaux-d-un-cluster
       # Lab guidé de la leçon 14-04 « Analyser les événements Kubernetes » (D103) :
       # quatre pannes nommées par leurs Events, et leur chronologie, sur le cluster kubeadm.
       - k8s-reconstituer-un-incident-par-les-evenements
