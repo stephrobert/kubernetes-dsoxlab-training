@@ -548,6 +548,9 @@ sections:
       - cks-pod-security-admission
       - cks-secure-existing-pod
       - cks-validating-admission-policy
+      # Lab guidé de la leçon « Admission Controllers » : un webhook orphelin à
+      # retirer, puis une MAP et une VAP natives, sur le cluster kubeadm.
+      - k8s-valider-et-modifier-a-l-admission
       # Le challenge du module Politiques d'admission (niveau 5), posé dans la
       # leçon « VAP vs Kyverno vs Gatekeeper » : standard restricted, Pod
       # privilégié reconstruit et politique native, sur le cluster kubeadm.

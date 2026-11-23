@@ -1,0 +1,21 @@
+title: "Débloquer un namespace, puis valider et modifier à l'admission sans webhook"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/#mettre-en-pratique
+description: |
+  Plus aucun Pod ne se crée dans le namespace ateliers. Retrouvez le webhook
+  qui le bloque et retirez-le, puis faites ajouter un label par défaut et
+  refuser les conteneurs privilégiés par l'API server lui-même, dans ce
+  namespace seulement.
+
+criteria:
+  - id: webhook-retire
+    label: "Le webhook orphelin controle-ateliers est retiré, et un Pod ordinaire est de nouveau accepté dans ateliers"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/
+  - id: label-par-defaut
+    label: "Un Pod soumis sans label à ateliers reçoit equipe=ateliers, et un Pod d'ateliers-temoin ne le reçoit pas"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/
+  - id: privileged-refuse
+    label: "Une politique refuse les conteneurs privilégiés, conteneurs d'initialisation compris, dans ateliers seulement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/admission-controllers/
