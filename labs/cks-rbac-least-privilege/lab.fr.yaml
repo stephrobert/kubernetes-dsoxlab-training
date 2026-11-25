@@ -5,3 +5,21 @@ description: |
   Reprenez ce pouvoir et donnez-lui exactement ce dont son application a
   besoin, rien de plus. La preuve n'est pas dans le manifeste : elle est dans
   ce que l'API server répond quand ce compte demande.
+
+criteria:
+  - id: le-compte-n-est-plus-administrateur-du-cluster
+    label: "Le compte n'est plus administrateur du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-compte-a-ce-qu-il-lui-faut-et-rien-de-plus
+    label: "Le compte a ce qu'il lui faut, et ne lit pas les Secrets"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-s-arrete-au-namespace
+    label: "Le droit s'arrête au namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-est-porte-par-le-namespace
+    label: "Le droit est porté par un RoleBinding du namespace"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/

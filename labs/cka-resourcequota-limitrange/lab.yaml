@@ -40,3 +40,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-namespace-refuse-un-pod-qui-demande-trop
+    label: "The namespace refuses a Pod that asks for too much"
+    tests:
+      - test_le_namespace_refuse_un_pod_qui_demande_trop
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: un-pod-muet-repart-avec-des-requests
+    label: "A Pod that declares nothing is accepted and given requests"
+    tests:
+      - test_un_pod_muet_repart_avec_des_requests
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: un-pod-muet-repart-avec-des-limits
+    label: "A Pod that declares nothing is accepted and given limits"
+    tests:
+      - test_un_pod_muet_repart_avec_des_limits
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/

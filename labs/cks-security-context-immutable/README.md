@@ -198,11 +198,11 @@ dsoxlab check cks-security-context-immutable
 ```text
 ╭─ Result: cks-security-context-immutable ─╮
 │  0 / 100 pts                             │
-│  ░░░░░░░░░░░░░░░░░░░░  0/2 tests         │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests         │
 ╰──────────────────────────────────────────╯
 ```
 
-0 out of 2: that is the expected result. The challenge is waiting for you,
+0 out of 5: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

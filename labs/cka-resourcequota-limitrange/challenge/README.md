@@ -41,7 +41,7 @@ restart. That would be an outage, not resource control.
 
 ## How you will know it works
 
-Both tests are **active** proofs: they really create the two Pods, the
+All three tests are **active** proofs: they really create the two Pods, the
 extravagant one and the silent one, and observe the first being refused and the
 second being completed. Re-reading the objects would prove nothing: a cap that
 does not apply to the right resources is a perfectly valid object that caps

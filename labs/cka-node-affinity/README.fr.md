@@ -202,11 +202,11 @@ dsoxlab check cka-node-affinity
 ```text
 ╭── Résultat : cka-node-affinity ───╮
 │  0 / 100 pts                      │
-│  ░░░░░░░░░░░░░░░░░░░░  0/4 tests  │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests  │
 ╰───────────────────────────────────╯
 ```
 
-0 sur 4 : c'est le résultat attendu. Le challenge vous attend, intact.
+0 sur 5 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 

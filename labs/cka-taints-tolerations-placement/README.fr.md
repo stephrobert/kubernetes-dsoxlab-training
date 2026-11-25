@@ -264,11 +264,11 @@ dsoxlab check cka-taints-tolerations-placement
 ```text
 ╭─ Résultat : cka-taints-tolerations-placement ─╮
 │  0 / 100 pts                                  │
-│  ░░░░░░░░░░░░░░░░░░░░  0/4 tests              │
+│  ░░░░░░░░░░░░░░░░░░░░  0/6 tests              │
 ╰───────────────────────────────────────────────╯
 ```
 
-0 sur 4 : c'est le résultat attendu. Le challenge vous attend, intact.
+0 sur 6 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 

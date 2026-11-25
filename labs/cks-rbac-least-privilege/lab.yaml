@@ -36,3 +36,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-compte-n-est-plus-administrateur-du-cluster
+    label: "The account is no longer a cluster administrator"
+    tests:
+      - test_le_compte_n_est_plus_administrateur_du_cluster
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-compte-a-ce-qu-il-lui-faut-et-rien-de-plus
+    label: "The account has what it needs, and cannot read the Secrets"
+    tests:
+      - test_le_compte_a_ce_qu_il_lui_faut_et_rien_de_plus
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-s-arrete-au-namespace
+    label: "The right stops at the namespace"
+    tests:
+      - test_le_droit_s_arrete_au_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-est-porte-par-le-namespace
+    label: "The right is carried by a RoleBinding of the namespace"
+    tests:
+      - test_le_droit_est_porte_par_le_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/

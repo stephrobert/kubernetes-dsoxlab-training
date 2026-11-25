@@ -39,3 +39,41 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: l-application-demarre-sous-son-identite
+    label: "The application runs under its ServiceAccount"
+    tests:
+      - test_l_application_demarre_sous_son_identite
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: le-role-accorde-la-lecture-et-rien-de-plus
+    label: "The Role grants reading the Pods and nothing more"
+    tests:
+      - test_le_role_accorde_la_lecture_et_rien_de_plus
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: le-binding-donne-le-role-au-serviceaccount
+    label: "The RoleBinding gives this Role to the ServiceAccount"
+    tests:
+      - test_le_binding_donne_le_role_au_serviceaccount
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: depuis-le-pod-lister-les-pods-passe
+    label: "From the Pod, listing the Pods is allowed"
+    tests:
+      - test_depuis_le_pod_lister_les_pods_passe
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: depuis-le-pod-tout-le-reste-est-refuse
+    label: "From the Pod, everything else is denied"
+    tests:
+      - test_depuis_le_pod_tout_le_reste_est_refuse
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/
+  - id: le-pod-qui-n-appelle-pas-l-api-n-a-aucun-jeton
+    label: "The Pod that never calls the API carries no token"
+    tests:
+      - test_le_pod_qui_n_appelle_pas_l_api_n_a_aucun_jeton
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-for-developers/

@@ -53,18 +53,11 @@ LABS = RACINE / "labs"
 #: rien : un lab nouveau naît conforme, c'est le sens même de la règle.
 DETTE: set[str] = {
     "cka-capstone-portail",
-    "cka-hpa-autoscaling",
     "cka-kubeadm-upgrade",
-    "cka-node-affinity",
     "cka-node-drain-cordon",
-    "cka-rbac-serviceaccount",
-    "cka-resourcequota-limitrange",
-    "cka-taints-tolerations-placement",
     "cka-troubleshoot-crashloopbackoff",
     "cka-troubleshoot-imagepullbackoff",
     "ckad-capstone-boutique",
-    "ckad-rbac-role-rolebinding",
-    "ckad-security-context-hardened",
     "ckad-troubleshoot-crashloop",
     "cks-api-server-hardening",
     "cks-apparmor-confiner-un-pod",
@@ -77,11 +70,9 @@ DETTE: set[str] = {
     "cks-istio-mtls-lockdown",
     "cks-networkpolicy-default-deny",
     "cks-pod-security-admission",
-    "cks-rbac-least-privilege",
     "cks-runtime-sandbox-gvisor",
     "cks-seccomp-profile",
     "cks-secure-existing-pod",
-    "cks-security-context-immutable",
     "cks-validating-admission-policy",
 }
 

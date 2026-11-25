@@ -269,11 +269,11 @@ dsoxlab check cka-resourcequota-limitrange
 ```text
 ╭─ Résultat : cka-resourcequota-limitrange ─╮
 │  0 / 100 pts                              │
-│  ░░░░░░░░░░░░░░░░░░░░  0/2 tests          │
+│  ░░░░░░░░░░░░░░░░░░░░  0/3 tests          │
 ╰───────────────────────────────────────────╯
 ```
 
-0 sur 2 : c'est le résultat attendu. Le challenge vous attend, intact.
+0 sur 3 : c'est le résultat attendu. Le challenge vous attend, intact.
 
 ## 🎯 Le challenge
 

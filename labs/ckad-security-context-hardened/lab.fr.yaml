@@ -6,3 +6,37 @@ description: |
   Et lui donner quand même de quoi écrire là où il en a besoin, sinon il ne
   démarre pas. Prouver, de l'intérieur, que le confinement agit et que
   l'application sert.
+
+criteria:
+  - id: la-definition-impose-l-utilisateur-1000
+    label: "Le Pod tourne, et sa définition impose l'utilisateur non root 1000"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: la-definition-interdit-l-escalade
+    label: "Le conteneur interdit l'escalade de privilèges"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: la-definition-ferme-la-racine
+    label: "Le conteneur déclare sa racine en lecture seule"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: la-definition-retire-toutes-les-capabilities
+    label: "Le conteneur retire toutes les capabilities"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: le-processus-est-l-utilisateur-1000
+    label: "Dans le conteneur, le processus est l'utilisateur 1000"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: la-racine-est-en-lecture-seule
+    label: "Une écriture dans la racine du conteneur est refusée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: le-serveur-peut-ecrire-dans-tmp
+    label: "Le serveur peut écrire dans /tmp"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: l-application-repond
+    label: "L'application répond malgré le durcissement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/

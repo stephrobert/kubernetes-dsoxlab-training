@@ -1,7 +1,8 @@
 """test_functional.py : cks-security-context-immutable
 
-Deux affirmations qui lisent l'état réel des conteneurs, jamais les commandes
-tapées.
+Cinq affirmations : les quatre exigences déclarées, une par test, puis la preuve
+qu'elles agissent sans arrêter le site. Elles lisent l'état réel, jamais les
+commandes tapées.
 
 Le choix du chemin de preuve est le point délicat de ce lab, et il a été
 mesuré plutôt que supposé. L'image tourne sous l'UID 101 : la racine lui est
@@ -73,12 +74,14 @@ def _un_pod_du_deployment(host) -> str:
 
 
 # ----------------------------------------------------------------------
-# 1. Les quatre exigences sont déclarées.
+# 1 à 4. Les quatre exigences sont déclarées.
 # ----------------------------------------------------------------------
-def test_les_quatre_exigences_sont_declarees(host):
-    """Ce test ne prouve rien à lui seul, et c'est voulu : il est là pour que
-    l'échec du test suivant soit diagnosticable, et pour nommer celle des
-    quatre exigences qui manque."""
+def _pod_declare(host) -> dict:
+    """Le Pod décrit par le Deployment.
+
+    Les quatre tests qui le lisent ne prouvent rien à eux seuls : ils nomment
+    l'exigence qui manque, pour que l'échec du dernier soit diagnosticable.
+    """
     rc, sortie, diagnostic = _kubectl(
         host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json"
     )
@@ -91,46 +94,64 @@ def test_les_quatre_exigences_sont_declarees(host):
         f"objet d'un autre nom. {diagnostic}",
     )
     spec = json.loads(sortie)["spec"]["template"]["spec"]
-    pod_sc = spec.get("securityContext", {})
-    conteneurs = spec.get("containers", [])
-    assert conteneurs, message(
+    assert spec.get("containers"), message(
         en="The Deployment declares no container.",
         fr="Le Deployment ne déclare aucun conteneur.",
     )
+    return spec
 
-    manques = []
-    for c in conteneurs:
-        sc = c.get("securityContext", {})
-        if sc.get("readOnlyRootFilesystem") is not True:
-            manques.append(f"{c['name']} : readOnlyRootFilesystem n'est pas true")
-        if sc.get("allowPrivilegeEscalation") is not False:
-            manques.append(f"{c['name']} : allowPrivilegeEscalation n'est pas false")
-        drop = [d.upper() for d in sc.get("capabilities", {}).get("drop", [])]
-        if "ALL" not in drop:
-            manques.append(f"{c['name']} : les capacités ne sont pas toutes retirées")
-    if pod_sc.get("runAsNonRoot") is not True and not all(
-        c.get("securityContext", {}).get("runAsNonRoot") is True for c in conteneurs
-    ):
-        manques.append("runAsNonRoot n'est déclaré ni au niveau du Pod ni des conteneurs")
 
-    assert not manques, message(
-        en="Some requirements are missing from the securityContext:\n  - "
-        + "\n  - ".join(manques)
-        + "\n\nMind the LEVEL: what concerns the process's identity "
-        "is declared at the Pod level as well as the container level, whereas "
-        "escalation, capabilities and the filesystem are only accepted "
-        "at the CONTAINER level.",
-        fr="Il manque des exigences dans le securityContext :\n  - "
-        + "\n  - ".join(manques)
-        + "\n\nAttention au NIVEAU : ce qui concerne l'identité du processus "
-        "se déclare au niveau du Pod comme du conteneur, tandis que "
-        "l'escalade, les capacités et le système de fichiers ne s'acceptent "
-        "qu'au niveau du CONTENEUR.",
+def _sc(conteneur: dict) -> dict:
+    return conteneur.get("securityContext") or {}
+
+
+NIVEAU_EN = (
+    "What concerns the process's identity is declared at the Pod level as well "
+    "as the container level, whereas escalation, capabilities and the filesystem "
+    "are only accepted at the CONTAINER level."
+)
+NIVEAU_FR = (
+    "Ce qui concerne l'identité du processus se déclare au niveau du Pod comme "
+    "du conteneur, tandis que l'escalade, les capacités et le système de fichiers "
+    "ne s'acceptent qu'au niveau du CONTENEUR."
+)
+
+
+def test_la_racine_est_declaree_en_lecture_seule(host):
+    fautifs = [c["name"] for c in _pod_declare(host)["containers"] if _sc(c).get("readOnlyRootFilesystem") is not True]
+    assert not fautifs, message(
+        en=f"readOnlyRootFilesystem is not true on: {fautifs}. " + NIVEAU_EN,
+        fr=f"readOnlyRootFilesystem n'est pas true sur : {fautifs}. " + NIVEAU_FR,
+    )
+
+
+def test_l_escalade_est_interdite(host):
+    fautifs = [c["name"] for c in _pod_declare(host)["containers"] if _sc(c).get("allowPrivilegeEscalation") is not False]
+    assert not fautifs, message(
+        en=f"allowPrivilegeEscalation is not false on: {fautifs}. " + NIVEAU_EN,
+        fr=f"allowPrivilegeEscalation n'est pas false sur : {fautifs}. " + NIVEAU_FR,
+    )
+
+
+def test_toutes_les_capacites_sont_retirees(host):
+    fautifs = [c["name"] for c in _pod_declare(host)["containers"] if "ALL" not in [d.upper() for d in (_sc(c).get("capabilities") or {}).get("drop") or []]]
+    assert not fautifs, message(
+        en=f"The capabilities are not all dropped on: {fautifs}. " + NIVEAU_EN,
+        fr=f"Les capacités ne sont pas toutes retirées sur : {fautifs}. " + NIVEAU_FR,
+    )
+
+
+def test_l_execution_non_root_est_declaree(host):
+    spec = _pod_declare(host)
+    au_pod = (spec.get("securityContext") or {}).get("runAsNonRoot") is True
+    assert au_pod or all(_sc(c).get("runAsNonRoot") is True for c in spec["containers"]), message(
+        en="runAsNonRoot is declared neither at the Pod level nor on every container. " + NIVEAU_EN,
+        fr="runAsNonRoot n'est déclaré ni au niveau du Pod ni sur tous les conteneurs. " + NIVEAU_FR,
     )
 
 
 # ----------------------------------------------------------------------
-# 2. LE test : l'écriture est refusée, et l'application sert encore.
+# 5. LE test : l'écriture est refusée, et l'application sert encore.
 # ----------------------------------------------------------------------
 def test_l_interieur_ne_s_ecrit_plus_et_le_site_sert_toujours(host):
     """La preuve, exercée depuis l'intérieur du conteneur et depuis le réseau.

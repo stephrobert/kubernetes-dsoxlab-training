@@ -2,15 +2,16 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Cinq affirmations. La première veut le Pod en marche sous son identité ;
-sans ServiceAccount, il n'existe pas. La deuxième lit le Role et le
-RoleBinding et refuse tout droit en trop : un Role qui donnerait aussi
-delete, ou secrets, passerait un candidat trop généreux. Les deux suivantes
+Six affirmations. La première veut le Pod en marche sous son identité ;
+sans ServiceAccount, il n'existe pas. La deuxième lit le Role et
+refuse tout droit en trop : un Role qui donnerait aussi delete, ou secrets,
+passerait un candidat trop généreux. La troisième lit le RoleBinding. Les deux
+suivantes
 entrent dans le Pod et interrogent l'API avec le jeton projeté, ce qui est
 la seule preuve que l'application, et pas l'administrateur, a ces droits :
 lister doit répondre 200, tout le reste 403.
 
-La cinquième (D61) porte sur l'autre moitié du moindre privilège : le Pod
+La sixième (D61) porte sur l'autre moitié du moindre privilège : le Pod
 d'affichage, qui n'appelle jamais l'API, ne doit porter aucun jeton. Elle lit
 les Pods EN MARCHE : couper le jeton sur le ServiceAccount sans recréer les
 Pods ne change rien à ceux qui tournent, et ne passe pas.
@@ -142,6 +143,12 @@ def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
         fr=f"Le Role touche à d'autres ressources que les Pods : {autres}. Le moindre privilège "
         "s'arrête à ce dont l'application a besoin.",
     )
+
+
+# ----------------------------------------------------------------------
+# 3. Le RoleBinding donne ce Role au ServiceAccount.
+# ----------------------------------------------------------------------
+def test_le_binding_donne_le_role_au_serviceaccount(host):
     res = _kubectl(host, f"-n {NAMESPACE} get rolebinding {BINDING} -o json")
     assert res.rc == 0, message(
         en=f"No RoleBinding {BINDING} in {NAMESPACE}.",
@@ -162,7 +169,7 @@ def test_le_role_accorde_la_lecture_et_rien_de_plus(host):
 
 
 # ----------------------------------------------------------------------
-# 3. Depuis le Pod, lister les Pods passe.
+# 4. Depuis le Pod, lister les Pods passe.
 # ----------------------------------------------------------------------
 def test_depuis_le_pod_lister_les_pods_passe(host):
     _pod(host)
@@ -178,7 +185,7 @@ def test_depuis_le_pod_lister_les_pods_passe(host):
 
 
 # ----------------------------------------------------------------------
-# 4. La preuve : tout le reste est refusé.
+# 5. La preuve : tout le reste est refusé.
 # ----------------------------------------------------------------------
 def test_depuis_le_pod_tout_le_reste_est_refuse(host):
     pod = _pod(host)
@@ -206,7 +213,7 @@ def test_depuis_le_pod_tout_le_reste_est_refuse(host):
 
 
 # ----------------------------------------------------------------------
-# 5. Le Pod qui n'appelle pas l'API n'a aucun jeton monté (D61).
+# 6. Le Pod qui n'appelle pas l'API n'a aucun jeton monté (D61).
 # ----------------------------------------------------------------------
 def _porte_un_jeton(pod: dict) -> list[str]:
     """Les conteneurs du Pod où un jeton de ServiceAccount est monté."""
