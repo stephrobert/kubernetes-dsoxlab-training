@@ -1,5 +1,20 @@
 title: "Sortir un Pod de l'ImagePullBackOff"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
 description: |
   Un Pod ne démarre pas parce que son image ne se télécharge pas. Lire le
   message exact du runtime dans les events, corriger la référence d'image, et
   prouver que le serveur répond.
+
+criteria:
+  - id: le-pod-tourne
+    label: "Le Pod tourne, son conteneur est prêt"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+  - id: l-image-est-nginx-et-a-ete-tiree
+    label: "L'image est nginx, et elle a vraiment été tirée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+  - id: le-serveur-repond
+    label: "Le serveur répond"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/

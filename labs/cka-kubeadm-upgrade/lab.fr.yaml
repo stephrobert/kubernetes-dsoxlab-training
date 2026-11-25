@@ -5,3 +5,13 @@ description: |
   à servir, et la montée à conduire : le plan de contrôle d'abord, le nœud
   ensuite, chacun avec sa propre commande. Les tests lisent les versions et
   vérifient que rien n'a été laissé vidé.
+
+criteria:
+  - id: le-plan-de-controle-est-monte
+    label: "Le plan de contrôle tourne à la version visée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/
+  - id: tous-les-noeuds-sont-montes-et-le-service-tient
+    label: "Tous les nœuds sont à la version visée, et le service tient"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/mettre-a-jour-cluster-kubernetes/

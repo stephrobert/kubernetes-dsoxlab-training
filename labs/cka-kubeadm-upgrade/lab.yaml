@@ -40,3 +40,17 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-plan-de-controle-est-monte
+    label: "The control plane runs the target version"
+    tests:
+      - test_le_plan_de_controle_est_monte
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
+  - id: tous-les-noeuds-sont-montes-et-le-service-tient
+    label: "Every node runs the target version, and the service holds"
+    tests:
+      - test_tous_les_noeuds_sont_montes_et_le_service_tient
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/upgrade-a-kubernetes-cluster/
