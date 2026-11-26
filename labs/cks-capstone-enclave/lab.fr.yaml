@@ -5,3 +5,25 @@ description: |
   espace qui reste sûr même si elle ne l'est pas : le cluster doit refuser
   lui-même ce qu'elle ne devrait pas déployer, son identité ne doit presque
   rien pouvoir, et rien hors de l'enclave ne doit atteindre ce qui y tourne.
+
+criteria:
+  - id: l-espace-refuse-une-charge-privilegiee
+    label: "Le namespace refuse une charge privilégiée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+  - id: l-identite-existe-et-son-jeton-ne-se-monte-pas
+    label: "L'identité existe, et son jeton ne se monte pas"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+  - id: l-identite-peut-lister-les-charges-et-rien-d-autre
+    label: "L'identité peut lister les charges, et rien d'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+  - id: le-coffre-tourne-et-emploie-l-identite
+    label: "Le coffre tourne et emploie l'identité"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/
+  - id: seul-l-appelant-declare-atteint-le-coffre
+    label: "Seul l'appelant déclaré atteint le coffre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercices/

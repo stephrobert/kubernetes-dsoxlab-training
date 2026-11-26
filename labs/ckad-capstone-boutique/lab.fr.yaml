@@ -6,3 +6,45 @@ description: |
   secret, sondes, identité, exposition et isolation. Rien ne dit quel objet
   créer, et le dernier test vérifie la seule chose qui compte : un Pod
   frontend joint la boutique, un Pod qui n'en est pas un ne la joint pas.
+
+criteria:
+  - id: le-catalogue-tourne-en-deux-exemplaires
+    label: "Le catalogue tourne en deux exemplaires"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: le-message-vit-en-dehors-du-pod
+    label: "Le message vit en dehors du Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: le-conteneur-recoit-vraiment-le-message
+    label: "Le conteneur reçoit vraiment le message"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: le-mot-de-passe-n-est-ni-dans-la-definition-ni-dans-l-environnement
+    label: "Le mot de passe n'est ni dans la définition ni dans l'environnement"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: le-conteneur-lit-le-mot-de-passe-dans-un-fichier
+    label: "Le conteneur lit le mot de passe dans un fichier"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: les-deux-sondes-sont-declarees
+    label: "Les deux sondes sont déclarées"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: les-sondes-ne-font-pas-redemarrer-les-exemplaires
+    label: "Les sondes ne font pas redémarrer les exemplaires"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: le-conteneur-ne-tourne-pas-en-root
+    label: "Le conteneur ne tourne pas en root"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: la-boutique-repond-au-nom-stable
+    label: "La boutique répond à son nom stable"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/
+  - id: seul-le-frontend-joint-la-boutique
+    label: "Seul le frontend joint la boutique"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/ckad/exercices/

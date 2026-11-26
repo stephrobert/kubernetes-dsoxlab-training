@@ -44,3 +44,53 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: les-deux-exemplaires-du-portail-sont-prets
+    label: "Both replicas of the portal are ready"
+    tests:
+      - test_les_deux_exemplaires_du_portail_sont_prets
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: la-reserve-du-portail-tient-dans-un-noeud
+    label: "The portal's resource requests fit on one node"
+    tests:
+      - test_la_reserve_du_portail_tient_dans_un_noeud
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: le-service-designe-vraiment-les-pods-du-portail
+    label: "The Service really selects the portal's Pods"
+    tests:
+      - test_le_service_designe_vraiment_les_pods_du_portail
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: le-portail-repond-dans-le-cluster
+    label: "The portal answers inside the cluster"
+    tests:
+      - test_le_portail_repond_dans_le_cluster
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: le-service-est-expose-sur-le-port-30080
+    label: "The Service is exposed on port 30080"
+    tests:
+      - test_le_service_est_expose_sur_le_port_30080
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: le-portail-repond-sur-chaque-noeud
+    label: "The portal answers on every node, from outside the cluster too"
+    tests:
+      - test_le_portail_repond_sur_chaque_noeud
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: la-reclamation-de-stockage-est-satisfaite
+    label: "The storage claim is bound"
+    tests:
+      - test_la_reclamation_de_stockage_est_satisfaite
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/
+  - id: les-archives-ecrivent-vraiment-dans-leur-volume
+    label: "The archives really write to their volume"
+    tests:
+      - test_les_archives_ecrivent_vraiment_dans_leur_volume
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercises/

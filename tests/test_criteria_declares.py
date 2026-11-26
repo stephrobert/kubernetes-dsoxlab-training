@@ -51,11 +51,10 @@ LABS = RACINE / "labs"
 #:
 #: CHAQUE RETRAIT DE CETTE LISTE EST UN LAB MIS EN CONFORMITÉ. On n'y ajoute
 #: rien : un lab nouveau naît conforme, c'est le sens même de la règle.
-DETTE: set[str] = {
-    "cka-capstone-portail",
-    "ckad-capstone-boutique",
-    "cks-capstone-enclave",
-}
+#:
+#: Soldée le 2026-11-26 : les 31 derniers labs ont reçu leurs critères. La
+#: liste reste, vide, pour que le mécanisme ne puisse pas revenir sans se voir.
+DETTE: set[str] = set()
 
 
 def labs() -> list[pathlib.Path]:

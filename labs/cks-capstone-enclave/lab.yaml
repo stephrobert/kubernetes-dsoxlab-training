@@ -46,3 +46,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: l-espace-refuse-une-charge-privilegiee
+    label: "The namespace refuses a privileged workload"
+    tests:
+      - test_l_espace_refuse_une_charge_privilegiee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
+  - id: l-identite-existe-et-son-jeton-ne-se-monte-pas
+    label: "The identity exists, and its token is not mounted"
+    tests:
+      - test_l_identite_existe_et_son_jeton_ne_se_monte_pas
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
+  - id: l-identite-peut-lister-les-charges-et-rien-d-autre
+    label: "The identity can list workloads, and nothing else"
+    tests:
+      - test_l_identite_peut_lister_les_charges_et_rien_d_autre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
+  - id: le-coffre-tourne-et-emploie-l-identite
+    label: "The vault runs and uses the identity"
+    tests:
+      - test_le_coffre_tourne_et_emploie_l_identite
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
+  - id: seul-l-appelant-declare-atteint-le-coffre
+    label: "Only the declared caller reaches the vault"
+    tests:
+      - test_seul_l_appelant_declare_atteint_le_coffre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/certifications/cks/exercises/
