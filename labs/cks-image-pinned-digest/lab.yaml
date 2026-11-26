@@ -34,3 +34,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: l-image-n-est-plus-referencee-par-un-tag
+    label: "The image is referenced by its digest, no longer by a tag"
+    tests:
+      - test_l_image_n_est_plus_referencee_par_un_tag
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: c-est-toujours-l-image-demandee
+    label: "It is still the requested nginx image"
+    tests:
+      - test_c_est_toujours_l_image_demandee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: le-digest-declare-est-celui-que-le-noeud-execute
+    label: "The declared digest is the one the node runs"
+    tests:
+      - test_le_digest_declare_est_celui_que_le_noeud_execute
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/

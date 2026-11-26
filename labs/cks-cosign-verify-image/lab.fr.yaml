@@ -5,3 +5,17 @@ description: |
   cosign, publiez la clé publique, et prouvez que la chaîne fonctionne : la
   même clé doit accepter l'image signée et refuser l'autre. Une vérification
   qui accepte tout ne prouve rien.
+
+criteria:
+  - id: la-cle-publique-est-publiee-dans-le-cluster
+    label: "La clé publique, et elle seule, est publiée dans le cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+  - id: la-signature-est-poussee-dans-le-registre
+    label: "La signature est poussée dans le registre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/
+  - id: la-cle-accepte-l-image-signee-et-refuse-l-autre
+    label: "La clé accepte l'image signée et refuse l'autre"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/signer-et-verifier-une-image/

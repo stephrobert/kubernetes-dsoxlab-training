@@ -5,3 +5,13 @@ description: |
   applicatif à lui. Placez-y un Pod, et prouvez l'isolation de la seule façon
   qui ne se truque pas : de l'intérieur, la version du noyau n'est plus celle
   du nœud.
+
+criteria:
+  - id: la-runtimeclass-designe-le-runtime-du-noeud
+    label: "La RuntimeClass désigne le runtime du nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/
+  - id: le-pod-confine-ne-voit-pas-le-noyau-de-l-hote
+    label: "Le Pod confiné ne voit pas le noyau de l'hôte"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/runtime-sandboxes/

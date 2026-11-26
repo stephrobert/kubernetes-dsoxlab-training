@@ -38,3 +38,17 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-namespace-exige-le-tls-mutuel
+    label: "The namespace requires mutual TLS in STRICT mode"
+    tests:
+      - test_le_namespace_exige_le_tls_mutuel
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/
+  - id: le-client-sans-sidecar-est-bloque-et-le-client-maille-passe
+    label: "The client without a sidecar is blocked, the meshed client gets through"
+    tests:
+      - test_le_client_sans_sidecar_est_bloque_et_le_client_maille_passe
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/mtls-pod-to-pod/

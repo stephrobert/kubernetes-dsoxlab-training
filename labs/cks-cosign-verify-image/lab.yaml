@@ -38,3 +38,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-cle-publique-est-publiee-dans-le-cluster
+    label: "The public key, and only it, is published in the cluster"
+    tests:
+      - test_la_cle_publique_est_publiee_dans_le_cluster
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
+  - id: la-signature-est-poussee-dans-le-registre
+    label: "The signature is pushed to the registry"
+    tests:
+      - test_la_signature_est_poussee_dans_le_registre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/
+  - id: la-cle-accepte-l-image-signee-et-refuse-l-autre
+    label: "The key accepts the signed image and refuses the other one"
+    tests:
+      - test_la_cle_accepte_l_image_signee_et_refuse_l_autre
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/sign-and-verify-an-image/

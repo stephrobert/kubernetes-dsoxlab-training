@@ -1,9 +1,9 @@
 """test_functional.py : cks-dockerfile-static-analysis
 
-Une seule affirmation, qui lit le fichier du nœud et relance l'analyse,
-jamais les commandes tapées.
+Cinq affirmations, une par constat, qui lisent le fichier du nœud et relancent
+l'analyse, jamais les commandes tapées.
 
-Le dernier test identifie les constats par leur NUMÉRO, et non par un total.
+Chaque test identifie son constat par leur NUMÉRO, et non par un total.
 Ce choix est le cœur du lab : Trivy ajoute des règles à chaque version, et un
 test qui exigerait « zéro constat » deviendrait rouge tout seul le jour où une
 nouvelle règle sortirait, sans que le Dockerfile ait changé d'une ligne. Le
@@ -26,12 +26,16 @@ REPERTOIRE = "/root/inventaire"
 #: Les cinq constats que l'analyse fait sur le Dockerfile de départ, mesurés
 #: le 2026-09-16 avec Trivy 0.74.0.
 CONSTATS_DU_DEPART = {
-    "DS-0001": "le tag flottant « latest »",
-    "DS-0002": "l'image tourne en root",
-    "DS-0004": "le port 22 est exposé",
-    "DS-0026": "aucun HEALTHCHECK",
-    "DS-0029": "apt-get sans --no-install-recommends",
+    "DS-0001": ("the floating \"latest\" tag", "le tag flottant « latest »"),
+    "DS-0002": ("the image runs as root", "l'image tourne en root"),
+    "DS-0004": ("port 22 is exposed", "le port 22 est exposé"),
+    "DS-0026": ("no HEALTHCHECK", "aucun HEALTHCHECK"),
+    "DS-0029": ("apt-get without --no-install-recommends", "apt-get sans --no-install-recommends"),
 }
+#: L'analyse coûte plusieurs secondes : elle tourne une fois pour les cinq
+#: tests. Ce n'est pas une fixture, pour qu'un échec de l'outil soit un ÉCHEC
+#: du test et non une erreur de préparation.
+_ANALYSE: dict[str, set[str]] = {}
 
 
 @pytest.fixture(scope="module")
@@ -61,22 +65,16 @@ def _analyse(host) -> set[str]:
     }
 
 
-# ----------------------------------------------------------------------
-# LE test, et le seul : les cinq constats ont disparu.
-# ----------------------------------------------------------------------
-def test_les_cinq_constats_ont_disparu(host):
-    """L'analyse est rejouée, et les constats sont nommés par leur numéro.
+def _constats_restants(host) -> set[str]:
+    """Les constats du départ que l'analyse rejouée fait encore.
 
-    Un test qui exigerait « zéro constat » deviendrait rouge tout seul le jour
-    où Trivy ajouterait une règle, sans que le Dockerfile ait changé. Les cinq
-    numéros, eux, désignent exactement ce qui était demandé.
+    Deux vérifications précèdent l'analyse et n'ont PAS de test à elles, parce
+    qu'elles sont vraies avant le travail comme après : le Dockerfile existe,
+    et il part de Node pour lancer server.js. Un test toujours vrai ne mesure
+    rien, et la validation a rendu ce lab ROUGE pour cette raison. Ici elles
+    gardent tout leur sens : elles interdisent de faire taire l'analyse en
+    supprimant le fichier, ou en changeant d'application.
     """
-    # Deux vérifications qui n'ont PAS de test à elles, parce qu'elles sont
-    # vraies avant le travail comme après : le Dockerfile existe, et il part
-    # de Node pour lancer server.js. Un test toujours vrai ne mesure rien, et
-    # la validation a rendu ce lab ROUGE pour cette raison. Ici elles gardent
-    # tout leur sens : elles interdisent de faire taire l'analyse en
-    # supprimant le fichier, ou en changeant d'application.
     res = host.run(f"sudo cat {DOCKERFILE}")
     assert res.rc == 0 and res.stdout.strip(), message(
         en=f"No readable Dockerfile at {DOCKERFILE}. The specification "
@@ -95,15 +93,57 @@ def test_les_cinq_constats_ont_disparu(host):
         "server.js. Il fallait corriger les constats, pas changer "
         "l'application.",
     )
+    if contenu not in _ANALYSE:
+        _ANALYSE[contenu] = _analyse(host)
+    return _ANALYSE[contenu] & set(CONSTATS_DU_DEPART)
 
-    restants = _analyse(host) & set(CONSTATS_DU_DEPART)
-    assert not restants, message(
-        en="The analysis still reports:\n  "
-        + "\n  ".join(f"{i}: {CONSTATS_DU_DEPART[i]}" for i in sorted(restants))
-        + "\n\nEach finding carries a `Resolution` section in the output of "
-        "`trivy config`: it says what to write.",
-        fr="L'analyse reproche encore :\n  "
-        + "\n  ".join(f"{i} : {CONSTATS_DU_DEPART[i]}" for i in sorted(restants))
-        + "\n\nChaque constat porte une section `Resolution` dans la sortie de "
-        "`trivy config` : elle dit quoi écrire.",
+
+def _corrige(host, ident: str) -> None:
+    """L'analyse est rejouée, et le constat est nommé par son numéro.
+
+    Un test qui exigerait « zéro constat » deviendrait rouge tout seul le jour
+    où Trivy ajouterait une règle, sans que le Dockerfile ait changé. Le
+    numéro, lui, désigne exactement ce qui était demandé.
+    """
+    en, fr = CONSTATS_DU_DEPART[ident]
+    assert ident not in _constats_restants(host), message(
+        en=f"The analysis still reports {ident}: {en}. The finding carries a "
+        "`Resolution` section in the output of `trivy config`: it says what to write.",
+        fr=f"L'analyse reproche encore {ident} : {fr}. Le constat porte une "
+        "section `Resolution` dans la sortie de `trivy config` : elle dit quoi écrire.",
     )
+
+
+# ----------------------------------------------------------------------
+# 1. L'image de base est épinglée (DS-0001).
+# ----------------------------------------------------------------------
+def test_le_tag_latest_a_disparu(host):
+    _corrige(host, "DS-0001")
+
+
+# ----------------------------------------------------------------------
+# 2. L'image ne tourne plus en root (DS-0002).
+# ----------------------------------------------------------------------
+def test_l_image_ne_tourne_plus_en_root(host):
+    _corrige(host, "DS-0002")
+
+
+# ----------------------------------------------------------------------
+# 3. Le port 22 n'est plus exposé (DS-0004).
+# ----------------------------------------------------------------------
+def test_le_port_22_n_est_plus_expose(host):
+    _corrige(host, "DS-0004")
+
+
+# ----------------------------------------------------------------------
+# 4. Un HEALTHCHECK est déclaré (DS-0026).
+# ----------------------------------------------------------------------
+def test_un_healthcheck_est_declare(host):
+    _corrige(host, "DS-0026")
+
+
+# ----------------------------------------------------------------------
+# 5. apt-get n'installe plus les paquets recommandés (DS-0029).
+# ----------------------------------------------------------------------
+def test_apt_get_n_installe_plus_les_recommandations(host):
+    _corrige(host, "DS-0029")

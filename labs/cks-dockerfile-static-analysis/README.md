@@ -171,11 +171,11 @@ dsoxlab check cks-dockerfile-static-analysis
 ```text
 ╭─ Result: cks-dockerfile-static-analysis ─╮
 │  0 / 100 pts                             │
-│  ░░░░░░░░░░░░░░░░░░░░  0/1 tests         │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests         │
 ╰──────────────────────────────────────────╯
 ```
 
-0 out of 1: that is the expected result. The challenge is waiting for you,
+0 out of 5: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

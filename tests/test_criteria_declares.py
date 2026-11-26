@@ -55,13 +55,6 @@ DETTE: set[str] = {
     "cka-capstone-portail",
     "ckad-capstone-boutique",
     "cks-capstone-enclave",
-    "cks-cosign-verify-image",
-    "cks-dockerfile-static-analysis",
-    "cks-image-pinned-digest",
-    "cks-image-scanning-trivy",
-    "cks-istio-mtls-lockdown",
-    "cks-runtime-sandbox-gvisor",
-    "cks-validating-admission-policy",
 }
 
 
