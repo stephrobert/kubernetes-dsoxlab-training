@@ -15,7 +15,7 @@ skills:
   - kubelet
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+doc_url: https://www.stephane-robert.info/en/docs/devsecops/runtime/seccomp/
 lab_type: lab
 estimated_time: 25m
 
@@ -40,3 +40,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-profil-refuse-la-famille-chmod
+    label: "The profile refuses the whole chmod family"
+    tests:
+      - test_le_profil_refuse_la_famille_chmod
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/seccomp/
+  - id: le-pod-tourne-et-declare-le-profil-local
+    label: "The Pod runs and declares the local profile"
+    tests:
+      - test_le_pod_tourne_et_declare_le_profil_local
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/seccomp/
+  - id: le-confinement-refuse-chmod-et-laisse-le-reste
+    label: "The confinement refuses chmod and lets the rest through"
+    tests:
+      - test_le_confinement_refuse_chmod_et_laisse_le_reste
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/seccomp/

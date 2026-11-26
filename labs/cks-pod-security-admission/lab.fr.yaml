@@ -5,3 +5,21 @@ description: |
   de l'hôte et tourne en root. Activez le standard restricted pour que le
   cluster le refuse à l'admission, et prouvez le refus sans rien créer : un
   essai côté serveur traverse l'admission et n'écrit rien.
+
+criteria:
+  - id: le-namespace-declare-le-standard-restricted
+    label: "Le namespace déclare le standard restricted dans les trois modes"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: le-pod-conforme-tourne
+    label: "Le Pod conforme tourne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: le-pod-conforme-satisfait-les-quatre-exigences
+    label: "Le Pod conforme satisfait les quatre exigences"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: l-admission-refuse-l-interdit-et-accepte-le-conforme
+    label: "L'admission refuse le Pod interdit et accepte le Pod conforme"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/

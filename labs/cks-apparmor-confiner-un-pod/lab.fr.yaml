@@ -1,5 +1,24 @@
 title: "Confiner un Pod avec un profil AppArmor"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
 description: |
   Charger un profil AppArmor sur le nœud, l'appliquer à un conteneur par le
   champ securityContext, et prouver que le confinement agit en constatant
   l'échec d'une écriture que le profil interdit.
+
+criteria:
+  - id: profil-charge-en-enforce
+    label: "Le profil est chargé en mode enforce"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: pod-en-marche
+    label: "Le Pod tourne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: profil-declare-dans-le-security-context
+    label: "Le profil est déclaré dans le securityContext"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/
+  - id: ecriture-refusee-et-lecture-permise
+    label: "L'écriture est refusée, la lecture fonctionne toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/apparmor/

@@ -5,3 +5,13 @@ description: |
   contrôles sur un cluster kubeadm sorti de l'installation. Corrigez ces deux
   contrôles, qui partagent une même cause, puis prouvez-le de la seule façon
   honnête : relancez l'audit et comptez.
+
+criteria:
+  - id: les-deux-controles-vises-passent
+    label: "Les deux contrôles CIS visés passent à l'audit rejoué"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: le-total-baisse-et-le-noeud-reste-pret
+    label: "Le nombre d'échecs baisse, et le worker reste Ready"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/

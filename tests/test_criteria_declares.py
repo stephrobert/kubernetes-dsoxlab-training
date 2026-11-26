@@ -54,20 +54,13 @@ LABS = RACINE / "labs"
 DETTE: set[str] = {
     "cka-capstone-portail",
     "ckad-capstone-boutique",
-    "cks-api-server-hardening",
-    "cks-apparmor-confiner-un-pod",
     "cks-capstone-enclave",
-    "cks-cis-benchmark-remediate",
     "cks-cosign-verify-image",
     "cks-dockerfile-static-analysis",
     "cks-image-pinned-digest",
     "cks-image-scanning-trivy",
     "cks-istio-mtls-lockdown",
-    "cks-networkpolicy-default-deny",
-    "cks-pod-security-admission",
     "cks-runtime-sandbox-gvisor",
-    "cks-seccomp-profile",
-    "cks-secure-existing-pod",
     "cks-validating-admission-policy",
 }
 

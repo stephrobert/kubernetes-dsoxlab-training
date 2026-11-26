@@ -37,3 +37,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-manifeste-porte-les-deux-flags
+    label: "The manifest carries the two flags, and nothing that breaks the API server"
+    tests:
+      - test_le_manifeste_porte_les_deux_flags
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
+  - id: le-profileur-est-ferme-et-l-api-sert-toujours
+    label: "The profiler is closed, and the API still serves"
+    tests:
+      - test_le_profileur_est_ferme_et_l_api_sert_toujours
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
+  - id: l-api-server-refuse-les-suites-cbc
+    label: "The API server refuses CBC suites and keeps AEAD suites"
+    tests:
+      - test_l_api_server_refuse_les_suites_cbc
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/cis-benchmark/
