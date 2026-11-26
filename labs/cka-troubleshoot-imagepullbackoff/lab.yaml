@@ -14,7 +14,7 @@ skills:
   - events
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/imagepullbackoff-kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/imagepullbackoff/
 lab_type: lab
 estimated_time: 10m
 
@@ -33,3 +33,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-pod-tourne
+    label: "The Pod runs, its container ready"
+    tests:
+      - test_le_pod_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/imagepullbackoff/
+  - id: l-image-est-nginx-et-a-ete-tiree
+    label: "The image is nginx, and it was really pulled"
+    tests:
+      - test_l_image_est_nginx_et_a_ete_tiree
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/imagepullbackoff/
+  - id: le-serveur-repond
+    label: "The server answers"
+    tests:
+      - test_le_serveur_repond
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/imagepullbackoff/

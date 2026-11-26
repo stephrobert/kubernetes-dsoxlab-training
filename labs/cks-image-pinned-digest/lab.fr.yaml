@@ -5,3 +5,17 @@ description: |
   immuable de l'image qu'il exécute réellement, et prouvez que l'épinglage
   tient : le digest déclaré doit correspondre à ce que le runtime a résolu, et
   pas seulement y ressembler.
+
+criteria:
+  - id: l-image-n-est-plus-referencee-par-un-tag
+    label: "L'image est référencée par son digest, plus par un tag"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: c-est-toujours-l-image-demandee
+    label: "C'est toujours l'image nginx demandée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: le-digest-declare-est-celui-que-le-noeud-execute
+    label: "Le digest déclaré est celui que le nœud exécute"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/

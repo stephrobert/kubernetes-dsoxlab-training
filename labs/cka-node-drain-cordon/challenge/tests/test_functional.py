@@ -2,13 +2,13 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première lit le budget et son état calculé : un
+Cinq affirmations. La première lit le budget et son état calculé : un
 selector qui ne matche rien donne un PDB qui ne protège rien. La deuxième
 prouve que l'évacuation a eu lieu : chaque Pod de web est né après l'heure
-notée par le setup, aucun ne tourne plus sur le worker, le Pod orphelin est
-parti et le DaemonSet du CNI est resté. La troisième veut le worker de retour
+notée par le setup, aucun ne tourne plus sur le worker, et le DaemonSet du CNI
+est resté. La troisième veut le Pod orphelin parti. La quatrième veut le worker de retour
 dans le scheduling, et comme un nœud jamais cordonné l'est aussi, elle exige
-en plus que l'évacuation ait eu lieu. La quatrième lit la trace.
+en plus que l'évacuation ait eu lieu. La cinquième lit la trace.
 """
 
 from __future__ import annotations
@@ -150,13 +150,6 @@ def test_le_budget_protege_l_application(host):
 # ----------------------------------------------------------------------
 def test_le_worker_a_ete_evacue(host):
     _evacuation_a_eu_lieu(host)
-    res = _kubectl(host, f"-n {NAMESPACE} get pod {ORPHELIN} -o json")
-    assert res.rc != 0 or json.loads(res.stdout)["metadata"].get("deletionTimestamp"), message(
-        en=f"Pod {ORPHELIN} is still on the worker. It has no controller and drain refuses it "
-        "by default: the instruction says it may disappear, and the option exists.",
-        fr=f"Le Pod {ORPHELIN} est toujours sur le worker. Il n'a aucun contrôleur et le drain "
-        "le refuse par défaut : la consigne dit qu'il peut disparaître, et l'option existe.",
-    )
     calico = [
         p for p in _json(host, "-n calico-system get pods -l k8s-app=calico-node")["items"]
         if p["spec"].get("nodeName") == WORKER and not p["metadata"].get("deletionTimestamp")
@@ -170,7 +163,21 @@ def test_le_worker_a_ete_evacue(host):
 
 
 # ----------------------------------------------------------------------
-# 3. Le worker est revenu dans le scheduling, après avoir été vidé.
+# 3. Le Pod sans contrôleur est parti avec les autres.
+# ----------------------------------------------------------------------
+def test_le_pod_sans_controleur_est_parti(host):
+    res = _kubectl(host, f"-n {NAMESPACE} get pod {ORPHELIN} -o json")
+    assert res.rc != 0 or json.loads(res.stdout)["metadata"].get("deletionTimestamp"), message(
+        en=f"Pod {ORPHELIN} is still on the worker. It has no controller and drain refuses it "
+        "by default: the instruction says it may disappear, and the option exists.",
+        fr=f"Le Pod {ORPHELIN} est toujours sur le worker. Il n'a aucun contrôleur et le drain "
+        "le refuse par défaut : la consigne dit qu'il peut disparaître, et l'option existe.",
+    )
+    _evacuation_a_eu_lieu(host)
+
+
+# ----------------------------------------------------------------------
+# 4. Le worker est revenu dans le scheduling, après avoir été vidé.
 # ----------------------------------------------------------------------
 def test_le_worker_est_remis_en_service(host):
     _evacuation_a_eu_lieu(host)
@@ -189,7 +196,7 @@ def test_le_worker_est_remis_en_service(host):
 
 
 # ----------------------------------------------------------------------
-# 4. La trace de l'opération.
+# 5. La trace de l'opération.
 # ----------------------------------------------------------------------
 def test_la_trace_est_ecrite(host):
     res = _kubectl(host, f"-n {NAMESPACE} get configmap {CONFIGMAP} -o json")

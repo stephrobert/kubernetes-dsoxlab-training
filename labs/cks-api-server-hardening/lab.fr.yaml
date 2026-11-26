@@ -5,3 +5,17 @@ description: |
   kubeadm le laisse actif. Fermez-le et retirez les suites de chiffrement CBC, puis prouvez
   les deux moitiés : le profileur répond 404, et le cluster fonctionne
   toujours.
+
+criteria:
+  - id: le-manifeste-porte-les-deux-flags
+    label: "Le manifeste porte les deux flags, et rien qui casse l'API server"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: le-profileur-est-ferme-et-l-api-sert-toujours
+    label: "Le profileur est fermé, et l'API sert toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/
+  - id: l-api-server-refuse-les-suites-cbc
+    label: "L'API server refuse les suites CBC et garde les suites AEAD"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/cis-benchmark/

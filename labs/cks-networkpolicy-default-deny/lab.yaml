@@ -40,3 +40,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-namespace-est-ferme-par-defaut-dans-les-deux-sens
+    label: "The namespace is closed by default, ingress and egress"
+    tests:
+      - test_le_namespace_est_ferme_par_defaut_dans_les_deux_sens
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: seul-le-flux-prevu-atteint-la-base
+    label: "Only web reaches the database"
+    tests:
+      - test_seul_le_flux_prevu_atteint_la_base
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: le-dns-repasse-sans-rouvrir-le-reste-de-la-sortie
+    label: "DNS works again, without reopening the rest of the egress"
+    tests:
+      - test_le_dns_repasse_sans_rouvrir_le_reste_de_la_sortie
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/
+  - id: la-sortie-reste-fermee-vers-ce-qui-n-a-pas-ete-ouvert
+    label: "Egress stays closed towards what was not opened"
+    tests:
+      - test_la_sortie_reste_fermee_vers_ce_qui_n_a_pas_ete_ouvert
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/network-policies/

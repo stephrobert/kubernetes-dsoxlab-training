@@ -1,6 +1,17 @@
 title: "Faire refuser une image non épinglée par le cluster lui-même, sans webhook"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
 description: |
   Un namespace accepte n'importe quelle image, tag compris. Faites refuser par
   l'API server celles qui ne sont pas épinglées par leur digest, avec une
   politique qu'il évalue lui-même : pas de webhook, pas de contrôleur, rien à
   maintenir en vie.
+
+criteria:
+  - id: une-politique-est-liee-en-mode-refus
+    label: "Une politique est liée en mode refus"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/
+  - id: une-image-par-tag-est-refusee-et-une-image-epinglee-passe
+    label: "Une image par tag est refusée, une image épinglée passe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/validating-admission-policy/

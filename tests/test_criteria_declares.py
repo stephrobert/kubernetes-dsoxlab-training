@@ -51,39 +51,10 @@ LABS = RACINE / "labs"
 #:
 #: CHAQUE RETRAIT DE CETTE LISTE EST UN LAB MIS EN CONFORMITÉ. On n'y ajoute
 #: rien : un lab nouveau naît conforme, c'est le sens même de la règle.
-DETTE: set[str] = {
-    "cka-capstone-portail",
-    "cka-hpa-autoscaling",
-    "cka-kubeadm-upgrade",
-    "cka-node-affinity",
-    "cka-node-drain-cordon",
-    "cka-rbac-serviceaccount",
-    "cka-resourcequota-limitrange",
-    "cka-taints-tolerations-placement",
-    "cka-troubleshoot-crashloopbackoff",
-    "cka-troubleshoot-imagepullbackoff",
-    "ckad-capstone-boutique",
-    "ckad-rbac-role-rolebinding",
-    "ckad-security-context-hardened",
-    "ckad-troubleshoot-crashloop",
-    "cks-api-server-hardening",
-    "cks-apparmor-confiner-un-pod",
-    "cks-capstone-enclave",
-    "cks-cis-benchmark-remediate",
-    "cks-cosign-verify-image",
-    "cks-dockerfile-static-analysis",
-    "cks-image-pinned-digest",
-    "cks-image-scanning-trivy",
-    "cks-istio-mtls-lockdown",
-    "cks-networkpolicy-default-deny",
-    "cks-pod-security-admission",
-    "cks-rbac-least-privilege",
-    "cks-runtime-sandbox-gvisor",
-    "cks-seccomp-profile",
-    "cks-secure-existing-pod",
-    "cks-security-context-immutable",
-    "cks-validating-admission-policy",
-}
+#:
+#: Soldée le 2026-11-26 : les 31 derniers labs ont reçu leurs critères. La
+#: liste reste, vide, pour que le mécanisme ne puisse pas revenir sans se voir.
+DETTE: set[str] = set()
 
 
 def labs() -> list[pathlib.Path]:

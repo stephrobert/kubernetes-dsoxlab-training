@@ -38,3 +38,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-hpa-vise-le-deployment-entre-ses-bornes
+    label: "The HPA targets php-apache, between 1 and 10 replicas"
+    tests:
+      - test_le_hpa_vise_le_deployment_entre_ses_bornes
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+  - id: le-hpa-decide-sur-l-utilisation-cpu
+    label: "The HPA decides on a 50% CPU utilization"
+    tests:
+      - test_le_hpa_decide_sur_l_utilisation_cpu
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+  - id: le-hpa-lit-des-metriques
+    label: "The HPA reads a current CPU metric"
+    tests:
+      - test_le_hpa_lit_des_metriques
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+  - id: une-montee-a-eu-lieu
+    label: "The controller scaled the Deployment up under load"
+    tests:
+      - test_une_montee_a_eu_lieu
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/
+  - id: la-charge-est-coupee
+    label: "The load is cut, after the scale-up"
+    tests:
+      - test_la_charge_est_coupee
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-autoscaling/

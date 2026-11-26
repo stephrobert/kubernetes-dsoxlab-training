@@ -234,11 +234,11 @@ dsoxlab check ckad-rbac-role-rolebinding
 ```text
 ╭─ Result: ckad-rbac-role-rolebinding ─╮
 │  0 / 100 pts                         │
-│  ░░░░░░░░░░░░░░░░░░░░  0/3 tests     │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests     │
 ╰──────────────────────────────────────╯
 ```
 
-0 out of 3: that is the expected result. The challenge is waiting for you,
+0 out of 5: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

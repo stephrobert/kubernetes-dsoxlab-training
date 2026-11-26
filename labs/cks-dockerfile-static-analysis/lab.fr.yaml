@@ -6,3 +6,25 @@ description: |
   prouvez-le en relançant l'analyse : les cinq constats doivent avoir disparu,
   identifiés par leur numéro et non par un total qu'une nouvelle règle
   fausserait.
+
+criteria:
+  - id: le-tag-latest-a-disparu
+    label: "L'image de base n'emploie plus le tag latest"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: l-image-ne-tourne-plus-en-root
+    label: "L'image ne tourne plus en root"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: le-port-22-n-est-plus-expose
+    label: "Le port 22 n'est plus exposé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: un-healthcheck-est-declare
+    label: "Un HEALTHCHECK est déclaré"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/
+  - id: apt-get-n-installe-plus-les-recommandations
+    label: "apt-get n'installe plus les paquets recommandés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/supply-chain-security/

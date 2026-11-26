@@ -43,7 +43,7 @@ redémarrage. Ce serait une panne, pas une maîtrise des ressources.
 
 ## Comment vous saurez que c'est bon
 
-Les deux tests sont des preuves **actives** : ils créent réellement les deux
+Les trois tests sont des preuves **actives** : ils créent réellement les deux
 Pods, l'un extravagant et l'autre muet, et constatent le refus du premier et la
 complétion du second. Relire les objets posés ne prouverait rien : un plafond
 qui ne porte pas sur les bonnes ressources est un objet parfaitement valide qui

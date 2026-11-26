@@ -5,3 +5,37 @@ description: |
   aucun ticket pour dire pourquoi. Trois défauts indépendants à trouver, deux
   exigences qui n'ont jamais été satisfaites, et une seule mesure de réussite :
   le portail répond sur chaque nœud du cluster.
+
+criteria:
+  - id: les-deux-exemplaires-du-portail-sont-prets
+    label: "Les deux exemplaires du portail sont prêts"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: la-reserve-du-portail-tient-dans-un-noeud
+    label: "Les ressources réservées par le portail tiennent sur un nœud"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: le-service-designe-vraiment-les-pods-du-portail
+    label: "Le Service sélectionne vraiment les Pods du portail"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: le-portail-repond-dans-le-cluster
+    label: "Le portail répond dans le cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: le-service-est-expose-sur-le-port-30080
+    label: "Le Service est exposé sur le port 30080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: le-portail-repond-sur-chaque-noeud
+    label: "Le portail répond sur chaque nœud, y compris hors du cluster"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: la-reclamation-de-stockage-est-satisfaite
+    label: "La demande de stockage est satisfaite"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/
+  - id: les-archives-ecrivent-vraiment-dans-leur-volume
+    label: "Les archives écrivent vraiment dans leur volume"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/certifications/cka/exercices/

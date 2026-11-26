@@ -2,11 +2,11 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première lit le spec du HPA. La deuxième lit ses
-métriques courantes : un HPA qui affiche <unknown> ne décidera jamais rien.
-La troisième lit les events du contrôleur : un SuccessfulRescale vers deux
+Cinq affirmations. Les deux premières lisent le spec du HPA, sa portée puis sa
+cible. La troisième lit ses métriques courantes : un HPA qui affiche <unknown>
+ne décidera jamais rien. La quatrième lit les events du contrôleur : un SuccessfulRescale vers deux
 replicas ou plus, pour une utilisation au-dessus de la cible, est la trace
-qu'une montée a eu lieu. La quatrième veut la charge coupée, et comme un
+qu'une montée a eu lieu. La cinquième veut la charge coupée, et comme un
 cluster jamais chargé n'a pas de générateur non plus, elle exige aussi que
 la montée ait eu lieu.
 """
@@ -54,9 +54,9 @@ def _montees(host) -> list[str]:
 
 
 # ----------------------------------------------------------------------
-# 1. Le HPA est déclaré comme demandé.
+# 1. Le HPA vise le bon Deployment, entre les bonnes bornes.
 # ----------------------------------------------------------------------
-def test_le_hpa_est_declare(host):
+def test_le_hpa_vise_le_deployment_entre_ses_bornes(host):
     hpa = _hpa(host)
     cible = hpa["spec"].get("scaleTargetRef") or {}
     assert (cible.get("kind"), cible.get("name")) == ("Deployment", DEPLOYMENT), message(
@@ -67,6 +67,13 @@ def test_le_hpa_est_declare(host):
         en=f"min {hpa['spec'].get('minReplicas')} and max {hpa['spec'].get('maxReplicas')}, expected 1 and 10.",
         fr=f"min {hpa['spec'].get('minReplicas')} et max {hpa['spec'].get('maxReplicas')}, attendu 1 et 10.",
     )
+
+
+# ----------------------------------------------------------------------
+# 2. Le HPA décide sur l'utilisation CPU.
+# ----------------------------------------------------------------------
+def test_le_hpa_decide_sur_l_utilisation_cpu(host):
+    hpa = _hpa(host)
     cpu = [
         m for m in hpa["spec"].get("metrics") or []
         if m.get("type") == "Resource" and (m.get("resource") or {}).get("name") == "cpu"
@@ -83,7 +90,7 @@ def test_le_hpa_est_declare(host):
 
 
 # ----------------------------------------------------------------------
-# 2. Le HPA lit des métriques.
+# 3. Le HPA lit des métriques.
 # ----------------------------------------------------------------------
 def test_le_hpa_lit_des_metriques(host):
     courantes: list[dict] = []
@@ -108,7 +115,7 @@ def test_le_hpa_lit_des_metriques(host):
 
 
 # ----------------------------------------------------------------------
-# 3. Une montée en charge a eu lieu.
+# 4. Une montée en charge a eu lieu.
 # ----------------------------------------------------------------------
 def test_une_montee_a_eu_lieu(host):
     montees = _montees(host)
@@ -123,7 +130,7 @@ def test_une_montee_a_eu_lieu(host):
 
 
 # ----------------------------------------------------------------------
-# 4. La charge est coupée, après avoir servi.
+# 5. La charge est coupée, après avoir servi.
 # ----------------------------------------------------------------------
 def test_la_charge_est_coupee(host):
     assert _montees(host), message(

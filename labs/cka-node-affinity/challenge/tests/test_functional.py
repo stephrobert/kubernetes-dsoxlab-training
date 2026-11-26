@@ -2,11 +2,11 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première lit le label du nœud. La deuxième lit les
-affinités déclarées par storage-app, l'obligatoire et la préférée, avec
-leurs opérateurs, valeurs et poids. La troisième lit le nœud réel de ses
-trois Pods : la contrainte obligatoire ne laisse qu'un nœud possible, et
-c'est ce qui se mesure. La quatrième veut gpu-app en marche sur un nœud
+Cinq affirmations. La première lit le label du nœud. Les deux suivantes lisent
+l'affinité obligatoire puis la préférée de storage-app, avec leurs opérateurs,
+valeurs et poids. La quatrième lit le nœud réel de ses trois Pods : la
+contrainte obligatoire ne laisse qu'un nœud possible, et c'est ce qui se
+mesure. La cinquième veut gpu-app en marche sur un nœud
 étiqueté accelerator=gpu, avec l'affinité qui l'a fait attendre, et sans
 avoir été recréé après la pose du label.
 """
@@ -65,20 +65,20 @@ def test_le_worker_est_etiquete_ssd(host):
 
 
 # ----------------------------------------------------------------------
-# 2. storage-app déclare l'obligatoire et le préféré.
+# 2. storage-app déclare l'affinité obligatoire.
 # ----------------------------------------------------------------------
-def test_storage_app_declare_les_deux_affinites(host):
+def _affinite_de_storage_app(host) -> dict:
     res = _kubectl(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json")
     assert res.rc == 0, message(
         en=f"No Deployment {DEPLOYMENT} in {NAMESPACE}.",
         fr=f"Aucun Deployment {DEPLOYMENT} dans {NAMESPACE}.",
     )
     d = json.loads(res.stdout)
-    assert d["spec"].get("replicas") == 3, message(
-        en=f"{DEPLOYMENT} asks for {d['spec'].get('replicas')} replica(s) instead of 3.",
-        fr=f"{DEPLOYMENT} demande {d['spec'].get('replicas')} replica(s) au lieu de 3.",
-    )
-    affinite = ((d["spec"]["template"]["spec"].get("affinity") or {}).get("nodeAffinity") or {})
+    return (d["spec"]["template"]["spec"].get("affinity") or {}).get("nodeAffinity") or {}
+
+
+def test_storage_app_declare_l_affinite_obligatoire(host):
+    affinite = _affinite_de_storage_app(host)
     obligatoire = _expressions((affinite.get("requiredDuringSchedulingIgnoredDuringExecution") or {}).get("nodeSelectorTerms") or [])
     assert ("disktype", "In", ["nvme", "ssd"]) in obligatoire, message(
         en=f"The required affinity of {DEPLOYMENT} is {obligatoire}, expected disktype In [ssd, nvme]. "
@@ -86,7 +86,13 @@ def test_storage_app_declare_les_deux_affinites(host):
         fr=f"L'affinité obligatoire de {DEPLOYMENT} est {obligatoire}, attendu disktype In [ssd, nvme]. "
         "C'est requiredDuringSchedulingIgnoredDuringExecution, avec l'opérateur In et les deux valeurs.",
     )
-    preferes = affinite.get("preferredDuringSchedulingIgnoredDuringExecution") or []
+
+
+# ----------------------------------------------------------------------
+# 3. storage-app déclare la préférence pondérée.
+# ----------------------------------------------------------------------
+def test_storage_app_declare_la_preference(host):
+    preferes = _affinite_de_storage_app(host).get("preferredDuringSchedulingIgnoredDuringExecution") or []
     bons = [
         p for p in preferes
         if p.get("weight") == 80 and ("storage-tier", "In", ["fast"]) in _expressions([p.get("preference") or {}])
@@ -102,7 +108,7 @@ def test_storage_app_declare_les_deux_affinites(host):
 
 
 # ----------------------------------------------------------------------
-# 3. Les trois Pods sont sur le seul nœud qui satisfait l'obligation.
+# 4. Les trois Pods sont sur le seul nœud qui satisfait l'obligation.
 # ----------------------------------------------------------------------
 def test_storage_app_tourne_sur_le_noeud_ssd(host):
     prets: list[dict] = []
@@ -133,7 +139,7 @@ def test_storage_app_tourne_sur_le_noeud_ssd(host):
 
 
 # ----------------------------------------------------------------------
-# 4. gpu-app a attendu son label, puis a démarré, sans être recréé.
+# 5. gpu-app a attendu son label, puis a démarré, sans être recréé.
 # ----------------------------------------------------------------------
 def test_gpu_app_a_demarre_quand_le_label_est_arrive(host):
     pod: dict = {}

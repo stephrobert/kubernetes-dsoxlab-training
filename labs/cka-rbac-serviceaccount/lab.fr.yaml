@@ -7,3 +7,29 @@ description: |
   jeton, que lister passe et que supprimer, lire les Secrets ou regarder
   ailleurs sont refusés. Enfin, couper le jeton du Pod qui n'appelle
   jamais l'API.
+
+criteria:
+  - id: l-application-demarre-sous-son-identite
+    label: "L'application tourne sous son ServiceAccount"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: le-role-accorde-la-lecture-et-rien-de-plus
+    label: "Le Role accorde la lecture des Pods et rien de plus"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: le-binding-donne-le-role-au-serviceaccount
+    label: "Le RoleBinding donne ce Role au ServiceAccount"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: depuis-le-pod-lister-les-pods-passe
+    label: "Depuis le Pod, lister les Pods est permis"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: depuis-le-pod-tout-le-reste-est-refuse
+    label: "Depuis le Pod, tout le reste est refusé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/
+  - id: le-pod-qui-n-appelle-pas-l-api-n-a-aucun-jeton
+    label: "Le Pod qui n'appelle pas l'API ne porte aucun jeton"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/serviceaccounts-developpeurs/

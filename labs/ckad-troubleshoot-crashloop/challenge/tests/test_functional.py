@@ -69,9 +69,14 @@ def _stable(host, nom: str, cause: str) -> dict:
 # ----------------------------------------------------------------------
 def test_bad_command_tourne(host):
     _stable(host, "bad-command",
-            "Le conteneur ne trouve pas sa commande : le message de sortie du dernier "
-            "état terminé le dit. Donnez-lui une commande qui existe dans l'image, "
-            "et qui ne se termine pas.")
+            message(
+                en="The container cannot find its command: the exit message of the last "
+                "terminated state says so. Give it a command that exists in the image, "
+                "and that does not end.",
+                fr="Le conteneur ne trouve pas sa commande : le message de sortie du dernier "
+                "état terminé le dit. Donnez-lui une commande qui existe dans l'image, "
+                "et qui ne se termine pas.",
+            ))
 
 
 # ----------------------------------------------------------------------
@@ -79,8 +84,12 @@ def test_bad_command_tourne(host):
 # ----------------------------------------------------------------------
 def test_missing_env_tourne(host):
     pod = _stable(host, "missing-env",
-                  "Le conteneur exige une variable et sort si elle manque : ses logs, avec "
-                  "--previous, disent laquelle. Elle se déclare sous env dans le Pod.")
+                  message(
+                      en="The container requires a variable and exits without it: its logs, with "
+                      "--previous, say which one. It is declared under env in the Pod.",
+                      fr="Le conteneur exige une variable et sort si elle manque : ses logs, avec "
+                      "--previous, disent laquelle. Elle se déclare sous env dans le Pod.",
+                  ))
     variables = {e.get("name") for e in pod["spec"]["containers"][0].get("env") or []}
     assert "APP_MODE" in variables, message(
         en=f"missing-env runs, but without APP_MODE in its env: {sorted(variables) or 'none'}. "
@@ -95,8 +104,12 @@ def test_missing_env_tourne(host):
 # ----------------------------------------------------------------------
 def test_oom_killed_tourne_avec_une_limite_suffisante(host):
     pod = _stable(host, "oom-killed",
-                  "Le kubelet rapporte OOMKilled dans le dernier état terminé : le noyau "
-                  "tue nginx dès qu'il dépasse sa limite de mémoire. Relevez la limite.")
+                  message(
+                      en="The kubelet reports OOMKilled in the last terminated state: the kernel "
+                      "kills nginx as soon as it exceeds its memory limit. Raise the limit.",
+                      fr="Le kubelet rapporte OOMKilled dans le dernier état terminé : le noyau "
+                      "tue nginx dès qu'il dépasse sa limite de mémoire. Relevez la limite.",
+                  ))
     limites = (pod["spec"]["containers"][0].get("resources") or {}).get("limits") or {}
     memoire = str(limites.get("memory", ""))
     octets = 0

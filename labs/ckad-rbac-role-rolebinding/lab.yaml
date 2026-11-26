@@ -34,3 +34,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-role-couvre-les-pods-et-leurs-logs
+    label: "The Role covers the Pods and their logs"
+    tests:
+      - test_le_role_couvre_les_pods_et_leurs_logs
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-binding-donne-le-role-a-dev-user
+    label: "The RoleBinding gives this Role to dev-user"
+    tests:
+      - test_le_binding_donne_le_role_a_dev_user
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: dev-user-liste-les-pods-sans-pouvoir-en-creer
+    label: "dev-user lists the Pods without being able to create any"
+    tests:
+      - test_dev_user_liste_les_pods_sans_pouvoir_en_creer
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: dev-user-lit-les-logs-sans-pouvoir-creer
+    label: "dev-user reads the logs without being able to create Pods"
+    tests:
+      - test_dev_user_lit_les_logs_sans_pouvoir_creer
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-reste-dans-le-namespace
+    label: "The right stays within the namespace and its Pods"
+    tests:
+      - test_le_droit_reste_dans_le_namespace
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/rbac/

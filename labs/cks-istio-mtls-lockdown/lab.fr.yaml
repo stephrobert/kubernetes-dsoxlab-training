@@ -5,3 +5,13 @@ description: |
   maillage ou du dehors. Exigez le TLS mutuel, et prouvez-le de la seule façon
   qui compte : un Pod muni d'un sidecar joint toujours le service, un Pod qui
   n'en a pas ne le joint plus.
+
+criteria:
+  - id: le-namespace-exige-le-tls-mutuel
+    label: "Le namespace exige le TLS mutuel en mode STRICT"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/
+  - id: le-client-sans-sidecar-est-bloque-et-le-client-maille-passe
+    label: "Le client sans sidecar est bloqué, le client maillé passe"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/mtls-pod-to-pod/

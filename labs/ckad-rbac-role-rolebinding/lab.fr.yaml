@@ -5,3 +5,25 @@ description: |
   et rien de plus : ni créer, ni supprimer, ni voir les autres namespaces.
   Prouver les deux côtés avec kubectl auth can-i, ce qui est permis et ce qui
   reste refusé.
+
+criteria:
+  - id: le-role-couvre-les-pods-et-leurs-logs
+    label: "Le Role couvre les Pods et leurs logs"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-binding-donne-le-role-a-dev-user
+    label: "Le RoleBinding donne ce Role à dev-user"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: dev-user-liste-les-pods-sans-pouvoir-en-creer
+    label: "dev-user liste les Pods sans pouvoir en créer"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: dev-user-lit-les-logs-sans-pouvoir-creer
+    label: "dev-user lit les logs sans pouvoir créer de Pod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/
+  - id: le-droit-reste-dans-le-namespace
+    label: "Le droit reste dans le namespace et sur ses Pods"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/rbac/

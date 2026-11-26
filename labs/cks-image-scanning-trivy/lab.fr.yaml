@@ -5,3 +5,13 @@ description: |
   choisissez son remplacement, et prouvez ce choix : le test analyse les deux
   et exige strictement moins de failles critiques que l'original, ce qu'aucun
   seuil fixe ne pourrait mesurer honnêtement.
+
+criteria:
+  - id: l-image-de-production-n-est-plus-celle-d-origine
+    label: "La production ne tourne plus sur l'image d'origine"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/
+  - id: la-nouvelle-image-porte-moins-de-failles-critiques
+    label: "La nouvelle image porte moins de failles critiques"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/image-scanning/

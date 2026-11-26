@@ -43,8 +43,8 @@ exists.
 
 ## How you will know it works
 
-The last test **reruns the analysis** and looks for the five findings by their
-**number**. It does not count: Trivy adds rules with each version, and a test
+Five tests, one per finding, **rerun the analysis** and look for each finding
+by its **number**. They do not count: Trivy adds rules with each version, and a test
 demanding "zero findings" would go red on its own the day a new rule shipped,
 without your Dockerfile changing a line.
 

@@ -5,3 +5,25 @@ description: |
   racine non inscriptible, retirez-lui toutes les capacités, interdisez
   l'escalade, et faites en sorte que l'application continue de servir : nginx
   a besoin de quelques chemins inscriptibles, et les trouver est l'exercice.
+
+criteria:
+  - id: la-racine-est-declaree-en-lecture-seule
+    label: "Les conteneurs déclarent leur racine en lecture seule"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: l-escalade-est-interdite
+    label: "Les conteneurs interdisent l'escalade de privilèges"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: toutes-les-capacites-sont-retirees
+    label: "Les conteneurs retirent toutes les capacités"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: l-execution-non-root-est-declaree
+    label: "L'exécution non root est déclarée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/
+  - id: l-interieur-ne-s-ecrit-plus-et-le-site-sert-toujours
+    label: "L'intérieur ne s'écrit plus, et le site sert toujours"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/security-context/

@@ -82,27 +82,33 @@ def test_les_cinq_defauts_sont_repris(host):
 
     restants = []
     if spec.get("hostPID"):
-        restants.append("le Pod partage encore le namespace de processus de l'hôte (hostPID)")
+        restants.append(("the Pod still shares the host's process namespace (hostPID)",
+                         "le Pod partage encore le namespace de processus de l'hôte (hostPID)"))
     if spec.get("hostNetwork") or spec.get("hostIPC"):
-        restants.append("le Pod partage encore un autre namespace de l'hôte (hostNetwork ou hostIPC)")
+        restants.append(("the Pod still shares another host namespace (hostNetwork or hostIPC)",
+                         "le Pod partage encore un autre namespace de l'hôte (hostNetwork ou hostIPC)"))
     if ctx_ctn.get("privileged"):
-        restants.append("le conteneur est encore privilégié")
+        restants.append(("the container is still privileged", "le conteneur est encore privilégié"))
     if ctx_ctn.get("allowPrivilegeEscalation") is not False:
-        restants.append("allowPrivilegeEscalation n'est pas explicitement à false")
+        restants.append(("allowPrivilegeEscalation is not explicitly false",
+                         "allowPrivilegeEscalation n'est pas explicitement à false"))
     identites = [ctx_pod.get("runAsUser"), ctx_ctn.get("runAsUser")]
     if 0 in identites or not any(i for i in identites if i):
-        restants.append("le conteneur tourne encore en root, ou n'impose aucun utilisateur")
+        restants.append(("the container still runs as root, or sets no user",
+                         "le conteneur tourne encore en root, ou n'impose aucun utilisateur"))
     if "ALL" not in ((ctx_ctn.get("capabilities") or {}).get("drop") or []):
-        restants.append("les capacités du noyau ne sont pas toutes retirées (drop: ALL)")
+        restants.append(("the kernel capabilities are not all dropped (drop: ALL)",
+                         "les capacités du noyau ne sont pas toutes retirées (drop: ALL)"))
     image = conteneur.get("image", "")
     if image.endswith(":latest") or ":" not in image.rsplit("/", 1)[-1]:
-        restants.append(f"l'image « {image} » emploie un tag flottant")
+        restants.append((f"the image \"{image}\" uses a floating tag",
+                         f"l'image « {image} » emploie un tag flottant"))
 
     assert not restants, message(
         en="The rebuilt Pod keeps some of the original's flaws:\n  "
-        + "\n  ".join(restants),
+        + "\n  ".join(en for en, _ in restants),
         fr="Le Pod reconstruit garde des défauts de l'original :\n  "
-        + "\n  ".join(restants),
+        + "\n  ".join(fr for _, fr in restants),
     )
 
 

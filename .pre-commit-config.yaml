@@ -248,6 +248,13 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: photo-pods-recrees
+        name: un Pod recréé ailleurs n'est pas un écart, un Pod en moins en est un
+        entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_photo_pods_recrees.py -q
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: outillage-coherent
         name: les vérificateurs de catalogue sont présents et câblés
         entry: uv run --no-project --with pytest --with pyyaml pytest tests/test_outillage_coherent.py -q

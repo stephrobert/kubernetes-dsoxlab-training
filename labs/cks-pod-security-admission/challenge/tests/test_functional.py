@@ -179,24 +179,27 @@ def test_le_pod_conforme_satisfait_les_quatre_exigences(host):
 
     ecarts = []
     if not (pod_ctx.get("runAsNonRoot") or ctn_ctx.get("runAsNonRoot")):
-        ecarts.append("runAsNonRoot n'est déclaré ni au niveau du Pod ni du conteneur")
+        ecarts.append(("runAsNonRoot is declared neither at the Pod level nor at the container level",
+                       "runAsNonRoot n'est déclaré ni au niveau du Pod ni du conteneur"))
     if ctn_ctx.get("allowPrivilegeEscalation") is not False:
-        ecarts.append("allowPrivilegeEscalation n'est pas à false sur le conteneur")
+        ecarts.append(("allowPrivilegeEscalation is not false on the container",
+                       "allowPrivilegeEscalation n'est pas à false sur le conteneur"))
     if "ALL" not in ((ctn_ctx.get("capabilities") or {}).get("drop") or []):
-        ecarts.append("les capabilities ne sont pas toutes retirées (drop: ALL)")
+        ecarts.append(("the capabilities are not all dropped (drop: ALL)",
+                       "les capabilities ne sont pas toutes retirées (drop: ALL)"))
     seccomp = (pod_ctx.get("seccompProfile") or {}).get("type") or (
         ctn_ctx.get("seccompProfile") or {}
     ).get("type")
     if seccomp not in ("RuntimeDefault", "Localhost"):
-        ecarts.append("aucun profil seccomp n'est déclaré")
+        ecarts.append(("no seccomp profile is declared", "aucun profil seccomp n'est déclaré"))
 
     assert not ecarts, message(
         en="The conforming Pod was admitted, but it does not satisfy what the "
-        "standard requires:\n  " + "\n  ".join(ecarts) + "\n\nIf admission "
+        "standard requires:\n  " + "\n  ".join(en for en, _ in ecarts) + "\n\nIf admission "
         "let it through anyway, then the enforce mode does not target "
         "restricted.",
         fr="Le Pod conforme a été admis, mais il ne satisfait pas ce que le "
-        "standard exige :\n  " + "\n  ".join(ecarts) + "\n\nSi l'admission l'a "
+        "standard exige :\n  " + "\n  ".join(fr for _, fr in ecarts) + "\n\nSi l'admission l'a "
         "laissé passer malgré cela, c'est que le mode enforce ne vise pas "
         "restricted.",
     )

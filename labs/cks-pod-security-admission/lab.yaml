@@ -36,3 +36,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-namespace-declare-le-standard-restricted
+    label: "The namespace declares the restricted standard in all three modes"
+    tests:
+      - test_le_namespace_declare_le_standard_restricted
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: le-pod-conforme-tourne
+    label: "The conforming Pod runs"
+    tests:
+      - test_le_pod_conforme_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: le-pod-conforme-satisfait-les-quatre-exigences
+    label: "The conforming Pod meets the four requirements"
+    tests:
+      - test_le_pod_conforme_satisfait_les_quatre_exigences
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: l-admission-refuse-l-interdit-et-accepte-le-conforme
+    label: "Admission refuses the forbidden Pod and accepts the conforming one"
+    tests:
+      - test_l_admission_refuse_l_interdit_et_accepte_le_conforme
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/

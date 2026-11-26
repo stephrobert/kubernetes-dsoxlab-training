@@ -43,8 +43,8 @@ constater qu'un processus existe.
 
 ## Comment vous saurez que c'est bon
 
-Le dernier test **relance l'analyse** et cherche les cinq constats par leur
-**numéro**. Il ne compte pas : Trivy ajoute des règles à chaque version, et un
+Cinq tests, un par constat, **relancent l'analyse** et cherchent chaque constat
+par son **numéro**. Ils ne comptent pas : Trivy ajoute des règles à chaque version, et un
 test qui exigerait « zéro constat » deviendrait rouge tout seul le jour où une
 nouvelle règle sortirait, sans que votre Dockerfile ait changé d'une ligne.
 

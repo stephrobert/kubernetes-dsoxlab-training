@@ -39,3 +39,17 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: la-runtimeclass-designe-le-runtime-du-noeud
+    label: "The RuntimeClass names the node's runtime"
+    tests:
+      - test_la_runtimeclass_designe_le_runtime_du_noeud
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/
+  - id: le-pod-confine-ne-voit-pas-le-noyau-de-l-hote
+    label: "The sandboxed Pod does not see the host's kernel"
+    tests:
+      - test_le_pod_confine_ne_voit_pas_le_noyau_de_l_hote
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/runtime-sandboxes/

@@ -270,11 +270,11 @@ dsoxlab check cka-hpa-autoscaling
 ```text
 ╭─── Result: cka-hpa-autoscaling ───╮
 │  0 / 100 pts                      │
-│  ░░░░░░░░░░░░░░░░░░░░  0/4 tests  │
+│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests  │
 ╰───────────────────────────────────╯
 ```
 
-0 out of 4: that is the expected result. The challenge is waiting for you,
+0 out of 5: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

@@ -2,8 +2,8 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Trois affirmations. La première lit le Role et le RoleBinding ; les deux
-autres interrogent l'API EN TANT QUE dev-user, et c'est cela qui prouve :
+Cinq affirmations. Les deux premières lisent le Role puis le RoleBinding ; les
+trois autres interrogent l'API EN TANT QUE dev-user, et c'est cela qui prouve :
 un Role bien écrit sans RoleBinding, ou un RoleBinding vers un mauvais nom,
 donneraient un manifeste plausible et une utilisatrice sans droits. Chaque
 test qui vérifie un droit accordé vérifie aussi un droit refusé, sans quoi
@@ -40,9 +40,9 @@ def _peut(host, verbe: str, ressource: str, namespace: str) -> bool:
 
 
 # ----------------------------------------------------------------------
-# 1. Le Role et le RoleBinding existent, et se répondent.
+# 1. Le Role porte sur les Pods et leurs logs.
 # ----------------------------------------------------------------------
-def test_le_role_et_le_binding_se_repondent(host):
+def test_le_role_couvre_les_pods_et_leurs_logs(host):
     res = _kubectl(host, f"-n {NAMESPACE} get role {ROLE} -o json")
     assert res.rc == 0, message(
         en=f"No Role {ROLE} in {NAMESPACE}. A Role is scoped to a namespace: this is where it is created.",
@@ -60,6 +60,12 @@ def test_le_role_et_le_binding_se_repondent(host):
         fr=f"Le Role {ROLE} ne porte pas sur pods/log : les logs sont une sous-ressource, "
         "à nommer à part dans resources.",
     )
+
+
+# ----------------------------------------------------------------------
+# 2. Le RoleBinding donne ce Role à dev-user.
+# ----------------------------------------------------------------------
+def test_le_binding_donne_le_role_a_dev_user(host):
     res = _kubectl(host, f"-n {NAMESPACE} get rolebinding {BINDING} -o json")
     assert res.rc == 0, message(
         en=f"No RoleBinding {BINDING} in {NAMESPACE}. Without it, a Role grants nothing to anyone.",
@@ -81,9 +87,19 @@ def test_le_role_et_le_binding_se_repondent(host):
 
 
 # ----------------------------------------------------------------------
-# 2. dev-user lit les Pods et leurs logs, et ne peut pas créer.
+# 3 et 4. dev-user lit les Pods, puis leurs logs, et ne peut pas créer.
 # ----------------------------------------------------------------------
-def test_dev_user_lit_sans_pouvoir_ecrire(host):
+def _ne_peut_pas_creer(host) -> None:
+    """Vrai avant le travail : il accompagne chaque droit accordé."""
+    assert not _peut(host, "create", "pods", NAMESPACE), message(
+        en=f"{UTILISATRICE} can CREATE Pods in {NAMESPACE}: that is too much. Reading "
+        "means get, list, watch; nothing else.",
+        fr=f"{UTILISATRICE} peut CRÉER des Pods dans {NAMESPACE} : c'est trop. Lire, "
+        "c'est get, list, watch ; rien d'autre.",
+    )
+
+
+def test_dev_user_liste_les_pods_sans_pouvoir_en_creer(host):
     assert _peut(host, "list", "pods", NAMESPACE), message(
         en=f"{UTILISATRICE} cannot list the Pods of {NAMESPACE}. Role and "
         "RoleBinding may exist, but the API says no: check the subject's "
@@ -92,6 +108,10 @@ def test_dev_user_lit_sans_pouvoir_ecrire(host):
         "RoleBinding existent peut-être, mais l'API dit non : vérifiez le nom du "
         "sujet et les verbs du Role, list en fait partie.",
     )
+    _ne_peut_pas_creer(host)
+
+
+def test_dev_user_lit_les_logs_sans_pouvoir_creer(host):
     assert _peut(host, "get", "pods/log", NAMESPACE), message(
         en=f"{UTILISATRICE} cannot read the logs. The right on pods does not cover "
         "pods/log: that is a subresource, to be added to the Role.",
@@ -103,16 +123,11 @@ def test_dev_user_lit_sans_pouvoir_ecrire(host):
         en=f"As {UTILISATRICE}, kubectl logs journal fails: {logs.stderr.strip()[:150]}",
         fr=f"En tant que {UTILISATRICE}, kubectl logs journal échoue : {logs.stderr.strip()[:150]}",
     )
-    assert not _peut(host, "create", "pods", NAMESPACE), message(
-        en=f"{UTILISATRICE} can CREATE Pods in {NAMESPACE}: that is too much. Reading "
-        "means get, list, watch; nothing else.",
-        fr=f"{UTILISATRICE} peut CRÉER des Pods dans {NAMESPACE} : c'est trop. Lire, "
-        "c'est get, list, watch ; rien d'autre.",
-    )
+    _ne_peut_pas_creer(host)
 
 
 # ----------------------------------------------------------------------
-# 3. Le droit ne déborde pas du namespace ni des Pods.
+# 5. Le droit ne déborde pas du namespace ni des Pods.
 # ----------------------------------------------------------------------
 def test_le_droit_reste_dans_le_namespace(host):
     assert _peut(host, "list", "pods", NAMESPACE), message(

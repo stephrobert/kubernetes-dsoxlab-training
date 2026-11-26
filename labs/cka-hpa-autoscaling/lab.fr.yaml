@@ -5,3 +5,25 @@ description: |
   replicas, puis couper la charge. Les tests lisent le HPA, ses métriques
   courantes, et l'event de redimensionnement que le contrôleur a émis : un
   HPA qui n'a jamais redimensionné n'est pas un HPA validé.
+
+criteria:
+  - id: le-hpa-vise-le-deployment-entre-ses-bornes
+    label: "Le HPA vise php-apache, entre 1 et 10 replicas"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+  - id: le-hpa-decide-sur-l-utilisation-cpu
+    label: "Le HPA décide sur une utilisation CPU de 50 %"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+  - id: le-hpa-lit-des-metriques
+    label: "Le HPA lit une métrique CPU courante"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+  - id: une-montee-a-eu-lieu
+    label: "Le contrôleur a fait monter le Deployment sous la charge"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/
+  - id: la-charge-est-coupee
+    label: "La charge est coupée, après la montée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/horizontal-pod-scaling/

@@ -38,3 +38,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-tag-latest-a-disparu
+    label: "The base image no longer uses the latest tag"
+    tests:
+      - test_le_tag_latest_a_disparu
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: l-image-ne-tourne-plus-en-root
+    label: "The image no longer runs as root"
+    tests:
+      - test_l_image_ne_tourne_plus_en_root
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: le-port-22-n-est-plus-expose
+    label: "Port 22 is no longer exposed"
+    tests:
+      - test_le_port_22_n_est_plus_expose
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: un-healthcheck-est-declare
+    label: "A HEALTHCHECK is declared"
+    tests:
+      - test_un_healthcheck_est_declare
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/
+  - id: apt-get-n-installe-plus-les-recommandations
+    label: "apt-get no longer installs recommended packages"
+    tests:
+      - test_apt_get_n_installe_plus_les_recommandations
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/kubernetes-supply-chain-security/

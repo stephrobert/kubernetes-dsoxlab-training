@@ -5,3 +5,21 @@ description: |
   depuis un tag flottant. Reconstruisez-le sans rien de tout cela, et prouvez
   la différence là où elle se voit : de l'intérieur, le conteneur ne voit plus
   l'hôte.
+
+criteria:
+  - id: le-pod-corrige-tourne
+    label: "Le Pod corrigé tourne"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: les-cinq-defauts-sont-repris
+    label: "Les cinq défauts de l'original sont corrigés"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: le-pod-fautif-n-existe-plus
+    label: "Le Pod fautif a disparu"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/
+  - id: le-conteneur-ne-voit-plus-les-processus-de-l-hote
+    label: "Le conteneur ne voit plus les processus de l'hôte, et n'est pas root"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/pod-security-standards/

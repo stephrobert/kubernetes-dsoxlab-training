@@ -145,11 +145,11 @@ dsoxlab check cks-api-server-hardening
 ```text
 ╭─ Result: cks-api-server-hardening ─╮
 │  0 / 100 pts                       │
-│  ░░░░░░░░░░░░░░░░░░░░  0/2 tests   │
+│  ░░░░░░░░░░░░░░░░░░░░  0/3 tests   │
 ╰────────────────────────────────────╯
 ```
 
-0 out of 2: that is the expected result. The challenge is waiting for you,
+0 out of 3: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

@@ -38,3 +38,23 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: bad-command-tourne
+    label: "bad-command runs without restarting"
+    tests:
+      - test_bad_command_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: missing-env-tourne
+    label: "missing-env runs, with the variable it requires"
+    tests:
+      - test_missing_env_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: oom-killed-tourne-avec-une-limite-suffisante
+    label: "oom-killed runs, with a sufficient memory limit"
+    tests:
+      - test_oom_killed_tourne_avec_une_limite_suffisante
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/

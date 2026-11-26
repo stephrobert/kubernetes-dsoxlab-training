@@ -6,3 +6,25 @@ description: |
   Pod qui attend un nœud qui n'existe pas encore en posant le label qu'il
   exige. Les tests lisent les labels des nœuds, les affinités déclarées et
   le nœud réel de chaque Pod.
+
+criteria:
+  - id: le-worker-est-etiquete-ssd
+    label: "Le worker porte le label disktype=ssd"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: storage-app-declare-l-affinite-obligatoire
+    label: "storage-app déclare l'affinité obligatoire sur disktype"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: storage-app-declare-la-preference
+    label: "storage-app déclare la préférence sur storage-tier, avec son poids"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: storage-app-tourne-sur-le-noeud-ssd
+    label: "Les trois Pods de storage-app tournent sur le nœud qui porte le label exigé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: gpu-app-a-demarre-quand-le-label-est-arrive
+    label: "gpu-app a attendu son label, puis a démarré"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/

@@ -161,11 +161,11 @@ dsoxlab check ckad-security-context-hardened
 ```text
 ╭─ Result: ckad-security-context-hardened ─╮
 │  0 / 100 pts                             │
-│  ░░░░░░░░░░░░░░░░░░░░  0/4 tests         │
+│  ░░░░░░░░░░░░░░░░░░░░  0/8 tests         │
 ╰──────────────────────────────────────────╯
 ```
 
-0 out of 4: that is the expected result. The challenge is waiting for you,
+0 out of 8: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

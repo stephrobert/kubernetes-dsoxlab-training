@@ -5,3 +5,21 @@ description: |
   directions, puis rouvrez exactement deux choses : le seul flux dont
   l'application a besoin, et la résolution de noms, qu'une sortie fermée par
   défaut casse sans que rien ne vous prévienne.
+
+criteria:
+  - id: le-namespace-est-ferme-par-defaut-dans-les-deux-sens
+    label: "Le namespace est fermé par défaut, en entrée et en sortie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: seul-le-flux-prevu-atteint-la-base
+    label: "Seul web joint la base"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: le-dns-repasse-sans-rouvrir-le-reste-de-la-sortie
+    label: "Le DNS repasse, sans rouvrir le reste de la sortie"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/
+  - id: la-sortie-reste-fermee-vers-ce-qui-n-a-pas-ete-ouvert
+    label: "La sortie reste fermée vers ce qui n'a pas été ouvert"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/network-policies/

@@ -2,9 +2,9 @@
 
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées.
 
-Quatre affirmations. La première lit le taint et le label du nœud. La
-deuxième et la troisième lisent où chaque Pod tourne réellement. La
-quatrième lit ce que prod-app déclare : une tolérance pour le taint et un
+Six affirmations. Les deux premières lisent le taint puis le label du nœud. Les
+deux suivantes lisent où chaque Pod tourne réellement. Les deux dernières
+lisent ce que prod-app déclare : une tolérance pour le taint et un
 nodeSelector sur le label ; un Pod épinglé par nodeName arriverait au même
 endroit en sautant le scheduler, et le taint avec lui, ce que ce test refuse.
 """
@@ -57,23 +57,32 @@ def _pod_pret(host, nom: str) -> dict:
 
 
 # ----------------------------------------------------------------------
-# 1. Le nœud est réservé, et reconnaissable.
+# 1. Le nœud est réservé.
 # ----------------------------------------------------------------------
-def test_le_noeud_porte_le_taint_et_le_label(host):
+def _noeud(host) -> dict:
     res = _kubectl(host, f"get node {WORKER} -o json")
     assert res.rc == 0, message(
         en=f"Node {WORKER} cannot be found.",
         fr=f"Le nœud {WORKER} est introuvable.",
     )
-    noeud = json.loads(res.stdout)
-    taints = [(t.get("key"), t.get("value"), t.get("effect")) for t in noeud["spec"].get("taints") or []]
+    return json.loads(res.stdout)
+
+
+def test_le_noeud_porte_le_taint(host):
+    taints = [(t.get("key"), t.get("value"), t.get("effect")) for t in _noeud(host)["spec"].get("taints") or []]
     assert ("env", "prod", "NoSchedule") in taints, message(
         en=f"{WORKER} carries taints {taints}, not env=prod:NoSchedule. A taint is set with "
         "kubectl taint nodes <node> <key>=<value>:<effect>.",
         fr=f"{WORKER} porte les taints {taints}, pas env=prod:NoSchedule. Un taint se pose avec "
         "kubectl taint nodes <nœud> <clé>=<valeur>:<effet>.",
     )
-    labels = noeud["metadata"].get("labels") or {}
+
+
+# ----------------------------------------------------------------------
+# 2. Le nœud est reconnaissable.
+# ----------------------------------------------------------------------
+def test_le_noeud_porte_le_label(host):
+    labels = _noeud(host)["metadata"].get("labels") or {}
     assert labels.get("disktype") == "ssd", message(
         en=f"{WORKER} has label disktype={labels.get('disktype')!r}, expected ssd. A taint repels, "
         "it does not designate: the label is what will let prod-app target that node.",
@@ -83,7 +92,7 @@ def test_le_noeud_porte_le_taint_et_le_label(host):
 
 
 # ----------------------------------------------------------------------
-# 2. prod-app tourne sur le worker réservé.
+# 3. prod-app tourne sur le worker réservé.
 # ----------------------------------------------------------------------
 def test_prod_app_tourne_sur_le_worker(host):
     pod = _pod_pret(host, "prod-app")
@@ -96,7 +105,7 @@ def test_prod_app_tourne_sur_le_worker(host):
 
 
 # ----------------------------------------------------------------------
-# 3. dev-app tourne, mais pas sur le worker réservé.
+# 4. dev-app tourne, mais pas sur le worker réservé.
 # ----------------------------------------------------------------------
 def test_dev_app_tourne_ailleurs(host):
     pod = _pod_pret(host, "dev-app")
@@ -109,9 +118,9 @@ def test_dev_app_tourne_ailleurs(host):
 
 
 # ----------------------------------------------------------------------
-# 4. La preuve : prod-app y est par tolérance et sélection, pas par nodeName.
+# 5. La preuve : prod-app tolère le taint, il n'y est pas épinglé par nodeName.
 # ----------------------------------------------------------------------
-def test_prod_app_y_est_par_tolerance_et_selection(host):
+def test_prod_app_tolere_le_taint(host):
     pod = _pod_pret(host, "prod-app")
     tolerances = pod["spec"].get("tolerations") or []
     bonnes = [
@@ -129,6 +138,13 @@ def test_prod_app_y_est_par_tolerance_et_selection(host):
         f"{WORKER} sans tolérer son taint : il y a été épinglé par nodeName, en sautant le "
         "scheduler. Le taint ne protège plus rien de cette façon.",
     )
+
+
+# ----------------------------------------------------------------------
+# 6. La preuve : prod-app vise le nœud par son label.
+# ----------------------------------------------------------------------
+def test_prod_app_vise_le_noeud_par_son_label(host):
+    pod = _pod_pret(host, "prod-app")
     selecteur = pod["spec"].get("nodeSelector") or {}
     assert selecteur.get("disktype") == "ssd", message(
         en=f"prod-app has no disktype=ssd nodeSelector (selector: {selecteur}). Without it, the "

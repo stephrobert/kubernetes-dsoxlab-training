@@ -54,7 +54,7 @@ def _json(host, args: str, quoi: str) -> dict:
         en=f"{quoi} no longer exists in namespace {NAMESPACE}. It was part of the "
         "delivery: deleting it is not a fix, and recreating it under another "
         f"name is not one either. Output: {diagnostic}",
-        fr=f"{quoi} n'existe plus dans le namespace {NAMESPACE}. Il faisait partie "
+        fr=f"L'objet {quoi} n'existe plus dans le namespace {NAMESPACE}. Il faisait partie "
         "de la livraison : le supprimer n'est pas une correction, et le "
         f"recréer sous un autre nom non plus. Sortie : {diagnostic}",
     )
@@ -149,7 +149,7 @@ def test_les_deux_exemplaires_du_portail_sont_prets(host):
     """On lit readyReplicas, pas replicas : un Deployment qui demande deux
     copies dont aucune ne démarre annonce quand même 2 en souhaité, et c'est
     exactement l'état dans lequel le lab commence."""
-    d = _json(host, f"-n {NAMESPACE} get deployment {PORTAIL}", f"Le Deployment {PORTAIL}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {PORTAIL}", f"Deployment {PORTAIL}")
     assert d["spec"].get("replicas") == 2, message(
         en=f"The portal asks for {d['spec'].get('replicas')} replica(s), two are "
         "expected. The number of replicas was not what was at fault.",
@@ -172,7 +172,7 @@ def test_la_reserve_du_portail_tient_dans_un_noeud(host):
     si quelqu'un ramenait le Deployment à zéro exemplaire puis à deux sur un
     cluster momentanément vide, celui-ci non.
     """
-    d = _json(host, f"-n {NAMESPACE} get deployment {PORTAIL}", f"Le Deployment {PORTAIL}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {PORTAIL}", f"Deployment {PORTAIL}")
     plafond = _cpu_allouable_max(host)
     for conteneur in d["spec"]["template"]["spec"]["containers"]:
         brut = ((conteneur.get("resources") or {}).get("requests") or {}).get("cpu")
@@ -222,7 +222,7 @@ def test_le_service_designe_vraiment_les_pods_du_portail(host):
 def test_le_portail_repond_dans_le_cluster(host):
     """La preuve, depuis le nœud : kube-proxy route les adresses de Service
     depuis l'hôte aussi bien que depuis un Pod."""
-    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Le Service {SERVICE}")
+    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Service {SERVICE}")
     ip = svc["spec"].get("clusterIP")
     ports = [p.get("port") for p in svc["spec"].get("ports", [])]
     assert 80 in ports, message(
@@ -245,7 +245,7 @@ def test_le_portail_repond_dans_le_cluster(host):
 # ----------------------------------------------------------------------
 def test_le_service_est_expose_sur_le_port_30080(host):
     """Le port est imposé par la supervision : il ne s'improvise pas."""
-    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Le Service {SERVICE}")
+    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Service {SERVICE}")
     type_svc = svc["spec"].get("type")
     assert type_svc in ("NodePort", "LoadBalancer"), message(
         en=f"Service {SERVICE} is of type {type_svc}: it is therefore only reachable "
@@ -285,15 +285,15 @@ def test_le_portail_repond_sur_chaque_noeud(host):
     for ip in ips:
         repond, code = _curl(host, f"http://{ip}:{NODE_PORT}/")
         if not repond:
-            echecs.append(f"{ip} a rendu {code}")
+            echecs.append((ip, code))
     assert not echecs, message(
         en=f"The portal does not answer on port {NODE_PORT} of: "
-        f"{', '.join(echecs)}. A NodePort opens on EVERY node, even those "
+        f"{', '.join(f'{ip} returned {code}' for ip, code in echecs)}. A NodePort opens on EVERY node, even those "
         "carrying no replica, and the traffic is routed to a ready Pod. If it "
         "answers on one node and not the other, the Service is not what to "
         "look at but the cluster's network.",
         fr=f"Le portail ne répond pas sur le port {NODE_PORT} de : "
-        f"{', '.join(echecs)}. Un NodePort s'ouvre sur TOUS les nœuds, même "
+        f"{', '.join(f'{ip} a rendu {code}' for ip, code in echecs)}. Un NodePort s'ouvre sur TOUS les nœuds, même "
         "ceux qui ne portent aucun exemplaire, et le trafic est routé vers un "
         "Pod prêt. S'il répond sur un nœud et pas sur l'autre, ce n'est pas le "
         "Service qu'il faut regarder mais le réseau du cluster.",
@@ -308,15 +308,15 @@ def test_le_portail_repond_sur_chaque_noeud(host):
     for ip in ips:
         repond, code = _curl_hors_du_cluster(f"http://{ip}:{NODE_PORT}/")
         if not repond:
-            dehors.append(f"{ip} a rendu {code}")
+            dehors.append((ip, code))
     assert not dehors, message(
         en=f"The portal answers on port {NODE_PORT} when queried from a node, but "
         "not from a machine outside the cluster: "
-        f"{', '.join(dehors)}. The Service is therefore correct and the block "
+        f"{', '.join(f'{ip} returned {code}' for ip, code in dehors)}. The Service is therefore correct and the block "
         "is elsewhere, on the network path between the outside and the node.",
         fr=f"Le portail répond sur le port {NODE_PORT} quand on l'interroge depuis "
         "un nœud, mais pas depuis une machine extérieure au cluster : "
-        f"{', '.join(dehors)}. Le Service est donc correct et le blocage est "
+        f"{', '.join(f'{ip} a rendu {code}' for ip, code in dehors)}. Le Service est donc correct et le blocage est "
         "ailleurs, sur le chemin réseau entre l'extérieur et le nœud.",
     )
 

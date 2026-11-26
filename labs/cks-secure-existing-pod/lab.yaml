@@ -38,3 +38,29 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-pod-corrige-tourne
+    label: "The fixed Pod runs"
+    tests:
+      - test_le_pod_corrige_tourne
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: les-cinq-defauts-sont-repris
+    label: "The five flaws of the original are fixed"
+    tests:
+      - test_les_cinq_defauts_sont_repris
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: le-pod-fautif-n-existe-plus
+    label: "The faulty Pod is gone"
+    tests:
+      - test_le_pod_fautif_n_existe_plus
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/
+  - id: le-conteneur-ne-voit-plus-les-processus-de-l-hote
+    label: "The container no longer sees the host's processes, and is not root"
+    tests:
+      - test_le_conteneur_ne_voit_plus_les_processus_de_l_hote
+    lessons:
+      - https://www.stephane-robert.info/en/docs/devsecops/runtime/pod-security-standards/

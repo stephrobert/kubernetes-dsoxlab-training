@@ -1,6 +1,21 @@
 title: "Interdire un appel système à un conteneur, et le vérifier de l'intérieur"
+doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
 description: |
   Un conteneur qui peut appeler tout ce que le noyau propose. Écrivez un
   profil seccomp qui refuse une famille d'appels système, appliquez-le, et
   prouvez que le confinement tient : l'appel interdit échoue depuis
   l'intérieur, et tout le reste continue de fonctionner.
+
+criteria:
+  - id: le-profil-refuse-la-famille-chmod
+    label: "Le profil refuse toute la famille chmod"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: le-pod-tourne-et-declare-le-profil-local
+    label: "Le Pod tourne et déclare le profil local"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/
+  - id: le-confinement-refuse-chmod-et-laisse-le-reste
+    label: "Le confinement refuse chmod et laisse passer le reste"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/securiser/seccomp/

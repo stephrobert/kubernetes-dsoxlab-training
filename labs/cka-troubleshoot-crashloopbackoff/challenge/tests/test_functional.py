@@ -3,8 +3,8 @@
 Ces tests lisent l'état du CLUSTER, jamais les commandes tapées. Le candidat
 arrive au résultat par le chemin qu'il veut, et seul le résultat compte.
 
-Quatre affirmations. Les deux premières regardent le Deployment et ses Pods ;
-les deux dernières entrent dans un Pod pour lire le fichier de configuration
+Cinq affirmations. Les trois premières regardent le Deployment, ses Pods et la
+variable déclarée ; les deux dernières entrent dans un Pod pour lire le fichier de configuration
 et interroger l'application. Ce sont elles qui prouvent quelque chose : un
 Deployment « réparé » en remplaçant la commande par un sleep aurait 2/2
 disponibles et ne servirait rien.
@@ -129,9 +129,9 @@ def test_plus_de_boucle_de_redemarrage(host):
 
 
 # ----------------------------------------------------------------------
-# 3. La variable désigne /etc/config, et le fichier y est vraiment.
+# 3. La variable désigne /etc/config.
 # ----------------------------------------------------------------------
-def test_la_configuration_est_lue_au_bon_endroit(host):
+def test_la_variable_designe_le_bon_repertoire(host):
     res = _kubectl(host, f"-n {NAMESPACE} get deployment {DEPLOYMENT} -o json")
     assert res.rc == 0, message(
         en=f"Cannot read Deployment {DEPLOYMENT}: {res.stderr.strip()[:200]}",
@@ -149,6 +149,12 @@ def test_la_configuration_est_lue_au_bon_endroit(host):
         f"{CHEMIN}, et c'est le Deployment qui doit le dire, pas un Pod édité "
         "à la main.",
     )
+
+
+# ----------------------------------------------------------------------
+# 4. Le fichier de l'équipe y est vraiment.
+# ----------------------------------------------------------------------
+def test_la_configuration_est_montee_a_cet_endroit(host):
     pod = _un_pod_pret(host)
     lecture = _kubectl(host, f"-n {NAMESPACE} exec {pod} -- cat {CHEMIN}/app.conf")
     assert lecture.rc == 0, message(
@@ -170,7 +176,7 @@ def test_la_configuration_est_lue_au_bon_endroit(host):
 
 
 # ----------------------------------------------------------------------
-# 4. L'application sert : la preuve que le processus a démarré pour de bon.
+# 5. L'application sert : la preuve que le processus a démarré pour de bon.
 # ----------------------------------------------------------------------
 def test_l_application_repond(host):
     pod = _un_pod_pret(host)

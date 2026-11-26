@@ -246,11 +246,11 @@ dsoxlab check cka-rbac-serviceaccount
 ```text
 ╭─ Result: cka-rbac-serviceaccount ─╮
 │  0 / 100 pts                      │
-│  ░░░░░░░░░░░░░░░░░░░░  0/5 tests  │
+│  ░░░░░░░░░░░░░░░░░░░░  0/6 tests  │
 ╰───────────────────────────────────╯
 ```
 
-0 out of 5: that is the expected result. The challenge is waiting for you,
+0 out of 6: that is the expected result. The challenge is waiting for you,
 untouched.
 
 ## 🎯 The challenge

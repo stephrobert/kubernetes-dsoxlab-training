@@ -4,3 +4,25 @@ description: |
   Les Pods d'un Deployment redémarrent en boucle depuis la dernière livraison.
   Lire ce que le processus a dit avant de mourir, comprendre ce qui lui
   manque, corriger le Deployment, et prouver que l'application sert à nouveau.
+
+criteria:
+  - id: deux-replicas-disponibles
+    label: "Le Deployment a ses deux replicas disponibles"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: plus-de-boucle-de-redemarrage
+    label: "Plus aucun Pod ne redémarre en boucle"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: la-variable-designe-le-bon-repertoire
+    label: "La variable du Deployment désigne /etc/config"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: la-configuration-est-montee-a-cet-endroit
+    label: "La configuration de l'équipe y est montée"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/
+  - id: l-application-repond
+    label: "L'application répond sur le port 8080"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/crashloopbackoff-kubernetes/

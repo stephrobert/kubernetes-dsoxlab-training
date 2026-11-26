@@ -57,7 +57,7 @@ def _json(host, args: str, quoi: str) -> dict:
         en=f"{quoi} does not exist in namespace {NAMESPACE}. The specification "
         f"names it explicitly: the name is part of the delivery, "
         f"it is not a matter of choice. Output: {diagnostic}",
-        fr=f"{quoi} n'existe pas dans le namespace {NAMESPACE}. Le cahier des "
+        fr=f"L'objet {quoi} n'existe pas dans le namespace {NAMESPACE}. Le cahier des "
         f"charges le nomme explicitement : le nom fait partie de la livraison, "
         f"il n'est pas au choix. Sortie : {diagnostic}",
     )
@@ -72,7 +72,7 @@ def _selecteur(host) -> str:
     `-l app=catalogue` mesurerait la conformité à une convention que personne
     n'a demandée, et rendrait ROUGE une livraison correcte.
     """
-    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Le Deployment {DEPLOIEMENT}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Deployment {DEPLOIEMENT}")
     labels = (d["spec"].get("selector") or {}).get("matchLabels") or {}
     assert labels, message(
         en=f"Deployment {DEPLOIEMENT} has no selector matchLabels: "
@@ -132,7 +132,7 @@ def test_le_catalogue_tourne_en_deux_exemplaires(host):
     On lit `readyReplicas` et non `replicas` : un Deployment qui demande deux
     copies dont aucune ne démarre annonce quand même 2 en souhaité.
     """
-    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Le Deployment {DEPLOIEMENT}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Deployment {DEPLOIEMENT}")
     souhaite = d["spec"].get("replicas")
     assert souhaite == 2, message(
         en=f"The catalogue asks for {souhaite} replica(s); the specification "
@@ -156,7 +156,7 @@ def test_le_catalogue_tourne_en_deux_exemplaires(host):
 # ----------------------------------------------------------------------
 def test_le_message_vit_en_dehors_du_pod(host):
     """L'objet existe et porte le texte. Sans lui, la variable serait en dur."""
-    cm = _json(host, f"-n {NAMESPACE} get configmap {CONFIG}", f"L'objet {CONFIG}")
+    cm = _json(host, f"-n {NAMESPACE} get configmap {CONFIG}", f"ConfigMap {CONFIG}")
     valeurs = list((cm.get("data") or {}).values())
     assert MESSAGE in valeurs, message(
         en=f"Object {CONFIG} does not contain the expected text. It carries "
@@ -206,7 +206,7 @@ def test_le_mot_de_passe_n_est_ni_dans_la_definition_ni_dans_l_environnement(hos
     qui compte n'est pas le fichier, c'est ce que porte le WORKLOAD, et ce que
     le conteneur expose à ses processus. L'énoncé le dit maintenant ainsi.
     """
-    s = _json(host, f"-n {NAMESPACE} get secret {SECRET}", f"L'objet {SECRET}")
+    s = _json(host, f"-n {NAMESPACE} get secret {SECRET}", f"Secret {SECRET}")
     assert "password" in (s.get("data") or {}), message(
         en=f"Object {SECRET} exists but has no password key. It carries "
         f"{sorted((s.get('data') or {}).keys()) or 'no key'}.",
@@ -273,7 +273,7 @@ def test_le_conteneur_lit_le_mot_de_passe_dans_un_fichier(host):
 # ----------------------------------------------------------------------
 def test_les_deux_sondes_sont_declarees(host):
     """Une seule sonde ne répond qu'à la moitié de la question posée."""
-    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Le Deployment {DEPLOIEMENT}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Deployment {DEPLOIEMENT}")
     conteneurs = d["spec"]["template"]["spec"]["containers"]
     manquantes = [
         nom
@@ -335,7 +335,7 @@ def test_le_conteneur_ne_tourne_pas_en_root(host):
     seulement `id -u` validerait un manifeste muet. On exige donc aussi que
     le manifeste le DISE, comme le cahier des charges le demande.
     """
-    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Le Deployment {DEPLOIEMENT}")
+    d = _json(host, f"-n {NAMESPACE} get deployment {DEPLOIEMENT}", f"Deployment {DEPLOIEMENT}")
     gabarit = d["spec"]["template"]["spec"]
     declares = [(gabarit.get("securityContext") or {}).get("runAsUser")]
     declares += [
@@ -373,7 +373,7 @@ def test_la_boutique_repond_au_nom_stable(host):
     prêts, le selector ou le targetPort sont en cause, ou la politique bloque
     ce qu'elle devrait laisser passer.
     """
-    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Le Service {SERVICE}")
+    svc = _json(host, f"-n {NAMESPACE} get service {SERVICE}", f"Service {SERVICE}")
     ports = [p.get("port") for p in svc["spec"].get("ports", [])]
     assert 80 in ports, message(
         en=f"Service {SERVICE} exposes port(s) {ports}. The specification "

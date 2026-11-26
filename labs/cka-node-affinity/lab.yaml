@@ -46,3 +46,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-worker-est-etiquete-ssd
+    label: "The worker carries the label disktype=ssd"
+    tests:
+      - test_le_worker_est_etiquete_ssd
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: storage-app-declare-l-affinite-obligatoire
+    label: "storage-app declares the required affinity on disktype"
+    tests:
+      - test_storage_app_declare_l_affinite_obligatoire
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: storage-app-declare-la-preference
+    label: "storage-app declares the preference on storage-tier, with its weight"
+    tests:
+      - test_storage_app_declare_la_preference
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: storage-app-tourne-sur-le-noeud-ssd
+    label: "The three Pods of storage-app run on the node that carries the required label"
+    tests:
+      - test_storage_app_tourne_sur_le_noeud_ssd
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/
+  - id: gpu-app-a-demarre-quand-le-label-est-arrive
+    label: "gpu-app waited for its label, then started"
+    tests:
+      - test_gpu_app_a_demarre_quand_le_label_est_arrive
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/affinity-tolerations-and-taints/

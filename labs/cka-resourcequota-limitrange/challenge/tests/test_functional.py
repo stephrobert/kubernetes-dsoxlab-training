@@ -1,6 +1,6 @@
 """test_functional.py : cka-resourcequota-limitrange
 
-Deux affirmations, et les deux sont des preuves ACTIVES : plutôt que de relire
+Trois affirmations, et les trois sont des preuves ACTIVES : plutôt que de relire
 les objets posés, le test tente ce qui doit être refusé et ce qui doit passer,
 puis constate.
 
@@ -112,9 +112,9 @@ def test_le_namespace_refuse_un_pod_qui_demande_trop(host):
 
 
 # ----------------------------------------------------------------------
-# 2. LE test : un Pod qui ne déclare rien passe, et repart complété.
+# 2 et 3. LES tests : un Pod qui ne déclare rien passe, et repart complété.
 # ----------------------------------------------------------------------
-def test_un_pod_sans_requests_est_accepte_et_complete(host):
+def _ressources_d_un_pod_muet(host) -> dict:
     """Preuve ACTIVE, et c'est la moitié que le plafond seul casserait.
 
     Un quota qui porte sur les `requests` rend invalide tout Pod qui n'en
@@ -123,9 +123,9 @@ def test_un_pod_sans_requests_est_accepte_et_complete(host):
     réconcilient, et ce test le vérifie dans les deux sens : le Pod est
     accepté, ET il repart avec des ressources qu'il n'avait pas déclarées.
 
-    Le dernier contrôle vérifie que l'application posée par le setup tourne
-    encore : un plafond trop bas l'empêcherait de se replacer, et ce serait une
-    panne, pas une maîtrise des ressources.
+    L'application posée par le setup est relue au passage : un plafond trop bas
+    l'empêcherait de se replacer, et ce serait une panne, pas une maîtrise des
+    ressources. C'est vrai avant le travail, donc ce n'est pas un test à part.
     """
     _supprimer(host, "sonde-sans")
     rc, sortie, diagnostic = _kubectl(
@@ -156,29 +156,6 @@ def test_un_pod_sans_requests_est_accepte_et_complete(host):
     ressources = json.loads(sortie)["spec"]["containers"][0].get("resources", {})
     _supprimer(host, "sonde-sans")
 
-    requests = ressources.get("requests", {})
-    limits = ressources.get("limits", {})
-    assert requests.get("cpu") and requests.get("memory"), message(
-        en=f"The Pod was accepted but comes back with no requests: {ressources}. It "
-        "will therefore be placed blindly, and will count for nothing against "
-        "the ceiling. What is missing is not the quota but whatever completes a "
-        "container that declares nothing, as it arrives in the namespace.",
-        fr=f"Le Pod a été accepté mais repart sans requests : {ressources}. Il "
-        "sera donc placé à l'aveugle, et ne comptera pour rien dans le "
-        "plafond. Ce qui manque n'est pas le quota mais ce qui complète un "
-        "conteneur qui ne déclare rien, à son arrivée dans le namespace.",
-    )
-    assert limits.get("cpu") and limits.get("memory"), message(
-        en=f"The Pod comes back with requests but no limits: {ressources}. "
-        "Both are set in the same place, through two distinct fields: one "
-        "feeds what the container REQUESTS, the other what it will not be "
-        "allowed to EXCEED.",
-        fr=f"Le Pod repart avec des requests mais sans limits : {ressources}. "
-        "Les deux se règlent au même endroit, par deux champs distincts : l'un "
-        "alimente ce que le conteneur DEMANDE, l'autre ce qu'il ne pourra pas "
-        "DÉPASSER.",
-    )
-
     rc, pretes, _ = _kubectl(
         host,
         f"-n {NAMESPACE} get deployment {DEPLOYMENT} "
@@ -193,4 +170,35 @@ def test_un_pod_sans_requests_est_accepte_et_complete(host):
         f"(« {pretes or 'aucun'} »). Un plafond trop bas l'empêche de se "
         "replacer quand elle redémarre : c'est une panne, pas une maîtrise des "
         "ressources. Elle demande 50m de CPU et 32Mi de mémoire.",
+    )
+    return ressources
+
+
+def test_un_pod_muet_repart_avec_des_requests(host):
+    ressources = _ressources_d_un_pod_muet(host)
+    requests = ressources.get("requests", {})
+    assert requests.get("cpu") and requests.get("memory"), message(
+        en=f"The Pod was accepted but comes back with no requests: {ressources}. It "
+        "will therefore be placed blindly, and will count for nothing against "
+        "the ceiling. What is missing is not the quota but whatever completes a "
+        "container that declares nothing, as it arrives in the namespace.",
+        fr=f"Le Pod a été accepté mais repart sans requests : {ressources}. Il "
+        "sera donc placé à l'aveugle, et ne comptera pour rien dans le "
+        "plafond. Ce qui manque n'est pas le quota mais ce qui complète un "
+        "conteneur qui ne déclare rien, à son arrivée dans le namespace.",
+    )
+
+
+def test_un_pod_muet_repart_avec_des_limits(host):
+    ressources = _ressources_d_un_pod_muet(host)
+    limits = ressources.get("limits", {})
+    assert limits.get("cpu") and limits.get("memory"), message(
+        en=f"The Pod comes back with requests but no limits: {ressources}. "
+        "Both are set in the same place, through two distinct fields: one "
+        "feeds what the container REQUESTS, the other what it will not be "
+        "allowed to EXCEED.",
+        fr=f"Le Pod repart avec des requests mais sans limits : {ressources}. "
+        "Les deux se règlent au même endroit, par deux champs distincts : l'un "
+        "alimente ce que le conteneur DEMANDE, l'autre ce qu'il ne pourra pas "
+        "DÉPASSER.",
     )

@@ -34,3 +34,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: deux-replicas-disponibles
+    label: "The Deployment has its two replicas available"
+    tests:
+      - test_deux_replicas_disponibles
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: plus-de-boucle-de-redemarrage
+    label: "No Pod restarts in a loop any more"
+    tests:
+      - test_plus_de_boucle_de_redemarrage
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: la-variable-designe-le-bon-repertoire
+    label: "The Deployment's variable points to /etc/config"
+    tests:
+      - test_la_variable_designe_le_bon_repertoire
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: la-configuration-est-montee-a-cet-endroit
+    label: "The team's configuration is mounted there"
+    tests:
+      - test_la_configuration_est_montee_a_cet_endroit
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/
+  - id: l-application-repond
+    label: "The application answers on port 8080"
+    tests:
+      - test_l_application_repond
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/crashloopbackoff/

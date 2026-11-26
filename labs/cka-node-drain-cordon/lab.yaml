@@ -17,7 +17,7 @@ skills:
   - node-maintenance
 distros:
   - ubuntu24
-doc_url: https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/operer/preparer-maintenance-cluster-kubernetes/
+doc_url: https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/
 lab_type: lab
 estimated_time: 15m
 
@@ -55,3 +55,35 @@ runtime:
 validation:
   functional: true
   persistence_after_reboot: false
+
+criteria:
+  - id: le-budget-protege-l-application
+    label: "The budget keeps two Pods of the application available"
+    tests:
+      - test_le_budget_protege_l_application
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/
+  - id: le-worker-a-ete-evacue
+    label: "The application's Pods left the worker, the network DaemonSet stayed"
+    tests:
+      - test_le_worker_a_ete_evacue
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/
+  - id: le-pod-sans-controleur-est-parti
+    label: "The Pod without a controller is gone too"
+    tests:
+      - test_le_pod_sans_controleur_est_parti
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/
+  - id: le-worker-est-remis-en-service
+    label: "The worker is back in scheduling, after being drained"
+    tests:
+      - test_le_worker_est_remis_en_service
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/
+  - id: la-trace-est-ecrite
+    label: "The trace of the operation is written"
+    tests:
+      - test_la_trace_est_ecrite
+    lessons:
+      - https://www.stephane-robert.info/en/docs/conteneurs/orchestrateurs/kubernetes/prepare-cluster-maintenance/

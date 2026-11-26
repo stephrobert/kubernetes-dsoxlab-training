@@ -5,3 +5,17 @@ description: |
   le cluster, et un Pod sans `requests` est placé à l'aveugle. Posez les deux, et
   prouvez chacun : un Pod qui demande trop est refusé, un Pod qui ne demande rien
   est accepté et complété.
+
+criteria:
+  - id: le-namespace-refuse-un-pod-qui-demande-trop
+    label: "Le namespace refuse un Pod qui demande trop"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: un-pod-muet-repart-avec-des-requests
+    label: "Un Pod qui ne déclare rien est accepté et reçoit des requests"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/
+  - id: un-pod-muet-repart-avec-des-limits
+    label: "Un Pod qui ne déclare rien est accepté et reçoit des limits"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/resource-quotas/

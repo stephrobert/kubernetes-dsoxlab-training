@@ -6,3 +6,29 @@ description: |
   pas y aller. Les tests lisent le nœud, le placement réel de chaque Pod et
   les mécanismes déclarés : un Pod épinglé par nodeName contourne le taint
   et ne passe pas.
+
+criteria:
+  - id: le-noeud-porte-le-taint
+    label: "Le worker porte le taint env=prod:NoSchedule"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: le-noeud-porte-le-label
+    label: "Le worker porte le label disktype=ssd"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: prod-app-tourne-sur-le-worker
+    label: "prod-app tourne sur le worker réservé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: dev-app-tourne-ailleurs
+    label: "dev-app tourne, et pas sur le worker réservé"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: prod-app-tolere-le-taint
+    label: "prod-app déclare une tolérance pour le taint"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/
+  - id: prod-app-vise-le-noeud-par-son-label
+    label: "prod-app choisit le worker par son label"
+    lessons:
+      - https://www.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/affinity-toleration-taint/

@@ -85,7 +85,8 @@ SSH_CONFIG = CACHE / "ssh_config"
 # Exécuté SUR le nœud, en root, par ssh : il rend une photographie JSON de ce
 # qu'un lab pourrait laisser derrière lui. Les noms de Pods de kube-system
 # changent à chaque redémarrage, on y regarde les Deployments, DaemonSets,
-# Pods statiques et ConfigMaps ; ailleurs, chaque objet compte.
+# Pods statiques et ConfigMaps ; ailleurs, chaque objet compte, et un Pod tenu
+# par un contrôleur se compte par ce contrôleur (voir noms_des_pods).
 PHOTOGRAPHIE = r'''
 import glob, hashlib, json, os, subprocess
 # Un nœud kubeadm porte /etc/kubernetes/admin.conf. Un hôte kind (k8s-kind.lab)
@@ -101,6 +102,28 @@ ESPACES_CNI = ("kube-flannel", "calico-system", "calico-apiserver", "tigera-oper
 def get(*args):
     out = subprocess.run(K + list(args) + ["-o", "json"], capture_output=True, text=True)
     return json.loads(out.stdout) if out.returncode == 0 and out.stdout.strip() else {"items": []}
+# Un Pod tenu par un ReplicaSet, un DaemonSet ou un Job change de nom chaque
+# fois qu'il est recréé : un drain, un redémarrage de nœud ou une éviction en
+# fabriquent un neuf, ailleurs, avec un autre suffixe. Le photographier par son
+# nom faisait de chaque Pod déplacé un « objet laissé » et un « objet disparu »
+# (28 faux écarts pour cka-node-drain-cordon, mesuré le 2026-11-26, cycle
+# 0 -> 5 -> 0 parfait). On le nomme donc par son contrôleur et un rang : le
+# NOMBRE de Pods de chaque contrôleur reste comparé, un Pod en plus ou en moins
+# reste un écart. Un Pod sans contrôleur, ou tenu par un StatefulSet (dont les
+# noms sont stables), garde son nom.
+CONTROLEURS_A_NOMS_JETABLES = ("ReplicaSet", "DaemonSet", "Job")
+def noms_des_pods(items):
+    noms, rangs = [], {}
+    for x in items:
+        nsn = x["metadata"]["namespace"]
+        maitre = next((o for o in x["metadata"].get("ownerReferences") or [] if o.get("controller")), None)
+        if maitre and maitre.get("kind") in CONTROLEURS_A_NOMS_JETABLES:
+            cle = nsn + "/pods/" + maitre["kind"] + ":" + maitre["name"]
+            rangs[cle] = rangs.get(cle, 0) + 1
+            noms.append(cle + "#" + str(rangs[cle]))
+        else:
+            noms.append(nsn + "/pods/" + x["metadata"]["name"])
+    return noms
 def photographier_un(prefixe):
     photo = {"noeuds": {}, "cluster": {}, "kube-system": {}}
     for n in get("get", "nodes")["items"]:
@@ -143,11 +166,12 @@ def photographier_un(prefixe):
     for kind in ("pods", "services", "configmaps", "secrets", "deployments", "daemonsets", "statefulsets", "jobs",
                  "cronjobs", "networkpolicies", "serviceaccounts", "roles", "rolebindings", "persistentvolumeclaims",
                  "ingresses", "resourcequotas", "limitranges"):
-        for x in get("get", kind, "-A")["items"]:
-            nsn = x["metadata"]["namespace"]
-            if nsn == "kube-system" or nsn in ESPACES_CNI or nsn in photo["terminating"]:
-                continue
-            objets.append(nsn + "/" + kind + "/" + x["metadata"]["name"])
+        items = [x for x in get("get", kind, "-A")["items"]
+                 if x["metadata"]["namespace"] not in ("kube-system", *ESPACES_CNI, *photo["terminating"])]
+        if kind == "pods":
+            objets.extend(noms_des_pods(items))
+        else:
+            objets.extend(x["metadata"]["namespace"] + "/" + kind + "/" + x["metadata"]["name"] for x in items)
     photo["objets"] = sorted(objets)
     return photo
 totale = {"noeuds": {}, "cluster": {}, "kube-system": {}, "namespaces": [], "terminating": [], "objets": []}
